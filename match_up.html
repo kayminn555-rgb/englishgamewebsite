@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Match Up - Advanced Maker & Play Station Engine</title>
+    <style>
+        /* ======================== STYLE: STUDIO LAYOUT & THEME ======================== */
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a252f; color: #ffffff;
+            overflow-x: hidden;
+        }
+        .app-container {
+            width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+        }
+        /* Creator / Studio Section */
+        .creator-section {
+            background-color: white; width: 95%; max-width: 700px; padding: 30px;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: left; box-sizing: border-box; color: #2c3e50;
+        }
+        .creator-section h1 { color: #2c3e50; margin-top: 0; margin-bottom: 5px; text-align: center; font-size: 24px; text-transform: uppercase; }
+        .subtitle { color: #7f8c8d; margin-bottom: 25px; text-align: center; font-size: 14px; }
+        
+        /* Dropzone Component */
+        .file-dropzone {
+            background: #edf2f7; padding: 20px; border-radius: 8px; margin-bottom: 20px;
+            text-align: center; border: 2px dashed #3498db; cursor: pointer; transition: background 0.2s;
+        }
+        .file-dropzone:hover { background: #e2e8f0; }
+        .file-dropzone p { margin: 0; font-size: 16px; color: #2c3e50; font-weight: bold; }
+        .file-dropzone span { font-size: 13px; color: #7f8c8d; display: block; margin-top: 4px; }
+        
+        /* Form Components */
+        .studio-field { margin-bottom: 15px; }
+        .studio-field label { font-weight: bold; display: block; margin-bottom: 6px; color: #34495e; }
+        .studio-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        
+        .word-pair-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+            background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;
+        }
+        .pair-number { font-weight: bold; color: #64748b; min-width: 50px; }
+        .word-pair-row input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        
+        /* Buttons */
+        .btn { padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; transition: background 0.2s, transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-add { background-color: #3498db; color: white; margin-bottom: 20px; width: 100%; }
+        .btn-generate { background-color: #2ecc71; color: white; width: 100%; font-size: 18px; margin-top: 10px; text-transform: uppercase; }
+        .btn-delete { background-color: #e74c3c; color: white; padding: 10px; border-radius: 6px; }
+
+        /* Setup Popup Component */
+        .setup-section {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 30px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            z-index: 1000; width: 90%; max-width: 450px; text-align: center; box-sizing: border-box; color: #2c3e50;
+        }
+        .close-setup-btn { position: absolute; top: 12px; right: 15px; background: #e74c3c; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .mode-options { display: flex; gap: 20px; justify-content: center; margin: 15px 0; }
+        .mode-btn { padding: 12px 20px; border: 2px solid #3498db; background: transparent; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; flex: 1; color: #3498db; }
+        .mode-btn.active { background: #3498db; color: white; }
+        .team-inputs { display: none; margin-top: 15px; text-align: left; }
+        .team-inputs label { font-weight: bold; display: block; margin-top: 10px; color: #34495e; }
+        
+        /* Screen Overlay */
+        .overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+
+        /* ======================== STYLE: GAME RUNTIME LAYOUT ======================== */
+        .game-section { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 20; }
+        .game-arena {
+            width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 15px; box-sizing: border-box;
+            background-color: #cd853f;
+            background-image: linear-gradient(45deg, #8b4513 25%, transparent 25%), linear-gradient(-45deg, #8b4513 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #8b4513 75%), linear-gradient(-45deg, transparent 75%, #8b4513 75%);
+            background-size: 60px 60px; box-shadow: inset 0 0 100px rgba(0,0,0,0.6);
+        }
+        
+        /* Scoreboard */
+        .scoreboard {
+            display: flex; width: 95%; max-width: 1200px; justify-content: space-around; align-items: center;
+            background: rgba(44, 62, 80, 0.95); padding: 12px; border-radius: 10px; border: 2px solid #ffffff; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); box-sizing: border-box;
+        }
+        .team-score-card { padding: 8px 20px; border-radius: 8px; min-width: 150px; text-align: center; background: rgba(255,255,255,0.1); border: 2px solid transparent; }
+        .team-score-card.active-turn { background: #e67e22; border-color: white; box-shadow: 0 0 15px #e67e22; }
+        .team-title-text { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .score-num { font-size: 28px; font-weight: bold; margin-top: 2px; }
+        .game-controls-header { display: flex; gap: 10px; }
+        .btn-header { padding: 8px 15px; font-weight: bold; border-radius: 5px; cursor: pointer; border: none; }
+        .btn-exit-game { background: #e74c3c; color: white; }
+
+        /* Game Matrix Grid */
+        .match-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px;
+            width: 95%; max-width: 1100px; margin: auto; padding: 15px; box-sizing: border-box; justify-content: center;
+        }
+        
+        /* 3D Card Engine Elements */
+        .card-container { height: 120px; perspective: 1000px; cursor: pointer; position: relative; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d;
+        }
+        .card-container.flipped .card-inner { transform: rotateY(180deg); }
+        .card-container.matched { opacity: 0.3; cursor: default; pointer-events: none; transform: scale(0.95); transition: all 0.4s; }
+        
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            padding: 10px; box-sizing: border-box; font-size: 16px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .card-front {
+            background: linear-gradient(135deg, #2c3e50, #34495e); color: #f1c40f; border: 2px solid #ffffff;
+            font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .card-back { background: #ffffff; color: #2c3e50; transform: rotateY(180deg); border: 2px solid #f1c40f; word-break: break-word; }
+
+        /* Dialog Popup */
+        .popup-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; color: #2c3e50; padding: 30px; border-radius: 12px; z-index: 2000;
+            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .popup-modal h2 { margin-top: 0; color: #2ecc71; }
+        .popup-modal p { font-size: 18px; font-weight: bold; margin: 15px 0; }
+        .popup-modal button { background: #34485e; color: white; padding: 10px 25px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="studioView">
+        <div class="creator-section">
+            <h1>🎯 Match Up Advanced Game Studio</h1>
+            <p class="subtitle">ဖိုင်အသစ်ဖန်တီးပြီး TXT ဒေါင်းလုပ်ဆွဲပါ သို့မဟုတ် ရှိပြီးသား ဖိုင်တင်ပြီး တန်းဆော့ပါ</p>
+            
+            <div class="file-dropzone" id="dropzone" onclick="document.getElementById('fileLoader').click()">
+                <p>📥 Click or Drag Game File (.txt) Here</p>
+                <span>ကွန်ပျူတာ သို့မဟုတ် ဖုန်းထဲက ဂိမ်းဖိုင်တင်ပြီး တန်းဆော့ရန်</span>
+                <input type="file" id="fileLoader" accept=".txt" style="display: none;" onchange="importGameROM(event)">
+            </div>
+
+            <div class="studio-field">
+                <label>📝 Game Pack Title / ခေါင်းစဉ် :</label>
+                <input type="text" id="gameTitle" class="studio-input" value="My English Match Pack">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #2c3e50;">🧩 Word Pairs / စာလုံးတွဲများ ထည့်သွင်းရန်</h3>
+                <button class="btn" style="background: #e67e22; color: white; padding: 6px 12px; font-size: 13px;" onclick="clearAllPairs()">Clear All</button>
+            </div>
+
+            <div id="pairsContainer">
+                </div>
+
+            <button class="btn btn-add" onclick="addNewPairSlot()">➕ Add New Pair (စာလုံးတွဲအသစ်တိုးရန်)</button>
+            <button class="btn btn-generate" onclick="exportGameROM()">💾 Save & Export ROM (.txt)</button>
+        </div>
+    </div>
+
+    <div class="game-section" id="gameRuntimeView">
+        <div class="game-arena">
+            <div class="scoreboard">
+                <div class="team-score-card" id="cardTeam1">
+                    <div class="team-title-text" id="nameT1Text">Team 1</div>
+                    <div class="score-num" id="scoreNum1">0</div>
+                </div>
+                
+                <div class="game-controls-header">
+                    <button class="btn-header btn-exit-game" onclick="quitActiveGameEngine()">🛑 Exit</button>
+                </div>
+
+                <div class="team-score-card" id="cardTeam2">
+                    <div class="team-title-text" id="nameT2Text">Team 2</div>
+                    <div class="score-num" id="scoreNum2">0</div>
+                </div>
+            </div>
+
+            <div class="match-container" id="boardArena"></div>
+            <div></div> </div>
+    </div>
+
+    <div class="overlay-bg" id="modalOverlay"></div>
+    <div class="setup-section" id="setupConfigPopup">
+        <button class="close-setup-btn" onclick="hideSetupPopup()">×</button>
+        <h3>🎮 Select Game Play Mode</h3>
+        <p style="font-size: 14px; color: #7f8c8d; margin-top: -10px;">ကစားမည့် ပုံစံကို ရွေးချယ်ပါ</p>
+        
+        <div class="mode-options">
+            <button class="mode-btn active" id="btnSingleMode" onclick="setGamePlayMode('single')">Single Player</button>
+            <button class="mode-btn" id="btnTeamMode" onclick="setGamePlayMode('team')">Team Battle</button>
+        </div>
+
+        <div class="team-inputs" id="teamConfigFields">
+            <label>🔴 Team 1 Name :</label>
+            <input type="text" id="inputTeam1" class="studio-input" value="Team A">
+            <label>🔵 Team 2 Name :</label>
+            <input type="text" id="inputTeam2" class="studio-input" value="Team B">
+        </div>
+
+        <button class="btn btn-generate" onclick="launchGameEngineWithConfig()" style="background: #3498db; margin-top: 20px;">🚀 Launch Match Game</button>
+    </div>
+
+    <div class="popup-modal" id="endGamePopup">
+        <h2 id="winTitle">🏆 Congratulations!</h2>
+        <p id="winDetails">Team A wins the match!</p>
+        <button onclick="closeEndGamePopupAndReset()">Back to Studio</button>
+    </div>
+
+    <script>
+        const AudioFX = {
+            ctx: null,
+            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playFlip() {
+                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(250, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.15);
+            },
+            playMatch() {
+                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.3);
+            },
+            playMis() {
+                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.25);
+            },
+            playWin() {
+                this.init();
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                    osc.type = 'sine'; osc.frequency.value = f;
+                    gain.gain.setValueAtTime(0.1, now + i*0.1);
+                    gain.gain.linearRampToValueAtTime(0.001, now + i*0.1 + 0.3);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now + i*0.1); osc.stop(now + i*0.1 + 0.3);
+                });
+            }
+        };
+    </script>
+
+    <script>
+        let currentActivePairs = [];
+        let engineGameMode = "single";
+        let teamScores = { 1: 0, 2: 0 };
+        let activeTurn = 1;
+        let selectedCards = [];
+        let lockGameBoard = false;
+        let successfulMatches = 0;
+
+        // Base starter mock data configuration list 
+        const starterMockPairs = [
+            { a: "Apple", b: "ပန်းသီး" },
+            { a: "Banana", b: "ငှက်ပျောသီး" },
+            { a: "Cat", b: "ကြောင်" },
+            { a: "Dog", b: "ခွေး" }
+        ];
+
+        // Boot system dynamic loaders
+        window.addEventListener("DOMContentLoaded", () => {
+            initializePairsForm(starterMockPairs);
+            setupDragAndDropZone();
+        });
+
+        function initializePairsForm(pairs) {
+            const container = document.getElementById("pairsContainer");
+            container.innerHTML = "";
+            pairs.forEach(pair => addNewPairSlot(pair.a, pair.b));
+        }
+
+        function addNewPairSlot(valA = "", valB = "") {
+            const container = document.getElementById("pairsContainer");
+            const currentIndex = container.children.length + 1;
+            
+            const row = document.createElement("div");
+            row.className = "word-pair-row";
+            row.innerHTML = `
+                <div class="pair-number">#${currentIndex}</div>
+                <input type="text" class="input-side-a" placeholder="English Word / Side A" value="${valA}">
+                <input type="text" class="input-side-b" placeholder="Meaning / Side B" value="${valB}">
+                <button class="btn btn-delete" onclick="this.parentElement.remove(); updatePairRowIndexes();">❌</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function updatePairRowIndexes() {
+            const rows = document.querySelectorAll(".word-pair-row");
+            rows.forEach((row, idx) => {
+                row.querySelector(".pair-number").innerText = `#${idx + 1}`;
+            });
+        }
+
+        function clearAllPairs() {
+            document.getElementById("pairsContainer").innerHTML = "";
+            addNewPairSlot();
+        }
+
+        // Parse runtime inputs back into unified schema payload database object structures
+        function compileFormDataIntoArray() {
+            const collected = [];
+            const rows = document.querySelectorAll(".word-pair-row");
+            rows.forEach(row => {
+                const a = row.querySelector(".input-side-a").value.trim();
+                const b = row.querySelector(".input-side-b").value.trim();
+                if(a !== "" || b !== "") {
+                    collected.push({ a: a, b: b });
+                }
+            });
+            return collected;
+        }
+
+        // Serializer: Saving the dynamic dataset contents down to storage targets
+        function exportGameROM() {
+            const data = compileFormDataIntoArray();
+            if(data.length === 0) return alert("ကျေးဇူးပြု၍ စာလုံးတွဲ အနည်းဆုံး တစ်တွဲထည့်ပေးပါ!");
+            
+            const title = document.getElementById("gameTitle").value.trim() || "Match-Up-Pack";
+            const romStructure = {
+                title: title,
+                gameType: "match_up",
+                pairs: data
+            };
+
+            const dataBlob = new Blob([JSON.stringify(romStructure, null, 2)], { type: "text/plain" });
+            const downloader = document.createElement("a");
+            downloader.download = `${title.toLowerCase().replace(/\s+/g, '-')}-game.txt`;
+            downloader.href = window.URL.createObjectURL(dataBlob);
+            downloader.click();
+        }
+
+        // Deserializer Engine parser loader input component script module
+        function importGameROM(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if(parsed.gameType !== "match_up" || !parsed.pairs) {
+                        return alert("မှားယွင်းနေပါသည်။ ဤဖိုင်သည် Match Up ဂိမ်းဖိုင်မဟုတ်ပါ!");
+                    }
+                    
+                    document.getElementById("gameTitle").value = parsed.title || "Imported Match Pack";
+                    currentActivePairs = parsed.pairs;
+                    initializePairsForm(currentActivePairs);
+                    
+                    // Direct trigger transition runtime launcher workflow steps setup configurations
+                    showSetupPopup();
+                } catch(err) {
+                    alert("ဖိုင်ကို ဖတ်၍မရပါ။ စာသားဖိုင် တည်ဆောက်ပုံ မှားယွင်းနေပါသည်။");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function setupDragAndDropZone() {
+            const zone = document.getElementById("dropzone");
+            ['dragenter', 'dragover'].forEach(name => {
+                zone.addEventListener(name, (e) => { e.preventDefault(); zone.style.background = "#e2e8f0"; }, false);
+            });
+            ['dragleave', 'drop'].forEach(name => {
+                zone.addEventListener(name, (e) => { e.preventDefault(); zone.style.background = "#edf2f7"; }, false);
+            });
+            zone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if(files.length > 0 && files[0].name.endsWith('.txt')) {
+                    document.getElementById('fileLoader').files = files;
+                    const event = { target: { files: files } };
+                    importGameROM(event);
+                }
+            }, false);
+        }
+
+        // Modal triggers setup rules controllers
+        function showSetupPopup() {
+            document.getElementById("modalOverlay").style.display = "block";
+            document.getElementById("setupConfigPopup").style.display = "block";
+        }
+        function hideSetupPopup() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("setupConfigPopup").style.display = "none";
+        }
+
+        function setGamePlayMode(mode) {
+            engineGameMode = mode;
+            document.getElementById("btnSingleMode").classList.toggle("active", mode === "single");
+            document.getElementById("btnTeamMode").classList.toggle("active", mode === "team");
+            document.getElementById("teamConfigFields").style.display = mode === "team" ? "block" : "none";
+        }
+
+        // Core Game Engine initialization launcher code segments 
+        function launchGameEngineWithConfig() {
+            const data = compileFormDataIntoArray();
+            if(data.length === 0) return alert("ဂိမ်းဆော့ရန် စာလုံးတွဲများ မရှိသေးပါ။ အရင်ထည့်သွင်းပါ သို့မဟုတ် ဖိုင်တင်ပါ!");
+            currentActivePairs = data;
+
+            hideSetupPopup();
+            document.getElementById("studioView").style.display = "none";
+            document.getElementById("gameRuntimeView").style.display = "block";
+
+            // Setup scoreboard profiles UI configurations
+            if(engineGameMode === "single") {
+                document.getElementById("nameT1Text").innerText = "PLAYER";
+                document.getElementById("cardTeam2").style.style.visibility = "hidden";
+            } else {
+                const name1 = document.getElementById("inputTeam1").value.trim() || "Team 1";
+                const name2 = document.getElementById("inputTeam2").value.trim() || "Team 2";
+                document.getElementById("nameT1Text").innerText = name1;
+                document.getElementById("nameT2Text").innerText = name2;
+                document.getElementById("cardTeam2").style.visibility = "visible";
+            }
+
+            // Reset engine status database parameters variables tracker values
+            teamScores = { 1: 0, 2: 0 };
+            document.getElementById("scoreNum1").innerText = "0";
+            document.getElementById("scoreNum2").innerText = "0";
+            activeTurn = 1;
+            successfulMatches = 0;
+            selectedCards = [];
+            lockGameBoard = false;
+            updateTurnUIStyle();
+
+            buildGameBoardMatrix();
+        }
+
+        // Construct 3D dynamic visual shuffling nodes interfaces grid arrays
+        function buildGameBoardMatrix() {
+            const arena = document.getElementById("boardArena");
+            arena.innerHTML = "";
+
+            // Flatten card structures elements list metadata mappings keys tracker values
+            let deck = [];
+            currentActivePairs.forEach((pair, index) => {
+                deck.push({ id: index, side: "A", text: pair.a });
+                deck.push({ id: index, side: "B", text: pair.b });
+            });
+
+            // Fisher-Yates array randomizer algorithms operations
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+
+            // Render layouts dynamically output targets
+            deck.forEach((cardMeta, orderIndex) => {
+                const container = document.createElement("div");
+                container.className = "card-container";
+                container.dataset.id = cardMeta.id;
+                container.dataset.side = cardMeta.side;
+                container.dataset.index = orderIndex;
+                container.onclick = () => processCardSelectionInteraction(container);
+
+                container.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">?</div>
+                        <div class="card-back">${cardMeta.text}</div>
+                    </div>
+                `;
+                arena.appendChild(container);
+            });
+        }
+
+        // Match card selection tracking and matching matrix evaluation rules engine algorithms
+        function processCardSelectionInteraction(container) {
+            if(lockGameBoard || container.classList.contains("flipped") || container.classList.contains("matched")) return;
+
+            AudioFX.playFlip();
+            container.classList.add("flipped");
+            selectedCards.push(container);
+
+            if(selectedCards.length === 2) {
+                lockGameBoard = true;
+                evaluateCardsMatchState();
+            }
+        }
+
+        function evaluateCardsMatchState() {
+            const c1 = selectedCards[0];
+            const c2 = selectedCards[1];
+
+            const isSameId = c1.dataset.id === c2.dataset.id;
+            const isDifferentSide = c1.dataset.side !== c2.dataset.side;
+
+            if(isSameId && isDifferentSide) {
+                // SUCCESS MATCH STATUS DETECTED
+                setTimeout(() => {
+                    AudioFX.playMatch();
+                    c1.classList.add("matched");
+                    c2.classList.add("matched");
+                    
+                    // Increment runtime scoreboard parameters systems profiles tracking logs
+                    teamScores[activeTurn] += 10;
+                    document.getElementById(`scoreNum${activeTurn}`).innerText = teamScores[activeTurn];
+
+                    successfulMatches++;
+                    selectedCards = [];
+                    lockGameBoard = false;
+
+                    // Evaluate endgame trigger states loops checkpoints
+                    if(successfulMatches === currentActivePairs.length) {
+                        triggerMatchEndgameSummary();
+                    }
+                }, 400);
+            } else {
+                // MISMATCH STATE TRIGGER CHECKPOINTS PROCESSORS
+                setTimeout(() => {
+                    AudioFX.playMis();
+                    c1.classList.remove("flipped");
+                    c2.classList.remove("flipped");
+
+                    // Pivot team turns sequence orders active indicators profiles track systems rules
+                    if(engineGameMode === "team") {
+                        activeTurn = activeTurn === 1 ? 2 : 1;
+                        updateTurnUIStyle();
+                    }
+
+                    selectedCards = [];
+                    lockGameBoard = false;
+                }, 1000);
+            }
+        }
+
+        function updateTurnUIStyle() {
+            if(engineGameMode === "single") {
+                document.getElementById("cardTeam1").classList.add("active-turn");
+                return;
+            }
+            document.getElementById("cardTeam1").classList.toggle("active-turn", activeTurn === 1);
+            document.getElementById("cardTeam2").classList.toggle("active-turn", activeTurn === 2);
+        }
+
+        // End Game execution processors UI components workflow triggers rules logic sets
+        function triggerMatchEndgameSummary() {
+            AudioFX.playWin();
+            const modal = document.getElementById("endGamePopup");
+            const details = document.getElementById("winDetails");
+            
+            if(engineGameMode === "single") {
+                document.getElementById("winTitle").innerText = "🎉 Game Completed!";
+                details.innerText = `Total Score: ${teamScores[1]} Points!`;
+            } else {
+                const name1 = document.getElementById("nameT1Text").innerText;
+                const name2 = document.getElementById("nameT2Text").innerText;
+                
+                if(teamScores[1] > teamScores[2]) {
+                    document.getElementById("winTitle").innerText = "🏆 Victory!";
+                    details.innerText = `${name1} Wins with ${teamScores[1]} Pts vs ${teamScores[2]} Pts!`;
+                } else if(teamScores[2] > teamScores[1]) {
+                    document.getElementById("winTitle").innerText = "🏆 Victory!";
+                    details.innerText = `${name2} Wins with ${teamScores[2]} Pts vs ${teamScores[1]} Pts!`;
+                } else {
+                    document.getElementById("winTitle").innerText = "🤝 It's a Tie!";
+                    details.innerText = `Both teams scored equal ${teamScores[1]} Pts!`;
+                }
+            }
+            
+            document.getElementById("modalOverlay").style.display = "block";
+            modal.style.display = "block";
+        }
+
+        function closeEndGamePopupAndReset() {
+            document.getElementById("endGamePopup").style.display = "none";
+            quitActiveGameEngine();
+        }
+
+        function quitActiveGameEngine() {
+            document.getElementById("modalOverlay").style.none;
+            document.getElementById("gameRuntimeView").style.display = "none";
+            document.getElementById("studioView").style.display = "flex";
+            document.getElementById("fileLoader").value = ""; // Clear file selector slots buffers
+        }
+    </script>
+</body>
+</html>
