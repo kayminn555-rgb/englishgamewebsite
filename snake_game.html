@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Snake & Ladder All-in-One Studio</title>
+<style>
+:root {
+--primary: #2c3e50;
+--secondary: #16a085;
+--correct: #2ecc71;
+--wrong: #e74c3c;
+--dark: #2c3e50;
+--light-bg: #f4efe2;
+--paper-border: #7f684e;
+--team1-color: #e67e22;
+--team2-color: #9b59b6;
+--ladder-color: #704214;
+--cell-white: #ffffff;
+--cell-tint: #f5ecd7;
+}
+* { box-sizing: border-box; }
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 0; padding: 0;
+background-color: #ebe3cf; color: var(--dark);
+user-select: none;
+}
+header {
+background-color: var(--dark); color: #f4efe2;
+padding: 12px 30px; display: flex;
+justify-content: space-between; align-items: center;
+box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+border-bottom: 4px solid var(--paper-border);
+}
+header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+nav { display: flex; gap: 10px; }
+.nav-btn {
+background: transparent; border: 2px solid #f4efe2; color: #f4efe2;
+padding: 8px 18px; cursor: pointer; border-radius: 6px;
+font-weight: bold; transition: all 0.3s ease;
+}
+.nav-btn.active, .nav-btn:hover { background-color: #f4efe2; color: var(--dark); }
+main { padding: 20px; }
+.tab-content { display: none; }
+.active-tab { display: block; }
+.btn {
+padding: 12px 24px; border: none; border-radius: 6px;
+font-weight: bold; cursor: pointer; transition: background 0.2s, transform 0.1s;
+box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+.btn:active { transform: scale(0.96); }
+
+/* TAB 1: TEACHER DASHBOARD STUDIO */
+.admin-container {
+background: #faf6eb; padding: 25px; border-radius: 12px;
+border: 3px solid var(--paper-border);
+box-shadow: 0 6px 12px rgba(0,0,0,0.1); max-width: 1100px;
+margin: 0 auto;
+}
+.file-dropzone {
+background: #ebdcb9; padding: 20px; border-radius: 10px; margin-bottom: 25px;
+text-align: center; border: 2px dashed var(--paper-border); cursor: pointer; transition: background 0.2s;
+}
+.file-dropzone:hover { background: #e3d2aa; }
+.file-dropzone p { margin: 0; font-size: 16px; color: var(--dark); font-weight: bold; }
+.file-dropzone span { font-size: 12px; color: #616a6b; display: block; margin-top: 4px; }
+
+.bulk-import-container {
+background: rgba(255,255,255,0.5); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--paper-border);
+}
+.bulk-import-container textarea {
+width: 100%; height: 100px; padding: 10px; border-radius: 6px;
+border: 1px solid var(--paper-border); font-family: monospace; font-size: 14px; resize: none;
+}
+.bulk-actions { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.btn-primary { background-color: #34495e; color: white; }
+.btn-primary:hover { background-color: #2c3e50; }
+.btn-secondary { background-color: #7f8c8d; color: white; }
+.btn-secondary:hover { background-color: #616a6b; }
+.btn-success { background-color: #27ae60; color: white; }
+.btn-success:hover { background-color: #219a52; }
+.btn-danger-mini { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+.ladder-config-box {
+background: #f0e6cc; border: 2px solid var(--paper-border);
+padding: 15px; border-radius: 8px; margin-bottom: 20px;
+}
+.ladder-inputs-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+.ladder-row-item { display: flex; align-items: center; gap: 10px; background: white; padding: 8px; border: 1px solid var(--paper-border); border-radius: 4px; display: inline-flex; width: fit-content; }
+.ladder-row-item input { width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 3px; }
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+.admin-table th, .admin-table td { border: 1px solid var(--paper-border); padding: 10px; text-align: left; vertical-align: middle; }
+.admin-table th { background-color: #e6dcbe; color: var(--dark); }
+.admin-table input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+
+/* TAB 2: GAME RUNTIME ARENA */
+.game-main-container { max-width: 950px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.top-team-row { display: flex; justify-content: center; width: 100%; max-width: 650px; margin-bottom: 20px; gap: 20px; }
+.team-status-card {
+flex: 1; max-width: 280px; background: #faf6eb; padding: 12px 20px; border-radius: 12px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;
+border: 4px solid #cdc2a5; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.team-card-left-info { display: flex; align-items: center; gap: 15px; }
+.status-name { font-size: 18px; font-weight: bold; }
+.status-pos { font-size: 14px; color: #7f8c8d; font-weight: bold; }
+.status-pos span { font-size: 24px; color: var(--dark); margin-left: 5px; }
+.team-status-card.active-turn-glow-1 { border-color: var(--team1-color); box-shadow: 0 0 15px rgba(230, 126, 34, 0.4); background-color: rgba(230, 126, 34, 0.08); }
+.team-status-card.active-turn-glow-1 .status-name { color: var(--team1-color); }
+.team-status-card.active-turn-glow-2 { border-color: var(--team2-color); box-shadow: 0 0 15px rgba(155, 89, 182, 0.4); background-color: rgba(155, 89, 182, 0.08); }
+.team-status-card.active-turn-glow-2 .status-name { color: var(--team2-color); }
+
+.board-split-layout-flex { display: flex; gap: 25px; width: 100%; justify-content: center; align-items: flex-start; }
+.side-dice-action-panel {
+width: 220px; background: #faf6eb; padding: 25px 15px; border-radius: 16px;
+border: 4px solid var(--paper-border); box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px;
+position: sticky; top: 20px;
+}
+.btn-trigger-roll {
+width: 100%; background-color: #27ae60; color: white; font-size: 17px;
+padding: 15px 10px; border-radius: 12px; box-shadow: 0 5px 12px rgba(39, 174, 96, 0.35);
+border: 2px solid #1e7e43; text-align: center;
+}
+.btn-trigger-roll:disabled { background-color: #bdc3c7; border-color: #bdc3c7; cursor: not-allowed; box-shadow: none; }
+
+.board-rel-wrapper {
+position: relative; background: #faf6eb; padding: 12px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+width: 100%; max-width: 650px; aspect-ratio: 1/1; overflow: hidden; border: 8px double var(--paper-border);
+}
+.grid-board { display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr); background-color: var(--paper-border); width: 100%; height: 100%; }
+.cell { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 0; border: 1px solid rgba(127, 104, 78, 0.35); overflow: hidden; }
+.cell-even-color { background-color: var(--cell-white); }
+.cell-odd-color { background-color: var(--cell-tint); }
+.cell-number { position: absolute; top: 4px; left: 4px; color: #5c4a37; font-size: 13px; font-weight: 800; opacity: 0.8; z-index: 5; background: rgba(255,255,255,0.6); padding: 1px 4px; border-radius: 3px; }
+.cell-content-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: relative; z-index: 1; }
+.cell-content-indicator { font-size: 11px; color: #2c3e50; text-align: center; font-weight: bold; padding: 5px; word-break: break-word; overflow: hidden; line-height: 1.2; z-index: 3; }
+.cell-thumbnail-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; opacity: 0.95; }
+.board-svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+.ladder-main-rail { stroke: var(--ladder-color); stroke-width: 6; stroke-linecap: round; opacity: 0.85; }
+.ladder-rung-step { stroke: #543111; stroke-width: 4; stroke-linecap: round; opacity: 0.9; }
+
+/* 🐍 [UPGRADE] - Burma Python Advanced Size Fitting Configuration */
+.snake-popup-bite-card {
+display: none; position: absolute; pointer-events: none; z-index: 9999;
+transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+/* [ပြင်ဆင်ချက်] - အလယ်မှာ ပွင့်လာတဲ့အချိန် စာသင်ခန်းထဲက ကလေးတွေ အကုန်မြင်ရအောင် Font Size ကို 140px ကြီးကြီးမားမား ပြောင်းလဲလိုက်ခြင်း */
+.snake-popup-bite-card.active-center { 
+display: flex; align-items: center; justify-content: center; 
+left: 50% !important; top: 50% !important; 
+transform: translate(-50%, -50%); 
+}
+.snake-popup-bite-card.active-center .vector-built-in-snake {
+font-size: 140px !important;
+}
+
+/* [ပြင်ဆင်ချက်] - Pawn ဆီ ပြေးကိုက်တဲ့အချိန် ကတ်ပြားအရွယ်အစားနဲ့ ကွက်တိဖြစ်အောင် 60px အဖြစ် ပြန်ကျုံ့ပေးခြင်း */
+.snake-popup-bite-card.active-target { 
+display: flex; align-items: center; justify-content: center; 
+transform: translate(-50%, -50%); 
+}
+.snake-popup-bite-card.active-target .vector-built-in-snake {
+font-size: 60px !important;
+}
+
+.snake-popup-bite-card.vector-built-in-snake { 
+line-height: 1; text-align: center; 
+filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.6)); 
+user-select: none; transition: font-size 0.4s ease;
+}
+
+/* TOKENS - 3D REAL CHESS PAWN STYLE */
+.token-container { display: flex; gap: 4px; position: absolute; bottom: 4px; right: 4px; z-index: 20 !important; flex-wrap: wrap; max-width: 45px; justify-content: flex-end; }
+.pawn-token {
+    width: 22px; height: 28px; position: relative;
+    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
+    animation: premiumPulse 1.4s infinite alternate ease-in-out;
+}
+.pawn-showcase {
+    width: 26px; height: 32px; position: relative;
+    display: inline-block; filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.3));
+}
+.pawn-token::before, .pawn-showcase::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 12px; border-radius: 50%; box-shadow: inset -2px -2px 3px rgba(0,0,0,0.3);
+}
+.pawn-token::after, .pawn-showcase::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 18px; border-radius: 50% 50% 20% 20%;
+    box-shadow: inset -3px -3px 4px rgba(0,0,0,0.4);
+}
+.t1::before, .pawn-token.t1::before { background: #ffbe76; }
+.t1::after, .pawn-token.t1::after { background: var(--team1-color); border: 1px solid #d35400; }
+.t2::before, .pawn-token.t2::before { background: #f53b57; }
+.t2::after, .pawn-token.t2::after { background: var(--team2-color); border: 1px solid #8e44ad; }
+
+@keyframes premiumPulse { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+.damage-flash-active-frame { animation: damageFlashFrame 0.2s ease-out 2 alternate; }
+@keyframes damageFlashFrame { 0% { background-color: rgba(0,0,0,0); } 100% { background-color: rgba(231, 76, 60, 0.25); } }
+
+/* DICE CUBE COMPONENT */
+.dice-modal-overlay { display: none; position: fixed; z-index: 300; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.55); align-items: center; justify-content: center; }
+.dice-box-card { background: #faf6eb; padding: 30px; border-radius: 16px; border: 4px solid var(--paper-border); box-shadow: 0 15px 30px rgba(0,0,0,0.4); text-align: center; width: 260px; }
+.dice-graphic-container { width: 100px; height: 100px; margin: 25px auto; perspective: 500px; }
+.real-cube-dice { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-25deg) rotateY(30deg); transition: transform 0.15s; }
+.dice-face { position: absolute; width: 94px; height: 94px; background: radial-gradient(circle, #ffffff 60%, #f1ebdc 100%); border: 3px solid var(--paper-border); border-radius: 14px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 8px; box-sizing: border-box; }
+.dot { background-color: #2c3e50; border-radius: 50%; width: 16px; height: 16px; margin: auto; }
+.dot.red-dot { background-color: #c0392b; width: 20px; height: 20px; }
+.face-1 { transform: rotateY(0deg) translateZ(47px); } .face-1 .dot { grid-area: 2/2; }
+.face-2 { transform: rotateY(90deg) translateZ(47px); } .face-2 .dot:nth-child(1) { grid-area: 1/1; } .face-2 .dot:nth-child(2) { grid-area: 3/3; }
+.face-3 { transform: rotateX(90deg) translateZ(47px); } .face-3 .dot:nth-child(1) { grid-area: 1/1; } .face-3 .dot:nth-child(2) { grid-area: 2/2; } .face-3 .dot:nth-child(3) { grid-area: 3/3; }
+.face-4 { transform: rotateX(-90deg) translateZ(47px); } .face-4 .dot:nth-child(1) { grid-area: 1/1; } .face-4 .dot:nth-child(2) { grid-area: 1/3; } .face-4 .dot:nth-child(3) { grid-area: 3/1; } .face-4 .dot:nth-child(4) { grid-area: 3/3; }
+.face-5 { transform: rotateY(-90deg) translateZ(47px); } .face-5 .dot:nth-child(1) { grid-area: 1/1; } .face-5 .dot:nth-child(2) { grid-area: 1/3; } .face-5 .dot:nth-child(3) { grid-area: 2/2; } .face-5 .dot:nth-child(4) { grid-area: 3/1; } .face-5 .dot:nth-child(5) { grid-area: 3/3; }
+.face-6 { transform: rotateY(180deg) translateZ(47px); } .face-6 .dot:nth-child(1) { grid-area: 1/1; } .face-6 .dot:nth-child(2) { grid-area: 1/3; } .face-6 .dot:nth-child(3) { grid-area: 2/1; } .face-6 .dot:nth-child(4) { grid-area: 2/3; } .face-6 .dot:nth-child(5) { grid-area: 3/1; } .face-6 .dot:nth-child(6) { grid-area: 3/3; }
+
+.real-cube-dice.rolling-animate-active { animation: superHighSpeedDiceRollMatrix 0.5s linear infinite; }
+@keyframes superHighSpeedDiceRollMatrix { 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(540deg); } }
+.show-value-1 { transform: rotateX(360deg) rotateY(360deg); }
+.show-value-2 { transform: rotateX(360deg) rotateY(270deg); }
+.show-value-3 { transform: rotateX(270deg) rotateY(360deg); }
+.show-value-4 { transform: rotateX(450deg) rotateY(360deg); }
+.show-value-5 { transform: rotateX(360deg) rotateY(450deg); }
+.show-value-6 { transform: rotateX(180deg) rotateY(360deg); }
+
+/* CHALLENGE POP-UP MODAL */
+.modal { display: none; position: fixed; z-index: 400; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.65); align-items: center; justify-content: center; }
+.modal-content {
+background-color: #faf6eb; padding: 30px; border-radius: 16px; width: 92%; max-width: 500px; text-align: center;
+border: 6px double var(--paper-border); box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+animation: popUpZoomEntrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes popUpZoomEntrance { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop-cell-badge { background-color: #e67e22; color: white; padding: 6px 20px; font-size: 18px; font-weight: 900; border-radius: 30px; display: inline-block; margin-bottom: 12px; border: 2px solid #d35400; }
+.pop-question-display { font-size: 24px; font-weight: 800; color: #2c3e50; line-height: 1.4; margin: 12px 0; padding: 15px; background: white; border-radius: 8px; border: 1px dashed var(--paper-border); }
+.pop-image-preview-container { width: 100%; max-height: 180px; display: none; justify-content: center; align-items: center; margin-bottom: 15px; border-radius: 8px; overflow: hidden; border: 2px solid var(--paper-border); background: #fff; }
+.pop-image-preview-container img { max-width: 100%; max-height: 180px; object-fit: contain; }
+.btn-correct { background-color: var(--correct); color: white; margin-right: 15px; border: 2px solid #27ae60; }
+.btn-wrong { background-color: var(--wrong); color: white; border: 2px solid #c0392b; }
+</style>
+</head>
+<body>
+<header>
+<h1>Snake & Ladder Pack Studio</h1>
+<nav>
+<button id="nav-admin-btn" class="nav-btn active" onclick="switchTab('admin-tab')">Studio Dashboard</button>
+<button id="nav-game-btn" class="nav-btn" onclick="switchTab('game-tab')">Game Arena</button>
+</nav>
+</header>
+<main id="main-viewport-container">
+    
+<section id="admin-tab" class="tab-content active-tab">
+<div class="admin-container">
+<h2>Configure ROM & Lesson Pack</h2>
+
+<div class="file-dropzone" id="dropzone" onclick="document.getElementById('romLoader').click()">
+    <p>📥 Click or Drag Snake Game ROM (.txt)</p>
+    <span>ဆော့မည့် သင်ခန်းစာဂိမ်းဖိုင်တင်ရန်</span>
+    <input type="file" id="romLoader" accept=".txt" style="display: none;" onchange="importSnakeROM(event)">
+</div>
+
+<div class="bulk-import-container">
+<strong style="display: block; margin-bottom: 8px; color: var(--dark);">Bulk Paste Word/Image List (1 to 50):</strong>
+<textarea id="bulkPasteInputTextArea" placeholder="Paste here example:&#10;1. Apple&#10;2. Banana&#10;3. https://image.link/pic.jpg&#10;4. Orange"></textarea>
+<button type="button" class="btn btn-success" style="padding: 6px 15px; font-size: 13px; margin-top: 8px;" onclick="executeBulkImportProcessing()">Import Raw Data Rows</button>
+</div>
+
+<div class="ladder-config-box">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+<strong style="color: var(--dark); font-size: 16px;">Configure Board Ladders (Routes Config)</strong>
+<button type="button" class="btn btn-success" style="padding: 6px 15px; font-size: 13px;" onclick="addNewLadderRow(null, null)">+ Add New Ladder</button>
+</div>
+<div id="ladder-container-list" class="ladder-inputs-list"></div>
+</div>
+
+<div class="bulk-actions">
+<button type="button" class="btn btn-secondary" onclick="autoPopulateDemoData()">Auto Demo Content</button>
+<button type="button" class="btn btn-primary" onclick="saveAdminData()">Save Configuration</button>
+<button type="button" class="btn btn-success" style="background-color: #e67e22; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" onclick="exportSnakeROM()">💾 Export Game ROM (.txt)</button>
+</div>
+
+<form id="admin-form">
+<table class="admin-table">
+<thead>
+<tr>
+<th style="width: 10%;">Cell No.</th>
+<th style="width: 45%;">Text / Question Details</th>
+<th style="width: 45%;">Optional Image Link (URL)</th>
+</tr>
+</thead>
+<tbody id="admin-table-body"></tbody>
+</table>
+</form>
+</div>
+</section>
+
+<section id="game-tab" class="tab-content">
+<div class="game-main-container">
+<div class="top-team-row">
+<div id="card-team-1" class="team-status-card active-turn-glow-1" onclick="manuallySetTurn(1)">
+<div class="team-card-left-info">
+<div class="pawn-showcase t1"></div>
+<div>
+<div class="status-name">Team 1</div>
+<div class="status-pos">Position: <span id="team1-pos-val">1</span></div>
+</div>
+</div>
+</div>
+<div id="card-team-2" class="team-status-card" onclick="manuallySetTurn(2)">
+<div class="team-card-left-info">
+<div class="pawn-showcase t2"></div>
+<div>
+<div class="status-name">Team 2</div>
+<div class="status-pos">Position: <span id="team2-pos-val">1</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="board-split-layout-flex">
+<div id="board-rel-anchor" class="board-rel-wrapper">
+<svg id="board-graphics-canvas" class="board-svg-overlay"></svg>
+<div id="board" class="grid-board"></div>
+<div id="snakeStickerAttackPuck" class="snake-popup-bite-card">
+    <div class="vector-built-in-snake">🐍</div>
+</div>
+</div>
+<div class="side-dice-action-panel">
+<span style="font-size: 13px; font-weight: bold; color: #7f8891; text-transform: uppercase;">Controls</span>
+<button id="roll-btn" class="btn btn-trigger-roll" onclick="openDiceRollSequence()">Roll Dice</button>
+<p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.3; color: #8e7a65;">Click a Team Card above to manually pass turns.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<div id="dice-overlay-modal" class="dice-modal-overlay">
+<div class="dice-box-card">
+<h3 id="dice-modal-title-text" style="margin: 0 0 10px 0;">Team 1 Rolling...</h3>
+<div class="dice-graphic-container">
+<div id="cube-dice-object" class="real-cube-dice">
+<div class="dice-face face-1"><div class="dot red-dot"></div></div>
+<div class="dice-face face-2"><div class="dot"></div><div class="dot"></div></div>
+<div class="dice-face face-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div class="dice-face face-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div class="dice-face face-5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div class="dice-face face-6"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+</div>
+<div id="dice-numerical-callout" style="font-size: 20px; font-weight: bold; margin-top: 15px; min-height: 24px; color: #d35400;"></div>
+</div>
+</div>
+
+<div id="question-modal" class="modal">
+<div class="modal-content">
+<div id="pop-cell-number-badge" class="pop-cell-badge">CELL 15</div>
+<div style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px;">Current Challenge</div>
+<div id="pop-image-frame" class="pop-image-preview-container">
+<img id="pop-actual-img" src="" alt="Challenge Visual">
+</div>
+<div id="modal-text" class="pop-question-display">Word...</div>
+<div style="margin-top: 25px;">
+<button class="btn btn-correct" onclick="evaluateAnswer(true)">✓ Correct</button>
+<button class="btn btn-wrong" onclick="evaluateAnswer(false)">✕ Wrong</button>
+</div>
+</div>
+</div>
+
+<script>
+const STORAGE_KEY = "snakegame_50_square_data_v3";
+const LADDER_KEY = "snakegame_50_ladder_data_v3";
+let defaultLadders = { 4:10, 7:18, 19:35, 15:31, 40:47 };
+let ladders = {};
+const snakes = { 14:3, 23:5, 36:18, 43:25, 48:31 };
+let gameData = {};
+let currentTeam = 1;
+let teamPositions = { 1:1, 2:1 };
+let oldPositions = { 1:1, 2:1 };
+let latestDiceRoll = 1;
+
+document.addEventListener("DOMContentLoaded", () => {
+generateAdminFormTable();
+loadSavedData();
+buildGameBoardUI();
+setupDragAndDropZone();
+window.addEventListener('resize', drawVisualTracksOverlayVectors);
+});
+
+function switchTab(tabId) {
+document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+document.getElementById(tabId).classList.add('active-tab');
+if (tabId === 'admin-tab') document.getElementById('nav-admin-btn').classList.add('active');
+if (tabId === 'game-tab') {
+document.getElementById('nav-game-btn').classList.add('active');
+buildGameBoardUI();
+}
+}
+
+function generateAdminFormTable() {
+const tbody = document.getElementById("admin-table-body");
+tbody.innerHTML = "";
+for (let i = 1; i <= 50; i++) {
+const tr = document.createElement("tr");
+tr.innerHTML = `
+<td><b>Cell ${i}</b></td>
+<td><input type="text" id="content-${i}" placeholder="Enter word/question for Cell ${i}..."></td>
+<td><input type="text" id="image-${i}" placeholder="Image URL (Optional)..."></td>
+`;
+tbody.appendChild(tr);
+}
+}
+
+function executeBulkImportProcessing() {
+const rawText = document.getElementById("bulkPasteInputTextArea").value;
+if(!rawText.trim()) { alert("Please paste text list first!"); return; }
+const lines = rawText.split("\n");
+lines.forEach(line => {
+const match = line.match(/^\s*(\d+)\s*[\.\s\-:]+\s*(.*)$/);
+if (match) {
+const cellNum = parseInt(match[1]);
+const dataContent = match[2].trim();
+if (cellNum >= 1 && cellNum <= 50 && dataContent) {
+if (dataContent.startsWith("http://") || dataContent.startsWith("https://")) {
+document.getElementById(`image-${cellNum}`).value = dataContent;
+} else {
+document.getElementById(`content-${cellNum}`).value = dataContent;
+}
+}
+}
+});
+alert("Bulk Import Completed!");
+}
+
+function addNewLadderRow(startVal, endVal) {
+const container = document.getElementById("ladder-container-list");
+const div = document.createElement("div");
+div.className = "ladder-row-item";
+div.innerHTML = `
+<span>Start:</span>
+<input type="number" class="ladder-start-input" value="${startVal !== null ? startVal : ''}" min="1" max="49">
+<span>→ End:</span>
+<input type="number" class="ladder-end-input" value="${endVal !== null ? endVal : ''}" min="2" max="50">
+<button type="button" class="btn-danger-mini" onclick="this.parentElement.remove()">Remove</button>
+`;
+container.appendChild(div);
+}
+
+function autoPopulateDemoData() {
+for (let i = 1; i <= 50; i++) {
+document.getElementById(`content-${i}`).value = `Word Unit ${i}`;
+}
+}
+
+function saveAdminData() {
+gameData = {};
+for (let i = 1; i <= 50; i++) {
+gameData[i] = {
+content: document.getElementById(`content-${i}`).value.trim(),
+imageUrl: document.getElementById(`image-${i}`).value.trim()
+};
+}
+localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+ladders = {};
+const startInputs = document.querySelectorAll(".ladder-start-input");
+const endInputs = document.querySelectorAll(".ladder-end-input");
+startInputs.forEach((input, index) => {
+let s = parseInt(input.value);
+let e = parseInt(endInputs[index].value);
+if (s > 0 && e > 0 && s <= 50 && e <= 50 && s !== e) { ladders[s] = e; }
+});
+localStorage.setItem(LADDER_KEY, JSON.stringify(ladders));
+switchTab('game-tab');
+}
+
+function loadSavedData() {
+const stored = localStorage.getItem(STORAGE_KEY);
+if (stored) {
+gameData = JSON.parse(stored);
+for (let i = 1; i <= 50; i++) {
+if (gameData[i]) {
+document.getElementById(`content-${i}`).value = gameData[i].content || '';
+document.getElementById(`image-${i}`).value = gameData[i].imageUrl || '';
+}
+}
+} else {
+for (let i = 1; i <= 50; i++) { gameData[i] = { content: `Room ${i}`, imageUrl: "" }; }
+}
+const storedLadders = localStorage.getItem(LADDER_KEY);
+if (storedLadders) ladders = JSON.parse(storedLadders);
+else ladders = defaultLadders;
+const container = document.getElementById("ladder-container-list");
+container.innerHTML = "";
+for (let s in ladders) { addNewLadderRow(s, ladders[s]); }
+}
+
+function exportSnakeROM() {
+    let collectedGrid = [];
+    for (let i = 1; i <= 50; i++) {
+        collectedGrid.push({
+            cell: i,
+            content: document.getElementById(`content-${i}`).value.trim(),
+            imageUrl: document.getElementById(`image-${i}`).value.trim()
+        });
+    }
+    
+    let activeLaddersArr = [];
+    const startInputs = document.querySelectorAll(".ladder-start-input");
+    const endInputs = document.querySelectorAll(".ladder-end-input");
+    startInputs.forEach((input, index) => {
+        let s = parseInt(input.value);
+        let e = parseInt(endInputs[index].value);
+        if (s && e) activeLaddersArr.push({ start: s, end: e });
+    });
+
+    const packageROM = {
+        gameType: "snake_and_ladder",
+        grid: collectedGrid,
+        ladders: activeLaddersArr
+    };
+
+    const dataBlob = new Blob([JSON.stringify(packageROM, null, 2)], { type: "text/plain" });
+    const downloader = document.createElement("a");
+    downloader.download = "snake-lessons-pack.txt";
+    downloader.href = URL.createObjectURL(dataBlob);
+    downloader.click();
+}
+
+function importSnakeROM(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const rom = JSON.parse(e.target.result);
+            if (rom.gameType !== "snake_and_ladder" || !rom.grid) {
+                return alert("မှားယွင်းနေပါသည်။ ဤဖိုင်သည် Snake Game ဖိုင်မဟုတ်ပါ!");
+            }
+            
+            rom.grid.forEach(item => {
+                document.getElementById(`content-${item.cell}`).value = item.content || "";
+                document.getElementById(`image-${item.cell}`).value = item.imageUrl || "";
+            });
+
+            const container = document.getElementById("ladder-container-list");
+            container.innerHTML = "";
+            ladders = {};
+            if (rom.ladders) {
+                rom.ladders.forEach(lad => {
+                    addNewLadderRow(lad.start, lad.end);
+                    ladders[lad.start] = lad.end;
+                });
+            }
+            
+            saveAdminData();
+            alert("ROM Loaded Successfully!");
+        } catch(err) {
+            alert("ဖိုင်ဖတ်မရပါ။ တည်ဆောက်ပုံမှားယွင်းနေပါသည်။");
+        }
+    };
+    reader.readAsText(file);
+}
+
+function setupDragAndDropZone() {
+    const zone = document.getElementById("dropzone");
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.background = "#e3d2aa"; });
+    zone.addEventListener('dragleave', () => { zone.style.background = "#ebdcb9"; });
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.style.background = "#ebdcb9";
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].name.endsWith('.txt')) {
+            document.getElementById('romLoader').files = files;
+            const event = { target: { files: files } };
+            importSnakeROM(event);
+        }
+    });
+}
+
+function manuallySetTurn(teamNum) {
+currentTeam = teamNum;
+document.getElementById("card-team-1").className = `team-status-card ${currentTeam === 1 ? 'active-turn-glow-1' : ''}`;
+document.getElementById("card-team-2").className = `team-status-card ${currentTeam === 2 ? 'active-turn-glow-2' : ''}`;
+}
+
+function buildGameBoardUI() {
+const board = document.getElementById("board");
+board.innerHTML = "";
+let cellCounter = 0;
+for (let row = 6; row >= 0; row--) {
+for (let col = 0; col < 7; col++) {
+let cellNum = (row % 2 === 1) ? ((row * 7) + (7 - col)) : ((row * 7) + (col + 1));
+if (cellNum <= 50) {
+const cellDiv = document.createElement("div");
+cellDiv.id = `board-cell-${cellNum}`;
+let cellColorClass = (cellCounter % 2 === 0) ? 'cell-even-color' : 'cell-odd-color';
+cellDiv.className = `cell ${cellColorClass}`;
+if (cellNum === 50) cellDiv.style.backgroundColor = "#f1c40f";
+let imgElementHtml = "";
+if (gameData[cellNum] && gameData[cellNum].imageUrl) {
+imgElementHtml = `<img src="${gameData[cellNum].imageUrl}" class="cell-thumbnail-img">`;
+}
+cellDiv.innerHTML = `
+<span class="cell-number">${cellNum === 50 ? "50 🏆" : cellNum}</span>
+<div class="cell-content-container">
+${imgElementHtml}
+<div class="cell-content-indicator" style="${gameData[cellNum]?.imageUrl ? 'background:rgba(255,255,255,0.75); border-radius: 3px; padding:2px;' : ''}">${gameData[cellNum]?.content || ''}</div>
+</div>
+<div id="tokens-cell-${cellNum}" class="token-container"></div>
+`;
+board.appendChild(cellDiv);
+cellCounter++;
+}
+}
+}
+renderPlayerTokens();
+setTimeout(drawVisualTracksOverlayVectors, 300);
+}
+
+function drawVisualTracksOverlayVectors() {
+const svg = document.getElementById("board-graphics-canvas");
+const wrapper = document.getElementById("board-rel-anchor");
+if (!svg || !wrapper) return;
+svg.innerHTML = "";
+const wrapperRect = wrapper.getBoundingClientRect();
+function drawRealLadder(start, end) {
+const c1 = document.getElementById(`board-cell-${start}`);
+const c2 = document.getElementById(`board-cell-${end}`);
+if (!c1 || !c2) return;
+const r1 = c1.getBoundingClientRect();
+const r2 = c2.getBoundingClientRect();
+const x1 = (r1.left + r1.width / 2) - wrapperRect.left;
+const y1 = (r1.top + r1.height / 2) - wrapperRect.top;
+const x2 = (r2.left + r2.width / 2) - wrapperRect.left;
+const y2 = (r2.top + r2.height / 2) - wrapperRect.top;
+const offset = 9;
+const angle = Math.atan2(y2 - y1, x2 - x1);
+const dx = offset * Math.sin(angle);
+const dy = offset * Math.cos(angle);
+const rail1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+rail1.setAttribute("x1", x1 - dx); rail1.setAttribute("y1", y1 + dy);
+rail1.setAttribute("x2", x2 - dx); rail1.setAttribute("y2", y2 + dy);
+rail1.setAttribute("class", "ladder-main-rail");
+svg.appendChild(rail1);
+const rail2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+rail2.setAttribute("x1", x1 + dx); rail2.setAttribute("y1", y1 - dy);
+rail2.setAttribute("x2", x2 + dx); rail2.setAttribute("y2", y2 - dy);
+rail2.setAttribute("class", "ladder-main-rail");
+svg.appendChild(rail2);
+const stepsCount = 6;
+for (let i = 1; i < stepsCount; i++) {
+const t = i / stepsCount;
+const sx = x1 + t * (x2 - x1);
+const sy = y1 + t * (y2 - y1);
+const rung = document.createElementNS("http://www.w3.org/2000/svg", "line");
+rung.setAttribute("x1", sx - dx); rung.setAttribute("y1", sy + dy);
+rung.setAttribute("x2", sx + dx); rung.setAttribute("y2", sy - dy);
+rung.setAttribute("class", "ladder-rung-step");
+svg.appendChild(rung);
+}
+}
+for (let src in ladders) { drawRealLadder(src, ladders[src]); }
+}
+
+function renderPlayerTokens() {
+for (let i = 1; i <= 50; i++) {
+const box = document.getElementById(`tokens-cell-${i}`);
+if (box) box.innerHTML = "";
+}
+const p1 = teamPositions[1];
+const box1 = document.getElementById(`tokens-cell-${p1}`);
+if (box1) box1.innerHTML += '<div class="pawn-token t1" id="live-pawn-p1"></div>';
+const p2 = teamPositions[2];
+const box2 = document.getElementById(`tokens-cell-${p2}`);
+if (box2) box2.innerHTML += '<div class="pawn-token t2" id="live-pawn-p2"></div>';
+document.getElementById("team1-pos-val").innerText = teamPositions[1];
+document.getElementById("team2-pos-val").innerText = teamPositions[2];
+}
+
+function openDiceRollSequence() {
+document.getElementById("roll-btn").disabled = true;
+const overlay = document.getElementById("dice-overlay-modal");
+const txtTitle = document.getElementById("dice-modal-title-text");
+const txtResult = document.getElementById("dice-numerical-callout");
+const cube = document.getElementById("cube-dice-object");
+txtTitle.innerText = `Team ${currentTeam} Rolling...`;
+txtResult.innerText = "Spinning...";
+cube.className = "real-cube-dice rolling-animate-active";
+overlay.style.display = "flex";
+latestDiceRoll = Math.floor(Math.random() * 6) + 1;
+setTimeout(() => {
+cube.className = "real-cube-dice";
+cube.classList.add(`show-value-${latestDiceRoll}`);
+txtResult.innerText = `Rolled a ${latestDiceRoll}!`;
+setTimeout(() => {
+overlay.style.display = "none";
+cube.classList.remove(`show-value-${latestDiceRoll}`);
+executeStepByStepMovementLogic(); 
+}, 1000);
+}, 1100);
+}
+
+function executeStepByStepMovementLogic() {
+    oldPositions[currentTeam] = teamPositions[currentTeam]; 
+    let targetPos = teamPositions[currentTeam] + latestDiceRoll;
+
+    if (targetPos > 50) {
+        document.getElementById("roll-btn").disabled = false;
+        toggleTeamTurn();
+        return;
+    }
+
+    let stepsInterval = setInterval(() => {
+        if (teamPositions[currentTeam] < targetPos) {
+            teamPositions[currentTeam]++;
+            renderPlayerTokens(); 
+        } else {
+            clearInterval(stepsInterval); 
+            setTimeout(() => {
+                triggerChallengePopup(teamPositions[currentTeam]); 
+            }, 400);
+        }
+    }, 450); 
+}
+
+function triggerChallengePopup(cellNum) {
+const modal = document.getElementById("question-modal");
+const imgFrame = document.getElementById("pop-image-frame");
+const popImg = document.getElementById("pop-actual-img");
+document.getElementById("pop-cell-number-badge").innerText = `CELL ${cellNum}`;
+document.getElementById("modal-text").innerText = gameData[cellNum]?.content || `Room ${cellNum}`;
+if (gameData[cellNum] && gameData[cellNum].imageUrl) {
+popImg.src = gameData[cellNum].imageUrl;
+imgFrame.style.display = "flex";
+} else {
+popImg.src = "";
+imgFrame.style.display = "none";
+}
+modal.style.display = "flex";
+}
+
+function evaluateAnswer(isCorrect) {
+document.getElementById("question-modal").style.display = "none";
+let currentPos = teamPositions[currentTeam];
+if (isCorrect) {
+    if (ladders[currentPos]) {
+        teamPositions[currentTeam] = ladders[currentPos];
+        renderPlayerTokens();
+    }
+    checkWinCondition();
+    document.getElementById("roll-btn").disabled = false;
+    toggleTeamTurn();
+} else {
+    executeBurmaPythonAttackEngine();
+}
+}
+
+/* 🐍 [BURMA PYTHON ENGINE] - Dynamic Scale Font-Size Fixed */
+function executeBurmaPythonAttackEngine() {
+const errorTargetCellNum = teamPositions[currentTeam]; 
+const targetCellDom = document.getElementById(`board-cell-${errorTargetCellNum}`);
+const boardWrapper = document.getElementById("board-rel-anchor");
+const snakePuck = document.getElementById("snakeStickerAttackPuck");
+
+let finalBasePos = snakes[errorTargetCellNum] ? snakes[errorTargetCellNum] : oldPositions[currentTeam];
+
+if (!targetCellDom || !boardWrapper || !snakePuck) {
+    executeStepByStepBackwardMovementLogic(finalBasePos);
+    return;
+}
+
+const wrapperRect = boardWrapper.getBoundingClientRect();
+const cellRect = targetCellDom.getBoundingClientRect();
+const targetX = (cellRect.left + cellRect.width / 2) - wrapperRect.left;
+const targetY = (cellRect.top + cellRect.height / 2) - wrapperRect.top;
+
+document.getElementById("main-viewport-container").classList.add("damage-flash-active-frame");
+
+// [အဆင့်မြှင့်တင်မှု] - အရင်ဆုံး ကင်းဗတ်စ်အလယ်တည့်တည့်မှာ နေရာချပြီး active-center class ဖွင့်လိုက်ခြင်း (Font Size 140px ဖြစ်သွားပါမယ်)
+snakePuck.style.left = "50%";
+snakePuck.style.top = "50%";
+snakePuck.style.display = "flex";
+snakePuck.className = "snake-popup-bite-card active-center";
+
+// အလယ်မှာ ပေါ်ပြီးမှ အဲဒီနေရာကနေ Pawn ရှိရာအကွက်ဆီကို ပြေးကိုက်စေခြင်း (ပြေးကိုက်ချိန်တွင် 60px သို့ ကျုံ့သွားပါမည်)
+setTimeout(() => {
+    snakePuck.className = "snake-popup-bite-card active-target";
+    snakePuck.style.left = `${targetX}px`;
+    snakePuck.style.top = `${targetY}px`;
+    
+    setTimeout(() => {
+        snakePuck.style.display = "none";
+        snakePuck.className = "snake-popup-bite-card";
+        document.getElementById("main-viewport-container").classList.remove("damage-flash-active-frame");
+        
+        // တစ်ကွက်ချင်း နောက်ပြန်ဆုတ်စေခြင်း
+        executeStepByStepBackwardMovementLogic(finalBasePos);
+    }, 700);
+}, 800); // 0.8 စက္ကန့်ကြာ အလယ်မှာ ကြီးကြီးမားမား အရင်ပြသထားခြင်း
+}
+
+function executeStepByStepBackwardMovementLogic(finalBasePos) {
+    let backwardInterval = setInterval(() => {
+        if (teamPositions[currentTeam] > finalBasePos) {
+            teamPositions[currentTeam]--;
+            renderPlayerTokens(); 
+        } else {
+            clearInterval(backwardInterval); 
+            checkWinCondition();
+            document.getElementById("roll-btn").disabled = false;
+            toggleTeamTurn();
+        }
+    }, 450); 
+}
+
+function toggleTeamTurn() {
+currentTeam = currentTeam == 1 ? 2 : 1;
+document.getElementById("card-team-1").className = `team-status-card ${currentTeam === 1 ? 'active-turn-glow-1' : ''}`;
+document.getElementById("card-team-2").className = `team-status-card ${currentTeam === 2 ? 'active-turn-glow-2' : ''}`;
+}
+
+function checkWinCondition() {
+if (teamPositions[1] == 50 || teamPositions[2] == 50) {
+alert(`Congratulations! Team ${teamPositions[1] == 50 ? '1' : '2'} wins the game!`);
+resetGame();
+}
+}
+
+function resetGame() {
+teamPositions = { 1:1, 2:1 };
+oldPositions = { 1:1, 2:1 };
+currentTeam = 1;
+document.getElementById("card-team-1").className = "team-status-card active-turn-glow-1";
+document.getElementById("card-team-2").className = "team-status-card";
+renderPlayerTokens();
+setTimeout(drawVisualTracksOverlayVectors, 300);
+}
+</script>
+</body>
+</html>
