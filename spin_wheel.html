@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Spin Wheel Premium Studio & Engine</title>
     <style>
-        /* STUDIO GHIBLI SKY BLUE & SOFT WHITE PREMIUM THEME */
+        /* PREMIUM STUDIO THEME V3 WITH MATRIX COMPONENTS */
         :root {
             --sky-blue-deep: #2980b9;
             --sky-blue-light: #6dd5fa;
@@ -15,6 +15,7 @@
             --text-muted: #7f8c8d;
             --accent-orange: #e67e22;
             --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
         }
 
         html, body {
@@ -73,10 +74,9 @@
             letter-spacing: 0.5px;
         }
 
-        /* Two-Column Workspace Layout */
         .studio-workspace {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-columns: 1.3fr 0.7fr;
             gap: 45px;
         }
 
@@ -88,7 +88,6 @@
             box-sizing: border-box;
         }
 
-        /* Drag & Dropzone Component */
         .file-dropzone {
             background: rgba(109, 213, 250, 0.08);
             padding: 25px 20px;
@@ -119,7 +118,6 @@
             margin-top: 6px;
         }
 
-        /* Form Components */
         label {
             font-weight: 700;
             display: block;
@@ -151,12 +149,109 @@
         }
 
         textarea.studio-input {
-            height: 100px;
+            height: 90px;
             resize: none;
             line-height: 1.6;
         }
 
-        /* Image Picker Premium Area Style */
+        /* MATRIX LIST ROW ENGINE STYLING */
+        .matrix-box-container {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(41, 128, 185, 0.2);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .matrix-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .matrix-index {
+            font-weight: 800;
+            color: var(--sky-blue-deep);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .matrix-word-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .matrix-media-block {
+            flex: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .matrix-link-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .matrix-file-btn {
+            background: #edf2f7;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .matrix-file-btn:hover { background: #e2e8f0; }
+
+        .matrix-row-delete-btn {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: var(--accent-red);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .matrix-row-delete-btn:hover { background: #feb2b2; }
+
+        .btn-add-matrix-row {
+            background: #ebf8ff;
+            color: var(--sky-blue-deep);
+            border: 1px dashed var(--sky-blue-deep);
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            margin-top: 5px;
+        }
+
+        .btn-add-matrix-row:hover { background: #cbd5e1; }
+
         .image-picker-container {
             display: flex;
             flex-direction: column;
@@ -178,9 +273,7 @@
             transition: background 0.2s;
         }
 
-        .btn-browse-images:hover {
-            background: #2c3e50;
-        }
+        .btn-browse-images:hover { background: #2c3e50; }
 
         .images-count-badge {
             font-size: 12px;
@@ -189,7 +282,6 @@
             margin-top: -4px;
         }
 
-        /* Dual Action Button Studio Section */
         .action-button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -256,7 +348,6 @@
             box-sizing: border-box;
         }
 
-        /* Main Giant Wheel Space Canvas Frame */
         .spin-main-workspace {
             flex: 1;
             display: flex;
@@ -310,7 +401,6 @@
             z-index: 10;
         }
 
-        /* GIANT FERRIS WHEEL FRAME */
         .ferris-wheel-frame {
             position: relative;
             width: 100%;
@@ -323,7 +413,6 @@
             justify-content: center;
         }
 
-        /* GIANT DIAL DIMENSION MAX VALUE (600px) */
         .wheel-wrapper {
             position: absolute;
             top: 0;
@@ -339,7 +428,6 @@
             justify-content: center;
         }
 
-        /* Premium Aesthetic Support Legs */
         .ferris-iron-leg-left {
             position: absolute;
             bottom: -20px;
@@ -388,7 +476,6 @@
             z-index: 6;
         }
 
-        /* Soft Right Side Pin Pointer Component */
         .wheel-pointer-right {
             position: absolute;
             top: 290px;
@@ -403,7 +490,6 @@
             filter: drop-shadow(-4px 4px 6px rgba(0,0,0,0.15));
         }
 
-        /* Inner Beautiful Trigger Engine */
         .center-hub {
             position: absolute;
             top: 290px;
@@ -441,7 +527,7 @@
             box-shadow: 0 8px 20px rgba(41, 128, 185, 0.4);
         }
 
-        /* IN-GAME RIGHT SIDEBAR CONTROLLER */
+        /* IN-GAME SIDEBAR */
         .game-control-sidebar {
             width: 460px;
             height: 100%;
@@ -516,7 +602,7 @@
             transform: translateY(-1px);
         }
 
-        /* POPUP MODAL VIEWPORTS */
+        /* MODALS */
         .overlay-mask {
             display: none;
             position: fixed;
@@ -570,7 +656,6 @@
             word-break: break-word;
         }
 
-        /* WINNER POPUP IMAGE SHOWCASE */
         .winner-image-frame {
             width: 140px;
             height: 140px;
@@ -623,7 +708,6 @@
             margin-bottom: 20px;
         }
 
-        /* RESPONSIVE LAYOUT MATRIX ENGINE */
         @media (max-width: 992px) {
             .game-arena { flex-direction: column; }
             .game-control-sidebar { width: 100%; height: auto; border-left: none; border-top: 1px solid rgba(0,0,0,0.06); }
@@ -651,8 +735,8 @@
     <div class="app-container" id="studioView">
         <div class="studio-dashboard">
             <div class="studio-header">
-                <h2>Spin Wheel Pack Factory</h2>
-                <p class="subtitle">Create lists, load images from device/links, and spin flexibly</p>
+                <h2>Spin Wheel Pack Factory V3</h2>
+                <p class="subtitle">Advanced Layout Mixer Engine With Live Sync Matrix Slots</p>
             </div>
             
             <div class="studio-workspace">
@@ -669,21 +753,16 @@
                     <label>Default Spin Duration (Seconds) :</label>
                     <input type="number" id="spinDuration" class="studio-input" value="5" min="2" max="60">
 
-                    <!-- WORDS BOX -->
-                    <label>Enter Names / Words / Numbers (One item per line) :</label>
-                    <textarea id="wordItems" class="studio-input" placeholder="Item 1&#10;Item 2&#10;Item 3"></textarea>
+                    <label>📋 Bulk Text Input (Fast Copy-Paste Box) :</label>
+                    <textarea id="wordItems" class="studio-input" placeholder="Item 1&#10;Item 2&#10;Item 3" oninput="syncBulkTextToMatrix()"></textarea>
 
-                    <!-- NEW IMAGE LINKS BOX (FIXED FOR URL SUPPORT) -->
-                    <label>Enter Image Links / URLs (Optional - One per line) :</label>
-                    <textarea id="imageLinks" class="studio-input" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" style="height: 80px;"></textarea>
+                    <label>🔗 Bulk Image Links (Fast Copy-Paste Box) :</label>
+                    <textarea id="imageLinks" class="studio-input" placeholder="https://example.com/pic1.jpg&#10;https://example.com/pic2.jpg" style="height: 70px;" oninput="syncBulkLinksToMatrix()"></textarea>
 
-                    <!-- DEVICE IMAGE BROWSER COMPONENT -->
-                    <label>Or Select Images from Device (Optional) :</label>
-                    <div class="image-picker-container">
-                        <button class="btn-browse-images" onclick="document.getElementById('deviceImagePicker').click()">📁 Choose Image Files</button>
-                        <div class="images-count-badge" id="studioImagesCount">No device images selected</div>
-                        <input type="file" id="deviceImagePicker" accept="image/*" multiple style="display: none;" onchange="handleDeviceImagesSelection(event, 'studio')">
-                    </div>
+                    <label>🛠️ Custom Word & Image Matrix Slots (One-by-One Controller) :</label>
+                    <div class="matrix-box-container" id="matrixRowsWrapper">
+                        </div>
+                    <button class="btn-add-matrix-row" onclick="addBlankMatrixRowCell()">➕ Add Item Row</button>
 
                     <div class="action-button-group">
                         <button class="btn-studio btn-download-txt" onclick="exportSpinWheelROMOnly()">💾 Download TXT ROM</button>
@@ -693,9 +772,10 @@
 
                 <div class="preview-showcase">
                     <div class="preview-icon">🎡</div>
-                    <h3 style="color: var(--sky-blue-deep); margin: 0 0 10px 0; font-weight: 800;">Image Link Engine Fixed</h3>
-                    <p style="color: var(--text-muted); font-size: 14px; max-width: 320px; margin: 0 auto; line-height: 1.7;">
-                       Now, whether you paste an image link (URL) from the internet or select images from your device, everything will be automatically connected and displayed.
+                    <h3 style="color: var(--sky-blue-deep); margin: 0 0 10px 0; font-weight: 800;">Dynamic Hybrid Controls</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; max-width: 320px; margin: 0 auto; line-height: 1.7; text-align: left;">
+                        • <b>စနစ်ဟောင်း (Bulk Box):</b> အတန်းလိုက် Copy Paste အမြန်ထည့်ချင်ရင် အပေါ်က Box တွေမှာ တန်းထည့်ပါ။<br><br>
+                        • <b>စနစ်သစ် (Matrix Slot):</b> စာနဲ့ ပုံ (Link သို့မဟုတ် Device File) ကို တစ်ခုချင်းစီ စိတ်ကြိုက် တွဲဖက်/ဖျက်ချင်ရင် Slot တန်းလေးတွေမှာ ပြင်ဆင်နိုင်ပါတယ်။ နှစ်ခုလုံး ချိတ်ဆက်နေမှာပါ။
                     </p>
                 </div>
             </div>
@@ -704,7 +784,6 @@
 
     <div class="game-section" id="gameRuntimeView">
         <div class="game-arena">
-            
             <div class="spin-main-workspace">
                 <div class="live-spin-time-box">
                     <span>⚡ Spin Speed:</span>
@@ -736,17 +815,10 @@
                 <div class="sidebar-title">📝 In-Game Controller</div>
                 
                 <label style="margin-top:5px; margin-bottom:4px; font-size:11px;">Modify Items List:</label>
-                <textarea id="runtimeWordItems" class="studio-input" style="height: 100px; font-size: 13px; margin-bottom: 10px;"></textarea>
+                <textarea id="runtimeWordItems" class="studio-input" style="height: 140px; font-size: 13px; margin-bottom: 10px;"></textarea>
 
                 <label style="margin-top:0; margin-bottom:4px; font-size:11px;">Modify Image Links / URLs:</label>
-                <textarea id="runtimeImageLinks" class="studio-input" style="height: 100px; font-size: 13px; margin-bottom: 10px;" placeholder="One URL per line"></textarea>
-                
-                <label style="margin-top:0; margin-bottom:4px; font-size:11px;">Or Change Device Images:</label>
-                <div class="image-picker-container">
-                    <button class="btn-browse-images" style="padding:10px; font-size:12px;" onclick="document.getElementById('runtimeImagePicker').click()">📁 Change Files</button>
-                    <div class="images-count-badge" id="runtimeImagesCount">0 device images cached</div>
-                    <input type="file" id="runtimeImagePicker" accept="image/*" multiple style="display: none;" onchange="handleDeviceImagesSelection(event, 'runtime')">
-                </div>
+                <textarea id="runtimeImageLinks" class="studio-input" style="height: 140px; font-size: 13px; margin-bottom: 10px;" placeholder="One URL per line"></textarea>
                 
                 <button class="btn-update-live" onclick="syncRuntimeSidebarToWheel()">🔄 Update Wheel</button>
                 
@@ -754,7 +826,6 @@
                     <button class="btn-console" onclick="quitActiveGameEngine()">Close Engine</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -773,9 +844,7 @@
         const SoundFX = {
             ctx: null,
             init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
+                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
             },
             playFlip(speedFactor = 1) {
@@ -815,8 +884,9 @@
     </script>
 
     <script>
-        let wheelSegments = []; 
-        let temporaryImagesList = []; // Holds Base64 images from Device Upload
+        // MASTER STRUCT ENGINE CORE DATA ARRAY
+        // Each entry: { text: "", img: "base64 or url data string", imgObj: HTMLImageElement }
+        let matrixStoreData = []; 
         let currentRotationAngle = 0;
         let isSpinning = false;
         let lastWinnerIndex = -1;
@@ -831,63 +901,177 @@
 
         window.addEventListener("DOMContentLoaded", () => {
             setupDragAndDropZone();
+            // Initialize default matrix rows with some space assets
+            for (let i = 0; i < 4; i++) {
+                matrixStoreData.push({ text: `Item ${i+1}`, img: "", imgObj: null });
+            }
+            renderStudioMatrixGUI();
         });
 
-        // HANDLE LOCAL DEVICE IMAGE BROWSER SELECTION
-        function handleDeviceImagesSelection(event, location) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
+        // DRAW STUDIO ROW SLOTS ELEMENTS ENGINE
+        function renderStudioMatrixGUI() {
+            const wrapper = document.getElementById("matrixRowsWrapper");
+            wrapper.innerHTML = "";
 
-            temporaryImagesList = [];
-            let loadedCount = 0;
+            matrixStoreData.forEach((row, index) => {
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "matrix-row";
 
-            for(let i=0; i<files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    temporaryImagesList.push(e.target.result);
-                    loadedCount++;
-                    
-                    if(loadedCount === files.length) {
-                        const message = `${temporaryImagesList.length} device images selected.`;
-                        document.getElementById("studioImagesCount").innerText = message;
-                        document.getElementById("runtimeImagesCount").innerText = message;
-                        if(location === 'runtime') {
-                            syncRuntimeSidebarToWheel();
-                        }
-                    }
+                // Index Column Number Badge
+                const indexSpan = document.createElement("span");
+                indexSpan.className = "matrix-index";
+                indexSpan.innerText = `${index + 1}.`;
+                rowDiv.appendChild(indexSpan);
+
+                // Word Text Field Input
+                const wordInput = document.createElement("input");
+                wordInput.type = "text";
+                wordInput.className = "matrix-word-input";
+                wordInput.placeholder = "Word / Name";
+                wordInput.value = row.text;
+                wordInput.oninput = (e) => {
+                    matrixStoreData[index].text = e.target.value;
+                    syncMatrixToBulkTextFields();
                 };
-                reader.readAsDataURL(files[i]);
-            }
+                rowDiv.appendChild(wordInput);
+
+                // Media Integration Bundle (Links & Local Files)
+                const mediaBlock = document.createElement("div");
+                mediaBlock.className = "matrix-media-block";
+
+                const linkInput = document.createElement("input");
+                linkInput.type = "text";
+                linkInput.className = "matrix-link-input";
+                linkInput.placeholder = "Image Link (URL) or Upload File ->";
+                // Only show string if it is an HTTP internet web path link address asset
+                linkInput.value = row.img.startsWith("data:") ? "[Device Storage Image File Cached]" : row.img;
+                linkInput.oninput = (e) => {
+                    matrixStoreData[index].img = e.target.value;
+                    matrixStoreData[index].imgObj = null; // Clear cached instance
+                    syncMatrixToBulkTextFields();
+                };
+                mediaBlock.appendChild(linkInput);
+
+                // Hidden Local Input Device Storage Driver File Element Picker
+                const hiddenFileInput = document.createElement("input");
+                hiddenFileInput.type = "file";
+                hiddenFileInput.accept = "image/*";
+                hiddenFileInput.style.display = "none";
+                hiddenFileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        matrixStoreData[index].img = evt.target.result;
+                        matrixStoreData[index].imgObj = null; // reset object binding
+                        linkInput.value = "[Device Storage Image File Cached]";
+                        syncMatrixToBulkTextFields();
+                    };
+                    reader.readAsDataURL(file);
+                };
+                mediaBlock.appendChild(hiddenFileInput);
+
+                // Browse Icon Button Selector Triggers Launcher
+                const fileBtn = document.createElement("button");
+                fileBtn.className = "matrix-file-btn";
+                fileBtn.innerHTML = "📁";
+                fileBtn.title = "Upload Image File from Local Storage Drive Device";
+                fileBtn.onclick = () => hiddenFileInput.click();
+                mediaBlock.appendChild(fileBtn);
+
+                rowDiv.appendChild(mediaBlock);
+
+                // Row Deletion Element Component Core Triggers
+                const delBtn = document.createElement("button");
+                delBtn.className = "matrix-row-delete-btn";
+                delBtn.innerText = "🗑️";
+                delBtn.onclick = () => {
+                    matrixStoreData.splice(index, 1);
+                    renderStudioMatrixGUI();
+                    syncMatrixToBulkTextFields();
+                };
+                rowDiv.appendChild(delBtn);
+
+                wrapper.appendChild(rowDiv);
+            });
         }
 
-        // COMPILE HYBRID SOURCE ELEMENT ARRAYS FLEXIBLY
-        function getRomConfigurationPackage(isRuntime = false) {
-            const title = document.getElementById("gameTitle").value.trim() || "Spin-Wheel";
-            const duration = parseInt(document.getElementById("spinDuration").value) || 5;
-            
-            const wordsText = isRuntime ? document.getElementById("runtimeWordItems").value.trim() : document.getElementById("wordItems").value.trim();
-            const linksText = isRuntime ? document.getElementById("runtimeImageLinks").value.trim() : document.getElementById("imageLinks").value.trim();
+        function addBlankMatrixRowCell() {
+            matrixStoreData.push({ text: "", img: "", imgObj: null });
+            renderStudioMatrixGUI();
+            syncMatrixToBulkTextFields();
+        }
 
-            let wordsArray = wordsText.split('\n').map(w => w.trim()).filter(w => w !== "");
-            let linksArray = linksText.split('\n').map(l => l.trim()).filter(l => l !== "");
-            
-            // Integrate device images if link box is empty
-            let imagesArray = linksArray.length > 0 ? linksArray : temporaryImagesList;
+        // SYNC MECHANISM DIRECTION A: (MATRIX GRID -> TEXTAREAS CACHE BUNDLES)
+        function syncMatrixToBulkTextFields() {
+            const wordsList = matrixStoreData.map(r => r.text).join('\n');
+            // Only output clear web url linkages out to avoid crashing text boxes with thousands of Base64 lines raw bytes codes
+            const linksList = matrixStoreData.map(r => r.img.startsWith('data:') ? '' : r.img).join('\n');
 
-            let loopLength = Math.max(wordsArray.length, imagesArray.length);
-            if (loopLength === 0) {
-                alert("Please add at least some Text items or Image links/files!");
+            document.getElementById("wordItems").value = wordsList;
+            document.getElementById("imageLinks").value = linksList;
+        }
+
+        // SYNC MECHANISM DIRECTION B: (BULK COPIED BOXES -> REPOPULATE MATRIX GRID INSIDE SYSTEM)
+        function syncBulkTextToMatrix() {
+            const bulkWordsText = document.getElementById("wordItems").value.trim();
+            const wordsArray = bulkWordsText.split('\n').map(w => w.trim());
+
+            let maxLines = Math.max(wordsArray.length, matrixStoreData.length);
+            if (maxLines === 0 || (wordsArray.length === 1 && wordsArray[0] === "")) {
+                matrixStoreData = [];
+                renderStudioMatrixGUI();
+                return;
+            }
+
+            let newMatrix = [];
+            for (let i = 0; i < wordsArray.length; i++) {
+                let currentWord = wordsArray[i];
+                let inheritedImage = (matrixStoreData[i] && matrixStoreData[i].img) ? matrixStoreData[i].img : "";
+                let inheritedImgObj = (matrixStoreData[i] && matrixStoreData[i].imgObj) ? matrixStoreData[i].imgObj : null;
+                newMatrix.push({ text: currentWord, img: inheritedImage, imgObj: inheritedImgObj });
+            }
+
+            matrixStoreData = newMatrix;
+            renderStudioMatrixGUI();
+        }
+
+        function syncBulkLinksToMatrix() {
+            const bulkLinksText = document.getElementById("imageLinks").value.trim();
+            const linksArray = bulkLinksText.split('\n').map(l => l.trim());
+
+            let maxLen = Math.max(matrixStoreData.length, linksArray.length);
+            if (maxLen === 0) return;
+
+            // Make sure the items match row bounds length sizes
+            while (matrixStoreData.length < linksArray.length) {
+                matrixStoreData.push({ text: "", img: "", imgObj: null });
+            }
+
+            for (let i = 0; i < linksArray.length; i++) {
+                if (linksArray[i] !== "") {
+                    matrixStoreData[i].img = linksArray[i];
+                    matrixStoreData[i].imgObj = null; 
+                }
+            }
+
+            renderStudioMatrixGUI();
+        }
+
+        // RUN ENGINE LOGIC CORE MANAGEMENT COMPILATION
+        function getRomConfigurationPackage() {
+            // Trim empty slots away to keep rendering sleek and bug-free
+            let dynamicFilterDataset = matrixStoreData.filter(item => item.text !== "" || item.img !== "");
+            
+            if (dynamicFilterDataset.length === 0) {
+                alert("Please add at least some Text elements or load Image assets inside rows/boxes!");
                 return null;
             }
+            
+            const title = document.getElementById("gameTitle").value.trim() || "Spin-Wheel";
+            const duration = parseInt(document.getElementById("spinDuration").value) || 5;
 
-            let segments = [];
-            for (let i = 0; i < loopLength; i++) {
-                let textVal = wordsArray[i] !== undefined ? wordsArray[i] : "";
-                let imgVal = imagesArray[i % imagesArray.length] || "";
-                segments.push({ text: textVal, img: imgVal, imgObj: null });
-            }
-
-            return { title, duration, segments, wordsText, linksText };
+            return { title, duration, segments: dynamicFilterDataset };
         }
 
         function exportSpinWheelROMOnly() {
@@ -911,7 +1095,7 @@
         function launchAndPlayDirectly() {
             const configPackage = getRomConfigurationPackage();
             if (!configPackage) return;
-            bootSpinWheelRuntimeEngine(configPackage.segments, configPackage.duration, configPackage.wordsText, configPackage.linksText);
+            bootSpinWheelRuntimeEngine(configPackage.segments, configPackage.duration);
         }
 
         function importSpinWheelROM(event) {
@@ -926,40 +1110,37 @@
 
                     document.getElementById("gameTitle").value = rom.title || "Lucky Pack";
                     document.getElementById("spinDuration").value = rom.duration || 5;
+
+                    matrixStoreData = rom.pairs.map(p => ({
+                        text: p.a || "",
+                        img: p.b || "",
+                        imgObj: null
+                    }));
+
+                    renderStudioMatrixGUI();
+                    syncMatrixToBulkTextFields();
                     
-                    const wordsString = rom.pairs.map(p => p.a).filter(a => a !== "").join('\n');
-                    document.getElementById("wordItems").value = wordsString;
-
-                    const linksString = rom.pairs.map(p => p.b).filter(b => b && b.startsWith('http')).join('\n');
-                    document.getElementById("imageLinks").value = linksString;
-
-                    // If they are base64 local data assets instead of http links
-                    temporaryImagesList = rom.pairs.map(p => p.b).filter(b => b && b.startsWith('data:image'));
-                    document.getElementById("studioImagesCount").innerText = `${temporaryImagesList.length} device images loaded from ROM.`;
-
-                    let segments = rom.pairs.map(p => ({ text: p.a || "", img: p.b || "", imgObj: null }));
-                    bootSpinWheelRuntimeEngine(segments, rom.duration || 5, wordsString, linksString);
+                    bootSpinWheelRuntimeEngine(matrixStoreData, rom.duration || 5);
                 } catch (err) {
-                    alert("Invalid Game File Format!");
+                    alert("Invalid Game File Format Config asset!");
                 }
             };
             reader.readAsText(file);
         }
 
-        function bootSpinWheelRuntimeEngine(segmentsList, durationSeconds, wordsText, linksText) {
+        function bootSpinWheelRuntimeEngine(segmentsList, durationSeconds) {
             document.getElementById("studioView").style.display = "none";
             document.getElementById("gameRuntimeView").style.display = "flex";
             document.getElementById("liveSecondsInput").value = durationSeconds;
 
-            wheelSegments = segmentsList;
             currentRotationAngle = 0;
             lastWinnerIndex = -1;
             isSpinning = false;
             globalRequestStop = false;
 
-            // Prefetch and load images properly
-            wheelSegments.forEach(seg => {
-                if (seg.img) {
+            // Load Canvas Image cache links loops dynamically
+            matrixStoreData.forEach(seg => {
+                if (seg.img && !seg.imgObj) {
                     let img = new Image();
                     img.src = seg.img;
                     img.onload = () => { drawConsoleWheelGraphic(currentRotationAngle); };
@@ -967,8 +1148,8 @@
                 }
             });
 
-            document.getElementById("runtimeWordItems").value = wordsText;
-            document.getElementById("runtimeImageLinks").value = linksText;
+            document.getElementById("runtimeWordItems").value = matrixStoreData.map(s => s.text).join('\n');
+            document.getElementById("runtimeImageLinks").value = matrixStoreData.map(s => s.img.startsWith('data:') ? '' : s.img).join('\n');
             document.getElementById("spinActionBtn").innerText = "SPIN";
 
             drawConsoleWheelGraphic(0);
@@ -976,35 +1157,57 @@
 
         function syncRuntimeSidebarToWheel() {
             if (isSpinning) return;
-            const configPackage = getRomConfigurationPackage(true);
-            if (!configPackage) return;
+            const wordsText = document.getElementById("runtimeWordItems").value.trim();
+            const linksText = document.getElementById("runtimeImageLinks").value.trim();
 
-            wheelSegments = configPackage.segments;
-            
-            wheelSegments.forEach(seg => {
-                if (seg.img) {
+            let wordsArray = wordsText.split('\n').map(w => w.trim());
+            let linksArray = linksText.split('\n').map(l => l.trim());
+
+            let loopLength = Math.max(wordsArray.length, linksArray.length);
+            if (loopLength === 0 || (wordsArray.length === 1 && wordsArray[0] === "")) {
+                alert("Active element list runtime array cannot be blanked completely!");
+                return;
+            }
+
+            let newMatrix = [];
+            for (let i = 0; i < loopLength; i++) {
+                let txtVal = wordsArray[i] !== undefined ? wordsArray[i] : "";
+                
+                // Inherit or fetch image linkage allocations properly
+                let imgVal = "";
+                if (linksArray[i] !== undefined && linksArray[i] !== "") {
+                    imgVal = linksArray[i];
+                } else if (matrixStoreData[i] && matrixStoreData[i].img.startsWith('data:')) {
+                    imgVal = matrixStoreData[i].img; // Carry over base64 if it existed here
+                }
+
+                let seg = { text: txtVal, img: imgVal, imgObj: null };
+                if (imgVal) {
                     let img = new Image();
-                    img.src = seg.img;
+                    img.src = imgVal;
                     img.onload = () => { drawConsoleWheelGraphic(currentRotationAngle); };
                     seg.imgObj = img;
                 }
-            });
+                newMatrix.push(seg);
+            }
 
-            // Sync back to studio fields
-            document.getElementById("wordItems").value = configPackage.wordsText;
-            document.getElementById("imageLinks").value = configPackage.linksText;
+            matrixStoreData = newMatrix;
+            
+            // Sync backward changes elements down into studio panels components viewport areas directly
+            renderStudioMatrixGUI();
+            syncMatrixToBulkTextFields();
 
             currentRotationAngle = 0;
             drawConsoleWheelGraphic(0);
         }
 
-        // MAIN DRAWING ENGINE RESPONSIBLE FOR GRAPHICS GENERATION WITH OR WITHOUT TEXT
+        // CANVAS GRAPHICS CORE WHEEL DISK RENDERING CORE ENGINE
         function drawConsoleWheelGraphic(currentRotationRad) {
             const canvas = document.getElementById("wheelCanvas");
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, 580, 580);
 
-            const numSegs = wheelSegments.length;
+            const numSegs = matrixStoreData.length;
             if (numSegs === 0) return 0;
 
             const arcSize = (2 * Math.PI) / numSegs;
@@ -1032,9 +1235,8 @@
                 ctx.save();
                 ctx.rotate((i + 0.5) * arcSize);
                 
-                let seg = wheelSegments[i];
+                let seg = matrixStoreData[i];
 
-                // RENDERING LOGIC FLOW FOR IMAGES (LINKS OR DEVICE DISK ASSETS)
                 if (seg.imgObj && seg.imgObj.complete && seg.imgObj.naturalWidth !== 0) {
                     ctx.save();
                     let translateRadius = (seg.text === "") ? 180 : 160;
@@ -1047,7 +1249,6 @@
                     ctx.drawImage(seg.imgObj, -imageRadius, -imageRadius, imageRadius*2, imageRadius*2);
                     ctx.restore();
 
-                    // Render Text alignment
                     if (seg.text !== "") {
                         ctx.fillStyle = "white";
                         let fontSize = seg.text.length > 12 ? 11 : 14;
@@ -1057,7 +1258,6 @@
                         ctx.fillText(seg.text, 120, 0);
                     }
                 } else if (seg.text !== "") {
-                    // TEXT ONLY RENDERING PATHWAY
                     ctx.fillStyle = "white";
                     let fontSize = 16;
                     if (seg.text.length > 12) fontSize = 13;
@@ -1094,7 +1294,7 @@
         }
 
         function toggleWheelSpinEngine() {
-            if (wheelSegments.length === 0) return;
+            if (matrixStoreData.length === 0) return;
             if (isSpinning) {
                 globalRequestStop = true;
                 return;
@@ -1155,16 +1355,15 @@
             globalRequestStop = false;
             document.getElementById("spinActionBtn").innerText = "SPIN";
             
-            if(winnerIdx < 0 || winnerIdx >= wheelSegments.length) {
+            if(winnerIdx < 0 || winnerIdx >= matrixStoreData.length) {
                 winnerIdx = 0;
             }
             
             lastWinnerIndex = winnerIdx;
             SoundFX.playWin();
 
-            let winner = wheelSegments[winnerIdx];
-            
-            document.getElementById("spinResultValue").innerText = winner.text !== "" ? winner.text : "Selected Graphic Asset Slot";
+            let winner = matrixStoreData[winnerIdx];
+            document.getElementById("spinResultValue").innerText = winner.text !== "" ? winner.text : "Selected Slot Graphic Asset Element";
             
             let resImg = document.getElementById("spinResultImg");
             if (winner.img) {
@@ -1180,16 +1379,12 @@
         }
 
         function removeWinnerNamePermanently() {
-            if (lastWinnerIndex > -1 && wheelSegments.length > 0) {
-                wheelSegments.splice(lastWinnerIndex, 1);
+            if (lastWinnerIndex > -1 && matrixStoreData.length > 0) {
+                matrixStoreData.splice(lastWinnerIndex, 1);
                 
-                // Update lists inputs
-                document.getElementById("wordItems").value = wheelSegments.map(s => s.text).join('\n');
-                document.getElementById("runtimeWordItems").value = wheelSegments.map(s => s.text).join('\n');
-                
-                const httpLinks = wheelSegments.map(s => s.img).filter(i => i.startsWith('http')).join('\n');
-                document.getElementById("imageLinks").value = httpLinks;
-                document.getElementById("runtimeImageLinks").value = httpLinks;
+                // Redraw studio system and keep elements mapped properly inside containers loops
+                renderStudioMatrixGUI();
+                syncMatrixToBulkTextFields();
 
                 lastWinnerIndex = -1;
                 currentRotationAngle = 0;
