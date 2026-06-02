@@ -11,6 +11,12 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp">
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp">
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp">
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp">
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp">
+
     <style>
         /* Modern Premium Console Style Base */
         html, body {
@@ -256,7 +262,7 @@
             transform: scale(1.04);
         }
 
-        /* [FIXED] Utility Icon Container Size Control */
+        /* Teacher Utilities Card Icon Size Fixing */
         .system-icon-box {
             width: 100%;
             height: 100%;
@@ -265,11 +271,10 @@
             align-items: center;
             justify-content: center;
             color: #16a34a;
-            font-size: 2.8rem; /* Icon အရွယ်အစားကို အနေတော်ဖြစ်အောင် သေးပေးလိုက်ပါတယ် */
+            font-size: 2.8rem;
             transition: transform 0.4s ease;
         }
 
-        /* ခြားနားတဲ့ အရောင်စပ်ချင်ရင် သုံးဖို့ Utility Class */
         .bg-blue-gradient {
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
             color: #0284c7 !important;
@@ -401,53 +406,52 @@
         if(activeBtn) activeBtn.classList.add('active');
     }
 
-    // 🎮 Game Pack Array Configuration
+    // 🎮 Game Pack Array Configuration (Optimized WebP Framework)
     const myArcadeGamesConfig = [
         {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_09%20AM.png?raw=true",
+            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp",
             title: "Match Up Studio",
             type: "Memory Engine",
             link: "match_up.html"
         },
         {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_16%20AM.png?raw=true",
+            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp",
             title: "Snake & Ladder",
             type: "Board Engine",
             link: "snake_game.html"
         },
         {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_27%20AM.png?raw=true",
+            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp",
             title: "Behind the Card",
             type: "Reveal Engine",
             link: "behind_the_card.html"
         },
         {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_34%20AM.png?raw=true",
+            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp",
             title: "Spin Wheel Factory",
             type: "Wheel Engine",
             link: "spin_wheel.html"
         },
         {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2006_59_04%20PM.png?raw=true",
-            title: "Flash Card Frenzy",
-            type: "Reveal Engine",
-            link: "flash_card.html"
+            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp",
+            title: "Flip Game Frenzy",
+            type: "Flip Engine",
+            link: "flip_game.html"
         }
-        
     ];
 
-    // 🏫 [NEW SYSTEM] Teacher Section Array Configuration (နောက်ထပ်စနစ်တွေ ဒီထဲမှာ အလွယ်တကူ စာကြောင်းတိုးပြီး ထည့်ရုံပါပဲ)
+    // 🏫 Teacher Section Array Configuration (Dynamic & Scalable)
     const myTeacherUtilitiesConfig = [
         {
             iconClass: "fa-solid fa-user-check",
-            bgStyle: "", // Default Green
+            bgStyle: "", 
             title: "Student Checking System",
             type: "GAS Web App",
-            link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec" // ⚠️ Replace with your GAS link
+            link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec"
         },
         {
             iconClass: "fa-solid fa-chart-line",
-            bgStyle: "bg-blue-gradient", 
+            bgStyle: "bg-blue-gradient",
             title: "Analytics & Reports",
             type: "Coming Soon",
             link: "#"
@@ -473,7 +477,7 @@
             card.innerHTML = `
                 <div class="game-badge">Play</div>
                 <div class="image-container">
-                    <img class="game-cover-img" src="${game.image}" alt="${game.title}" loading="lazy">
+                    <img class="game-cover-img" src="${game.image}" alt="${game.title}" loading="eager">
                 </div>
                 <div class="game-details">
                     <div class="game-title">${game.title}</div>
