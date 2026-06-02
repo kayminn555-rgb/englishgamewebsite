@@ -3,585 +3,1340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Match Up - Advanced Maker & Play Station Engine</title>
+    <title>Match Up Advanced Maker & Play Station Engine</title>
     <style>
-        /* ======================== STYLE: STUDIO LAYOUT & THEME ======================== */
+        /* CHEERFUL BRIGHT SKY THEME LAYOUT & STUDIO UI */
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a252f; color: #ffffff;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            color: #1e293b;
+            overflow: hidden;
+            user-select: none;
         }
+
         .app-container {
-            width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            box-sizing: border-box;
         }
-        /* Creator / Studio Section */
-        .creator-section {
-            background-color: white; width: 95%; max-width: 700px; padding: 30px;
-            border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            text-align: left; box-sizing: border-box; color: #2c3e50;
+
+        /* LIGHT PROFESSIONAL DASHBOARD LAYOUT (UNTOUCHED) */
+        .studio-box {
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.65);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(14, 165, 233, 0.15), 0 10px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex;
+            overflow: hidden;
+            box-sizing: border-box;
         }
-        .creator-section h1 { color: #2c3e50; margin-top: 0; margin-bottom: 5px; text-align: center; font-size: 24px; text-transform: uppercase; }
-        .subtitle { color: #7f8c8d; margin-bottom: 25px; text-align: center; font-size: 14px; }
-        
-        /* Dropzone Component */
+
+        .studio-sidebar {
+            width: 35%;
+            background: rgba(240, 249, 255, 0.6);
+            border-right: 1px solid rgba(14, 165, 233, 0.15);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .studio-main-content {
+            width: 65%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        h1, h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #0369a1;
+            text-transform: uppercase;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #0f172a;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
         .file-dropzone {
-            background: #edf2f7; padding: 20px; border-radius: 8px; margin-bottom: 20px;
-            text-align: center; border: 2px dashed #3498db; cursor: pointer; transition: background 0.2s;
+            background: rgba(14, 165, 233, 0.05);
+            padding: 30px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px dashed #0ea5e9;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .file-dropzone:hover { background: #e2e8f0; }
-        .file-dropzone p { margin: 0; font-size: 16px; color: #2c3e50; font-weight: bold; }
-        .file-dropzone span { font-size: 13px; color: #7f8c8d; display: block; margin-top: 4px; }
-        
-        /* Form Components */
-        .studio-field { margin-bottom: 15px; }
-        .studio-field label { font-weight: bold; display: block; margin-bottom: 6px; color: #34495e; }
-        .studio-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        
+
+        .file-dropzone:hover {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: #0284c7;
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 20px rgba(14, 165, 233, 0.15);
+        }
+
+        .file-dropzone p {
+            margin: 0;
+            font-size: 16px;
+            color: #0369a1;
+            font-weight: 700;
+        }
+
+        .file-dropzone span {
+            font-size: 13px;
+            color: #64748b;
+            display: block;
+            margin-top: 6px;
+        }
+
+        label {
+            font-weight: 700;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .studio-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #bae6fd;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        /* DATA ROW WITH IMAGE PREVIEWS */
         .word-pair-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-            background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid #e0f2fe;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .pair-number { font-weight: bold; color: #64748b; min-width: 50px; }
-        .word-pair-row input { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        
-        /* Buttons */
-        .btn { padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; transition: background 0.2s, transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-add { background-color: #3498db; color: white; margin-bottom: 20px; width: 100%; }
-        .btn-generate { background-color: #2ecc71; color: white; width: 100%; font-size: 18px; margin-top: 10px; text-transform: uppercase; }
-        .btn-delete { background-color: #e74c3c; color: white; padding: 10px; border-radius: 6px; }
 
-        /* Setup Popup Component */
+        .pair-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pair-number {
+            font-weight: 800;
+            color: #0284c7;
+        }
+
+        .pair-inputs {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-block input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #1e293b;
+            box-sizing: border-box;
+        }
+
+        .image-preview-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .local-upload-btn {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: none;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .sidebar-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            font-size: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .btn-add { background-color: #0284c7; color: white; width: 100%; margin-bottom: 15px; }
+        .btn-generate { background: #8b5cf6; color: white; width: 100%; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-generate:hover { background: #a78bfa; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+        .btn-direct-play { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-direct-play:hover { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4); }
+        .btn-delete { background-color: #fef2f2; color: #ef4444; padding: 6px 12px; border-radius: 8px; border: 1px solid #fca5a5; font-weight: bold; cursor: pointer; }
+
+        /* Overlay Setup Config Modals */
+        .overlay-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 999;
+            backdrop-filter: blur(8px);
+        }
+
         .setup-section {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 30px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            z-index: 1000; width: 90%; max-width: 450px; text-align: center; box-sizing: border-box; color: #2c3e50;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #1e293b;
+            padding: 35px;
+            border-radius: 20px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 480px;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
         }
-        .close-setup-btn { position: absolute; top: 12px; right: 15px; background: #e74c3c; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .mode-options { display: flex; gap: 20px; justify-content: center; margin: 15px 0; }
-        .mode-btn { padding: 12px 20px; border: 2px solid #3498db; background: transparent; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; flex: 1; color: #3498db; }
-        .mode-btn.active { background: #3498db; color: white; }
-        .team-inputs { display: none; margin-top: 15px; text-align: left; }
-        .team-inputs label { font-weight: bold; display: block; margin-top: 10px; color: #34495e; }
-        
-        /* Screen Overlay */
-        .overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
 
-        /* ======================== STYLE: GAME RUNTIME LAYOUT ======================== */
-        .game-section { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 20; }
+        .close-setup-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mode-options { display: flex; gap: 15px; margin: 25px 0; }
+        .mode-btn { padding: 14px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .mode-btn.active { background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%); color: white; border-color: #0ea5e9; }
+        .team-fields { display: none; margin-top: 20px; max-height: 220px; overflow-y: auto; }
+        .team-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+        /* ========================================== */
+        /* BRAND NEW COMPACT & FRESH GAME ARENA DESIGN */
+        /* ========================================== */
+        .game-section {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+
         .game-arena {
-            width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 15px; box-sizing: border-box;
-            background-color: #cd853f;
-            background-image: linear-gradient(45deg, #8b4513 25%, transparent 25%), linear-gradient(-45deg, #8b4513 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #8b4513 75%), linear-gradient(-45deg, transparent 75%, #8b4513 75%);
-            background-size: 60px 60px; box-shadow: inset 0 0 100px rgba(0,0,0,0.6);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 100%);
+            box-sizing: border-box;
+            position: relative;
         }
-        
-        /* Scoreboard */
+
+        /* Top Header Scoreboard HUD Console Row */
         .scoreboard {
-            display: flex; width: 95%; max-width: 1200px; justify-content: space-around; align-items: center;
-            background: rgba(44, 62, 80, 0.95); padding: 12px; border-radius: 10px; border: 2px solid #ffffff; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); box-sizing: border-box;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 14px 40px;
+            border-bottom: 2px solid #bae6fd;
+            box-sizing: border-box;
+            z-index: 20;
+            gap: 20px;
+            box-shadow: 0 4px 25px rgba(14, 165, 233, 0.08);
         }
-        .team-score-card { padding: 8px 20px; border-radius: 8px; min-width: 150px; text-align: center; background: rgba(255,255,255,0.1); border: 2px solid transparent; }
-        .team-score-card.active-turn { background: #e67e22; border-color: white; box-shadow: 0 0 15px #e67e22; }
-        .team-title-text { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .score-num { font-size: 28px; font-weight: bold; margin-top: 2px; }
-        .game-controls-header { display: flex; gap: 10px; }
-        .btn-header { padding: 8px 15px; font-weight: bold; border-radius: 5px; cursor: pointer; border: none; }
-        .btn-exit-game { background: #e74c3c; color: white; }
 
-        /* Game Matrix Grid */
+        .score-side-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-grow: 1;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .team-score-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            padding: 8px 14px;
+            border-radius: 16px;
+            border: 2px solid #e0f2fe;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .team-score-card {
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            min-width: 150px;
+            box-sizing: border-box;
+            color: #475569;
+            position: relative;
+            border: 1px solid #edf2f7;
+        }
+
+        /* HIGHLIGHTED ACTIVE PLAYER TURN */
+        .team-score-card.active-turn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 16px rgba(14, 165, 233, 0.35);
+        }
+
+        .score-num {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .team-score-card.active-turn .score-num {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .score-tuning-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .tune-btn {
+            flex: 1;
+            padding: 5px 0;
+            font-size: 13px;
+            font-weight: 900;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .tune-btn:hover { background: #e2e8f0; transform: scale(1.05); }
+
+        /* Modern Grid Board Matrix Styles (NO BLUR EFFECT) */
         .match-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px;
-            width: 95%; max-width: 1100px; margin: auto; padding: 15px; box-sizing: border-box; justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 20px;
+            width: 95%;
+            max-width: 1150px;
+            height: calc(100vh - 210px);
+            margin: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            justify-content: center;
+            align-content: center;
+            overflow-y: auto;
+            /* CRITICAL FIX: Blur removed completely so background text/numbers stay fully transparent and visible */
         }
-        
-        /* 3D Card Engine Elements */
-        .card-container { height: 120px; perspective: 1000px; cursor: pointer; position: relative; }
-        .card-inner {
-            position: relative; width: 100%; height: 100%; text-align: center;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d;
-        }
-        .card-container.flipped .card-inner { transform: rotateY(180deg); }
-        .card-container.matched { opacity: 0.3; cursor: default; pointer-events: none; transform: scale(0.95); transition: all 0.4s; }
-        
-        .card-front, .card-back {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            padding: 10px; box-sizing: border-box; font-size: 16px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        .card-front {
-            background: linear-gradient(135deg, #2c3e50, #34495e); color: #f1c40f; border: 2px solid #ffffff;
-            font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .card-back { background: #ffffff; color: #2c3e50; transform: rotateY(180deg); border: 2px solid #f1c40f; word-break: break-word; }
 
-        /* Dialog Popup */
-        .popup-modal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; color: #2c3e50; padding: 30px; border-radius: 12px; z-index: 2000;
-            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* PREMIUM FRESH CARD COVER DESIGN LAYOUTS */
+        .card-container {
+            height: 120px;
+            perspective: 1000px;
+            cursor: pointer;
         }
-        .popup-modal h2 { margin-top: 0; color: #2ecc71; }
-        .popup-modal p { font-size: 18px; font-weight: bold; margin: 15px 0; }
-        .popup-modal button { background: #34485e; color: white; padding: 10px 25px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+
+        .card-front {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px; /* Modern Soft Curved Style */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 60%, #0284c7 100%);
+            color: white;
+            border: 3px solid white;
+            font-size: 40px; /* Highly visible card number */
+            font-weight: 900;
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.15);
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card-container:hover .card-front {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 22px rgba(2, 132, 199, 0.3);
+        }
+
+        .card-container.matched-hidden {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* INTERACTIVE STEPPED 3D POP-UP ARENA HUD SCREEN */
+        .popup-comparison-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.05); /* Soft transparent dimming only, NO BLUR */
+            z-index: 100;
+            pointer-events: none; /* Allows selecting cards behind safely */
+        }
+
+        .comparison-window {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 3D Pop Up Card Design Profiles */
+        .popup-card {
+            position: absolute;
+            width: 270px;
+            height: 360px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 35px 70px rgba(15, 23, 42, 0.22);
+            border: 6px solid #0ea5e9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: auto; /* Allows tapping the item itself to deselect */
+            z-index: 110;
+            cursor: pointer;
+        }
+
+        .popup-card.pos-left { top: calc(50% - 180px); left: 7%; transform: scale(1); }
+        .popup-card.pos-right { top: calc(50% - 180px); right: 7%; transform: scale(1); }
+        
+        /* ASSEMBLED CHASSIS SLIDE HUD CENTRAL MATRIX */
+        .popup-card.pos-center-1 { top: calc(50% - 180px); left: calc(50% - 290px); transform: scale(1.05); }
+        .popup-card.pos-center-2 { top: calc(50% - 180px); left: calc(50% + 20px); transform: scale(1.05); }
+
+        .popup-card-text {
+            font-size: 28px;
+            font-weight: 900;
+            color: #0369a1;
+            word-break: break-word;
+            text-align: center;
+        }
+
+        .popup-card-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 14px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* JUDGEMENT HOVERS POSITIONED SAFELY ON TOP & CENTER */
+        .match-sign-correct {
+            position: absolute;
+            top: calc(50% - 240px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 46px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            z-index: 150;
+            animation: signPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .match-sign-wrong {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ef4444;
+            color: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5);
+            z-index: 150;
+            animation: signPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes signPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            100% { scale(1); opacity: 1; }
+        }
+
+        /* EXPANDED MAXIMUM SIZE CLOSE ARENA BOTTOM BAR HUB */
+        .bottom-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 2px solid #bae6fd;
+            display: flex;
+            justify-content: center; /* Centered layout placement */
+            align-items: center;
+            width: 100%;
+            height: 95px; /* Increased padding bar space height */
+            box-sizing: border-box;
+            z-index: 30;
+        }
+
+        /* CRITICAL EXPANDED BUTTON HUD REQUEST SIZE */
+        .btn-close-arena-massive {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 16px 80px; /* Massive wide clickable space footprint */
+            font-size: 1.25rem;
+            font-weight: 900;
+            border-radius: 16px;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-close-arena-massive:hover {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .popup-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #1e293b;
+            padding: 35px;
+            border-radius: 20px;
+            z-index: 2000;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .popup-modal h2 { margin: 0; color: #ea580c; font-weight: 800; }
+        .popup-modal button {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .studio-box { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .studio-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #bae6fd; }
+            .studio-main-content { width: 100%; }
+            .popup-card.pos-left { left: 2%; width: 170px; height: 230px; }
+            .popup-card.pos-right { right: 2%; width: 170px; height: 230px; }
+            .popup-card.pos-center-1 { left: calc(50% - 180px); width: 170px; height: 230px; }
+            .popup-card.pos-center-2 { left: calc(50% + 10px); width: 170px; height: 230px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="studioView">
-        <div class="creator-section">
-            <h1>🎯 Match Up Advanced Game Studio</h1>
-            <p class="subtitle">ဖိုင်အသစ်ဖန်တီးပြီး TXT ဒေါင်းလုပ်ဆွဲပါ သို့မဟုတ် ရှိပြီးသား ဖိုင်တင်ပြီး တန်းဆော့ပါ</p>
-            
-            <div class="file-dropzone" id="dropzone" onclick="document.getElementById('fileLoader').click()">
-                <p>📥 Click or Drag Game File (.txt) Here</p>
-                <span>ကွန်ပျူတာ သို့မဟုတ် ဖုန်းထဲက ဂိမ်းဖိုင်တင်ပြီး တန်းဆော့ရန်</span>
-                <input type="file" id="fileLoader" accept=".txt" style="display: none;" onchange="importGameROM(event)">
+<div class="app-container" id="studioView">
+    <div class="studio-box">
+        <div class="studio-sidebar">
+            <div>
+                <h1>Match Up Studio</h1>
+                <p class="subtitle">Configure connection dataset matrices. Text data and device/cloud storage uploads will clone mapping lines automatically.</p>
+                
+                <div class="file-dropzone" id="dropzone" onclick="document.getElementById('fileLoader').click()">
+                    <p>Load ROM Engine (.txt)</p>
+                    <span>Click or drop structured game configurations</span>
+                    <input type="file" id="fileLoader" accept=".txt" style="display: none;" onchange="importGameROM(event)">
+                </div>
             </div>
 
-            <div class="studio-field">
-                <label>📝 Game Pack Title / ခေါင်းစဉ် :</label>
+            <div class="sidebar-btn-group">
+                <button class="btn btn-direct-play" onclick="triggerDirectStudioPlayEngine()">Direct Play Match 🎮</button>
+                <button class="btn btn-generate" onclick="exportGameROM()">Save & Export ROM (.txt)</button>
+            </div>
+        </div>
+
+        <div class="studio-main-content">
+            <h3>Configuration Workspace</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <label>Game Pack Title:</label>
                 <input type="text" id="gameTitle" class="studio-input" value="My English Match Pack">
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 10px;">
-                <h3 style="margin: 0; color: #2c3e50;">🧩 Word Pairs / စာလုံးတွဲများ ထည့်သွင်းရန်</h3>
-                <button class="btn" style="background: #e67e22; color: white; padding: 6px 12px; font-size: 13px;" onclick="clearAllPairs()">Clear All</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Word Pairs & Image Assets Matrix</h3>
+                <button class="btn" style="background: #ea580c; color: white; padding: 6px 14px; font-size: 13px;" onclick="clearAllPairs()">Clear All</button>
             </div>
 
-            <div id="pairsContainer">
-                </div>
+            <div id="pairsContainer"></div>
 
-            <button class="btn btn-add" onclick="addNewPairSlot()">➕ Add New Pair (စာလုံးတွဲအသစ်တိုးရန်)</button>
-            <button class="btn btn-generate" onclick="exportGameROM()">💾 Save & Export ROM (.txt)</button>
+            <button class="btn btn-add" onclick="addNewPairSlot()">+ Add New Pair Slot</button>
         </div>
     </div>
+</div>
 
-    <div class="game-section" id="gameRuntimeView">
-        <div class="game-arena">
-            <div class="scoreboard">
-                <div class="team-score-card" id="cardTeam1">
-                    <div class="team-title-text" id="nameT1Text">Team 1</div>
-                    <div class="score-num" id="scoreNum1">0</div>
-                </div>
-                
-                <div class="game-controls-header">
-                    <button class="btn-header btn-exit-game" onclick="quitActiveGameEngine()">🛑 Exit</button>
-                </div>
-
-                <div class="team-score-card" id="cardTeam2">
-                    <div class="team-title-text" id="nameT2Text">Team 2</div>
-                    <div class="score-num" id="scoreNum2">0</div>
-                </div>
+<!-- LIVE ARENA PLAYGROUND ENGINE TERMINAL SCREEN -->
+<div class="game-section" id="gameRuntimeView">
+    <div class="game-arena">
+        <div class="scoreboard" id="scoreboardHeader">
+            <div class="score-side-container" id="dynamicScoreboardsContainer"></div>
+            
+            <div class="ingame-action-box">
+                <button class="btn-add-team-ingame" onclick="addNewTeamInGameRuntime()">+ Add Team</button>
             </div>
+        </div>
 
-            <div class="match-container" id="boardArena"></div>
-            <div></div> </div>
+        <!-- Interactive Grid Layout Panel (NO LONGER BLURS REAR VISUAL ASSETS) -->
+        <div class="match-container" id="boardArena"></div>
+
+        <div class="bottom-bar">
+            <!-- MASSIVE EASILY CLICKABLE DISMISS TERMINAL TARGET -->
+            <button class="btn-close-arena-massive" onclick="quitActiveGameEngine()">Close Arena ❌</button>
+        </div>
+    </div>
+</div>
+
+<!-- CENTRAL INTERACTIVE 3D POP-UP CHAMBER SCREEN VIEWPORT HUB -->
+<div class="popup-comparison-overlay" id="popupComparisonViewport">
+    <div class="comparison-window" id="comparisonWindowFrame"></div>
+</div>
+
+<!-- INITIAL SETUP MODAL CONFIGS -->
+<div class="overlay-bg" id="modalOverlay"></div>
+<div class="setup-section" id="setupConfigPopup">
+    <button class="close-setup-btn" onclick="hideSetupPopup()">×</button>
+    <h3>Select Match Mode</h3>
+    
+    <div class="mode-options">
+        <button class="mode-btn active" id="btnSingleMode" onclick="setGamePlayMode('single')">Solo Player</button>
+        <button class="mode-btn" id="btnTeamMode" onclick="setGamePlayMode('team')">Team Battle</button>
     </div>
 
-    <div class="overlay-bg" id="modalOverlay"></div>
-    <div class="setup-section" id="setupConfigPopup">
-        <button class="close-setup-btn" onclick="hideSetupPopup()">×</button>
-        <h3>🎮 Select Game Play Mode</h3>
-        <p style="font-size: 14px; color: #7f8c8d; margin-top: -10px;">ကစားမည့် ပုံစံကို ရွေးချယ်ပါ</p>
+    <div class="team-fields" id="teamConfigFields">
+        <div id="dynamicTeamInputsWrapper"></div>
+        <button type="button" class="btn-add-team-ingame" style="width:100%; padding:12px; border-radius:10px; text-align:center;" onclick="addNewTeamInputField()">+ Add New Team</button>
         
-        <div class="mode-options">
-            <button class="mode-btn active" id="btnSingleMode" onclick="setGamePlayMode('single')">Single Player</button>
-            <button class="mode-btn" id="btnTeamMode" onclick="setGamePlayMode('team')">Team Battle</button>
-        </div>
-
-        <div class="team-inputs" id="teamConfigFields">
-            <label>🔴 Team 1 Name :</label>
-            <input type="text" id="inputTeam1" class="studio-input" value="Team A">
-            <label>🔵 Team 2 Name :</label>
-            <input type="text" id="inputTeam2" class="studio-input" value="Team B">
-        </div>
-
-        <button class="btn btn-generate" onclick="launchGameEngineWithConfig()" style="background: #3498db; margin-top: 20px;">🚀 Launch Match Game</button>
+        <label style="margin-top: 15px;">Starting Turn Selector:</label>
+        <select id="startingTeamSelect" class="studio-input" style="background: white; color: #1e293b; border: 1px solid #cbd5e1;"></select>
     </div>
 
-    <div class="popup-modal" id="endGamePopup">
-        <h2 id="winTitle">🏆 Congratulations!</h2>
-        <p id="winDetails">Team A wins the match!</p>
-        <button onclick="closeEndGamePopupAndReset()">Back to Studio</button>
-    </div>
+    <button class="btn btn-direct-play" onclick="launchGameEngineWithConfig()" style="margin-top:25px;">Launch Match Engine</button>
+</div>
 
-    <script>
-        const AudioFX = {
-            ctx: null,
-            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-            playFlip() {
-                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(250, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.15);
-            },
-            playMatch() {
-                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(440, this.ctx.currentTime);
-                osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.3);
-            },
-            playMis() {
-                this.init(); const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.25);
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
-                osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.25);
-            },
-            playWin() {
-                this.init();
-                const now = this.ctx.currentTime;
-                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                    const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-                    osc.type = 'sine'; osc.frequency.value = f;
-                    gain.gain.setValueAtTime(0.1, now + i*0.1);
-                    gain.gain.linearRampToValueAtTime(0.001, now + i*0.1 + 0.3);
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.start(now + i*0.1); osc.stop(now + i*0.1 + 0.3);
-                });
-            }
-        };
-    </script>
+<!-- WIN DIALOG WINDOW MODAL SUMMARY -->
+<div class="popup-modal" id="endGamePopup">
+    <h2 id="winTitle">Sequence Complete</h2>
+    <p id="winDetails">Pack completed successfully.</p>
+    <button onclick="closeEndGamePopupAndReset()">Return Studio Workspace</button>
+</div>
 
-    <script>
-        let currentActivePairs = [];
-        let engineGameMode = "single";
-        let teamScores = { 1: 0, 2: 0 };
-        let activeTurn = 1;
-        let selectedCards = [];
-        let lockGameBoard = false;
-        let successfulMatches = 0;
-
-        // Base starter mock data configuration list 
-        const starterMockPairs = [
-            { a: "Apple", b: "ပန်းသီး" },
-            { a: "Banana", b: "ငှက်ပျောသီး" },
-            { a: "Cat", b: "ကြောင်" },
-            { a: "Dog", b: "ခွေး" }
-        ];
-
-        // Boot system dynamic loaders
-        window.addEventListener("DOMContentLoaded", () => {
-            initializePairsForm(starterMockPairs);
-            setupDragAndDropZone();
+<!-- SoundFX Audio Synthesizer Framework Matrix Block -->
+<script>
+const AudioFX = {
+    ctx: null,
+    init() { 
+        if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+        if(this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    playFlip() {
+        this.init(); 
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(420, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.12);
+    },
+    playMatch() {
+        this.init(); 
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(460, this.ctx.currentTime);
+        osc.frequency.setValueAtTime(920, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.25);
+    },
+    playMis() {
+        this.init(); 
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(170, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.22);
+        gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.22);
+    },
+    playWin() {
+        this.init(); const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+            osc.type = 'sine'; osc.frequency.value = f;
+            gain.gain.setValueAtTime(0.05, now + i * 0.08);
+            gain.gain.linearRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.2);
         });
+    }
+};
+</script>
 
-        function initializePairsForm(pairs) {
-            const container = document.getElementById("pairsContainer");
-            container.innerHTML = "";
-            pairs.forEach(pair => addNewPairSlot(pair.a, pair.b));
+<!-- Core Logic Steering Scripts (MANUAL POINT ASSIGNMENT RULES MAPS INCLUDED) -->
+<script>
+let currentActivePairs = [];
+let engineGameMode = "single";
+let teamList = ["Team A", "Team B"];
+let teamScores = {};
+let activeTurn = 0; 
+let selectedCards = [];
+let lockGameBoard = false;
+let successfulMatches = 0;
+
+const starterMockPairs = [
+    { a: "Apple", b: "Apple" },
+    { a: "Banana", b: "Banana" },
+    { a: "Cat", b: "Cat" },
+    { a: "Dog", b: "Dog" }
+];
+
+window.addEventListener("DOMContentLoaded", () => {
+    initializePairsForm(starterMockPairs);
+    setupDragAndDropZone();
+    renderSetupTeamInputs();
+});
+
+function initializePairsForm(pairs) {
+    const container = document.getElementById("pairsContainer");
+    container.innerHTML = "";
+    pairs.forEach(pair => addNewPairSlot(pair.a, pair.b));
+}
+
+function addNewPairSlot(valA = "", valB = "") {
+    const container = document.getElementById("pairsContainer");
+    const currentIndex = container.children.length + 1;
+    
+    const row = document.createElement("div");
+    row.className = "word-pair-row";
+    
+    const isImgA = checkIsImageResourceUrl(valA);
+    const isImgB = checkIsImageResourceUrl(valB);
+
+    row.innerHTML = `
+        <div class="pair-header">
+            <div class="pair-number">Slot #${currentIndex}</div>
+            <button class="btn-delete" onclick="this.parentElement.parentElement.remove(); updatePairRowIndexes();">Remove</button>
+        </div>
+        <div class="pair-inputs">
+            <div class="input-block">
+                <input type="text" class="input-side-a" placeholder="Text or Image URL" value="${valA}" oninput="executeAutoPairSyncPipeline(this)">
+                <button class="local-upload-btn" onclick="triggerLocalFileInputRouting(this)">📁 Choose Image</button>
+                <input type="file" accept="image/*" style="display:none;" onchange="processLocalImageSelection(this, 'A')">
+            </div>
+            <div class="image-preview-box id-preview-a" style="background-image: ${isImgA ? `url(${valA})` : 'none'}"></div>
+
+            <div style="font-weight: bold; color: #64748b;">=</div>
+
+            <div class="input-block">
+                <input type="text" class="input-side-b" placeholder="Auto-mapped Pair Text" value="${valB}" oninput="syncPreviewOnTextChange(this)">
+                <button class="local-upload-btn" onclick="triggerLocalFileInputRouting(this)">📁 Choose Image</button>
+                <input type="file" accept="image/*" style="display:none;" onchange="processLocalImageSelection(this, 'B')">
+            </div>
+            <div class="image-preview-box id-preview-b" style="background-image: ${isImgB ? `url(${valB})` : 'none'}"></div>
+        </div>
+    `;
+    container.appendChild(row);
+}
+
+function executeAutoPairSyncPipeline(sourceInput) {
+    const val = sourceInput.value;
+    const parentRow = sourceInput.parentElement.parentElement;
+    const partnerInput = parentRow.querySelector(".input-side-b");
+    partnerInput.value = val;
+    syncPreviewOnTextChange(sourceInput);
+    syncPreviewOnTextChange(partnerInput);
+}
+
+function checkIsImageResourceUrl(str) {
+    if(!str) return false;
+    return (str.startsWith("data:image") || str.startsWith("http://") || str.startsWith("https://") || str.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) != null);
+}
+
+function syncPreviewOnTextChange(inputElement) {
+    const val = inputElement.value.trim();
+    const parentRow = inputElement.parentElement.parentElement;
+    const targetPreview = inputElement.classList.contains("input-side-a") ? parentRow.querySelector(".id-preview-a") : parentRow.querySelector(".id-preview-b");
+    
+    if(checkIsImageResourceUrl(val)) {
+        targetPreview.style.backgroundImage = `url(${val})`;
+    } else {
+        targetPreview.style.backgroundImage = 'none';
+    }
+}
+
+function triggerLocalFileInputRouting(btnElement) {
+    btnElement.parentElement.querySelector("input[type='file']").click();
+}
+
+function processLocalImageSelection(fileInputElement, sideChar) {
+    const file = fileInputElement.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Str = e.target.result;
+        const parentBlock = fileInputElement.parentElement;
+        const parentRow = parentBlock.parentElement;
+        const textInput = parentBlock.querySelector("input[type='text']");
+        textInput.value = base64Str;
+        
+        if(sideChar === 'A') {
+            const partnerInput = parentRow.querySelector(".input-side-b");
+            partnerInput.value = base64Str;
+            parentRow.querySelector(".id-preview-a").style.backgroundImage = `url(${base64Str})`;
+            parentRow.querySelector(".id-preview-b").style.backgroundImage = `url(${base64Str})`;
+        } else {
+            const targetPreview = parentRow.querySelector(".id-preview-b");
+            targetPreview.style.backgroundImage = `url(${base64Str})`;
         }
+    };
+    reader.readAsDataURL(file);
+}
 
-        function addNewPairSlot(valA = "", valB = "") {
-            const container = document.getElementById("pairsContainer");
-            const currentIndex = container.children.length + 1;
-            
-            const row = document.createElement("div");
-            row.className = "word-pair-row";
-            row.innerHTML = `
-                <div class="pair-number">#${currentIndex}</div>
-                <input type="text" class="input-side-a" placeholder="English Word / Side A" value="${valA}">
-                <input type="text" class="input-side-b" placeholder="Meaning / Side B" value="${valB}">
-                <button class="btn btn-delete" onclick="this.parentElement.remove(); updatePairRowIndexes();">❌</button>
+function updatePairRowIndexes() {
+    const rows = document.querySelectorAll(".word-pair-row");
+    rows.forEach((row, idx) => {
+        row.querySelector(".pair-number").innerText = `Slot #${idx + 1}`;
+    });
+}
+
+function clearAllPairs() {
+    document.getElementById("pairsContainer").innerHTML = ""; 
+    addNewPairSlot();
+}
+
+function compileFormDataIntoArray() {
+    const collected = [];
+    const rows = document.querySelectorAll(".word-pair-row");
+    rows.forEach(row => {
+        const a = row.querySelector(".input-side-a").value.trim();
+        const b = row.querySelector(".input-side-b").value.trim();
+        if (a !== "" || b !== "") {
+            collected.push({ a: a, b: b });
+        }
+    });
+    return collected;
+}
+
+function triggerDirectStudioPlayEngine() {
+    const data = compileFormDataIntoArray();
+    if(data.length === 0) return alert("Please configure at least one active entry slot configuration!");
+    currentActivePairs = data;
+    showSetupPopup();
+}
+
+function exportGameROM() {
+    const data = compileFormDataIntoArray();
+    if(data.length === 0) return alert("Please configure at least one active payload row entry!");
+    const title = document.getElementById("gameTitle").value.trim() || "Match-Up-Pack";
+    const romStructure = { title: title, gameType: "match_up", pairs: data };
+    const dataBlob = new Blob([JSON.stringify(romStructure, null, 2)], { type: "text/plain" });
+    const downloader = document.createElement("a");
+    downloader.download = `${title.toLowerCase().replace(/\s+/g, '-')}-game.txt`;
+    downloader.href = window.URL.createObjectURL(dataBlob);
+    downloader.click();
+}
+
+function importGameROM(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (parsed.gameType !== "match_up" || !parsed.pairs) return alert("Verification mismatch!");
+            document.getElementById("gameTitle").value = parsed.title || "Imported Match Pack";
+            currentActivePairs = parsed.pairs;
+            initializePairsForm(currentActivePairs);
+            showSetupPopup();
+        } catch(err) { alert("ROM Stream corruption detected!"); }
+    };
+    reader.readAsText(file);
+}
+
+function setupDragAndDropZone() {
+    const zone = document.getElementById("dropzone");
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); }, false);
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if(files.length > 0 && files[0].name.endsWith('.txt')) {
+            document.getElementById('fileLoader').files = files;
+            const event = { target: { files: files } };
+            importGameROM(event);
+        }
+    }, false);
+}
+
+function showSetupPopup() {
+    document.getElementById("modalOverlay").style.display = "block";
+    document.getElementById("setupConfigPopup").style.display = "block";
+}
+
+function hideSetupPopup() {
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("setupConfigPopup").style.display = "none";
+}
+
+function renderSetupTeamInputs() {
+    const wrapper = document.getElementById("dynamicTeamInputsWrapper");
+    wrapper.innerHTML = "";
+    teamList.forEach((teamName, index) => {
+        const row = document.createElement("div");
+        row.className = "team-input-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "studio-input";
+        input.value = teamName;
+        input.onchange = function(e) {
+            teamList[index] = e.target.value.trim() || `Team ${index + 1}`;
+            populateStartingTeamSelect();
+        };
+        row.appendChild(input);
+        
+        if (teamList.length > 2) {
+            const delBtn = document.createElement("button");
+            delBtn.className = "btn-delete";
+            delBtn.innerText = "×";
+            delBtn.onclick = function() { teamList.splice(index, 1); renderSetupTeamInputs(); };
+            row.appendChild(delBtn);
+        }
+        wrapper.appendChild(row);
+    });
+    populateStartingTeamSelect();
+}
+
+function addNewTeamInputField() {
+    const nextChar = String.fromCharCode(65 + teamList.length);
+    teamList.push(`Team ${nextChar}`);
+    renderSetupTeamInputs();
+}
+
+function populateStartingTeamSelect() {
+    const select = document.getElementById("startingTeamSelect");
+    select.innerHTML = "";
+    teamList.forEach((teamName, index) => {
+        const opt = document.createElement("option");
+        opt.value = index;
+        opt.innerText = teamName;
+        select.appendChild(opt);
+    });
+}
+
+function setGamePlayMode(mode) {
+    engineGameMode = mode;
+    document.getElementById("btnSingleMode").classList.toggle("active", mode === "single");
+    document.getElementById("btnTeamMode").classList.toggle("active", mode === "team");
+    document.getElementById("teamConfigFields").style.display = mode === "team" ? "block" : "none";
+}
+
+function renderInGameScoreboards() {
+    const container = document.getElementById("dynamicScoreboardsContainer");
+    container.innerHTML = "";
+    
+    if (engineGameMode === "single") {
+        if (teamScores[0] === undefined) teamScores[0] = 0;
+        const wrapper = document.createElement("div");
+        wrapper.className = "team-score-wrapper";
+        wrapper.innerHTML = `
+            <div class="team-score-card active-turn" id="scoreCard_0">
+                <div class="team-title-text">Score Tracker</div>
+                <div class="score-num" id="scoreNum_0">${teamScores[0]}</div>
+            </div>
+            <div class="score-tuning-row">
+                <button class="tune-btn" onclick="modifyScoreManualEngine(0, 1)">+1</button>
+                <button class="tune-btn" onclick="modifyScoreManualEngine(0, -1)">-1</button>
+            </div>
+        `;
+        container.appendChild(wrapper);
+    } else {
+        teamList.forEach((teamName, index) => {
+            if (teamScores[index] === undefined) teamScores[index] = 0;
+            const wrapper = document.createElement("div");
+            wrapper.className = "team-score-wrapper";
+            wrapper.innerHTML = `
+                <div class="team-score-card" id="scoreCard_${index}" onclick="handleManualTurnSelect(${index})">
+                    <div class="team-title-text">${teamName}</div>
+                    <div class="score-num" id="scoreNum_${index}">${teamScores[index]}</div>
+                    <button class="ingame-del-btn" onclick="removeTeamDuringRuntime(event, ${index})">×</button>
+                </div>
+                <div class="score-tuning-row">
+                    <button class="tune-btn" onclick="modifyScoreManualEngine(${index}, 1)">+1</button>
+                    <button class="tune-btn" onclick="modifyScoreManualEngine(${index}, -1)">-1</button>
+                </div>
             `;
-            container.appendChild(row);
-        }
+            container.appendChild(wrapper);
+        });
+    }
+    updateTurnUIStyle();
+}
 
-        function updatePairRowIndexes() {
-            const rows = document.querySelectorAll(".word-pair-row");
-            rows.forEach((row, idx) => {
-                row.querySelector(".pair-number").innerText = `#${idx + 1}`;
-            });
-        }
+function handleManualTurnSelect(idx) {
+    activeTurn = idx;
+    updateTurnUIStyle();
+    AudioFX.playFlip();
+}
 
-        function clearAllPairs() {
-            document.getElementById("pairsContainer").innerHTML = "";
-            addNewPairSlot();
-        }
+function modifyScoreManualEngine(teamIdx, delta) {
+    if(teamScores[teamIdx] === undefined) teamScores[teamIdx] = 0;
+    teamScores[teamIdx] += delta;
+    if(teamScores[teamIdx] < 0) teamScores[teamIdx] = 0;
+    const el = document.getElementById(`scoreNum_${teamIdx}`);
+    if(el) el.innerText = teamScores[teamIdx];
+    AudioFX.playFlip();
+}
 
-        // Parse runtime inputs back into unified schema payload database object structures
-        function compileFormDataIntoArray() {
-            const collected = [];
-            const rows = document.querySelectorAll(".word-pair-row");
-            rows.forEach(row => {
-                const a = row.querySelector(".input-side-a").value.trim();
-                const b = row.querySelector(".input-side-b").value.trim();
-                if(a !== "" || b !== "") {
-                    collected.push({ a: a, b: b });
-                }
-            });
-            return collected;
-        }
+function addNewTeamInGameRuntime() {
+    if (engineGameMode === "single") {
+        engineGameMode = "team";
+        teamList = ["Team A", "Team B"];
+        teamScores = { 0: teamScores[0] || 0, 1: 0 };
+        activeTurn = 0;
+    } else {
+        const nextChar = String.fromCharCode(65 + teamList.length);
+        const newIdx = teamList.length;
+        teamList.push(`Team ${nextChar}`);
+        teamScores[newIdx] = 0;
+    }
+    renderInGameScoreboards();
+}
 
-        // Serializer: Saving the dynamic dataset contents down to storage targets
-        function exportGameROM() {
-            const data = compileFormDataIntoArray();
-            if(data.length === 0) return alert("ကျေးဇူးပြု၍ စာလုံးတွဲ အနည်းဆုံး တစ်တွဲထည့်ပေးပါ!");
-            
-            const title = document.getElementById("gameTitle").value.trim() || "Match-Up-Pack";
-            const romStructure = {
-                title: title,
-                gameType: "match_up",
-                pairs: data
-            };
+function removeTeamDuringRuntime(event, index) {
+    event.stopPropagation();
+    if (teamList.length <= 2) return alert("Minimum of 2 teams required!");
+    teamList.splice(index, 1);
+    let newScores = {};
+    teamList.forEach((_, idx) => { newScores[idx] = teamScores[idx >= index ? idx + 1 : idx] || 0; });
+    teamScores = newScores;
+    if (activeTurn >= teamList.length) activeTurn = teamList.length - 1;
+    renderInGameScoreboards();
+}
 
-            const dataBlob = new Blob([JSON.stringify(romStructure, null, 2)], { type: "text/plain" });
-            const downloader = document.createElement("a");
-            downloader.download = `${title.toLowerCase().replace(/\s+/g, '-')}-game.txt`;
-            downloader.href = window.URL.createObjectURL(dataBlob);
-            downloader.click();
-        }
+function launchGameEngineWithConfig() {
+    hideSetupPopup();
+    document.getElementById("studioView").style.display = "none";
+    document.getElementById("gameRuntimeView").style.display = "block";
+    teamScores = {};
+    if (engineGameMode === "team") {
+        activeTurn = parseInt(document.getElementById("startingTeamSelect").value) || 0;
+    } else {
+        activeTurn = 0;
+    }
+    renderInGameScoreboards();
+    successfulMatches = 0;
+    selectedCards = [];
+    lockGameBoard = false;
+    buildGameBoardMatrix();
+}
 
-        // Deserializer Engine parser loader input component script module
-        function importGameROM(event) {
-            const file = event.target.files[0];
-            if(!file) return;
+function buildGameBoardMatrix() {
+    const arena = document.getElementById("boardArena");
+    arena.innerHTML = "";
+    let deck = [];
+    currentActivePairs.forEach((pair, index) => {
+        deck.push({ id: index, side: "A", text: pair.a });
+        deck.push({ id: index, side: "B", text: pair.b });
+    });
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if(parsed.gameType !== "match_up" || !parsed.pairs) {
-                        return alert("မှားယွင်းနေပါသည်။ ဤဖိုင်သည် Match Up ဂိမ်းဖိုင်မဟုတ်ပါ!");
-                    }
-                    
-                    document.getElementById("gameTitle").value = parsed.title || "Imported Match Pack";
-                    currentActivePairs = parsed.pairs;
-                    initializePairsForm(currentActivePairs);
-                    
-                    // Direct trigger transition runtime launcher workflow steps setup configurations
-                    showSetupPopup();
-                } catch(err) {
-                    alert("ဖိုင်ကို ဖတ်၍မရပါ။ စာသားဖိုင် တည်ဆောက်ပုံ မှားယွင်းနေပါသည်။");
-                }
-            };
-            reader.readAsText(file);
-        }
+    for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
 
-        function setupDragAndDropZone() {
-            const zone = document.getElementById("dropzone");
-            ['dragenter', 'dragover'].forEach(name => {
-                zone.addEventListener(name, (e) => { e.preventDefault(); zone.style.background = "#e2e8f0"; }, false);
-            });
-            ['dragleave', 'drop'].forEach(name => {
-                zone.addEventListener(name, (e) => { e.preventDefault(); zone.style.background = "#edf2f7"; }, false);
-            });
-            zone.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                if(files.length > 0 && files[0].name.endsWith('.txt')) {
-                    document.getElementById('fileLoader').files = files;
-                    const event = { target: { files: files } };
-                    importGameROM(event);
-                }
-            }, false);
-        }
+    deck.forEach((cardMeta, globalIndex) => {
+        const container = document.createElement("div");
+        container.className = "card-container";
+        container.id = `arenaCardGlobal_${globalIndex}`;
+        container.dataset.id = cardMeta.id;
+        container.dataset.side = cardMeta.side;
+        container.dataset.text = cardMeta.text;
+        container.onclick = () => processCardSelectionInteraction(container);
+        container.innerHTML = `<div class="card-front">${globalIndex + 1}</div>`;
+        arena.appendChild(container);
+    });
+}
 
-        // Modal triggers setup rules controllers
-        function showSetupPopup() {
-            document.getElementById("modalOverlay").style.display = "block";
-            document.getElementById("setupConfigPopup").style.display = "block";
-        }
-        function hideSetupPopup() {
-            document.getElementById("modalOverlay").style.display = "none";
-            document.getElementById("setupConfigPopup").style.display = "none";
-        }
+/* INTERACTIVE CONTROLLER MATRIX: CAPABLE OF STEPPED DISPATCHERS WITHOUT BLUR ERROR DEVIATIONS */
+function processCardSelectionInteraction(cardElement) {
+    if (lockGameBoard || cardElement.classList.contains("matched-hidden")) return;
+    if (selectedCards.includes(cardElement)) return;
+    
+    AudioFX.playFlip();
+    selectedCards.push(cardElement);
+    
+    const overlay = document.getElementById("popupComparisonViewport");
+    const windowFrame = document.getElementById("comparisonWindowFrame");
+    overlay.style.display = "block";
 
-        function setGamePlayMode(mode) {
-            engineGameMode = mode;
-            document.getElementById("btnSingleMode").classList.toggle("active", mode === "single");
-            document.getElementById("btnTeamMode").classList.toggle("active", mode === "team");
-            document.getElementById("teamConfigFields").style.display = mode === "team" ? "block" : "none";
-        }
+    const textVal = cardElement.dataset.text;
+    const isImg = checkIsImageResourceUrl(textVal);
 
-        // Core Game Engine initialization launcher code segments 
-        function launchGameEngineWithConfig() {
-            const data = compileFormDataIntoArray();
-            if(data.length === 0) return alert("ဂိမ်းဆော့ရန် စာလုံးတွဲများ မရှိသေးပါ။ အရင်ထည့်သွင်းပါ သို့မဟုတ် ဖိုင်တင်ပါ!");
-            currentActivePairs = data;
+    const popCard = document.createElement("div");
+    popCard.id = `popId_${selectedCards.length}`;
+    
+    if(isImg) {
+        popCard.innerHTML = `<div class="popup-card-img" style="background-image: url(${textVal})"></div>`;
+    } else {
+        popCard.innerHTML = `<div class="popup-card-text">${textVal}</div>`;
+    }
 
-            hideSetupPopup();
-            document.getElementById("studioView").style.display = "none";
-            document.getElementById("gameRuntimeView").style.display = "block";
-
-            // Setup scoreboard profiles UI configurations
-            if(engineGameMode === "single") {
-                document.getElementById("nameT1Text").innerText = "PLAYER";
-                document.getElementById("cardTeam2").style.style.visibility = "hidden";
-            } else {
-                const name1 = document.getElementById("inputTeam1").value.trim() || "Team 1";
-                const name2 = document.getElementById("inputTeam2").value.trim() || "Team 2";
-                document.getElementById("nameT1Text").innerText = name1;
-                document.getElementById("nameT2Text").innerText = name2;
-                document.getElementById("cardTeam2").style.visibility = "visible";
-            }
-
-            // Reset engine status database parameters variables tracker values
-            teamScores = { 1: 0, 2: 0 };
-            document.getElementById("scoreNum1").innerText = "0";
-            document.getElementById("scoreNum2").innerText = "0";
-            activeTurn = 1;
-            successfulMatches = 0;
-            selectedCards = [];
-            lockGameBoard = false;
-            updateTurnUIStyle();
-
-            buildGameBoardMatrix();
-        }
-
-        // Construct 3D dynamic visual shuffling nodes interfaces grid arrays
-        function buildGameBoardMatrix() {
-            const arena = document.getElementById("boardArena");
-            arena.innerHTML = "";
-
-            // Flatten card structures elements list metadata mappings keys tracker values
-            let deck = [];
-            currentActivePairs.forEach((pair, index) => {
-                deck.push({ id: index, side: "A", text: pair.a });
-                deck.push({ id: index, side: "B", text: pair.b });
-            });
-
-            // Fisher-Yates array randomizer algorithms operations
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-
-            // Render layouts dynamically output targets
-            deck.forEach((cardMeta, orderIndex) => {
-                const container = document.createElement("div");
-                container.className = "card-container";
-                container.dataset.id = cardMeta.id;
-                container.dataset.side = cardMeta.side;
-                container.dataset.index = orderIndex;
-                container.onclick = () => processCardSelectionInteraction(container);
-
-                container.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-front">?</div>
-                        <div class="card-back">${cardMeta.text}</div>
-                    </div>
-                `;
-                arena.appendChild(container);
-            });
-        }
-
-        // Match card selection tracking and matching matrix evaluation rules engine algorithms
-        function processCardSelectionInteraction(container) {
-            if(lockGameBoard || container.classList.contains("flipped") || container.classList.contains("matched")) return;
-
+    if (selectedCards.length === 1) {
+        popCard.className = "popup-card pos-left";
+        popCard.onclick = function() {
             AudioFX.playFlip();
-            container.classList.add("flipped");
-            selectedCards.push(container);
+            closeComparisonPopupHub(); 
+        };
+        windowFrame.appendChild(popCard);
+        
+        // CRITICAL UPDATE: Blur effect line removed so cards background stay crystal clear!
+    } else if (selectedCards.length === 2) {
+        lockGameBoard = true; 
+        popCard.className = "popup-card pos-right";
+        windowFrame.appendChild(popCard);
 
-            if(selectedCards.length === 2) {
-                lockGameBoard = true;
-                evaluateCardsMatchState();
+        setTimeout(() => {
+            const p1 = document.getElementById("popId_1");
+            const p2 = document.getElementById("popId_2");
+            if(p1 && p2) {
+                p1.onclick = null; 
+                p1.className = "popup-card pos-center-1";
+                p2.className = "popup-card pos-center-2";
             }
-        }
+            evaluateCardsMatchState();
+        }, 500);
+    }
+}
 
-        function evaluateCardsMatchState() {
-            const c1 = selectedCards[0];
-            const c2 = selectedCards[1];
+function evaluateCardsMatchState() {
+    const c1 = selectedCards[0];
+    const c2 = selectedCards[1];
+    const isSameId = c1.dataset.id === c2.dataset.id;
+    const isDifferentSide = c1.dataset.side !== c2.dataset.side;
+    const windowFrame = document.getElementById("comparisonWindowFrame");
 
-            const isSameId = c1.dataset.id === c2.dataset.id;
-            const isDifferentSide = c1.dataset.side !== c2.dataset.side;
-
-            if(isSameId && isDifferentSide) {
-                // SUCCESS MATCH STATUS DETECTED
-                setTimeout(() => {
-                    AudioFX.playMatch();
-                    c1.classList.add("matched");
-                    c2.classList.add("matched");
-                    
-                    // Increment runtime scoreboard parameters systems profiles tracking logs
-                    teamScores[activeTurn] += 10;
-                    document.getElementById(`scoreNum${activeTurn}`).innerText = teamScores[activeTurn];
-
-                    successfulMatches++;
-                    selectedCards = [];
-                    lockGameBoard = false;
-
-                    // Evaluate endgame trigger states loops checkpoints
-                    if(successfulMatches === currentActivePairs.length) {
-                        triggerMatchEndgameSummary();
-                    }
-                }, 400);
-            } else {
-                // MISMATCH STATE TRIGGER CHECKPOINTS PROCESSORS
-                setTimeout(() => {
-                    AudioFX.playMis();
-                    c1.classList.remove("flipped");
-                    c2.classList.remove("flipped");
-
-                    // Pivot team turns sequence orders active indicators profiles track systems rules
-                    if(engineGameMode === "team") {
-                        activeTurn = activeTurn === 1 ? 2 : 1;
-                        updateTurnUIStyle();
-                    }
-
-                    selectedCards = [];
-                    lockGameBoard = false;
-                }, 1000);
-            }
-        }
-
-        function updateTurnUIStyle() {
-            if(engineGameMode === "single") {
-                document.getElementById("cardTeam1").classList.add("active-turn");
-                return;
-            }
-            document.getElementById("cardTeam1").classList.toggle("active-turn", activeTurn === 1);
-            document.getElementById("cardTeam2").classList.toggle("active-turn", activeTurn === 2);
-        }
-
-        // End Game execution processors UI components workflow triggers rules logic sets
-        function triggerMatchEndgameSummary() {
-            AudioFX.playWin();
-            const modal = document.getElementById("endGamePopup");
-            const details = document.getElementById("winDetails");
+    if (isSameId && isDifferentSide) {
+        setTimeout(() => {
+            AudioFX.playMatch();
+            const correctSign = document.createElement("div");
+            correctSign.className = "match-sign-correct";
+            correctSign.innerText = "✓";
+            windowFrame.appendChild(correctSign);
             
-            if(engineGameMode === "single") {
-                document.getElementById("winTitle").innerText = "🎉 Game Completed!";
-                details.innerText = `Total Score: ${teamScores[1]} Points!`;
-            } else {
-                const name1 = document.getElementById("nameT1Text").innerText;
-                const name2 = document.getElementById("nameT2Text").innerText;
-                
-                if(teamScores[1] > teamScores[2]) {
-                    document.getElementById("winTitle").innerText = "🏆 Victory!";
-                    details.innerText = `${name1} Wins with ${teamScores[1]} Pts vs ${teamScores[2]} Pts!`;
-                } else if(teamScores[2] > teamScores[1]) {
-                    document.getElementById("winTitle").innerText = "🏆 Victory!";
-                    details.innerText = `${name2} Wins with ${teamScores[2]} Pts vs ${teamScores[1]} Pts!`;
-                } else {
-                    document.getElementById("winTitle").innerText = "🤝 It's a Tie!";
-                    details.innerText = `Both teams scored equal ${teamScores[1]} Pts!`;
+            // REQUESTED UPDATE: Automated score calculation removed! Teachers manually select points now.
+            successfulMatches++;
+
+            setTimeout(() => {
+                c1.classList.add("matched-hidden");
+                c2.classList.add("matched-hidden");
+                closeComparisonPopupHub();
+                if(successfulMatches === currentActivePairs.length) triggerMatchEndgameSummary();
+            }, 1000);
+        }, 500);
+    } else {
+        setTimeout(() => {
+            AudioFX.playMis();
+            const wrongSign = document.createElement("div");
+            wrongSign.className = "match-sign-wrong";
+            wrongSign.innerText = "✗";
+            windowFrame.appendChild(wrongSign);
+
+            setTimeout(() => {
+                if (engineGameMode === "team" && teamList.length > 0) {
+                    activeTurn = (activeTurn + 1) % teamList.length;
                 }
-            }
-            
-            document.getElementById("modalOverlay").style.display = "block";
-            modal.style.display = "block";
-        }
+                closeComparisonPopupHub();
+            }, 1000); // Mismatch display indicator frame runs for exactly 1 second
+        }, 500);
+    }
+}
 
-        function closeEndGamePopupAndReset() {
-            document.getElementById("endGamePopup").style.display = "none";
-            quitActiveGameEngine();
-        }
+function closeComparisonPopupHub() {
+    document.getElementById("popupComparisonViewport").style.display = "none";
+    document.getElementById("comparisonWindowFrame").innerHTML = "";
+    selectedCards = [];
+    lockGameBoard = false;
+    updateTurnUIStyle();
+}
 
-        function quitActiveGameEngine() {
-            document.getElementById("modalOverlay").style.none;
-            document.getElementById("gameRuntimeView").style.display = "none";
-            document.getElementById("studioView").style.display = "flex";
-            document.getElementById("fileLoader").value = ""; // Clear file selector slots buffers
-        }
-    </script>
+function updateTurnUIStyle() {
+    document.querySelectorAll('.team-score-card').forEach(card => card.classList.remove('active-turn'));
+    if (engineGameMode === "single") {
+        const sc0 = document.getElementById("scoreCard_0");
+        if(sc0) sc0.classList.add('active-turn');
+    } else {
+        const activeCard = document.getElementById(`scoreCard_${activeTurn}`);
+        if(activeCard) activeCard.classList.add('active-turn');
+    }
+}
+
+function triggerMatchEndgameSummary() {
+    AudioFX.playWin();
+    const modal = document.getElementById("endGamePopup");
+    const details = document.getElementById("winDetails");
+
+    if(engineGameMode === "single") {
+        document.getElementById("winTitle").innerText = "Game Completed!";
+        details.innerText = `Total Score: ${teamScores[0] || 0} Points!`;
+    } else {
+        let maxScore = -1; let winnerName = ""; let isTie = false;
+        teamList.forEach((name, idx) => {
+            if((teamScores[idx] || 0) > maxScore) { maxScore = teamScores[idx] || 0; winnerName = name; isTie = false; }
+            else if((teamScores[idx] || 0) === maxScore) { isTie = true; }
+        });
+        if(isTie) { document.getElementById("winTitle").innerText = "It's a Tie!"; details.innerText = `Multiple teams tied with ${maxScore} Pts!`; }
+        else { document.getElementById("winTitle").innerText = "Victory!"; details.innerText = `${winnerName} Wins with ${maxScore} Pts!`; }
+    }
+    document.getElementById("modalOverlay").style.display = "block";
+    modal.style.display = "block";
+}
+
+function closeEndGamePopupAndReset() {
+    document.getElementById("endGamePopup").style.display = "none";
+    quitActiveGameEngine();
+}
+
+function quitActiveGameEngine() {
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("gameRuntimeView").style.display = "none";
+    document.getElementById("studioView").style.display = "flex";
+    document.getElementById("fileLoader").value = "";
+    closeComparisonPopupHub();
+}
+</script>
 </body>
 </html>

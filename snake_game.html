@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Snake & Ladder All-in-One Studio</title>
+<title>Snake & Ladder Premium Studio</title>
 <style>
 :root {
 --primary: #2c3e50;
@@ -13,8 +13,6 @@
 --dark: #2c3e50;
 --light-bg: #f4efe2;
 --paper-border: #7f684e;
---team1-color: #e67e22;
---team2-color: #9b59b6;
 --ladder-color: #704214;
 --cell-white: #ffffff;
 --cell-tint: #f5ecd7;
@@ -51,77 +49,76 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.15);
 }
 .btn:active { transform: scale(0.96); }
 
-/* TAB 1: TEACHER DASHBOARD STUDIO */
-.admin-container {
-background: #faf6eb; padding: 25px; border-radius: 12px;
-border: 3px solid var(--paper-border);
-box-shadow: 0 6px 12px rgba(0,0,0,0.1); max-width: 1100px;
-margin: 0 auto;
+/* TAB 1: STUDIOS DASHBOARD LAYOUT */
+.admin-grid-layout {
+display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
+max-width: 1200px; margin: 0 auto 25px auto;
 }
+.dashboard-card {
+background: #faf6eb; border: 3px solid var(--paper-border); border-radius: 12px;
+padding: 20px; box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+.dashboard-card h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid var(--paper-border); padding-bottom: 8px; margin-bottom: 15px; }
+
 .file-dropzone {
-background: #ebdcb9; padding: 20px; border-radius: 10px; margin-bottom: 25px;
+background: #ebdcb9; padding: 25px 15px; border-radius: 10px;
 text-align: center; border: 2px dashed var(--paper-border); cursor: pointer; transition: background 0.2s;
+margin-bottom: 15px;
 }
 .file-dropzone:hover { background: #e3d2aa; }
-.file-dropzone p { margin: 0; font-size: 16px; color: var(--dark); font-weight: bold; }
-.file-dropzone span { font-size: 12px; color: #616a6b; display: block; margin-top: 4px; }
+.file-dropzone p { margin: 0; font-size: 15px; color: var(--dark); font-weight: bold; }
+.file-dropzone span { font-size: 11px; color: #616a6b; display: block; margin-top: 4px; }
 
-/* Dynamic Play Floating Button Indicator */
 .btn-play-now {
-display: none; background: linear-gradient(135deg, #27ae60, #2ecc71); color: white;
-width: 100%; max-width: 300px; padding: 15px; font-size: 18px; font-weight: bold;
-border-radius: 30px; text-align: center; margin: 0 auto 25px auto; border: 3px solid #ffffff;
-box-shadow: 0 10px 20px rgba(39,174,96,0.4); cursor: pointer;
+display: block; background: linear-gradient(135deg, #27ae60, #2ecc71); color: white;
+width: 100%; padding: 14px; font-size: 18px; font-weight: bold;
+border-radius: 30px; text-align: center; margin: 0 auto 15px auto; border: 3px solid #ffffff;
+box-shadow: 0 8px 16px rgba(39,174,96,0.3); cursor: pointer;
 animation: pulsePlay 1.5s infinite alternate ease-in-out;
 }
-@keyframes pulsePlay { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+@keyframes pulsePlay { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
 
-.bulk-import-container {
-background: rgba(255,255,255,0.5); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--paper-border);
-}
 .bulk-import-container textarea {
-width: 100%; height: 100px; padding: 10px; border-radius: 6px;
-border: 1px solid var(--paper-border); font-family: monospace; font-size: 14px; resize: none;
+width: 100%; height: 90px; padding: 10px; border-radius: 6px;
+border: 1px solid var(--paper-border); font-family: monospace; font-size: 13px; resize: none;
 }
-.bulk-actions { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-.btn-primary { background-color: #34495e; color: white; }
-.btn-primary:hover { background-color: #2c3e50; }
-.btn-secondary { background-color: #7f8c8d; color: white; }
-.btn-secondary:hover { background-color: #616a6b; }
-.btn-success { background-color: #27ae60; color: white; }
-.btn-success:hover { background-color: #219a52; }
-.btn-danger-mini { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-.ladder-config-box {
-background: #f0e6cc; border: 2px solid var(--paper-border);
-padding: 15px; border-radius: 8px; margin-bottom: 20px;
+.team-dashboard-item {
+display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid var(--paper-border);
 }
-.ladder-inputs-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
-.ladder-row-item { display: flex; align-items: center; gap: 10px; background: white; padding: 8px; border: 1px solid var(--paper-border); border-radius: 4px; display: inline-flex; width: fit-content; }
-.ladder-row-item input { width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 3px; }
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-.admin-table th, .admin-table td { border: 1px solid var(--paper-border); padding: 10px; text-align: left; vertical-align: middle; }
+.team-dashboard-item input {
+flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold;
+}
+
+.ladder-inputs-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
+.ladder-row-item { display: flex; align-items: center; gap: 8px; background: white; padding: 6px; border: 1px solid var(--paper-border); border-radius: 4px; }
+.ladder-row-item input { width: 55px; padding: 4px; text-align: center; border: 1px solid #ccc; border-radius: 3px; font-weight: bold; }
+
+.admin-table-wrapper { max-width: 1200px; margin: 0 auto; background: #faf6eb; border: 3px solid var(--paper-border); border-radius: 12px; padding: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+.admin-table { width: 100%; border-collapse: collapse; background: white; }
+.admin-table th, .admin-table td { border: 1px solid var(--paper-border); padding: 10px; text-align: left; }
 .admin-table th { background-color: #e6dcbe; color: var(--dark); }
-.admin-table input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+.admin-table input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+
+.image-input-flex-wrap { display: flex; gap: 6px; align-items: center; }
+.btn-upload-local-file { background-color: #34495e; color: white; border: none; padding: 8px 10px; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
 /* TAB 2: GAME RUNTIME ARENA */
-.game-main-container { width: 100%; max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
-.top-team-row { display: flex; justify-content: center; width: 100%; max-width: 650px; margin-bottom: 20px; gap: 20px; }
+.game-main-container { width: 100%; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.top-team-row { display: flex; justify-content: center; width: 100%; max-width: 750px; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
 .team-status-card {
-flex: 1; max-width: 280px; background: #faf6eb; padding: 12px 20px; border-radius: 12px;
+flex: 1; min-width: 160px; max-width: 240px; background: #faf6eb; padding: 12px 15px; border-radius: 12px;
 box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;
-border: 4px solid #cdc2a5; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+border: 4px solid #cdc2a5; cursor: pointer; transition: all 0.25s ease;
+display: none;
 }
-.team-card-left-info { display: flex; align-items: center; gap: 15px; }
-.status-name { font-size: 18px; font-weight: bold; }
-.status-pos { font-size: 14px; color: #7f8c8d; font-weight: bold; }
-.status-pos span { font-size: 24px; color: var(--dark); margin-left: 5px; }
-.team-status-card.active-turn-glow-1 { border-color: var(--team1-color); box-shadow: 0 0 15px rgba(230, 126, 34, 0.4); background-color: rgba(230, 126, 34, 0.08); }
-.team-status-card.active-turn-glow-1 .status-name { color: var(--team1-color); }
-.team-status-card.active-turn-glow-2 { border-color: var(--team2-color); box-shadow: 0 0 15px rgba(155, 89, 182, 0.4); background-color: rgba(155, 89, 182, 0.08); }
-.team-status-card.active-turn-glow-2 .status-name { color: var(--team2-color); }
+.team-card-left-info { display: flex; align-items: center; gap: 12px; pointer-events: none; }
+.status-name { font-size: 16px; font-weight: bold; pointer-events: none; }
+.status-pos { font-size: 13px; color: #7f8c8d; font-weight: bold; pointer-events: none; }
+.status-pos span { font-size: 20px; color: var(--dark); margin-left: 3px; pointer-events: none; }
 
-/* [UPGRADE MOBILE RESPONSIVE] - Flex Wrap Grid Layout System */
+.team-status-card.active-turn-active-glow { border-color: #27ae60 !important; box-shadow: 0 0 15px rgba(39,174,96,0.5); background-color: rgba(39,174,96,0.08); }
+
 .board-split-layout-flex { 
 display: flex; gap: 25px; width: 100%; justify-content: center; align-items: flex-start; flex-wrap: wrap; 
 }
@@ -138,77 +135,66 @@ border: 2px solid #1e7e43; text-align: center;
 }
 .btn-trigger-roll:disabled { background-color: #bdc3c7; border-color: #bdc3c7; cursor: not-allowed; box-shadow: none; }
 
-/* [UPGRADE MOBILE RESPONSIVE] - Fluid aspect ratio dimensions sizing updates */
+.btn-fullscreen-toggle {
+width: 100%; background-color: #34495e; color: white; font-size: 14px; padding: 10px;
+border-radius: 8px; border: 1px solid #2c3e50; cursor: pointer; text-align: center; font-weight: bold;
+box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: all 0.2s;
+}
+.btn-fullscreen-toggle:hover { background-color: #2c3e50; }
+
 .board-rel-wrapper {
 position: relative; background: #faf6eb; padding: 12px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25);
 width: 100%; max-width: 650px; min-width: 320px; aspect-ratio: 1/1; overflow: hidden; border: 8px double var(--paper-border);
-flex: 1 1 500px; /* Expands to full available spacing seamlessly */
+flex: 1 1 500px;
 }
 .grid-board { display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr); background-color: var(--paper-border); width: 100%; height: 100%; }
+
 .cell { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 0; border: 1px solid rgba(127, 104, 78, 0.35); overflow: hidden; }
 .cell-even-color { background-color: var(--cell-white); }
 .cell-odd-color { background-color: var(--cell-tint); }
-.cell-number { position: absolute; top: 4px; left: 4px; color: #5c4a37; font-size: 12px; font-weight: 800; opacity: 0.8; z-index: 5; background: rgba(255,255,255,0.6); padding: 1px 4px; border-radius: 3px; }
-.cell-content-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: relative; z-index: 1; }
-.cell-content-indicator { font-size: 11px; color: #2c3e50; text-align: center; font-weight: bold; padding: 5px; word-break: break-word; overflow: hidden; line-height: 1.2; z-index: 3; }
-.cell-thumbnail-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; opacity: 0.95; }
-.board-svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-.ladder-main-rail { stroke: var(--ladder-color); stroke-width: 6; stroke-linecap: round; opacity: 0.85; }
-.ladder-rung-step { stroke: #543111; stroke-width: 4; stroke-linecap: round; opacity: 0.9; }
+.cell-number { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #5c4a37; font-size: 26px; font-weight: 900; opacity: 0.65; z-index: 5; }
 
-/* Burma Python Container Configuration */
-.snake-popup-bite-card {
-display: none; position: absolute; width: 90px; height: 90px; pointer-events: none; z-index: 9999;
-transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-}
-.snake-popup-bite-card.active-center { 
-display: flex; align-items: center; justify-content: center; 
-left: 50% !important; top: 50% !important; 
-transform: translate(-50%, -50%); 
-}
-.snake-popup-bite-card.active-center .vector-built-in-snake { font-size: 140px !important; }
-.snake-popup-bite-card.active-target { 
-display: flex; align-items: center; justify-content: center; 
-transform: translate(-50%, -50%); 
-}
-.snake-popup-bite-card.active-target .vector-built-in-snake { font-size: 60px !important; }
-.snake-popup-bite-card.vector-built-in-snake { 
-line-height: 1; text-align: center; 
-filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.6)); 
-user-select: none; transition: font-size 0.4s ease;
+.snake-sticker-overlay {
+    position: absolute; top: 4px; right: 4px; font-size: 18px; z-index: 10;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
 }
 
-/* TOKENS - 3D REAL CHESS PAWN STYLE */
-.token-container { display: flex; gap: 2px; position: absolute; bottom: 4px; right: 4px; z-index: 20 !important; flex-wrap: wrap; max-width: 45px; justify-content: flex-end; }
+.cell-content-container { display: none; }
+.board-canvas-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+/* PLAYER PAWN TOKENS */
+.token-container { display: flex; gap: 2px; position: absolute; bottom: 4px; left: 4px; z-index: 20 !important; flex-wrap: wrap; max-width: 80px; }
 .pawn-token {
-    width: 20px; height: 26px; position: relative;
-    filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.4));
+    width: 16px; height: 22px; position: relative;
+    filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.4));
     animation: premiumPulse 1.4s infinite alternate ease-in-out;
 }
 .pawn-showcase {
-    width: 26px; height: 32px; position: relative;
-    display: inline-block; filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.3));
+    width: 22px; height: 28px; position: relative;
+    display: inline-block; filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.3));
 }
 .pawn-token::before, .pawn-showcase::before {
     content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 10px; height: 10px; border-radius: 50%; box-shadow: inset -2px -2px 3px rgba(0,0,0,0.3);
+    width: 8px; height: 8px; border-radius: 50%; box-shadow: inset -1px -1px 2px rgba(0,0,0,0.3);
 }
 .pawn-token::after, .pawn-showcase::after {
     content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 18px; height: 16px; border-radius: 50% 50% 20% 20%;
-    box-shadow: inset -3px -3px 4px rgba(0,0,0,0.4);
+    width: 14px; height: 13px; border-radius: 50% 50% 20% 20%;
+    box-shadow: inset -2px -2px 3px rgba(0,0,0,0.4);
 }
-.t1::before, .pawn-token.t1::before { background: #ffbe76; }
-.t1::after, .pawn-token.t1::after { background: var(--team1-color); border: 1px solid #d35400; }
-.t2::before, .pawn-token.t2::before { background: #f53b57; }
-.t2::after, .pawn-token.t2::after { background: var(--team2-color); border: 1px solid #8e44ad; }
+
+.tc-1::before { background: #ffbe76; } .tc-1::after { background: #e67e22; border: 1px solid #d35400; }
+.tc-2::before { background: #f53b57; } .tc-2::after { background: #9b59b6; border: 1px solid #8e44ad; }
+.tc-3::before { background: #4bc0c0; } .tc-3::after { background: #16a085; border: 1px solid #117a65; }
+.tc-4::before { background: #ff6384; } .tc-4::after { background: #ff3366; border: 1px solid #b3002d; }
+.tc-5::before { background: #ffcd56; } .tc-5::after { background: #f1c40f; border: 1px solid #b7950b; }
 
 @keyframes premiumPulse { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 .damage-flash-active-frame { animation: damageFlashFrame 0.2s ease-out 2 alternate; }
 @keyframes damageFlashFrame { 0% { background-color: rgba(0,0,0,0); } 100% { background-color: rgba(231, 76, 60, 0.25); } }
 
-/* DICE CUBE COMPONENT */
-.dice-modal-overlay { display: none; position: fixed; z-index: 300; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.55); align-items: center; justify-content: center; }
+/* DICE MODAL OVERLAY */
+.dice-modal-overlay { display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.55); align-items: center; justify-content: center; }
 .dice-box-card { background: #faf6eb; padding: 30px; border-radius: 16px; border: 4px solid var(--paper-border); box-shadow: 0 15px 30px rgba(0,0,0,0.4); text-align: center; width: 260px; }
 .dice-graphic-container { width: 100px; height: 100px; margin: 25px auto; perspective: 500px; }
 .real-cube-dice { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-25deg) rotateY(30deg); transition: transform 0.15s; }
@@ -232,7 +218,7 @@ user-select: none; transition: font-size 0.4s ease;
 .show-value-6 { transform: rotateX(180deg) rotateY(360deg); }
 
 /* CHALLENGE POP-UP MODAL */
-.modal { display: none; position: fixed; z-index: 400; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.65); align-items: center; justify-content: center; }
+.modal { display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.65); align-items: center; justify-content: center; }
 .modal-content {
 background-color: #faf6eb; padding: 30px; border-radius: 16px; width: 92%; max-width: 500px; text-align: center;
 border: 6px double var(--paper-border); box-shadow: 0 15px 40px rgba(0,0,0,0.5);
@@ -241,127 +227,154 @@ animation: popUpZoomEntrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 @keyframes popUpZoomEntrance { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .pop-cell-badge { background-color: #e67e22; color: white; padding: 6px 20px; font-size: 18px; font-weight: 900; border-radius: 30px; display: inline-block; margin-bottom: 12px; border: 2px solid #d35400; }
 .pop-question-display { font-size: 24px; font-weight: 800; color: #2c3e50; line-height: 1.4; margin: 12px 0; padding: 15px; background: white; border-radius: 8px; border: 1px dashed var(--paper-border); }
-.pop-image-preview-container { width: 100%; max-height: 180px; display: none; justify-content: center; align-items: center; margin-bottom: 15px; border-radius: 8px; overflow: hidden; border: 2px solid var(--paper-border); background: #fff; }
-.pop-image-preview-container img { max-width: 100%; max-height: 180px; object-fit: contain; }
+.pop-image-preview-container { width: 100%; max-height: 240px; display: none; justify-content: center; align-items: center; margin-bottom: 15px; border-radius: 8px; overflow: hidden; border: 2px solid var(--paper-border); background: #fff; }
+.pop-image-preview-container img { max-width: 100%; max-height: 240px; object-fit: contain; }
 .btn-correct { background-color: var(--correct); color: white; margin-right: 15px; border: 2px solid #27ae60; }
 .btn-wrong { background-color: var(--wrong); color: white; border: 2px solid #c0392b; }
 
-/* Responsive Media Queries Configuration for Smartphones Screen Viewports */
 @media (max-width: 768px) {
     main { padding: 10px; }
     .board-split-layout-flex { flex-direction: column; align-items: center; gap: 15px; }
     .side-dice-action-panel { width: 100%; max-width: 500px; position: static; flex-direction: row; padding: 15px; gap: 20px; }
     .btn-trigger-roll { font-size: 15px; padding: 10px; }
-    .cell-content-indicator { font-size: 9px; padding: 2px; }
-    .cell-number { font-size: 10px; padding: 0px 2px; }
-    .pawn-token { width: 14px; height: 20px; }
-    .pawn-token::before { width: 6px; height: 6px; }
-    .pawn-token::after { width: 12px; height: 11px; }
+    .cell-number { font-size: 18px; }
 }
 </style>
 </head>
 <body>
 <header>
-<h1>Snake & Ladder Pack Studio</h1>
-<nav>
-<button id="nav-admin-btn" class="nav-btn active" onclick="switchTab('admin-tab')">Studio Dashboard</button>
-<button id="nav-game-btn" class="nav-btn" onclick="switchTab('game-tab')">Game Arena</button>
-</nav>
+    <h1>Snake & Ladder Premium Pack</h1>
+    <nav>
+        <button id="nav-admin-btn" class="nav-btn active" onclick="switchTab('admin-tab')">Dashboard</button>
+        <button id="nav-game-btn" class="nav-btn" onclick="switchTab('game-tab')">Game Arena</button>
+    </nav>
 </header>
 <main id="main-viewport-container">
     
 <section id="admin-tab" class="tab-content active-tab">
-<div class="admin-container">
-<h2>Configure ROM & Lesson Pack</h2>
+<div class="admin-grid-layout">
+    
+    <div class="dashboard-card">
+        <h3>📥 ROM Storage Engine</h3>
+        <div class="file-dropzone" id="dropzone" onclick="document.getElementById('romLoader').click()">
+            <p>📥 Click or Drag ROM (.txt)</p>
+            <span>Load Lesson Pack File</span>
+            <input type="file" id="romLoader" accept=".txt" style="display: none;" onchange="importSnakeROM(event)">
+        </div>
+        <button type="button" class="btn-play-now" id="playNowBtn" onclick="switchTab('game-tab')">▶️ PLAY GAME</button>
+        <button type="button" class="btn btn-success" style="width:100%; background-color:#e67e22;" onclick="exportSnakeROM()">💾 Export Game ROM (.txt)</button>
+    </div>
 
-<!-- File Drag & Drop ROM Loader Component -->
-<div class="file-dropzone" id="dropzone" onclick="document.getElementById('romLoader').click()">
-    <p>📥 Click or Drag Snake Game ROM (.txt)</p>
-    <span>ဆော့မည့် သင်ခန်းစာဂਿမ်းဖိုင်တင်ရန်</span>
-    <input type="file" id="romLoader" accept=".txt" style="display: none;" onchange="importSnakeROM(event)">
+    <div class="dashboard-card">
+        <h3>👥 Teams Customizer Management</h3>
+        <div id="teamDashboardInputsContainer"></div>
+        <button type="button" class="btn btn-primary" style="padding:5px 12px; font-size:12px; margin-top:5px;" onclick="addNewTeamConfigRow()">+ Add Team</button>
+    </div>
+
+    <div class="dashboard-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--paper-border); padding-bottom:8px; margin-bottom:15px;">
+            <h3 style="margin:0; border:none; padding:0;">🗺️ Custom Routes & Trap Config</h3>
+            <button type="button" class="btn btn-success" style="padding:4px 10px; font-size:12px;" onclick="addNewLadderRow(null, null)">+ Add Route</button>
+        </div>
+        
+        <div class="bulk-import-container" style="margin-bottom:12px;">
+            <textarea id="bulkPasteInputTextArea" placeholder="Paste Lesson Pack list here...&#10;Example:&#10;1. Apple https://images.com/apple.jpg&#10;2. Cat https://images.com/cat.jpg&#10;3. https://images.com/dog.jpg"></textarea>
+            <button type="button" class="btn btn-success" style="padding:5px 12px; font-size:12px; margin-top:6px; width:100%; font-weight:bold;" onclick="executeBulkImportProcessing()">⚡ Smart Bulk Import Pack</button>
+        </div>
+        
+        <div id="ladder-container-list" class="ladder-inputs-list"></div>
+    </div>
 </div>
 
-<!-- [UPGRADE] - Play game directly button without notification alert framework toggles -->
-<button type="button" class="btn-play-now" id="playNowBtn" onclick="switchTab('game-tab')">▶️ PLAY GAME</button>
-
-<div class="bulk-import-container">
-<strong style="display: block; margin-bottom: 8px; color: var(--dark);">Bulk Paste Word/Image List (1 to 50):</strong>
-<textarea id="bulkPasteInputTextArea" placeholder="Paste here example:&#10;1. Apple&#10;2. Banana&#10;3. https://image.link/pic.jpg&#10;4. Orange"></textarea>
-<button type="button" class="btn btn-success" style="padding: 6px 15px; font-size: 13px; margin-top: 8px;" onclick="executeBulkImportProcessing()">Import Raw Data Rows</button>
-</div>
-
-<div class="ladder-config-box">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-<strong style="color: var(--dark); font-size: 16px;">Configure Board Ladders (Routes Config)</strong>
-<button type="button" class="btn btn-success" style="padding: 6px 15px; font-size: 13px;" onclick="addNewLadderRow(null, null)">+ Add New Ladder</button>
-</div>
-<div id="ladder-container-list" class="ladder-inputs-list"></div>
-</div>
-
-<div class="bulk-actions">
-<button type="button" class="btn btn-secondary" onclick="autoPopulateDemoData()">Auto Demo Content</button>
-<button type="button" class="btn btn-primary" onclick="saveAdminData()">Save Configuration</button>
-<button type="button" class="btn btn-success" style="background-color: #e67e22; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" onclick="exportSnakeROM()">💾 Export Game ROM (.txt)</button>
-</div>
-
-<form id="admin-form">
-<table class="admin-table">
-<thead>
-<tr>
-<th style="width: 10%;">Cell No.</th>
-<th style="width: 45%;">Text / Question Details</th>
-<th style="width: 45%;">Optional Image Link (URL)</th>
-</tr>
-</thead>
-<tbody id="admin-table-body"></tbody>
-</table>
-</form>
+<div class="admin-table-wrapper">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <h3 style="margin:0;">Grid Content Editor Space</h3>
+        <button type="button" class="btn btn-secondary" style="padding:5px 15px;" onclick="autoPopulateDemoData()">Auto Demo Content</button>
+        <button type="button" class="btn btn-primary" style="padding:5px 25px;" onclick="saveAdminData()">Save All Configuration</button>
+    </div>
+    <form id="admin-form">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Cell No.</th>
+                    <th style="width: 45%;">Text / Question Details</th>
+                    <th style="width: 40%;">Optional Image Link (URL) / Device Upload</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table-body"></tbody>
+        </table>
+    </form>
 </div>
 </section>
 
 <section id="game-tab" class="tab-content">
 <div class="game-main-container">
-<div class="top-team-row">
-<div id="card-team-1" class="team-status-card active-turn-glow-1" onclick="manuallySetTurn(1)">
-<div class="team-card-left-info">
-<div class="pawn-showcase t1"></div>
-<div>
-<div class="status-name">Team 1</div>
-<div class="status-pos">Position: <span id="team1-pos-val">1</span></div>
-</div>
-</div>
-</div>
-<div id="card-team-2" class="team-status-card" onclick="manuallySetTurn(2)">
-<div class="team-card-left-info">
-<div class="pawn-showcase t2"></div>
-<div>
-<div class="status-name">Team 2</div>
-<div class="status-pos">Position: <span id="team2-pos-val">1</span></div>
-</div>
-</div>
-</div>
-</div>
-<div class="board-split-layout-flex">
-<div id="board-rel-anchor" class="board-rel-wrapper">
-<svg id="board-graphics-canvas" class="board-svg-overlay"></svg>
-<div id="board" class="grid-board"></div>
-<div id="snakeStickerAttackPuck" class="snake-popup-bite-card">
-    <div class="vector-built-in-snake">🐍</div>
-</div>
-</div>
-<div class="side-dice-action-panel">
-<span style="font-size: 13px; font-weight: bold; color: #7f8891; text-transform: uppercase;">Controls</span>
-<button id="roll-btn" class="btn btn-trigger-roll" onclick="openDiceRollSequence()">Roll Dice</button>
-<p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.3; color: #8e7a65;">Click a Team Card above to manually pass turns.</p>
-</div>
-</div>
+    <div class="top-team-row" id="gameScoresHeaderWrapper">
+        <div id="card-team-1" class="team-status-card" onclick="manuallySetTurn(1)">
+            <div class="team-card-left-info">
+                <div class="pawn-showcase tc-1"></div>
+                <div>
+                    <div class="status-name" id="label-display-t1">Team 1</div>
+                    <div class="status-pos">Pos: <span id="team1-pos-val">1</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="card-team-2" class="team-status-card" onclick="manuallySetTurn(2)">
+            <div class="team-card-left-info">
+                <div class="pawn-showcase tc-2"></div>
+                <div>
+                    <div class="status-name" id="label-display-t2">Team 2</div>
+                    <div class="status-pos">Pos: <span id="team2-pos-val">1</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="card-team-3" class="team-status-card" onclick="manuallySetTurn(3)">
+            <div class="team-card-left-info">
+                <div class="pawn-showcase tc-3"></div>
+                <div>
+                    <div class="status-name" id="label-display-t3">Team 3</div>
+                    <div class="status-pos">Pos: <span id="team3-pos-val">1</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="card-team-4" class="team-status-card" onclick="manuallySetTurn(4)">
+            <div class="team-card-left-info">
+                <div class="pawn-showcase tc-4"></div>
+                <div>
+                    <div class="status-name" id="label-display-t4">Team 4</div>
+                    <div class="status-pos">Pos: <span id="team4-pos-val">1</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="card-team-5" class="team-status-card" onclick="manuallySetTurn(5)">
+            <div class="team-card-left-info">
+                <div class="pawn-showcase tc-5"></div>
+                <div>
+                    <div class="status-name" id="label-display-t5">Team 5</div>
+                    <div class="status-pos">Pos: <span id="team5-pos-val">1</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="board-split-layout-flex">
+        <div id="board-rel-anchor" class="board-rel-wrapper">
+            <div id="board" class="grid-board"></div>
+            <canvas id="animationCanvas" class="board-canvas-overlay"></canvas>
+        </div>
+        <div class="side-dice-action-panel">
+            <span style="font-size: 13px; font-weight: bold; color: #7f8891; text-transform: uppercase;">Controls</span>
+            <button id="roll-btn" class="btn btn-trigger-roll" onclick="openDiceRollSequence()">Roll Dice</button>
+            <button class="btn-fullscreen-toggle" onclick="toggleFullScreenArena()">🖥️ True Full Screen</button>
+            <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.3; color: #8e7a65;">Click a Team Card above to manually pass turns.</p>
+        </div>
+    </div>
 </div>
 </section>
 </main>
 
 <div id="dice-overlay-modal" class="dice-modal-overlay">
 <div class="dice-box-card">
-<h3 id="dice-modal-title-text" style="margin: 0 0 10px 0;">Team 1 Rolling...</h3>
+<h3 id="dice-modal-title-text" style="margin: 0 0 10px 0;">Team Rolling...</h3>
 <div class="dice-graphic-container">
 <div id="cube-dice-object" class="real-cube-dice">
 <div class="dice-face face-1"><div class="dot red-dot"></div></div>
@@ -392,134 +405,677 @@ animation: popUpZoomEntrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 </div>
 
 <script>
-const STORAGE_KEY = "snakegame_50_square_data_v3";
-const LADDER_KEY = "snakegame_50_ladder_data_v3";
-let defaultLadders = { 4:10, 7:18, 19:35, 15:31, 40:47 };
+const STORAGE_KEY = "snakegame_50_square_data_v5";
+const LADDER_KEY = "snakegame_50_ladder_data_v5";
+const CONFIG_TEAMS_KEY = "snakegame_50_custom_teams_v5";
+
+let defaultLadders = { 4:10, 7:18, 15:31, 19:35, 40:47 };
 let ladders = {};
-const snakes = { 14:3, 23:5, 36:18, 43:25, 48:31 };
+let reverseLaddersTrapMap = {}; 
+
 let gameData = {};
-let currentTeam = 1;
-let teamPositions = { 1:1, 2:1 };
-let oldPositions = { 1:1, 2:1 };
+let currentTeam = 1; 
+let activeTeamsCount = 2;
+let teamPositions = { 1:1, 2:1, 3:1, 4:1, 5:1 };
+let oldPositions = { 1:1, 2:1, 3:1, 4:1, 5:1 };
+let teamNamesMap = { 1:"Team 1", 2:"Team 2", 3:"Team 3", 4:"Team 4", 5:"Team 5" };
 let latestDiceRoll = 1;
 
+/* 🎵 WEB AUDIO SYNTHESIZER ENGINE */
+let audioCtx = null;
+function initAudioContextSystem() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playSuccessCorrectChimeAudio() {
+    try {
+        initAudioContextSystem();
+        let osc1 = audioCtx.createOscillator();
+        let osc2 = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc1.type = "sine"; osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+        osc2.type = "sine"; osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1);
+        osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+        osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+        osc2.start(); osc2.stop(audioCtx.currentTime + 0.4);
+    } catch(e) {}
+}
+
+function playPawnHopMoveAudioTick() {
+    try {
+        initAudioContextSystem();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = "sine"; osc.frequency.setValueAtTime(340, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(490, audioCtx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.18);
+    } catch(e) {}
+}
+
+function playSnakeAttackBiteHissAudio() {
+    try {
+        initAudioContextSystem();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = "sawtooth"; osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.85);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.9);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.9);
+    } catch(e) {}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-generateAdminFormTable();
-loadSavedData();
-buildGameBoardUI();
-setupDragAndDropZone();
-window.addEventListener('resize', drawVisualTracksOverlayVectors);
+    generateAdminFormTable();
+    loadSavedData();
+    renderDashboardTeamsCard();
+    buildGameBoardUI();
+    setupDragAndDropZone();
 });
 
 function switchTab(tabId) {
-document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
-document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-document.getElementById(tabId).classList.add('active-tab');
-if (tabId === 'admin-tab') document.getElementById('nav-admin-btn').classList.add('active');
-if (tabId === 'game-tab') {
-document.getElementById('nav-game-btn').classList.add('active');
-buildGameBoardUI();
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active-tab');
+    if (tabId === 'admin-tab') document.getElementById('nav-admin-btn').classList.add('active');
+    if (tabId === 'game-tab') {
+        document.getElementById('nav-game-btn').classList.add('active');
+        saveTeamsStateFromDashboardInputs();
+        buildGameBoardUI();
+        resizeAnimationCanvas();
+    }
 }
+
+function toggleFullScreenArena() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function resizeAnimationCanvas() {
+    const canvas = document.getElementById("animationCanvas");
+    const wrapper = document.getElementById("board-rel-anchor");
+    if(canvas && wrapper) {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        setTimeout(drawVisualTracksOverlayVectors, 100);
+    }
 }
 
 function generateAdminFormTable() {
-const tbody = document.getElementById("admin-table-body");
-tbody.innerHTML = "";
-for (let i = 1; i <= 50; i++) {
-const tr = document.createElement("tr");
-tr.innerHTML = `
-<td><b>Cell ${i}</b></td>
-<td><input type="text" id="content-${i}" placeholder="Enter word/question for Cell ${i}..."></td>
-<td><input type="text" id="image-${i}" placeholder="Image URL (Optional)..."></td>
-`;
-tbody.appendChild(tr);
-}
+    const tbody = document.getElementById("admin-table-body");
+    tbody.innerHTML = "";
+    for (let i = 1; i <= 50; i++) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td><b>Cell ${i}</b></td>
+        <td><input type="text" id="content-${i}" placeholder="Enter question data..."></td>
+        <td>
+            <div class="image-input-flex-wrap">
+                <input type="text" id="image-${i}" placeholder="Image Link (URL)..." style="flex:1;">
+                <button type="button" class="btn-upload-local-file" onclick="triggerLocalFileSelectWindow(${i})">📁 Upload</button>
+                <input type="file" id="local-file-selector-${i}" accept="image/*" style="display:none;" onchange="processLocalImageFileUpload(event, ${i})">
+            </div>
+        </td>
+        `;
+        tbody.appendChild(tr);
+    }
 }
 
-function executeBulkImportProcessing() {
-const rawText = document.getElementById("bulkPasteInputTextArea").value;
-if(!rawText.trim()) { alert("Please paste text list first!"); return; }
-const lines = rawText.split("\n");
-lines.forEach(line => {
-const match = line.match(/^\s*(\d+)\s*[\.\s\-:]+\s*(.*)$/);
-if (match) {
-const cellNum = parseInt(match[1]);
-const dataContent = match[2].trim();
-if (cellNum >= 1 && cellNum <= 50 && dataContent) {
-if (dataContent.startsWith("http://") || dataContent.startsWith("https://")) {
-document.getElementById(`image-${cellNum}`).value = dataContent;
-} else {
-document.getElementById(`content-${cellNum}`).value = dataContent;
+function triggerLocalFileSelectWindow(cellNum) {
+    const el = document.getElementById(`local-file-selector-${cellNum}`);
+    if(el) el.click();
 }
+
+function processLocalImageFileUpload(event, cellNum) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const txtInput = document.getElementById(`image-${cellNum}`);
+        if(txtInput) {
+            txtInput.value = base64Data; 
+        }
+    };
+    reader.readAsDataURL(file);
 }
+
+function renderDashboardTeamsCard() {
+    const container = document.getElementById("teamDashboardInputsContainer");
+    container.innerHTML = "";
+    for(let i = 1; i <= activeTeamsCount; i++) {
+        const div = document.createElement("div");
+        div.className = "team-dashboard-item";
+        div.innerHTML = `
+            <div class="pawn-showcase tc-${i}"></div>
+            <input type="text" class="dashboard-team-name-input-field" data-teamid="${i}" value="${teamNamesMap[i] || 'Team ' + i}">
+            ${i > 1 ? `<button type="button" class="btn-danger-mini" onclick="removeLastTeamConfigRow()">X</button>` : ''}
+        `;
+        container.appendChild(div);
+    }
 }
-});
-document.getElementById("playNowBtn").style.display = "block"; // Trigger Play button visible instantly
+
+function addNewTeamConfigRow() {
+    if(activeTeamsCount >= 5) { alert("Maximum 5 Teams allowed!"); return; }
+    saveTeamsStateFromDashboardInputs();
+    activeTeamsCount++;
+    renderDashboardTeamsCard();
+}
+
+function removeLastTeamConfigRow() {
+    if(activeTeamsCount <= 1) return;
+    saveTeamsStateFromDashboardInputs();
+    activeTeamsCount--;
+    renderDashboardTeamsCard();
+}
+
+function saveTeamsStateFromDashboardInputs() {
+    const inputs = document.querySelectorAll(".dashboard-team-name-input-field");
+    inputs.forEach(inp => {
+        let tid = parseInt(inp.getAttribute("data-teamid"));
+        let val = inp.value.trim();
+        if(val) teamNamesMap[tid] = val;
+    });
+    localStorage.setItem(CONFIG_TEAMS_KEY, JSON.stringify({
+        count: activeTeamsCount,
+        names: teamNamesMap
+    }));
 }
 
 function addNewLadderRow(startVal, endVal) {
-const container = document.getElementById("ladder-container-list");
-const div = document.createElement("div");
-div.className = "ladder-row-item";
-div.innerHTML = `
-<span>Start:</span>
-<input type="number" class="ladder-start-input" value="${startVal !== null ? startVal : ''}" min="1" max="49">
-<span>→ End:</span>
-<input type="number" class="ladder-end-input" value="${endVal !== null ? endVal : ''}" min="2" max="50">
-<button type="button" class="btn-danger-mini" onclick="this.parentElement.remove()">Remove</button>
-`;
-container.appendChild(div);
+    const container = document.getElementById("ladder-container-list");
+    const div = document.createElement("div");
+    div.className = "ladder-row-item";
+    div.innerHTML = `
+    <span>Base (Start):</span>
+    <input type="number" class="ladder-start-input" value="${startVal !== null ? startVal : ''}" min="1" max="49">
+    <span>→ Top (Sticker 🐍):</span>
+    <input type="number" class="ladder-end-input" value="${endVal !== null ? endVal : ''}" min="2" max="50">
+    <button type="button" class="btn-danger-mini" style="margin-left:auto; background-color:#e74c3c; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
+    `;
+    container.appendChild(div);
+}
+
+function executeBulkImportProcessing() {
+    const rawText = document.getElementById("bulkPasteInputTextArea").value;
+    if(!rawText.trim()) return;
+    
+    const lines = rawText.split("\n");
+    lines.forEach(line => {
+        const initialMatch = line.match(/^\s*(\d+)\s*[\.\s\-:]+\s*(.*)$/);
+        if (initialMatch) {
+            const cellNum = parseInt(initialMatch[1]);
+            let remainingString = initialMatch[2].trim();
+            
+            if (cellNum >= 1 && cellNum <= 50 && remainingString) {
+                const urlRegex = /(https?:\/\/[^\s]+)/gi;
+                const urlMatch = remainingString.match(urlRegex);
+                
+                let extractedUrl = "";
+                let extractedWord = remainingString;
+                
+                if (urlMatch && urlMatch.length > 0) {
+                    extractedUrl = urlMatch[0];
+                    extractedWord = remainingString.replace(extractedUrl, "").trim();
+                }
+                
+                extractedWord = extractedWord.replace(/^[\s\.\,:\-]+|[\s\.\,:\-]+$/g, "").trim();
+                
+                if(extractedWord === "" && extractedUrl !== "") {
+                    extractedWord = `Image Room ${cellNum}`;
+                }
+
+                if (document.getElementById(`content-${cellNum}`)) {
+                    document.getElementById(`content-${cellNum}`).value = extractedWord;
+                }
+                if (document.getElementById(`image-${cellNum}`)) {
+                    document.getElementById(`image-${cellNum}`).value = extractedUrl;
+                }
+            }
+        }
+    });
+    
+    rebuildActiveLaddersMapsFromInputs();
 }
 
 function autoPopulateDemoData() {
-for (let i = 1; i <= 50; i++) {
-document.getElementById(`content-${i}`).value = `Word Unit ${i}`;
+    for (let i = 1; i <= 50; i++) {
+        document.getElementById(`content-${i}`).value = `Word Challenge ${i}`;
+    }
 }
+
+function rebuildActiveLaddersMapsFromInputs() {
+    ladders = {};
+    reverseLaddersTrapMap = {};
+    
+    const startInputs = document.querySelectorAll(".ladder-start-input");
+    const endInputs = document.querySelectorAll(".ladder-end-input");
+    
+    startInputs.forEach((input, idx) => {
+        let s = parseInt(input.value);
+        let e = parseInt(endInputs[idx].value);
+        if (s > 0 && e > 0 && s <= 50 && e <= 50 && s !== e) { 
+            ladders[s] = e; 
+            reverseLaddersTrapMap[e] = s; 
+        }
+    });
 }
 
 function saveAdminData() {
-gameData = {};
-for (let i = 1; i <= 50; i++) {
-gameData[i] = {
-content: document.getElementById(`content-${i}`).value.trim(),
-imageUrl: document.getElementById(`image-${i}`).value.trim()
-};
-}
-localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
-ladders = {};
-const startInputs = document.querySelectorAll(".ladder-start-input");
-const endInputs = document.querySelectorAll(".ladder-end-input");
-startInputs.forEach((input, index) => {
-let s = parseInt(input.value);
-let e = parseInt(endInputs[index].value);
-if (s > 0 && e > 0 && s <= 50 && e <= 50 && s !== e) { ladders[s] = e; }
-});
-localStorage.setItem(LADDER_KEY, JSON.stringify(ladders));
-switchTab('game-tab');
+    saveTeamsStateFromDashboardInputs();
+    gameData = {};
+    for (let i = 1; i <= 50; i++) {
+        gameData[i] = {
+            content: document.getElementById(`content-${i}`).value.trim(),
+            imageUrl: document.getElementById(`image-${i}`).value.trim()
+        };
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+    
+    rebuildActiveLaddersMapsFromInputs();
+    localStorage.setItem(LADDER_KEY, JSON.stringify(ladders));
+    
+    resetGamePositionsMapState();
+    switchTab('game-tab');
 }
 
 function loadSavedData() {
-const stored = localStorage.getItem(STORAGE_KEY);
-if (stored) {
-gameData = JSON.parse(stored);
-for (let i = 1; i <= 50; i++) {
-if (gameData[i]) {
-document.getElementById(`content-${i}`).value = gameData[i].content || '';
-document.getElementById(`image-${i}`).value = gameData[i].imageUrl || '';
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        gameData = JSON.parse(stored);
+        for (let i = 1; i <= 50; i++) {
+            if (gameData[i]) {
+                document.getElementById(`content-${i}`).value = gameData[i].content || '';
+                document.getElementById(`image-${i}`).value = gameData[i].imageUrl || '';
+            }
+        }
+    } else {
+        for (let i = 1; i <= 50; i++) { gameData[i] = { content: `Question ${i}`, imageUrl: "" }; }
+    }
+    
+    const storedLadders = localStorage.getItem(LADDER_KEY);
+    if (storedLadders) ladders = JSON.parse(storedLadders);
+    else ladders = defaultLadders;
+    
+    reverseLaddersTrapMap = {};
+    const container = document.getElementById("ladder-container-list");
+    container.innerHTML = "";
+    for (let s in ladders) { 
+        addNewLadderRow(s, ladders[s]); 
+        reverseLaddersTrapMap[ladders[s]] = parseInt(s);
+    }
+
+    const storedTeamsConfig = localStorage.getItem(CONFIG_TEAMS_KEY);
+    if (storedTeamsConfig) {
+        let obj = JSON.parse(storedTeamsConfig);
+        activeTeamsCount = obj.count || 2;
+        teamNamesMap = obj.names || teamNamesMap;
+    }
+    resetGamePositionsMapState();
 }
+
+function resetGamePositionsMapState() {
+    currentTeam = 1;
+    for(let i = 1; i <= 5; i++) {
+        teamPositions[i] = 1;
+        oldPositions[i] = 1;
+    }
 }
-} else {
-for (let i = 1; i <= 50; i++) { gameData[i] = { content: `Room ${i}`, imageUrl: "" }; }
+
+function buildGameBoardUI() {
+    saveTeamsStateFromDashboardInputs();
+    rebuildActiveLaddersMapsFromInputs(); 
+    
+    for(let i = 1; i <= 5; i++) {
+        let card = document.getElementById(`card-team-${i}`);
+        if(card) {
+            if(i <= activeTeamsCount) {
+                card.style.display = "flex";
+                let lbl = document.getElementById(`label-display-t${i}`);
+                if(lbl) lbl.innerText = teamNamesMap[i] || 'Team ' + i;
+            } else {
+                card.style.display = "none";
+            }
+        }
+    }
+    manuallySetTurn(currentTeam);
+
+    const board = document.getElementById("board");
+    board.innerHTML = "";
+    let cellCounter = 0;
+    for (let row = 6; row >= 0; row--) {
+        for (let col = 0; col < 7; col++) {
+            let cellNum = (row % 2 === 1) ? ((row * 7) + (7 - col)) : ((row * 7) + (col + 1));
+            if (cellNum <= 50) {
+                const cellDiv = document.createElement("div");
+                cellDiv.id = `board-cell-${cellNum}`;
+                let cellColorClass = (cellCounter % 2 === 0) ? 'cell-even-color' : 'cell-odd-color';
+                cellDiv.className = `cell ${cellColorClass}`;
+                if (cellNum === 50) cellDiv.style.backgroundColor = "#f1c40f";
+                
+                let stickerHtml = "";
+                if (reverseLaddersTrapMap[cellNum]) {
+                    stickerHtml = `<span class="snake-sticker-overlay">🐍</span>`;
+                }
+
+                cellDiv.innerHTML = `
+                    <span class="cell-number">${cellNum === 50 ? "50 🏆" : cellNum}</span>
+                    ${stickerHtml}
+                    <div id="tokens-cell-${cellNum}" class="token-container"></div>
+                `;
+                board.appendChild(cellDiv);
+                cellCounter++;
+            }
+        }
+    }
+    renderPlayerTokens();
+    setTimeout(resizeAnimationCanvas, 150);
 }
-const storedLadders = localStorage.getItem(LADDER_KEY);
-if (storedLadders) ladders = JSON.parse(storedLadders);
-else ladders = defaultLadders;
-const container = document.getElementById("ladder-container-list");
-container.innerHTML = "";
-for (let s in ladders) { addNewLadderRow(s, ladders[s]); }
+
+function drawVisualTracksOverlayVectors() {
+    const canvas = document.getElementById("animationCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const wrapperRect = canvas.getBoundingClientRect();
+
+    function drawPremiumLadder(start, end) {
+        const c1 = document.getElementById(`board-cell-${start}`);
+        const c2 = document.getElementById(`board-cell-${end}`);
+        if (!c1 || !c2) return;
+        
+        const r1 = c1.getBoundingClientRect();
+        const r2 = c2.getBoundingClientRect();
+        
+        const x1 = (r1.left + r1.width / 2) - wrapperRect.left;
+        const y1 = (r1.top + r1.height / 2) - wrapperRect.top;
+        const x2 = (r2.left + r2.width / 2) - wrapperRect.left;
+        const y2 = (r2.top + r2.height / 2) - wrapperRect.top;
+
+        const widthOffset = 10;
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const dx = widthOffset * Math.sin(angle);
+        const dy = widthOffset * Math.cos(angle);
+
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 4;
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#5a2d0c";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.moveTo(x1 - dx, y1 + dy); ctx.lineTo(x2 - dx, y2 + dy);
+        ctx.moveTo(x1 + dx, y1 - dy); ctx.lineTo(x2 + dx, y2 - dy);
+        ctx.stroke();
+
+        const stepsCount = 6;
+        ctx.beginPath();
+        ctx.strokeStyle = "#cd853f";
+        ctx.lineWidth = 3;
+        for (let i = 1; i < stepsCount; i++) {
+            const t = i / stepsCount;
+            const sx = x1 + t * (x2 - x1);
+            const sy = y1 + t * (y2 - y1);
+            ctx.moveTo(sx - dx, sy + dy);
+            ctx.lineTo(sx + dx, sy - dy);
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    for (let src in ladders) { drawPremiumLadder(src, ladders[src]); }
+}
+
+function renderPlayerTokens() {
+    for (let i = 1; i <= 50; i++) {
+        const box = document.getElementById(`tokens-cell-${i}`);
+        if (box) box.innerHTML = "";
+    }
+    
+    for(let i = 1; i <= activeTeamsCount; i++) {
+        let pos = teamPositions[i] || 1;
+        const box = document.getElementById(`tokens-cell-${pos}`);
+        if(box) {
+            box.innerHTML += `<div class="pawn-token tc-${i}" id="live-pawn-p${i}"></div>`;
+        }
+        let valField = document.getElementById(`team${i}-pos-val`);
+        if(valField) valField.innerText = pos;
+    }
+}
+
+function manuallySetTurn(teamNum) {
+    if(teamNum > activeTeamsCount) teamNum = 1;
+    currentTeam = teamNum;
+    for(let i = 1; i <= 5; i++) {
+        let card = document.getElementById(`card-team-${i}`);
+        if(card) {
+            card.className = `team-status-card ${i === currentTeam ? 'active-turn-active-glow' : ''}`;
+        }
+    }
+}
+
+function openDiceRollSequence() {
+    initAudioContextSystem();
+    document.getElementById("roll-btn").disabled = true;
+    
+    const overlay = document.getElementById("dice-overlay-modal");
+    const txtTitle = document.getElementById("dice-modal-title-text");
+    const txtResult = document.getElementById("dice-numerical-callout");
+    const cube = document.getElementById("cube-dice-object");
+    
+    let currentName = teamNamesMap[currentTeam] || "Team " + currentTeam;
+    txtTitle.innerText = `${currentName} Rolling...`;
+    txtResult.innerText = "Spinning...";
+    
+    cube.className = "real-cube-dice rolling-animate-active";
+    overlay.style.display = "flex";
+    
+    let tickerCount = 0;
+    let tickerInterval = setInterval(() => {
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(150 + (tickerCount * 10), audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            tickerCount++;
+        } catch(err){}
+    }, 120);
+    
+    latestDiceRoll = Math.floor(Math.random() * 6) + 1;
+    
+    setTimeout(() => {
+        clearInterval(tickerInterval);
+        cube.className = "real-cube-dice";
+        cube.classList.add(`show-value-${latestDiceRoll}`);
+        txtResult.innerText = `Rolled a ${latestDiceRoll}!`;
+        
+        setTimeout(() => {
+            overlay.style.display = "none";
+            cube.classList.remove(`show-value-${latestDiceRoll}`);
+            executeStepByStepMovementLogic(); 
+        }, 1000);
+    }, 1100);
+}
+
+function executeStepByStepMovementLogic() {
+    oldPositions[currentTeam] = teamPositions[currentTeam]; 
+    let targetPos = teamPositions[currentTeam] + latestDiceRoll;
+
+    if (targetPos > 50) {
+        document.getElementById("roll-btn").disabled = false;
+        toggleTeamTurn();
+        return;
+    }
+
+    let stepsInterval = setInterval(() => {
+        if (teamPositions[currentTeam] < targetPos) {
+            teamPositions[currentTeam]++;
+            playPawnHopMoveAudioTick(); 
+            renderPlayerTokens(); 
+        } else {
+            clearInterval(stepsInterval); 
+            
+            if (ladders[teamPositions[currentTeam]]) {
+                let climbDestination = ladders[teamPositions[currentTeam]];
+                setTimeout(() => {
+                    teamPositions[currentTeam] = climbDestination;
+                    playPawnHopMoveAudioTick();
+                    renderPlayerTokens();
+                    
+                    setTimeout(() => {
+                        triggerChallengePopup(teamPositions[currentTeam]);
+                    }, 400);
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    triggerChallengePopup(teamPositions[currentTeam]); 
+                }, 400);
+            }
+        }
+    }, 450); 
+}
+
+function triggerChallengePopup(cellNum) {
+    const modal = document.getElementById("question-modal");
+    const imgFrame = document.getElementById("pop-image-frame");
+    const popImg = document.getElementById("pop-actual-img");
+    
+    let hasSnakeSticker = reverseLaddersTrapMap[cellNum] ? " 🐍" : "";
+    document.getElementById("pop-cell-number-badge").innerText = `CELL ${cellNum}${hasSnakeSticker}`;
+    
+    document.getElementById("modal-text").innerText = gameData[cellNum]?.content || `Challenge Room ${cellNum}`;
+    
+    // 🔥 PREMIUM SECURITY FIX: Pre-loaders & Anonymous CORS injection loops setup directly
+    if (gameData[cellNum] && gameData[cellNum].imageUrl && gameData[cellNum].imageUrl.trim() !== "") {
+        const targetUrl = gameData[cellNum].imageUrl.trim();
+        
+        // Check if the source data is data URI base64 or standard web absolute paths
+        if (targetUrl.startsWith("data:image")) {
+            popImg.removeAttribute("crossOrigin");
+            popImg.src = targetUrl;
+        } else {
+            // Apply standalone cross-origin parameters dynamically to bypass caching blockers
+            popImg.setAttribute("crossOrigin", "anonymous");
+            popImg.src = targetUrl + (targetUrl.includes("?") ? "&" : "?") + "bypass_cache=" + new Date().getTime();
+        }
+        
+        imgFrame.style.display = "flex";
+    } else {
+        popImg.src = "";
+        imgFrame.style.display = "none";
+    }
+    modal.style.display = "flex";
+}
+
+function evaluateAnswer(isCorrect) {
+    document.getElementById("question-modal").style.display = "none";
+    let currentPos = teamPositions[currentTeam];
+    
+    if (isCorrect) {
+        playSuccessCorrectChimeAudio(); 
+        checkWinCondition();
+        document.getElementById("roll-btn").disabled = false;
+        toggleTeamTurn();
+    } else {
+        if (reverseLaddersTrapMap[currentPos]) {
+            let baseDestination = reverseLaddersTrapMap[currentPos];
+            executeStepByStepTrapFallLogic(baseDestination);
+        } else {
+            executeStepByStepTrapFallLogic(oldPositions[currentTeam]);
+        }
+    }
+}
+
+function executeStepByStepTrapFallLogic(finalBasePos) {
+    const canvas = document.getElementById("animationCanvas");
+    const ctx = canvas.getContext("2d");
+    
+    document.getElementById("main-viewport-container").classList.add("damage-flash-active-frame");
+    playSnakeAttackBiteHissAudio();
+
+    let startTime = null;
+    function animateJumpscare(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = timestamp - startTime;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawVisualTracksOverlayVectors();
+
+        if (elapsed < 800) {
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.font = "bold 200px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.shadowBlur = 15; ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.fillText("🐍", 0, 0);
+            ctx.restore();
+            requestAnimationFrame(animateJumpscare);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawVisualTracksOverlayVectors();
+            document.getElementById("main-viewport-container").classList.remove("damage-flash-active-frame");
+            
+            let backwardInterval = setInterval(() => {
+                if (teamPositions[currentTeam] > finalBasePos) {
+                    teamPositions[currentTeam]--;
+                    playPawnHopMoveAudioTick();
+                    renderPlayerTokens(); 
+                } else {
+                    clearInterval(backwardInterval); 
+                    checkWinCondition();
+                    document.getElementById("roll-btn").disabled = false;
+                    toggleTeamTurn();
+                }
+            }, 450);
+        }
+    }
+    requestAnimationFrame(animateJumpscare);
+}
+
+function toggleTeamTurn() {
+    let nextTeam = currentTeam + 1;
+    if(nextTeam > activeTeamsCount) nextTeam = 1;
+    manuallySetTurn(nextTeam);
+}
+
+function checkWinCondition() {
+    if (teamPositions[currentTeam] == 50) {
+        let winName = teamNamesMap[currentTeam] || "Team " + currentTeam;
+        alert(`Congratulations! ${winName} wins the game!`);
+        resetGame();
+    }
+}
+
+function resetGame() {
+    for(let i = 1; i <= 5; i++) {
+        teamPositions[i] = 1;
+        oldPositions[i] = 1;
+    }
+    currentTeam = 1;
+    buildGameBoardUI();
 }
 
 function exportSnakeROM() {
+    saveTeamsStateFromDashboardInputs();
     let collectedGrid = [];
     for (let i = 1; i <= 50; i++) {
         collectedGrid.push({
@@ -528,25 +1084,16 @@ function exportSnakeROM() {
             imageUrl: document.getElementById(`image-${i}`).value.trim()
         });
     }
-    
-    let activeLaddersArr = [];
-    const startInputs = document.querySelectorAll(".ladder-start-input");
-    const endInputs = document.querySelectorAll(".ladder-end-input");
-    startInputs.forEach((input, index) => {
-        let s = parseInt(input.value);
-        let e = parseInt(endInputs[index].value);
-        if (s && e) activeLaddersArr.push({ start: s, end: e });
-    });
-
     const packageROM = {
-        gameType: "snake_and_ladder",
+        gameType: "snake_and_ladder_fully_customized",
         grid: collectedGrid,
-        ladders: activeLaddersArr
+        ladders: ladders, 
+        activeTeamsCount: activeTeamsCount,
+        teamNamesMap: teamNamesMap
     };
-
     const dataBlob = new Blob([JSON.stringify(packageROM, null, 2)], { type: "text/plain" });
     const downloader = document.createElement("a");
-    downloader.download = "snake-lessons-pack.txt";
+    downloader.download = "custom-sticker-trap-pack.txt";
     downloader.href = URL.createObjectURL(dataBlob);
     downloader.click();
 }
@@ -554,37 +1101,31 @@ function exportSnakeROM() {
 function importSnakeROM(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const rom = JSON.parse(e.target.result);
-            if (rom.gameType !== "snake_and_ladder" || !rom.grid) {
-                return alert("Invalid file format!");
-            }
-            
+            if (!rom.grid) return alert("Invalid format!");
             rom.grid.forEach(item => {
                 document.getElementById(`content-${item.cell}`).value = item.content || "";
                 document.getElementById(`image-${item.cell}`).value = item.imageUrl || "";
             });
-
-            const container = document.getElementById("ladder-container-list");
-            container.innerHTML = "";
-            ladders = {};
+            
             if (rom.ladders) {
-                rom.ladders.forEach(lad => {
-                    addNewLadderRow(lad.start, lad.end);
-                    ladders[lad.start] = lad.end;
-                });
+                ladders = rom.ladders;
+                const container = document.getElementById("ladder-container-list");
+                container.innerHTML = "";
+                for (let s in ladders) { 
+                    addNewLadderRow(s, ladders[s]); 
+                }
             }
+
+            if(rom.activeTeamsCount) activeTeamsCount = rom.activeTeamsCount;
+            if(rom.teamNamesMap) teamNamesMap = rom.teamNamesMap;
             
+            renderDashboardTeamsCard();
             saveAdminData();
-            
-            // [UPGRADE] - Reveal the premium Play Button instead of standard notification alert box
-            document.getElementById("playNowBtn").style.display = "block";
-        } catch(err) {
-            alert("Error reading file!");
-        }
+        } catch(err) { alert("Error reading file!"); }
     };
     reader.readAsText(file);
 }
@@ -603,254 +1144,6 @@ function setupDragAndDropZone() {
             importSnakeROM(event);
         }
     });
-}
-
-function buildGameBoardUI() {
-const board = document.getElementById("board");
-board.innerHTML = "";
-let cellCounter = 0;
-for (let row = 6; row >= 0; row--) {
-for (let col = 0; col < 7; col++) {
-let cellNum = (row % 2 === 1) ? ((row * 7) + (7 - col)) : ((row * 7) + (col + 1));
-if (cellNum <= 50) {
-const cellDiv = document.createElement("div");
-cellDiv.id = `board-cell-${cellNum}`;
-let cellColorClass = (cellCounter % 2 === 0) ? 'cell-even-color' : 'cell-odd-color';
-cellDiv.className = `cell ${cellColorClass}`;
-if (cellNum === 50) cellDiv.style.backgroundColor = "#f1c40f";
-let imgElementHtml = "";
-if (gameData[cellNum] && gameData[cellNum].imageUrl) {
-imgElementHtml = `<img src="${gameData[cellNum].imageUrl}" class="cell-thumbnail-img">`;
-}
-cellDiv.innerHTML = `
-<span class="cell-number">${cellNum === 50 ? "50 🏆" : cellNum}</span>
-<div class="cell-content-container">
-${imgElementHtml}
-<div class="cell-content-indicator" style="${gameData[cellNum]?.imageUrl ? 'background:rgba(255,255,255,0.75); border-radius: 3px; padding:2px;' : ''}">${gameData[cellNum]?.content || ''}</div>
-</div>
-<div id="tokens-cell-${cellNum}" class="token-container"></div>
-`;
-board.appendChild(cellDiv);
-cellCounter++;
-}
-}
-}
-renderPlayerTokens();
-setTimeout(drawVisualTracksOverlayVectors, 300);
-}
-
-function drawVisualTracksOverlayVectors() {
-const svg = document.getElementById("board-graphics-canvas");
-const wrapper = document.getElementById("board-rel-anchor");
-if (!svg || !wrapper) return;
-svg.innerHTML = "";
-const wrapperRect = wrapper.getBoundingClientRect();
-function drawRealLadder(start, end) {
-const c1 = document.getElementById(`board-cell-${start}`);
-const c2 = document.getElementById(`board-cell-${end}`);
-if (!c1 || !c2) return;
-const r1 = c1.getBoundingClientRect();
-const r2 = c2.getBoundingClientRect();
-const x1 = (r1.left + r1.width / 2) - wrapperRect.left;
-const y1 = (r1.top + r1.height / 2) - wrapperRect.top;
-const x2 = (r2.left + r2.width / 2) - wrapperRect.left;
-const y2 = (r2.top + r2.height / 2) - wrapperRect.top;
-const offset = 6;
-const angle = Math.atan2(y2 - y1, x2 - x1);
-const dx = offset * Math.sin(angle);
-const dy = offset * Math.cos(angle);
-const rail1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-rail1.setAttribute("x1", x1 - dx); rail1.setAttribute("y1", y1 + dy);
-rail1.setAttribute("x2", x2 - dx); rail1.setAttribute("y2", y2 + dy);
-rail1.setAttribute("class", "ladder-main-rail");
-svg.appendChild(rail1);
-const rail2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-rail2.setAttribute("x1", x1 + dx); rail2.setAttribute("y1", y1 - dy);
-rail2.setAttribute("x2", x2 + dx); rail2.setAttribute("y2", y2 - dy);
-rail2.setAttribute("class", "ladder-main-rail");
-svg.appendChild(rail2);
-const stepsCount = 6;
-for (let i = 1; i < stepsCount; i++) {
-const t = i / stepsCount;
-const sx = x1 + t * (x2 - x1);
-const sy = y1 + t * (y2 - y1);
-const rung = document.createElementNS("http://www.w3.org/2000/svg", "line");
-rung.setAttribute("x1", sx - dx); rung.setAttribute("y1", sy + dy);
-rung.setAttribute("x2", sx + dx); rung.setAttribute("y2", sy - dy);
-rung.setAttribute("class", "ladder-rung-step");
-svg.appendChild(rung);
-}
-}
-for (let src in ladders) { drawRealLadder(src, ladders[src]); }
-}
-
-function renderPlayerTokens() {
-for (let i = 1; i <= 50; i++) {
-const box = document.getElementById(`tokens-cell-${i}`);
-if (box) box.innerHTML = "";
-}
-const p1 = teamPositions[1];
-const box1 = document.getElementById(`tokens-cell-${p1}`);
-if (box1) box1.innerHTML += '<div class="pawn-token t1" id="live-pawn-p1"></div>';
-const p2 = teamPositions[2];
-const box2 = document.getElementById(`tokens-cell-${p2}`);
-if (box2) box2.innerHTML += '<div class="pawn-token t2" id="live-pawn-p2"></div>';
-document.getElementById("team1-pos-val").innerText = teamPositions[1];
-document.getElementById("team2-pos-val").innerText = teamPositions[2];
-}
-
-function openDiceRollSequence() {
-document.getElementById("roll-btn").disabled = true;
-const overlay = document.getElementById("dice-overlay-modal");
-const txtTitle = document.getElementById("dice-modal-title-text");
-const txtResult = document.getElementById("dice-numerical-callout");
-const cube = document.getElementById("cube-dice-object");
-txtTitle.innerText = `Team ${currentTeam} Rolling...`;
-txtResult.innerText = "Spinning...";
-cube.className = "real-cube-dice rolling-animate-active";
-overlay.style.display = "flex";
-latestDiceRoll = Math.floor(Math.random() * 6) + 1;
-setTimeout(() => {
-cube.className = "real-cube-dice";
-cube.classList.add(`show-value-${latestDiceRoll}`);
-txtResult.innerText = `Rolled a ${latestDiceRoll}!`;
-setTimeout(() => {
-overlay.style.display = "none";
-cube.classList.remove(`show-value-${latestDiceRoll}`);
-executeStepByStepMovementLogic(); 
-}, 1000);
-}, 1100);
-}
-
-function executeStepByStepMovementLogic() {
-    oldPositions[currentTeam] = teamPositions[currentTeam]; 
-    let targetPos = teamPositions[currentTeam] + latestDiceRoll;
-
-    if (targetPos > 50) {
-        document.getElementById("roll-btn").disabled = false;
-        toggleTeamTurn();
-        return;
-    }
-
-    let stepsInterval = setInterval(() => {
-        if (teamPositions[currentTeam] < targetPos) {
-            teamPositions[currentTeam]++;
-            renderPlayerTokens(); 
-        } else {
-            clearInterval(stepsInterval); 
-            setTimeout(() => {
-                triggerChallengePopup(teamPositions[currentTeam]); 
-            }, 400);
-        }
-    }, 450); 
-}
-
-function triggerChallengePopup(cellNum) {
-const modal = document.getElementById("question-modal");
-const imgFrame = document.getElementById("pop-image-frame");
-const popImg = document.getElementById("pop-actual-img");
-document.getElementById("pop-cell-number-badge").innerText = `CELL ${cellNum}`;
-document.getElementById("modal-text").innerText = gameData[cellNum]?.content || `Room ${cellNum}`;
-if (gameData[cellNum] && gameData[cellNum].imageUrl) {
-popImg.src = gameData[cellNum].imageUrl;
-imgFrame.style.display = "flex";
-} else {
-popImg.src = "";
-imgFrame.style.display = "none";
-}
-modal.style.display = "flex";
-}
-
-function evaluateAnswer(isCorrect) {
-document.getElementById("question-modal").style.display = "none";
-let currentPos = teamPositions[currentTeam];
-if (isCorrect) {
-    if (ladders[currentPos]) {
-        teamPositions[currentTeam] = ladders[currentPos];
-        renderPlayerTokens();
-    }
-    checkWinCondition();
-    document.getElementById("roll-btn").disabled = false;
-    toggleTeamTurn();
-} else {
-    executeBurmaPythonAttackEngine();
-}
-}
-
-function executeBurmaPythonAttackEngine() {
-const errorTargetCellNum = teamPositions[currentTeam]; 
-const targetCellDom = document.getElementById(`board-cell-${errorTargetCellNum}`);
-const boardWrapper = document.getElementById("board-rel-anchor");
-const snakePuck = document.getElementById("snakeStickerAttackPuck");
-
-let finalBasePos = snakes[errorTargetCellNum] ? snakes[errorTargetCellNum] : oldPositions[currentTeam];
-
-if (!targetCellDom || !boardWrapper || !snakePuck) {
-    executeStepByStepBackwardMovementLogic(finalBasePos);
-    return;
-}
-
-const wrapperRect = boardWrapper.getBoundingClientRect();
-const cellRect = targetCellDom.getBoundingClientRect();
-const targetX = (cellRect.left + cellRect.width / 2) - wrapperRect.left;
-const targetY = (cellRect.top + cellRect.height / 2) - wrapperRect.top;
-
-document.getElementById("main-viewport-container").classList.add("damage-flash-active-frame");
-
-snakePuck.style.left = "50%";
-snakePuck.style.top = "50%";
-snakePuck.style.display = "flex";
-snakePuck.className = "snake-popup-bite-card active-center";
-
-setTimeout(() => {
-    snakePuck.className = "snake-popup-bite-card active-target";
-    snakePuck.style.left = `${targetX}px`;
-    snakePuck.style.top = `${targetY}px`;
-    
-    setTimeout(() => {
-        snakePuck.style.display = "none";
-        snakePuck.className = "snake-popup-bite-card";
-        document.getElementById("main-viewport-container").classList.remove("damage-flash-active-frame");
-        executeStepByStepBackwardMovementLogic(finalBasePos);
-    }, 700);
-}, 800); 
-}
-
-function executeStepByStepBackwardMovementLogic(finalBasePos) {
-    let backwardInterval = setInterval(() => {
-        if (teamPositions[currentTeam] > finalBasePos) {
-            teamPositions[currentTeam]--;
-            renderPlayerTokens(); 
-        } else {
-            clearInterval(backwardInterval); 
-            checkWinCondition();
-            document.getElementById("roll-btn").disabled = false;
-            toggleTeamTurn();
-        }
-    }, 450); 
-}
-
-function toggleTeamTurn() {
-currentTeam = currentTeam == 1 ? 2 : 1;
-document.getElementById("card-team-1").className = `team-status-card ${currentTeam === 1 ? 'active-turn-glow-1' : ''}`;
-document.getElementById("card-team-2").className = `team-status-card ${currentTeam === 2 ? 'active-turn-glow-2' : ''}`;
-}
-
-function checkWinCondition() {
-if (teamPositions[1] == 50 || teamPositions[2] == 50) {
-alert(`Congratulations! Team ${teamPositions[1] == 50 ? '1' : '2'} wins the game!`);
-resetGame();
-}
-}
-
-function resetGame() {
-teamPositions = { 1:1, 2:1 };
-oldPositions = { 1:1, 2:1 };
-currentTeam = 1;
-document.getElementById("card-team-1").className = "team-status-card active-turn-glow-1";
-document.getElementById("card-team-2").className = "team-status-card";
-renderPlayerTokens();
-setTimeout(drawVisualTracksOverlayVectors, 300);
 }
 </script>
 </body>

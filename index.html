@@ -4,159 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educational Arcade Game Hub</title>
+    
+    <!-- Premium Google Fonts Link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
+
     <style>
-        /* ======================== THEME & BACKGROUND ======================== */
+        /* Modern Nintendo Switch Dashboard Style */
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: radial-gradient(circle at center, #0a3d70 0%, #03162b 100%);
-            color: #ffffff; overflow-x: hidden; user-select: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Quicksand', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
+
         body {
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            padding: 40px 20px; box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 50px 20px;
+            box-sizing: border-box;
         }
 
-        /* Neon Title Header */
+        /* Clean Header */
         h1 {
-            font-size: 2.2rem; font-weight: bold; color: #ffffff;
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;
-            text-shadow: 0 0 15px rgba(0, 122, 255, 0.5); text-align: center;
-        }
-        .subtitle {
-            font-size: 0.95rem; color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 45px; text-align: center; max-width: 600px; line-height: 1.5;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            text-align: center;
         }
 
-        /* Compact & Smart Grid Layout */
+        h1 span {
+            background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 50px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Responsive Grid Matrix */
         .menu-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px; width: 100%; max-width: 950px; padding: 10px; box-sizing: border-box;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
-        /* [UPGRADE] Compact Card Style inspired by user photo */
+        /* iOS/Premium App Store Card Style */
         .game-card {
-            background: rgba(255, 255, 255, 0.06);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px; padding: 20px 15px; text-align: center;
-            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            text-decoration: none; color: white;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            aspect-ratio: 1 / 1; /* Makes cards perfectly squared like a gaming console */
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden; /* အပေါ်ကပုံ ထောင့်ဝိုင်းတွေ အပြင်မလျှံထွက်အောင် ထိန်းပေးတာပါ */
+            text-decoration: none;
+            color: #1e293b;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Hover Interaction Effects */
         .game-card:hover {
-            border-color: #23007aff;
-            transform: scale(1.06) translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4), 0 0 15px #007aff;
-            background: rgba(0, 122, 255, 0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* Elements Inside Card */
-        .icon {
-            font-size: 3rem; margin-bottom: 12px; display: block;
-            transition: transform 0.3s ease; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        /* [FIXED] ဓာတ်ပုံဘောင်ကို ၄:၃ အချိုး ကွက်တိဖြတ်ပြီး ဘေးဘောင်အဖြူလွတ်တွေ ပျောက်အောင် လုပ်ထားပါတယ် */
+        .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: #f1f5f9;
+            /* ကတ်ပြားရဲ့ အပေါ်ထောင့်ဝိုင်းတွေနဲ့ တစ်ထပ်တည်းကျအောင် ထောင့်ဝိုင်းပေးထားပါတယ် */
+            border-top-left-radius: 23px;
+            border-top-right-radius: 23px;
         }
-        .game-card:hover .icon { transform: scale(1.15); }
-        
+
+        /* [FIXED] ပုံကို ကတ်ပြားအပြည့် ကွက်တိ (Fit) ဖြစ်စေပြီး ဆွဲဆန့်မသွားအောင် ထိန်းပေးတဲ့ စနစ် */
+        .game-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ပုံကို ဘေးဘောင်မလွတ်စေဘဲ frame ထဲ ကွက်တိဖြည့်ပေးပါတယ် */
+            object-position: center;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .game-card:hover .game-cover-img {
+            transform: scale(1.04);
+        }
+
+        /* Text Block Details */
+        .game-details {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #ffffff;
+            border-top: 1px solid #f1f5f9;
+        }
+
         .game-title {
-            font-size: 1.15rem; font-weight: bold; color: #ffffff;
-            letter-spacing: 0.5px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 0;
         }
-        
+
+        /* Minimalist Modern Tags */
         .game-type {
-            font-size: 0.75rem; color: #f1c40f; text-transform: uppercase;
-            font-weight: bold; margin-top: 5px; letter-spacing: 0.5px;
+            align-self: flex-start;
+            font-size: 0.75rem;
+            color: #3b82f6;
+            background: #eff6ff;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
         }
 
+        /* PLAY Badge */
         .game-badge {
-            position: absolute; top: 10px; right: 10px; font-size: 8px;
-            font-weight: bold; background: #007aff; padding: 3px 6px;
-            border-radius: 4px; text-transform: uppercase; z-index: 2;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 10;
+            transition: all 0.3s ease;
         }
 
-        @media (max-width: 480px) {
-            h1 { font-size: 1.6rem; }
-            .menu-container { grid-template-columns: repeat(2, 1fr); gap: 12px; } /* 2 columns layout on mobile */
-            .game-title { font-size: 1rem; }
-            .icon { font-size: 2.5rem; }
+        .game-card:hover .game-badge {
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 640px) {
+            h1 { font-size: 2.2rem; }
+            .menu-container { 
+                grid-template-columns: 1fr;
+                gap: 24px; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Main Header (English Only) -->
-    <h1>Educational Game Hub</h1>
+    <!-- Main Title Header Area -->
+    <h1><span>Educational</span> Arcade</h1>
     <p class="subtitle">Select a game pack below to start playing instantly or generate your custom lesson ROM files.</p>
 
-    <!-- Game Cards Matrix Grid -->
+    <!-- Game Cards Grid Matrix -->
     <div class="menu-container" id="arcadeGrid">
-        <!-- Automatically injected by JavaScript below -->
+        <!-- Injected automatically via Script below -->
     </div>
 
-    <!-- ======================== CONFIG ENGINE SYSTEM ======================== -->
-    <script>
-        /* 
-           ✏️ EASY ADD MODE: 
-           To add a new game, just insert a new line inside the [ ] brackets below:
-           { icon: "🎁", title: "Game Name", type: "ROM Engine", link: "file_name.html" },
-        */
-        const myArcadeGamesConfig = [
-            {
-                icon: "🎯",
-                title: "Match Up Studio",
-                type: "Memory Engine",
-                link: "matchup.html"
-            },
-            {
-                icon: "🖼️",
-                title: "Behind the Card",
-                type: "Reveal Engine",
-                link: "behindthecard.html"
-            },
-            {
-                icon: "🎡",
-                title: "Spin Wheel Factory",
-                type: "Wheel Engine",
-                link: "spinwheel.html"
-            },
-            {
-                icon: "🐍",
-                title: "Snake & Ladder",
-                type: "Board Engine",
-                link: "snake_game.html"
-            }
-            /* 🔗 ADD NEW GAME CARDS HERE: Copy/Paste the line below and change details */
-            // { icon: "📝", title: "Quiz Time", type: "Trivia Engine", link: "quiz.html" },
-        ];
+<script>
+    // Config System
+    const myArcadeGamesConfig = [
+        {
+            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_09%20AM.png?raw=true",
+            title: "Match Up Studio",
+            type: "Memory Engine",
+            link: "match_up.html"
+        },
+        {
+            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_16%20AM.png?raw=true",
+            title: "Snake & Ladder",
+            type: "Board Engine",
+            link: "snake_game.html"
+        },
+        {
+            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_27%20AM.png?raw=true",
+            title: "Behind the Card",
+            type: "Reveal Engine",
+            link: "behind_the_card.html"
+        },
+        {
+            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT%20Image%20Jun%202,%202026,%2010_20_34%20AM.png?raw=true",
+            title: "Spin Wheel Factory",
+            type: "Wheel Engine",
+            link: "spin_wheel.html"
+        }
+    ];
 
-        // Core Automatic Card Generator Engine
-        function generateArcadePackHub() {
-            const grid = document.getElementById("arcadeGrid");
-            grid.innerHTML = ""; 
+    function generateArcadePackHub() {
+        const grid = document.getElementById("arcadeGrid");
+        grid.innerHTML = "";
 
-            myArcadeGamesConfig.forEach(game => {
-                const cardAnchor = document.createElement("a");
-                cardAnchor.href = game.link;
-                cardAnchor.className = "game-card";
-
-                cardAnchor.innerHTML = `
-                    <div class="game-badge">Online</div>
-                    <span class="icon">${game.icon}</span>
+        myArcadeGamesConfig.forEach(game => {
+            const cardAnchor = document.createElement("a");
+            cardAnchor.href = game.link;
+            cardAnchor.className = "game-card";
+            
+            cardAnchor.innerHTML = `
+                <div class="game-badge">Play</div>
+                <div class="image-container">
+                    <img class="game-cover-img" src="${game.image}" alt="${game.title}" loading="lazy">
+                </div>
+                <div class="game-details">
                     <div class="game-title">${game.title}</div>
                     <div class="game-type">${game.type}</div>
-                `;
-                grid.appendChild(cardAnchor);
-            });
-        }
+                </div>
+            `;
+            grid.appendChild(cardAnchor);
+        });
+    }
 
-        // Boot Launcher
-        window.addEventListener("DOMContentLoaded", generateArcadePackHub);
-    </script>
-
+    window.addEventListener("DOMContentLoaded", generateArcadePackHub);
+</script>
 </body>
 </html>

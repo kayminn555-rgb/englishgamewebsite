@@ -3,550 +3,1370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Behind the Card - Advanced Studio & Emulator Engine</title>
+    <title>Behind the Card Advanced Studio & Emulator Engine</title>
     <style>
-        /* ======================== STYLE: STUDIO LAYOUT & THEME ======================== */
+        /* CHEERFUL BRIGHT SKY THEME LAYOUT */
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #4e54c8, #8f94fb); color: white;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Beautiful Bright Blue Sky Gradient to completely remove eerie feelings */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            color: #1e293b;
+            overflow: hidden;
             user-select: none;
         }
+
         .app-container {
-            width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            box-sizing: border-box;
         }
+
+        /* LIGHT PROFESSIONAL DASHBOARD VISUALS */
         .studio-box {
-            width: 100%; max-width: 600px; background: rgba(0, 0, 0, 0.65); padding: 25px;
-            border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); box-sizing: border-box;
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.65);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(14, 165, 233, 0.15), 0 10px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex;
+            overflow: hidden;
+            box-sizing: border-box;
         }
-        h2 { margin-top: 0; margin-bottom: 5px; color: #f1c40f; text-align: center; text-transform: uppercase; font-size: 22px; }
-        .subtitle { text-align: center; font-size: 13px; color: #ddd; margin-bottom: 20px; }
-        
+
+        .studio-sidebar {
+            width: 35%;
+            background: rgba(240, 249, 255, 0.6);
+            border-right: 1px solid rgba(14, 165, 233, 0.15);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .studio-main-content {
+            width: 65%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #0369a1;
+            text-transform: uppercase;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
         .file-dropzone {
-            background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;
-            text-align: center; border: 2px dashed #f1c40f; cursor: pointer; transition: background 0.2s;
+            background: rgba(14, 165, 233, 0.05);
+            padding: 40px 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 2px dashed #0ea5e9;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .file-dropzone:hover { background: rgba(255, 255, 255, 0.15); }
-        .file-dropzone p { margin: 0; font-size: 16px; color: #fff; font-weight: bold; }
-        .file-dropzone span { font-size: 12px; color: #ccc; display: block; margin-top: 4px; }
 
-        label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; font-size: 14px; color: #f1c40f; }
-        .studio-input { width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        .studio-input::placeholder { color: #ccc; }
-        textarea.studio-input { height: 80px; resize: vertical; }
-        
-        .upload-row { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-top: 5px; }
-        
-        .btn { padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; transition: background 0.2s, transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-export { background: #e67e22; color: white; width: 100%; margin-top: 20px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(230,126,34,0.3); }
-        .btn-choose { background: #3498db; color: white; font-size: 13px; padding: 8px 15px; border: 2px dashed rgba(255,255,255,0.4); }
+        /* BUTTONS & HOVER POP UP EFFECT */
+        .file-dropzone:hover {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: #0284c7;
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 20px rgba(14, 165, 233, 0.15);
+        }
 
-        /* Setup Popup */
-        .overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; }
+        .file-dropzone p {
+            margin: 0;
+            font-size: 16px;
+            color: #0369a1;
+            font-weight: 700;
+        }
+
+        .file-dropzone span {
+            font-size: 13px;
+            color: #64748b;
+            display: block;
+            margin-top: 6px;
+        }
+
+        label {
+            font-weight: 700;
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .studio-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #bae6fd;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .studio-input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        textarea.studio-input {
+            height: 140px;
+            resize: none;
+            flex-grow: 1;
+        }
+
+        .upload-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #e0f2fe;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Universal Button Pop-Up effect */
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-export:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            box-shadow: 0 10px 24px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-choose {
+            background: #f0f9ff;
+            color: #0369a1;
+            font-size: 13px;
+            padding: 10px 18px;
+            border: 1px solid #bae6fd;
+        }
+
+        .btn-choose:hover {
+            background: #e0f2fe;
+        }
+
+        /* Overlay & Popups Style Updates */
+        .overlay-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 999;
+            backdrop-filter: blur(8px);
+        }
+
         .setup-section {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; color: #2c3e50; padding: 25px; border-radius: 12px; z-index: 1000;
-            width: 90%; max-width: 400px; text-align: center; box-sizing: border-box;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #1e293b;
+            padding: 35px;
+            border-radius: 20px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 480px;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 30px rgba(14, 165, 233, 0.1);
         }
-        .close-setup-btn { position: absolute; top: 10px; right: 12px; background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; }
-        .team-fields { display: none; margin-top: 15px; text-align: left; }
-        .mode-options { display: flex; gap: 15px; margin: 15px 0; }
-        .mode-btn { padding: 10px; border: 2px solid #4e54c8; background: transparent; color: #4e54c8; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
-        .mode-btn.active { background: #4e54c8; color: white; }
 
-        /* ======================== STYLE: PS4 CORE GAME ARENA ======================== */
-        .game-section { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 20; }
+        .close-setup-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-setup-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .mode-options {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .mode-btn {
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #475569;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            color: white;
+            border-color: #0ea5e9;
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .team-fields {
+            display: none;
+            margin-top: 20px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .team-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-delete-team {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fca5a5;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-delete-team:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-add-team {
+            background: #ecfdf5;
+            color: #10b981;
+            border: 1px dashed #34d399;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-add-team:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* BRIGHT IMMERSIVE PLAYFUL GAME ARENA */
+        .game-section {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+
         .game-arena {
-            width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 10px; box-sizing: border-box;
-            background: radial-gradient(circle at center, #1e2942 0%, #111726 100%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            /* Recolor Arena to Fresh Happy Sky Day Vibes */
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            box-sizing: border-box;
         }
-        
-        /* Scoreboard System */
+
+        /* Top HUD Scoreboard Control Panel */
         .scoreboard {
-            display: flex; width: 100%; max-width: 1200px; justify-content: space-between; align-items: center;
-            background: rgba(44, 62, 80, 0.95); padding: 8px 15px; border-radius: 10px; border: 2px solid #ffffff; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); box-sizing: border-box; z-index: 20;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 15px 30px;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-sizing: border-box;
+            z-index: 20;
+            gap: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
-        .score-side-container { display: flex; gap: 10px; align-items: center; width: 100%; justify-content: space-between; }
-        .team-score-card { padding: 6px 12px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; width: 35%; max-width: 260px; box-sizing: border-box; }
-        .team-score-card.active-turn { background: #f39c12; color: #000; border-color: #fff; box-shadow: 0 0 12px #f39c12; transform: scale(1.02); }
-        .score-num { background: rgba(0, 0, 0, 0.5); color: white; padding: 2px 10px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; margin-left: 5px; }
-        .round-info { font-size: 1rem; font-weight: bold; background: #34495e; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; white-space: nowrap; }
 
-        /* Game Core Board Layout (4x3 Grid) */
-        .main-content-layout { display: flex; width: 100%; height: calc(100% - 140px); justify-content: space-between; align-items: center; padding: 5px; box-sizing: border-box; }
-        .score-control { display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center; width: 90px; }
-        .control-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); transition: transform 0.1s; }
-        .control-btn:active { transform: scale(0.9); }
-        .btn-correct { background-color: #2ecc71; color: white; }
-        .btn-wrong { background-color: #e74c3c; color: white; }
-        .score-control span { font-weight: bold; font-size: 0.8rem; text-align: center; color: rgba(255, 255, 255, 0.8); }
-        .btn-minus { background-color: #7f8c8d; color: white; width: 50px; height: 28px; font-size: 0.85rem; font-weight: bold; border-radius: 5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); margin-top: 2px; }
+        .score-side-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-grow: 1;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
 
-        .board-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; box-sizing: border-box; padding: 5px; }
+        .ingame-action-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        /* Friendly Fresh Active Turn Cards */
+        .team-score-card {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: 1px solid #bae6fd;
+            min-width: 150px;
+            box-sizing: border-box;
+            color: #475569;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+
+        .team-score-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        .team-score-card.active-turn {
+            /* Active team gets a vibrant, joyful Sky Neon highlight */
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .score-num {
+            background: rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-left: 12px;
+        }
+
+        .team-score-card.active-turn .score-num {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .ingame-del-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .team-score-card:hover .ingame-del-btn {
+            display: flex;
+        }
+
+        .btn-add-team-ingame {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px dashed #10b981;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .btn-add-team-ingame:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .round-info {
+            font-size: 1rem;
+            font-weight: 800;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            letter-spacing: 0.5px;
+        }
+
+        /* IMMERSIVE COMPACT MULTI-GEOMETRY GRID AREA */
+        .main-content-layout {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 170px);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .board-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
         .grid-board {
-            position: relative; width: 100%; height: 100%; max-width: 72vh; max-height: 52vh; aspect-ratio: 4/3;
-            background: #ffffff; border: 4px solid #fff; border-radius: 12px; box-shadow: 0 12px 25px rgba(0,0,0,0.6);
-            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); overflow: hidden; transition: opacity 0.4s ease-in-out; opacity: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 110vh; 
+            max-height: 82.5vh;
+            aspect-ratio: 4/3;
+            background: #f8fafc;
+            border: 6px solid #0ea5e9; /* Beautiful Sky Frame Border */
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(14, 165, 233, 0.15);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            overflow: hidden;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
         }
-        
-        /* Hidden Image Underneath Component */
+
         .hidden-image-holder {
-            position: absolute; background-size: contain; background-repeat: no-repeat; background-position: center;
-            top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
-        
-        /* 12 Covering Cards Styles */
-        .card-slot { position: relative; background: transparent; z-index: 5; }
+
+        .card-slot {
+            position: relative;
+            background: transparent;
+            z-index: 5;
+        }
+
+        /* Happy Bright Playful Card Covers */
         .card-cover {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #2c3e50, #1a252f); color: white;
-            font-size: 1.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; outline: 1px solid #2c3e50; transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s ease;
-            opacity: 1; transform: scale(1); z-index: 5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Bright Soft Magic Cyan and Blue Gradient for high engagement */
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #ffffff;
+            font-size: 2.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: 1px solid rgba(255, 255, 255, 0.3);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease, background 0.2s, box-shadow 0.2s;
+            opacity: 1;
+            transform: scale(1);
+            z-index: 5;
+            text-shadow: 0 2px 5px rgba(2, 132, 199, 0.4);
         }
-        .card-cover:hover { background: linear-gradient(135deg, #34495e, #2c3e50); }
-        .card-slot.revealed .card-cover { opacity: 0; transform: scale(0.8); pointer-events: none; }
 
-        /* Navigation Controller Bottom Bar */
-        .bottom-bar { background: rgba(0, 0, 0, 0.6); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; width: 100%; height: 55px; box-sizing: border-box; }
-        .nav-btn { background: #3498db; color: white; border: none; padding: 6px 12px; font-size: 0.85rem; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        .nav-btn:hover { background: #2980b9; }
-        .nav-btn:disabled { background: #7f8c8d; cursor: not-allowed; }
+        /* 3D Pop Lift Effect for Grid covers */
+        .card-cover:hover {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: #ffffff;
+            box-shadow: inset 0 0 15px rgba(255,255,255,0.4);
+            transform: scale(1.02);
+            z-index: 6;
+        }
 
-        /* End Pack Popup Dialog */
+        .card-slot.revealed .card-cover {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        /* LIGHT PRESET DASHBOARD FOOTER CONSOLE */
+        .bottom-bar {
+            background: rgba(255, 255, 255, 0.85);
+            border-top: 1px solid rgba(14, 165, 233, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            width: 100%;
+            height: 90px;
+            box-sizing: border-box;
+            backdrop-filter: blur(15px);
+            z-index: 30;
+        }
+
+        .nav-group-left, .nav-group-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-group-center {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0f9ff;
+            padding: 10px 20px;
+            border-radius: 16px;
+            border: 1px solid #bae6fd;
+        }
+
+        .nav-btn {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 3px 6px rgba(2, 132, 199, 0.15);
+        }
+
+        .nav-btn:hover {
+            background: #0ea5e9;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Unified HUD Game Control Scoring Console Buttons */
+        .console-score-btn {
+            height: 52px;
+            padding: 0 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .console-score-btn:hover {
+            transform: translateY(-4px);
+        }
+
+        .btn-correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+        }
+        .btn-correct:hover {
+            box-shadow: 0 8px 18px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-wrong {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+        }
+        .btn-wrong:hover {
+            box-shadow: 0 8px 18px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-minus-inline {
+            background: white;
+            color: #475569;
+            padding: 0 14px;
+            height: 52px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-minus-inline:hover {
+            background: #f1f5f9;
+            transform: translateY(-3px);
+        }
+
+        /* Popups Dialog Windows Configurations */
         .popup-modal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; color: #2c3e50; padding: 25px; border-radius: 12px; z-index: 2000;
-            width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #1e293b;
+            padding: 35px;
+            border-radius: 20px;
+            z-index: 2000;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
-        .popup-modal h2 { margin: 0; color: #f1c40f; }
-        .popup-modal p { font-size: 16px; font-weight: bold; margin: 15px 0; }
-        .popup-modal button { background: #4e54c8; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
 
-        @media (max-width: 768px) {
-            .main-content-layout { padding: 2px; }
-            .control-btn { width: 50px; height: 50px; font-size: 1.2rem; }
-            .score-control { width: 65px; }
-            .team-score-card { font-size: 0.85rem; padding: 4px 8px; }
-            .score-num { font-size: 0.85rem; padding: 1px 6px; }
-            .round-info { font-size: 0.8rem; padding: 3px 8px; }
-            .card-cover { font-size: 1.2rem; }
+        .popup-modal h2 {
+            margin: 0;
+            color: #ea580c;
+            font-weight: 800;
+        }
+
+        .popup-modal p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #475569;
+        }
+
+        .popup-modal button {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .popup-modal button:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .studio-box { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .studio-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #bae6fd; }
+            .studio-main-content { width: 100%; }
+            .bottom-bar { padding: 0 15px; height: auto; padding-top: 15px; padding-bottom: 15px; flex-direction: column; gap: 15px; }
+            .main-content-layout { height: calc(100vh - 240px); }
+            .card-cover { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="studioView">
-        <!-- ============================== MAKER STUDIO INTERFACE ============================== -->
-        <div class="studio-box">
-            <h2>🎯 Behind Card ROM Maker & Player</h2>
-            <p class="subtitle">ပုံဝှက်ဂိမ်းဖိုင်ထုတ်ရန် သို့မဟုတ် ရှိပြီးသားဖိုင်တင်၍ တန်းဆော့ရန်</p>
-
-            <!-- ROM Loader Dropzone -->
-            <div class="file-dropzone" id="dropzone" onclick="document.getElementById('romLoader').click()">
-                <p>📥 Click or Drag Behind Card ROM (.txt)</p>
-                <span>ဆော့မည့် ဂိမ်းဖိုင် (.txt) တင်ရန်</span>
-                <input type="file" id="romLoader" accept=".txt" style="display: none;" onchange="importBehindCardROM(event)">
+<div class="app-container" id="studioView">
+    <div class="studio-box">
+        <div class="studio-sidebar">
+            <div>
+                <h2>Behind Card Studio</h2>
+                <p class="subtitle">Hide custom interactive image targets inside structured system pack frames seamlessly.</p>
+                
+                <div class="file-dropzone" id="dropzone" onclick="document.getElementById('romLoader').click()">
+                    <p>Load ROM Engine (.txt)</p>
+                    <span>Click or drop structured runtime files</span>
+                    <input type="file" id="romLoader" accept=".txt" style="display: none;" onchange="importBehindCardROM(event)">
+                </div>
             </div>
 
-            <label> Enter Game Title:</label>
+            <button class="btn btn-export" onclick="exportBehindCardROM()">Export ROM File (.txt)</button>
+        </div>
+
+        <div class="studio-main-content">
+            <h3>Configuration Engine Workspace</h3>
+            
+            <label>Workspace Target Title:</label>
             <input type="text" id="gameTitle" class="studio-input" value="Guess the Hidden Picture">
 
-            <label> Option 1: Choose Photos from Device (စက်ထဲမှ ဓာတ်ပုံများ ရွေးရန်) :</label>
+            <label>Option 1: Choose Files from Storage:</label>
             <div class="upload-row">
-                <button class="btn btn-choose" onclick="document.getElementById('imgUploader').click()">📁 Click to Select Images</button>
-                <span id="uploadStatus" style="font-size: 13px; color: #aaa;">No files selected (0 photos ready)</span>
+                <button class="btn btn-choose" onclick="document.getElementById('imgUploader').click()">Select Asset Images</button>
+                <span id="uploadStatus" style="font-size: 13px; color: #64748b;">No items verified (0 assets loaded)</span>
                 <input type="file" id="imgUploader" accept="image/*" multiple style="display: none;" onchange="handleLocalImagesUpload(event)">
             </div>
 
-            <label> Option 2: Paste Internet Image Links (သို့မဟုတ် ပုံလင့်ခ်များ တစ်လိုင်းလျှင် တစ်ခုစီထည့်ရန်) :</label>
-            <textarea id="urlLinks" class="studio-input" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.png"></textarea>
-
-            <button class="btn btn-export" onclick="exportBehindCardROM()"> Export ROM File (.txt)</button>
+            <label style="margin-top:25px;">Option 2: Alternative Matrix Cloud Image Links (One link per line):</label>
+            <textarea id="urlLinks" class="studio-input" placeholder="https://images.unsplash.com/photo-1511512578047-dfb367046420&#10;https://images.unsplash.com/photo-1542751371-adc38448a05e"></textarea>
         </div>
     </div>
+</div>
 
-    <!-- ============================== RUNTIME GAME SYSTEM ============================== -->
-    <div class="game-section" id="gameRuntimeView">
-        <div class="game-arena" id="arenaStyleFrame">
-            <!-- Scoreboard Header System -->
-            <div class="scoreboard" id="scoreboardHeader">
-                <div class="score-side-container">
-                    <div class="team-score-card team-left active-turn" id="scoreCard1" onclick="selectActiveTeamConsole(1)">
-                        <span id="displayName1">Team A</span>
-                        <span class="score-num" id="scoreNum1">0</span>
-                    </div>
-                    <div class="round-info" id="roundLabel">Slide 1 / 12</div>
-                    <div class="team-score-card team-right" id="scoreCard2" onclick="selectActiveTeamConsole(2)">
-                        <span id="displayName2">Team B</span>
-                        <span class="score-num" id="scoreNum2">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Layout Section -->
-            <div class="main-content-layout">
-                <!-- Left Score Control -->
-                <div class="score-control">
-                    <button class="control-btn btn-correct" onclick="handleScore(true)">✔</button>
-                    <span>Correct</span>
-                    <button class="btn-minus" onclick="modifyScoreManual(-1)">-1</button>
-                </div>
-
-                <!-- 4x3 Grid Board Box Container -->
-                <div class="board-container">
-                    <div class="grid-board" id="gridBoard">
-                        <!-- Secret Target Image Background Holder -->
-                        <div class="hidden-image-holder" id="secretImage"></div>
-                        
-                        <!-- 12 Covering Slots Elements -->
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">1</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">2</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">3</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">4</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">5</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">6</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">7</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">8</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">9</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">10</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">11</div></div>
-                        <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">12</div></div>
-                    </div>
-                </div>
-
-                <!-- Right Score Control -->
-                <div class="score-control">
-                    <button class="control-btn btn-wrong" onclick="handleScore(false)">X</button>
-                    <span>Wrong</span>
-                    <button class="btn-minus" onclick="modifyScoreManual(-1)">-1</button>
-                </div>
-            </div>
-
-            <!-- Bottom Universal Navigation Controls Bar -->
-            <div class="bottom-bar">
-                <button class="nav-btn" id="prevBtn" onclick="navigateSlide(-1)">◀ Prev</button>
-                <button class="nav-btn" style="background-color: #e67e22;" onclick="resetCurrentGrid()">Reset</button>
-                <button class="nav-btn" style="background-color: #9b59b6;" onclick="revealEntireImage()">Reveal</button>
-                <button class="nav-btn" id="nextBtn" onclick="navigateSlide(1)">Next ▶</button>
-                <button class="nav-btn" style="background-color: #e74c3c;" onclick="quitActiveGameEngine()">Close</button>
+<div class="game-section" id="gameRuntimeView">
+    <div class="game-arena" id="arenaStyleFrame">
+        <div class="scoreboard" id="scoreboardHeader">
+            <div class="score-side-container" id="dynamicScoreboardsContainer"></div>
+            
+            <div class="ingame-action-box">
+                <button class="btn-add-team-ingame" onclick="addNewTeamInGameRuntime()">+ Add Team</button>
+                <div class="round-info" id="roundLabel">Slide 1 / 1</div>
             </div>
         </div>
-    </div>
 
-    <!-- ============================== SETUP MODE POPUP ============================== -->
-    <div class="overlay-bg" id="modalOverlay"></div>
-    <div class="setup-section" id="setupConfigPopup">
-        <button class="close-setup-btn" onclick="hideSetupPopup()">×</button>
-        <h3>🎮 Select Game Play Mode</h3>
-        
-        <div class="mode-options">
-            <button class="mode-btn active" id="btnSingleMode" onclick="setGamePlayMode('solo')">Solo Player</button>
-            <button class="mode-btn" id="btnTeamMode" onclick="setGamePlayMode('team')">Team Battle</button>
-        </div>
-
-        <div class="team-fields" id="teamConfigFields">
-            <label style="color:#2c3e50;">🔴 Team A Name :</label>
-            <input type="text" id="inputTeam1" class="studio-input" style="color:#2c3e50; border:1px solid #ccc;" value="Team A">
-            <label style="color:#2c3e50;">🔵 Team B Name :</label>
-            <input type="text" id="inputTeam2" class="studio-input" style="color:#2c3e50; border:1px solid #ccc;" value="Team B">
-        </div>
-
-        <button class="btn btn-export" onclick="launchGameEngineWithConfig()" style="background:#4e54c8; margin-top:20px;">🚀 Start Game</button>
-    </div>
-
-    <!-- Winner Status Popup -->
-    <div class="popup-modal" id="endGamePopup">
-        <h2 id="winTitle">🏆 End Game!</h2>
-        <p id="winDetails">Pack completed successfully.</p>
-        <button onclick="closeEndGamePopupAndReset()">Back to Studio</button>
-    </div>
-
-    <!-- SoundFX Engine Synthesizer Core -->
-    <script>
-        const SoundFX = {
-            ctx: null,
-            init() { if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } if (this.ctx.state === 'suspended') this.ctx.resume(); },
-            playFlip() { this.init(); const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(550, this.ctx.currentTime); gain.gain.setValueAtTime(0.04, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.08); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.08); },
-            playWin() { this.init(); const t = this.ctx.currentTime; const tone = (f, s, d) => { const o = this.ctx.createOscillator(); const g = this.ctx.createGain(); o.type = 'square'; o.frequency.setValueAtTime(f, s); g.gain.setValueAtTime(0.05, s); g.gain.linearRampToValueAtTime(0.001, s + d); o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s + d); }; tone(523.25, t, 0.1); tone(659.25, t + 0.1, 0.1); tone(783.99, t + 0.2, 0.3); },
-            playLose() { this.init(); const o = this.ctx.createOscillator(); const g = this.ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(150, this.ctx.currentTime); g.gain.setValueAtTime(0.08, this.ctx.currentTime); g.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.4); o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(this.ctx.currentTime + 0.4); }
-        };
-    </script>
-
-    <!-- Core Dynamic Data & Runtime Matrix Control Rules Engine Scripts -->
-    <script>
-        let loadedBase64ImagesArray = [];
-        let finalRuntimeImagesList = [];
-        let currentIdx = 0;
-        let isTransitioning = false;
-        let gameMode = 'solo';
-        let activeTurn = 1;
-        let scores = { 1: 0, 2: 0 };
-
-        // Core Layout Geometry Masks Matrix Maps Data Configuration
-        const hidingLayouts = [
-            { top: "0%", left: "50%", width: "25%", height: "33.33%" },
-            { top: "33.33%", left: "75%", width: "25%", height: "33.33%" },
-            { top: "66.66%", left: "0%", width: "25%", height: "33.33%" },
-            { top: "33.33%", left: "25%", width: "25%", height: "33.33%" },
-            { top: "0%", left: "0%", width: "50%", height: "33.33%" },
-            { top: "33.33%", left: "50%", width: "50%", height: "33.33%" },
-            { top: "66.66%", left: "25%", width: "50%", height: "33.33%" },
-            { top: "0%", left: "25%", width: "50%", height: "66.66%" },
-            { top: "33.33%", left: "0%", width: "50%", height: "66.66%" },
-            { top: "33.33%", left: "50%", width: "50%", height: "66.66%" }
-        ];
-        const rotations = ["rotate(0deg)", "rotate(180deg)", "scaleX(-1)", "scaleY(-1)"];
-
-        // Handle File Drag/Selection operations components
-        function handleLocalImagesUpload(event) {
-            const files = event.target.files;
-            loadedBase64ImagesArray = [];
-            if (files.length === 0) return;
-
-            let loadedCount = 0;
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    loadedBase64ImagesArray.push(e.target.result);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        document.getElementById("uploadStatus").innerText = `Successfully loaded ${files.length} photo(s) from device!`;
-                        document.getElementById("uploadStatus").style.color = "#2ecc71";
-                    }
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        }
-
-        // Complie Payload objects structures back down to plain text bundles blocks 
-        function exportBehindCardROM() {
-            const title = document.getElementById("gameTitle").value.trim() || "Behind-the-Card";
-            const urlsText = document.getElementById("urlLinks").value.trim();
-            let compiledImagesList = [];
-
-            if (loadedBase64ImagesArray.length > 0) {
-                loadedBase64ImagesArray.forEach(base64Data => compiledImagesList.push(base64Data));
-            }
-            if (urlsText !== "") {
-                urlsText.split('\n').forEach(url => {
-                    if (url.trim() !== "") compiledImagesList.push(url.trim());
-                });
-            }
-
-            if (compiledImagesList.length === 0) {
-                return alert("Please either choose local photos from device OR paste internet image links!");
-            }
-
-            const romObject = {
-                title: title,
-                gameType: "behind_the_card",
-                pairs: compiledImagesList.map(img => ({ a: img, b: "" }))
-            };
-
-            const dataBlob = new Blob([JSON.stringify(romObject)], { type: "text/plain" });
-            const downloader = document.createElement("a");
-            downloader.download = `${title}.txt`;
-            downloader.href = URL.createObjectURL(dataBlob);
-            downloader.click();
-        }
-
-        // Parsing system deserializer reader loader workflows
-        function importBehindCardROM(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (evt) {
-                try {
-                    const rom = JSON.parse(evt.target.result);
-                    if (rom.gameType !== 'behind_the_card' || !rom.pairs) throw new Error();
+        <div class="main-content-layout">
+            <div class="board-container">
+                <div class="grid-board" id="gridBoard">
+                    <div class="hidden-image-holder" id="secretImage"></div>
                     
-                    document.getElementById("gameTitle").value = rom.title || "Imported Secrets Pack";
-                    finalRuntimeImagesList = rom.pairs;
-                    showSetupPopup();
-                } catch (err) {
-                    alert("Invalid Game File Format!");
-                }
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">1</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">2</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">3</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">4</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">5</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">6</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">7</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">8</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">9</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">10</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">11</div></div>
+                    <div class="card-slot" onclick="revealCard(this)"><div class="card-cover">12</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="nav-group-left">
+                <button class="nav-btn" style="background-color: #0284c7;" id="prevBtn" onclick="navigateSlide(-1)">Prev</button>
+                <button class="nav-btn" style="background-color: #eab308;" onclick="resetCurrentGrid()">Reset Grid</button>
+                <button class="nav-btn" style="background-color: #8b5cf6;" onclick="revealEntireImage()">Reveal Pic</button>
+                <button class="nav-btn" style="background-color: #0284c7;" id="nextBtn" onclick="navigateSlide(1)">Next</button>
+            </div>
+
+            <div class="nav-group-center">
+                <button class="console-score-btn btn-correct" onclick="handleScore(true)">✓ Correct</button>
+                <button class="btn-minus-inline" onclick="modifyScoreManual(-1)">-1</button>
+                <button class="console-score-btn btn-wrong" onclick="handleScore(false)">✗ Wrong</button>
+            </div>
+
+            <div class="nav-group-right">
+                <button class="nav-btn" style="background-color: #ef4444;" onclick="quitActiveGameEngine()">Close Arena</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="overlay-bg" id="modalOverlay"></div>
+<div class="setup-section" id="setupConfigPopup">
+    <button class="close-setup-btn" onclick="hideSetupPopup()">×</button>
+    <h3>Select Match Mode</h3>
+    
+    <div class="mode-options">
+        <button class="mode-btn active" id="btnSingleMode" onclick="setGamePlayMode('solo')">Solo Player</button>
+        <button class="mode-btn" id="btnTeamMode" onclick="setGamePlayMode('team')">Team Battle</button>
+    </div>
+
+    <div class="team-fields" id="teamConfigFields">
+        <div id="dynamicTeamInputsWrapper"></div>
+        <button type="button" class="btn-add-team" onclick="addNewTeamInputField()">+ Add New Team</button>
+        
+        <label style="margin-top: 15px;">Starting Turn Selector:</label>
+        <select id="startingTeamSelect" class="studio-input" style="background: white; color: #1e293b; border: 1px solid #cbd5e1;"></select>
+    </div>
+
+    <button class="btn btn-export" onclick="launchGameEngineWithConfig()" style="margin-top:25px;">Launch Match Engine</button>
+</div>
+
+<div class="popup-modal" id="endGamePopup">
+    <h2 id="winTitle">Sequence Complete</h2>
+    <p id="winDetails">Pack completed successfully.</p>
+    <button onclick="closeEndGamePopupAndReset()">Return Studio Workspace</button>
+</div>
+
+<script>
+const SoundFX = {
+    ctx: null,
+    init() { 
+        if (!this.ctx) { 
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+        } 
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    playFlip() { 
+        this.init(); 
+        const osc = this.ctx.createOscillator(); 
+        const gain = this.ctx.createGain();
+        osc.type = 'sine'; 
+        osc.frequency.setValueAtTime(580, this.ctx.currentTime); 
+        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.08); 
+        osc.connect(gain);
+        gain.connect(this.ctx.destination); 
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08); 
+    },
+    playWin() { 
+        this.init(); 
+        const t = this.ctx.currentTime;
+        const tone = (f, s, d) => { 
+            const o = this.ctx.createOscillator(); 
+            const g = this.ctx.createGain(); 
+            o.type = 'sine';
+            o.frequency.setValueAtTime(f, s);
+            g.gain.setValueAtTime(0.04, s);
+            g.gain.linearRampToValueAtTime(0.001, s + d); 
+            o.connect(g);
+            g.connect(this.ctx.destination); 
+            o.start(s); 
+            o.stop(s + d); 
+        };
+        tone(523.25, t, 0.08);
+        tone(659.25, t + 0.08, 0.08); 
+        tone(783.99, t + 0.16, 0.25); 
+    },
+    playLose() { 
+        this.init(); 
+        const o = this.ctx.createOscillator(); 
+        const g = this.ctx.createGain(); 
+        o.type = 'triangle'; 
+        o.frequency.setValueAtTime(140, this.ctx.currentTime);
+        g.gain.setValueAtTime(0.06, this.ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+        o.connect(g); 
+        g.connect(this.ctx.destination); 
+        o.start();
+        o.stop(this.ctx.currentTime + 0.35); 
+    }
+};
+</script>
+
+<script>
+let loadedBase64ImagesArray = [];
+let finalRuntimeImagesList = [];
+let currentIdx = 0;
+let isTransitioning = false;
+let gameMode = 'solo';
+
+let teamList = ["Team A", "Team B"]; 
+let activeTurn = 0; 
+let scores = {};
+
+const hidingLayouts = [
+    { top: "0%", left: "0%", width: "100%", height: "100%" },
+    { top: "0%", left: "50%", width: "25%", height: "33.33%" },
+    { top: "0%", left: "75%", width: "25%", height: "33.33%" },
+    { top: "66.66%", left: "0%", width: "25%", height: "33.33%" },
+    { top: "33.33%", left: "25%", width: "25%", height: "33.33%" },
+    { top: "33.33%", left: "0%", width: "50%", height: "33.33%" },
+    { top: "0%", left: "50%", width: "50%", height: "33.33%" },
+    { top: "66.66%", left: "25%", width: "50%", height: "33.33%" },
+    { top: "0%", left: "25%", width: "50%", height: "66.66%" },
+    { top: "33.33%", left: "0%", width: "50%", height: "66.66%" },
+    { top: "33.33%", left: "50%", width: "50%", height: "66.66%" }
+];
+
+const rotations = ["rotate(0deg)", "rotate(180deg)", "scaleX(-1)", "scaleY(-1)"];
+
+window.onload = function() {
+    setupDragAndDropZone();
+    renderSetupTeamInputs();
+};
+
+function renderSetupTeamInputs() {
+    const wrapper = document.getElementById("dynamicTeamInputsWrapper");
+    wrapper.innerHTML = "";
+    
+    teamList.forEach((teamName, index) => {
+        const row = document.createElement("div");
+        row.className = "team-input-row";
+        
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "studio-input";
+        input.value = teamName;
+        input.onchange = function(e) {
+            teamList[index] = e.target.value.trim() || `Team ${index + 1}`;
+            populateStartingTeamSelect();
+        };
+        
+        row.appendChild(input);
+        
+        if (teamList.length > 2) {
+            const delBtn = document.createElement("button");
+            delBtn.type = "button";
+            delBtn.className = "btn-delete-team";
+            delBtn.innerHTML = "×";
+            delBtn.onclick = function() {
+                removeTeamInputField(index);
             };
-            reader.readAsText(file);
+            row.appendChild(delBtn);
         }
+        wrapper.appendChild(row);
+    });
+    populateStartingTeamSelect();
+}
 
-        function showSetupPopup() {
-            document.getElementById("modalOverlay").style.display = "block";
-            document.getElementById("setupConfigPopup").style.display = "block";
-        }
-        function hideSetupPopup() {
-            document.getElementById("modalOverlay").style.display = "none";
-            document.getElementById("setupConfigPopup").style.display = "none";
-        }
+function addNewTeamInputField() {
+    const nextChar = String.fromCharCode(65 + teamList.length);
+    teamList.push(`Team ${nextChar}`);
+    renderSetupTeamInputs();
+}
 
-        function setGamePlayMode(mode) {
-            gameMode = mode;
-            document.getElementById("btnSingleMode").classList.toggle("active", mode === 'solo');
-            document.getElementById("btnTeamMode").classList.toggle("active", mode === 'team');
-            document.getElementById("teamConfigFields").style.display = mode === 'team' ? "block" : "none";
-        }
+function removeTeamInputField(index) {
+    if (teamList.length <= 2) return;
+    teamList.splice(index, 1);
+    renderSetupTeamInputs();
+}
 
-        // PS4 Interactive Arena Boot configuration engine logic triggers profiles 
-        function launchGameEngineWithConfig() {
-            if (finalRuntimeImagesList.length === 0) {
-                const urlsText = document.getElementById("urlLinks").value.trim();
-                let directList = [...loadedBase64ImagesArray];
-                if (urlsText !== "") {
-                    urlsText.split('\n').forEach(url => { if (url.trim() !== "") directList.push(url.trim()); });
-                }
-                finalRuntimeImagesList = directList.map(img => ({ a: img, b: "" }));
+function populateStartingTeamSelect() {
+    const select = document.getElementById("startingTeamSelect");
+    select.innerHTML = "";
+    teamList.forEach((teamName, index) => {
+        const opt = document.createElement("option");
+        opt.value = index;
+        opt.innerText = teamName;
+        select.appendChild(opt);
+    });
+}
+
+function handleLocalImagesUpload(event) {
+    const files = event.target.files;
+    loadedBase64ImagesArray = [];
+    if (files.length === 0) return;
+    let loadedCount = 0;
+    for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            loadedBase64ImagesArray.push(e.target.result);
+            loadedCount++;
+            if (loadedCount === files.length) {
+                document.getElementById("uploadStatus").innerText = `Successfully prepared ${files.length} asset photos!`;
+                document.getElementById("uploadStatus").style.color = "#10b981";
             }
+        };
+        reader.readAsDataURL(files[i]);
+    }
+}
 
-            if (finalRuntimeImagesList.length === 0) {
-                return alert("ဂိမ်းဆော့ရန် ပုံများ မရှိသေးပါ။ အရင်ရွေးချယ်ပါ သို့မဟုတ် ဖိုင်တင်ပါ!");
-            }
+function exportBehindCardROM() {
+    const title = document.getElementById("gameTitle").value.trim() || "Behind-the-Card";
+    const urlsText = document.getElementById("urlLinks").value.trim();
+    let compiledImagesList = [];
 
-            hideSetupPopup();
-            document.getElementById("studioView").style.display = "none";
-            document.getElementById("gameRuntimeView").style.display = "block";
+    if (loadedBase64ImagesArray.length > 0) {
+        loadedBase64ImagesArray.forEach(base64Data => compiledImagesList.push(base64Data));
+    }
+    if (urlsText !== "") {
+        urlsText.split('\n').forEach(url => {
+            if (url.trim() !== "") compiledImagesList.push(url.trim());
+        });
+    }
 
-            scores = { 1: 0, 2: 0 };
-            activeTurn = 1;
-            currentIdx = 0;
-            isTransitioning = false;
-            document.getElementById("scoreNum1").innerText = "0";
-            document.getElementById("scoreNum2").innerText = "0";
+    if (compiledImagesList.length === 0) {
+        return alert("Please upload local images or supply active cloud links first!");
+    }
 
-            if (gameMode === 'solo') {
-                document.getElementById("displayName1").innerText = "Score";
-                document.getElementById("scoreCard2").style.display = "none";
-            } else {
-                document.getElementById("displayName1").innerText = document.getElementById("inputTeam1").value.trim() || "Team A";
-                document.getElementById("displayName2").innerText = document.getElementById("inputTeam2").value.trim() || "Team B";
-                document.getElementById("scoreCard2").style.display = "flex";
-            }
+    const romObject = {
+        title: title,
+        gameType: "behind the card",
+        pairs: compiledImagesList.map(img => ({ a: img, b: "" }))
+    };
+
+    const dataBlob = new Blob([JSON.stringify(romObject)], { type: "text/plain" });
+    const downloader = document.createElement("a");
+    downloader.download = `${title}.txt`;
+    downloader.href = URL.createObjectURL(dataBlob);
+    downloader.click();
+}
+
+function importBehindCardROM(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const rom = JSON.parse(evt.target.result);
+            if (rom.gameType !== 'behind the card' || !rom.pairs) throw new Error();
+            document.getElementById("gameTitle").value = rom.title || "Imported Secrets Pack";
+            finalRuntimeImagesList = rom.pairs;
+            showSetupPopup();
+        } catch (err) {
+            alert("Standard structural configuration check failed!");
+        }
+    };
+    reader.readAsText(file);
+}
+
+function showSetupPopup() {
+    document.getElementById("modalOverlay").style.display = "block";
+    document.getElementById("setupConfigPopup").style.display = "block";
+}
+
+function hideSetupPopup() {
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("setupConfigPopup").style.display = "none";
+}
+
+function setGamePlayMode(mode) {
+    gameMode = mode;
+    document.getElementById("btnSingleMode").classList.toggle("active", mode === 'solo');
+    document.getElementById("btnTeamMode").classList.toggle("active", mode === 'team');
+    document.getElementById("teamConfigFields").style.display = mode === 'team' ? "block" : "none";
+}
+
+function renderInGameScoreboards() {
+    const container = document.getElementById("dynamicScoreboardsContainer");
+    container.innerHTML = "";
+
+    if (gameMode === 'solo') {
+        if (scores[0] === undefined) scores[0] = 0;
+        
+        const card = document.createElement("div");
+        card.className = "team-score-card active-turn";
+        card.id = "scoreCard_0";
+        card.innerHTML = `Score Tracker: <span class="score-num" id="scoreNum_0">${scores[0]}</span>`;
+        container.appendChild(card);
+    } else {
+        teamList.forEach((teamName, index) => {
+            if (scores[index] === undefined) scores[index] = 0;
             
-            updateConsoleTurnUI();
-            loadBehindCardRound(currentIdx);
-        }
-
-        // Core Game Emulator Loop Slide Loader Rules Engine Algorithms
-        function loadBehindCardRound(idx) {
-            document.getElementById('roundLabel').innerText = `Slide ${idx + 1} / ${finalRuntimeImagesList.length}`;
-            const imgHolder = document.getElementById('secretImage');
-            let imgSource = finalRuntimeImagesList[idx].a.trim();
+            const card = document.createElement("div");
+            card.className = "team-score-card" + (index === activeTurn ? " active-turn" : "");
+            card.id = `scoreCard_${index}`;
+            card.onclick = function(e) {
+                if(e.target.className !== 'ingame-del-btn') selectActiveTeamConsole(index);
+            };
             
-            imgHolder.style.backgroundImage = 'url(' + imgSource + ')';
+            card.innerHTML = `
+                <span>${teamName}</span>
+                <span class="score-num" id="scoreNum_${index}">${scores[index]}</span>
+                <button class="ingame-del-btn" onclick="removeTeamDuringRuntime(event, ${index})">×</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+}
 
-            // Randomize spatial parameters layout mapping matrix keys 
-            const randomLayout = hidingLayouts[Math.floor(Math.random() * hidingLayouts.length)];
-            imgHolder.style.top = randomLayout.top;
-            imgHolder.style.left = randomLayout.left;
-            imgHolder.style.width = randomLayout.width;
-            imgHolder.style.height = randomLayout.height;
+function addNewTeamInGameRuntime() {
+    if (gameMode === 'solo') {
+        gameMode = 'team';
+        teamList = ["Team A", "Team B"];
+        scores = { 0: scores[0] || 0, 1: 0 };
+        activeTurn = 0;
+    } else {
+        const nextChar = String.fromCharCode(65 + teamList.length);
+        const newIndex = teamList.length;
+        teamList.push(`Team ${nextChar}`);
+        scores[newIndex] = 0;
+    }
+    renderInGameScoreboards();
+    SoundFX.playFlip();
+}
 
-            const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
-            imgHolder.style.transform = randomRotation;
+function removeTeamDuringRuntime(event, index) {
+    event.stopPropagation();
+    if (teamList.length <= 2) {
+        alert("Cannot remove. Minimum of 2 teams required for Team Battle!");
+        return;
+    }
+    
+    teamList.splice(index, 1);
+    
+    let newScores = {};
+    teamList.forEach((_, idx) => {
+        newScores[idx] = scores[idx >= index ? idx + 1 : idx] || 0;
+    });
+    scores = newScores;
 
-            document.getElementById('prevBtn').disabled = (idx === 0);
-            document.getElementById('nextBtn').disabled = (idx === finalRuntimeImagesList.length - 1);
-            resetCurrentGrid();
-        }
+    if (activeTurn >= teamList.length) {
+        activeTurn = teamList.length - 1;
+    }
+    
+    renderInGameScoreboards();
+    updateConsoleTurnUI();
+    SoundFX.playLose();
+}
 
-        function revealCard(slotElement) {
-            if (isTransitioning) return;
-            SoundFX.playFlip();
-            slotElement.classList.add('revealed');
-        }
-
-        function resetCurrentGrid() {
-            document.querySelectorAll('.card-slot').forEach(s => s.classList.remove('revealed'));
-        }
-
-        function revealEntireImage() {
-            document.querySelectorAll('.card-slot').forEach(s => s.classList.add('revealed'));
-        }
-
-        function navigateSlide(dir) {
-            if (isTransitioning) return;
-            isTransitioning = true;
-            const board = document.getElementById('gridBoard');
-            resetCurrentGrid();
-            
-            setTimeout(() => { board.style.opacity = '0'; }, 400);
-            setTimeout(() => {
-                currentIdx += dir;
-                if (currentIdx >= 0 && currentIdx < finalRuntimeImagesList.length) {
-                    loadBehindCardRound(currentIdx);
-                }
-                board.style.opacity = '1';
-                isTransitioning = false;
-            }, 800);
-        }
-
-        // Score Engine Handlers Controllers
-        function selectActiveTeamConsole(teamNum) {
-            if (gameMode === 'solo') return;
-            activeTurn = teamNum;
-            SoundFX.playFlip();
-            updateConsoleTurnUI();
-        }
-
-        function updateConsoleTurnUI() {
-            document.getElementById("scoreCard1").classList.toggle("active-turn", activeTurn === 1);
-            if (gameMode === 'team') {
-                document.getElementById("scoreCard2").classList.toggle("active-turn", activeTurn === 2);
-            }
-        }
-
-        function handleScore(isCorrect) {
-            if (isCorrect) {
-                scores[activeTurn]++;
-                document.getElementById(`scoreNum${activeTurn}`).innerText = scores[activeTurn];
-                SoundFX.playWin();
-                
-                // Switch turn on correct answer if team mode active loop
-                if(gameMode === 'team') {
-                    activeTurn = activeTurn === 1 ? 2 : 1;
-                    updateConsoleTurnUI();
-                }
-            } else {
-                SoundFX.playLose();
-                if(gameMode === 'team') {
-                    activeTurn = activeTurn === 1 ? 2 : 1;
-                    updateConsoleTurnUI();
-                }
-            }
-        }
-
-        function modifyScoreManual(amount) {
-            scores[activeTurn] += amount;
-            if (scores[activeTurn] < 0) scores[activeTurn] = 0;
-            document.getElementById(`scoreNum${activeTurn}`).innerText = scores[activeTurn];
-            SoundFX.playFlip();
-        }
-
-        function quitActiveGameEngine() {
-            document.getElementById("gameRuntimeView").style.display = "none";
-            document.getElementById("studioView").style.display = "flex";
-            document.getElementById("romLoader").value = "";
-        }
-
-        function setupDragAndDropZone() {
-            const zone = document.getElementById("dropzone");
-            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.background = "rgba(255,255,255,0.15)"; });
-            zone.addEventListener('dragleave', () => { zone.style.background = "rgba(255,255,255,0.1)"; });
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.style.background = "rgba(255,255,255,0.1)";
-                const files = e.dataTransfer.files;
-                if (files.length > 0 && files[0].name.endsWith('.txt')) {
-                    document.getElementById('romLoader').files = files;
-                    const event = { target: { files: files } };
-                    importBehindCardROM(event);
-                }
+function launchGameEngineWithConfig() {
+    if (finalRuntimeImagesList.length === 0) {
+        const urlsText = document.getElementById("urlLinks").value.trim();
+        let directList = [...loadedBase64ImagesArray];
+        if (urlsText !== "") {
+            urlsText.split('\n').forEach(url => { 
+                if (url.trim() !== "") directList.push(url.trim()); 
             });
         }
-    </script>
+        finalRuntimeImagesList = directList.map(img => ({ a: img, b: "" }));
+    }
+
+    if (finalRuntimeImagesList.length === 0) {
+        return alert("Matrix compilation failure: No assets ready to stream!");
+    }
+
+    hideSetupPopup();
+    document.getElementById("studioView").style.display = "none";
+    document.getElementById("gameRuntimeView").style.display = "block";
+
+    scores = {};
+    if (gameMode === 'team') {
+        activeTurn = parseInt(document.getElementById("startingTeamSelect").value) || 0;
+    } else {
+        activeTurn = 0;
+    }
+
+    renderInGameScoreboards();
+    currentIdx = 0;
+    isTransitioning = false;
+    
+    loadBehindCardRound(currentIdx);
+}
+
+function loadBehindCardRound(idx) {
+    document.getElementById('roundLabel').innerText = `Slide ${idx + 1} / ${finalRuntimeImagesList.length}`;
+    const imgHolder = document.getElementById('secretImage');
+    let imgSource = finalRuntimeImagesList[idx].a.trim();
+    imgHolder.style.backgroundImage = 'url(' + imgSource + ')';
+
+    const randomLayout = hidingLayouts[Math.floor(Math.random() * hidingLayouts.length)];
+    imgHolder.style.top = randomLayout.top;
+    imgHolder.style.left = randomLayout.left;
+    imgHolder.style.width = randomLayout.width;
+    imgHolder.style.height = randomLayout.height;
+
+    const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
+    imgHolder.style.transform = randomRotation;
+
+    document.getElementById('prevBtn').disabled = (idx === 0);
+    document.getElementById('nextBtn').disabled = (idx === finalRuntimeImagesList.length - 1);
+    resetCurrentGrid();
+}
+
+function revealCard(slotElement) {
+    if (isTransitioning) return;
+    SoundFX.playFlip();
+    slotElement.classList.add('revealed');
+}
+
+function resetCurrentGrid() {
+    document.querySelectorAll('.card-slot').forEach(s => s.classList.remove('revealed'));
+}
+
+function revealEntireImage() {
+    document.querySelectorAll('.card-slot').forEach(s => s.classList.add('revealed'));
+}
+
+function navigateSlide(dir) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    const board = document.getElementById('gridBoard');
+    resetCurrentGrid();
+    setTimeout(() => { board.style.opacity = '0'; }, 250);
+    setTimeout(() => {
+        currentIdx += dir;
+        if (currentIdx >= 0 && currentIdx < finalRuntimeImagesList.length) {
+            loadBehindCardRound(currentIdx);
+        }
+        board.style.opacity = '1';
+        isTransitioning = false;
+    }, 550);
+}
+
+function selectActiveTeamConsole(teamIndex) {
+    if (gameMode === 'solo') return;
+    activeTurn = teamIndex;
+    SoundFX.playFlip();
+    updateConsoleTurnUI();
+}
+
+function updateConsoleTurnUI() {
+    document.querySelectorAll('.team-score-card').forEach(card => {
+        card.classList.remove('active-turn');
+    });
+    const activeCard = document.getElementById(`scoreCard_${activeTurn}`);
+    if (activeCard) activeCard.classList.add('active-turn');
+}
+
+function handleScore(isCorrect) {
+    if (isCorrect) {
+        scores[activeTurn]++;
+        document.getElementById(`scoreNum_${activeTurn}`).innerText = scores[activeTurn];
+        SoundFX.playWin();
+    } else {
+        SoundFX.playLose();
+    }
+    
+    if (gameMode === 'team' && teamList.length > 0) {
+        activeTurn = (activeTurn + 1) % teamList.length;
+        updateConsoleTurnUI();
+    }
+}
+
+function modifyScoreManual(amount) {
+    scores[activeTurn] += amount;
+    if (scores[activeTurn] < 0) scores[activeTurn] = 0;
+    document.getElementById(`scoreNum_${activeTurn}`).innerText = scores[activeTurn];
+    SoundFX.playFlip();
+}
+
+function quitActiveGameEngine() {
+    document.getElementById("gameRuntimeView").style.display = "none";
+    document.getElementById("studioView").style.display = "flex";
+    document.getElementById("romLoader").value = "";
+    finalRuntimeImagesList = [];
+}
+
+function setupDragAndDropZone() {
+    const zone = document.getElementById("dropzone");
+    zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.style.background = "rgba(14, 165, 233, 0.12)";
+    });
+    zone.addEventListener('dragleave', () => {
+        zone.style.background = "rgba(14, 165, 233, 0.05)";
+    });
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.style.background = "rgba(14, 165, 233, 0.05)";
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].name.endsWith('.txt')) {
+            document.getElementById('romLoader').files = files;
+            const event = { target: { files: files } };
+            importBehindCardROM(event);
+        }
+    });
+}
+
+function showEndGamePopup() {
+    document.getElementById("modalOverlay").style.display = "block";
+    document.getElementById("endGamePopup").style.display = "block";
+}
+
+function closeEndGamePopupAndReset() {
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("endGamePopup").style.display = "none";
+    quitActiveGameEngine();
+}
+</script>
+
 </body>
 </html>
