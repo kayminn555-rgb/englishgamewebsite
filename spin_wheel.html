@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spin Wheel Premium Studio & Engine</title>
+    <title>Spin Wheel Premium Studio & Engine V3.6</title>
     <style>
-        /* PREMIUM STUDIO THEME V3 WITH MATRIX COMPONENTS */
+        /* PREMIUM STUDIO THEME V3.6 WITH FULLSCREEN FIX */
         :root {
             --sky-blue-deep: #2980b9;
             --sky-blue-light: #6dd5fa;
@@ -101,7 +101,7 @@
 
         .file-dropzone:hover {
             background: rgba(109, 213, 250, 0.15);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .file-dropzone p {
@@ -216,10 +216,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.2s;
         }
-
-        .matrix-file-btn:hover { background: #e2e8f0; }
+        .matrix-file-btn:hover { background: #e2e8f0; transform: scale(1.05); }
 
         .matrix-row-delete-btn {
             background: #fff5f5;
@@ -231,8 +230,7 @@
             font-weight: bold;
             transition: all 0.2s;
         }
-
-        .matrix-row-delete-btn:hover { background: #feb2b2; }
+        .matrix-row-delete-btn:hover { background: #feb2b2; transform: scale(1.05); }
 
         .btn-add-matrix-row {
             background: #ebf8ff;
@@ -249,38 +247,7 @@
             transition: all 0.2s;
             margin-top: 5px;
         }
-
-        .btn-add-matrix-row:hover { background: #cbd5e1; }
-
-        .image-picker-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .btn-browse-images {
-            background: #34495e;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: background 0.2s;
-        }
-
-        .btn-browse-images:hover { background: #2c3e50; }
-
-        .images-count-badge {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-top: -4px;
-        }
+        .btn-add-matrix-row:hover { background: #cbd5e1; transform: translateY(-1px); }
 
         .action-button-group {
             display: grid;
@@ -310,9 +277,8 @@
             color: white;
             box-shadow: 0 6px 20px rgba(149, 165, 166, 0.25);
         }
-
         .btn-download-txt:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(149, 165, 166, 0.35);
         }
 
@@ -321,9 +287,8 @@
             color: white;
             box-shadow: 0 6px 20px rgba(41, 128, 185, 0.25);
         }
-
         .btn-launch-play:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(41, 128, 185, 0.4);
         }
 
@@ -346,6 +311,7 @@
             background: linear-gradient(135deg, var(--sky-blue-light), #a1c4fd, #c2e9fb);
             position: relative;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
         .spin-main-workspace {
@@ -354,10 +320,39 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 25px 10px 25px 40px;
+            padding: 20px;
             position: relative;
             height: 100%;
             box-sizing: border-box;
+        }
+
+        .top-control-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .btn-fullscreen-toggle {
+            background: rgba(44, 62, 80, 0.85);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+        .btn-fullscreen-toggle:hover {
+            background: var(--text-dark);
+            transform: scale(1.05) translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .live-spin-time-box {
@@ -370,8 +365,6 @@
             align-items: center;
             gap: 12px;
             font-weight: 700;
-            margin-top: 10px;
-            z-index: 20;
             font-size: 14px;
             color: var(--text-dark);
             backdrop-filter: blur(10px);
@@ -397,27 +390,24 @@
             margin: auto;
             position: relative;
             width: 100%;
-            height: calc(100% - 100px);
+            height: calc(100% - 80px);
             z-index: 10;
         }
 
         .ferris-wheel-frame {
             position: relative;
             width: 100%;
-            max-width: 700px;
-            height: 100%;
-            max-height: 650px;
+            max-width: 600px;
+            aspect-ratio: 1/1;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
         .wheel-wrapper {
-            position: absolute;
-            top: 0;
-            width: 580px;
-            height: 580px;
+            position: relative;
+            width: 90%;
+            height: 90%;
             border-radius: 50%;
             border: 8px solid #ffffff;
             box-shadow: 0 20px 60px rgba(41, 128, 185, 0.2), 0 0 0 4px rgba(255, 255, 255, 0.5);
@@ -428,12 +418,19 @@
             justify-content: center;
         }
 
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: block;
+        }
+
         .ferris-iron-leg-left {
             position: absolute;
-            bottom: -20px;
-            left: 190px;
-            width: 14px;
-            height: 340px;
+            bottom: -5%;
+            left: 30%;
+            width: 3%;
+            height: 55%;
             background: linear-gradient(to right, #e2e8f0, #ffffff, #cbd5e1);
             transform: rotate(18deg);
             transform-origin: bottom center;
@@ -443,10 +440,10 @@
 
         .ferris-iron-leg-right {
             position: absolute;
-            bottom: -20px;
-            right: 190px;
-            width: 14px;
-            height: 340px;
+            bottom: -5%;
+            right: 30%;
+            width: 3%;
+            height: 55%;
             background: linear-gradient(to right, #e2e8f0, #ffffff, #cbd5e1);
             transform: rotate(-18deg);
             transform-origin: bottom center;
@@ -456,10 +453,10 @@
 
         .leg-foot-left {
             position: absolute;
-            bottom: -20px;
-            left: 150px;
-            width: 55px;
-            height: 14px;
+            bottom: -5%;
+            left: 23%;
+            width: 10%;
+            height: 3%;
             background: #94a3b8;
             border-radius: 6px 6px 0 0;
             z-index: 6;
@@ -467,10 +464,10 @@
 
         .leg-foot-right {
             position: absolute;
-            bottom: -20px;
-            right: 150px;
-            width: 55px;
-            height: 14px;
+            bottom: -5%;
+            right: 23%;
+            width: 10%;
+            height: 3%;
             background: #94a3b8;
             border-radius: 6px 6px 0 0;
             z-index: 6;
@@ -478,27 +475,27 @@
 
         .wheel-pointer-right {
             position: absolute;
-            top: 290px;
-            right: -32px;
+            top: 50%;
+            right: -5%;
             transform: translateY(-50%);
             width: 0;
             height: 0;
-            border-top: 26px solid transparent;
-            border-bottom: 26px solid transparent;
-            border-right: 55px solid #ff7675;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-right: 45px solid #ff7675;
             z-index: 30;
             filter: drop-shadow(-4px 4px 6px rgba(0,0,0,0.15));
         }
 
         .center-hub {
             position: absolute;
-            top: 290px;
+            top: 50%;
             left: 50%;
             transform: translate(-50%,-50%);
-            width: 90px;
-            height: 90px;
+            width: 16%;
+            aspect-ratio: 1/1;
             background: radial-gradient(circle, #ffffff 30%, #f1f5f9 70%, #cbd5e1 100%);
-            border: 6px solid #ffffff;
+            border: 4px solid #ffffff;
             border-radius: 50%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             z-index: 40;
@@ -508,28 +505,30 @@
         }
 
         .spin-trigger-btn {
-            width: 68px;
-            height: 68px;
+            width: 85%;
+            height: 85%;
             background: linear-gradient(135deg, var(--sky-blue-deep), #3498db);
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 6px 15px rgba(41, 128, 185, 0.3);
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
         .spin-trigger-btn:hover {
-            transform: scale(1.05);
+            transform: scale(1.08);
             box-shadow: 0 8px 20px rgba(41, 128, 185, 0.4);
         }
 
         /* IN-GAME SIDEBAR */
         .game-control-sidebar {
-            width: 460px;
+            width: 420px;
             height: 100%;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
@@ -541,6 +540,11 @@
             box-sizing: border-box;
             z-index: 45;
             box-shadow: -10px 0 40px rgba(41, 128, 185, 0.05);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+        }
+
+        .game-control-sidebar.fullscreen-hide {
+            display: none !important;
         }
 
         .sidebar-title {
@@ -570,10 +574,9 @@
             letter-spacing: 0.5px;
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
         }
-
         .btn-update-live:hover {
             box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .bottom-bar {
@@ -593,32 +596,31 @@
             background: #ff7675;
             color: white;
             box-shadow: 0 5px 15px rgba(255, 118, 117, 0.25);
-            transition: all 0.2s;
+            transition: all 0.2;
             text-transform: uppercase;
         }
-
         .btn-console:hover {
             background: #e17055;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
-        /* MODALS */
+        /* MODALS INSIDE ARENA CONTEXT FOR FIXED FULLSCREEN MATRIX LAYER */
         .overlay-mask {
             display: none;
-            position: fixed;
+            position: absolute; /* Changed to absolute to fit within parent Fullscreen Context DOM */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(44, 62, 80, 0.4);
+            background: rgba(44, 62, 80, 0.5);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            z-index: 1500;
+            z-index: 1000;
         }
 
         .spin-result-popup {
             display: none;
-            position: fixed;
+            position: absolute; /* Changed to absolute to align perfectly center during high layer fullscreen view */
             top: 50%;
             left: 50%;
             transform: translate(-50%,-50%);
@@ -627,10 +629,11 @@
             padding: 40px;
             border-radius: 24px;
             text-align: center;
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.15);
-            z-index: 3000;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+            z-index: 2000;
             border: 1px solid rgba(255,255,255,0.8);
             min-width: 350px;
+            box-sizing: border-box;
             animation: scaleUpGhibli 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -686,9 +689,9 @@
         }
 
         .btn-popup-remove { background: #ff7675; color: white; }
-        .btn-popup-remove:hover { background: #e17055; }
+        .btn-popup-remove:hover { background: #e17055; transform: scale(1.05); }
         .btn-popup-keep { background: var(--accent-green); color: white; }
-        .btn-popup-keep:hover { background: #27ae60; }
+        .btn-popup-keep:hover { background: #27ae60; transform: scale(1.05); }
 
         .preview-showcase {
             display: flex;
@@ -708,25 +711,27 @@
             margin-bottom: 20px;
         }
 
+        /* RESPONSIVE FLUID MEDIA MATRIX GENERATOR */
         @media (max-width: 992px) {
-            .game-arena { flex-direction: column; }
+            .game-arena { flex-direction: column; overflow-y: auto; }
             .game-control-sidebar { width: 100%; height: auto; border-left: none; border-top: 1px solid rgba(0,0,0,0.06); }
             .studio-workspace { grid-template-columns: 1fr; }
             .preview-showcase { display: none; }
-            .spin-main-workspace { padding: 25px 20px; }
+            .spin-main-workspace { padding: 20px; min-height: 80vh; }
+            .ferris-wheel-frame { max-width: 480px; }
         }
 
-        @media (max-width: 768px) {
-            .wheel-wrapper { width: 350px; height: 350px; border-width: 6px; }
-            .wheel-pointer-right { top: 175px; right: -20px; border-right-width: 42px; border-top-width: 20px; border-bottom-width: 20px; }
-            .center-hub { top: 175px; width: 70px; height: 70px; }
-            .spin-trigger-btn { width: 52px; height: 52px; font-size: 12px; }
-            .ferris-iron-leg-left, .ferris-iron-leg-right { height: 200px; bottom: -10px; }
-            .ferris-iron-leg-left { left: 110px; }
-            .ferris-iron-leg-right { right: 110px; }
-            .leg-foot-left { left: 85px; }
-            .leg-foot-right { right: 85px; }
-            .studio-dashboard { padding: 25px; }
+        @media (max-width: 480px) {
+            .studio-dashboard { padding: 20px 15px; }
+            .studio-header h2 { font-size: 24px; }
+            .ferris-wheel-frame { max-width: 100%; }
+            .live-spin-time-box { padding: 6px 14px; font-size: 12px; }
+            .live-spin-time-box input { width: 40px; padding: 4px; }
+            .btn-fullscreen-toggle { padding: 8px 14px; font-size: 11px; }
+            .spin-trigger-btn { font-size: 11px; }
+            .action-button-group { grid-template-columns: 1fr; gap: 12px; }
+            .spin-result-popup { min-width: 90%; padding: 25px 15px; }
+            .spin-result-popup div#spinResultValue { font-size: 32px; }
         }
     </style>
 </head>
@@ -735,8 +740,8 @@
     <div class="app-container" id="studioView">
         <div class="studio-dashboard">
             <div class="studio-header">
-                <h2>Spin Wheel Pack Factory V3</h2>
-                <p class="subtitle">Advanced Layout Mixer Engine With Live Sync Matrix Slots</p>
+                <h2>Spin Wheel Pack Factory V3.6</h2>
+                <p class="subtitle">Advanced Fluid Engine with FullScreen Pop-up Architecture Fixed</p>
             </div>
             
             <div class="studio-workspace">
@@ -760,8 +765,7 @@
                     <textarea id="imageLinks" class="studio-input" placeholder="https://example.com/pic1.jpg&#10;https://example.com/pic2.jpg" style="height: 70px;" oninput="syncBulkLinksToMatrix()"></textarea>
 
                     <label>🛠️ Custom Word & Image Matrix Slots (One-by-One Controller) :</label>
-                    <div class="matrix-box-container" id="matrixRowsWrapper">
-                        </div>
+                    <div class="matrix-box-container" id="matrixRowsWrapper"></div>
                     <button class="btn-add-matrix-row" onclick="addBlankMatrixRowCell()">➕ Add Item Row</button>
 
                     <div class="action-button-group">
@@ -772,10 +776,10 @@
 
                 <div class="preview-showcase">
                     <div class="preview-icon">🎡</div>
-                    <h3 style="color: var(--sky-blue-deep); margin: 0 0 10px 0; font-weight: 800;">Dynamic Hybrid Controls</h3>
+                    <h3 style="color: var(--sky-blue-deep); margin: 0 0 10px 0; font-weight: 800;">FullScreen Layer Updated</h3>
                     <p style="color: var(--text-muted); font-size: 14px; max-width: 320px; margin: 0 auto; line-height: 1.7; text-align: left;">
-                        • <b>စနစ်ဟောင်း (Bulk Box):</b> အတန်းလိုက် Copy Paste အမြန်ထည့်ချင်ရင် အပေါ်က Box တွေမှာ တန်းထည့်ပါ။<br><br>
-                        • <b>စနစ်သစ် (Matrix Slot):</b> စာနဲ့ ပုံ (Link သို့မဟုတ် Device File) ကို တစ်ခုချင်းစီ စိတ်ကြိုက် တွဲဖက်/ဖျက်ချင်ရင် Slot တန်းလေးတွေမှာ ပြင်ဆင်နိုင်ပါတယ်။ နှစ်ခုလုံး ချိတ်ဆက်နေမှာပါ။
+                        • <b>Pop-up ပြဿနာ ဖြေရှင်းပြီး:</b> ယခုအခါ Full Screen အကျယ်ကြီး ချဲ့ထားချိန်တွင် Wheel လှည့်ပြီး ကျလာမည့် ကံထူးရှင် Pop-up သည် ပိတ်စရာမလိုဘဲ အရှေ့မှာ တိုက်ရိုက် ပေါ်လာမည် ဖြစ်သည်။<br><br>
+                        • <b>စာရင်းပယ်ဖျက်ခြင်း:</b> Pop-up ရှိ Remove ခလုတ်နှိပ်ပါက စာရင်းထဲမှ အလိုအလျောက် ပယ်ဖျက်ပေးသွားမည်။
                     </p>
                 </div>
             </div>
@@ -783,12 +787,28 @@
     </div>
 
     <div class="game-section" id="gameRuntimeView">
-        <div class="game-arena">
+        <div class="game-arena" id="arenaMainElement">
+            
+            <div class="overlay-mask" id="mask"></div>
+            <div class="spin-result-popup" id="spinResultBox">
+                <h3>🎉 Selected Winner</h3>
+                <div id="spinResultValue">-</div>
+                <img id="spinResultImg" class="winner-image-frame" src="" alt="Winner Graphic Asset">
+                <div class="popup-btn-container">
+                    <button class="btn-popup btn-popup-remove" onclick="removeWinnerNamePermanently()">Remove Asset</button>
+                    <button class="btn-popup btn-popup-keep" onclick="closeConsoleSpinPopup()">Keep & Close</button>
+                </div>
+            </div>
+
             <div class="spin-main-workspace">
-                <div class="live-spin-time-box">
-                    <span>⚡ Spin Speed:</span>
-                    <input type="number" id="liveSecondsInput" value="5" min="2" max="60">
-                    <span>Secs</span>
+                <div class="top-control-row">
+                    <button class="btn-fullscreen-toggle" onclick="toggleAdvancedFullscreenMode()">🖥️ Full Screen</button>
+                    
+                    <div class="live-spin-time-box">
+                        <span>⚡ Speed:</span>
+                        <input type="number" id="liveSecondsInput" value="5" min="2" max="60">
+                        <span>Secs</span>
+                    </div>
                 </div>
 
                 <div class="spin-container">
@@ -799,7 +819,7 @@
                         <div class="leg-foot-right"></div>
                         
                         <div class="wheel-wrapper">
-                            <canvas id="wheelCanvas" width="580" height="580"></canvas>
+                            <canvas id="wheelCanvas" width="600" height="600"></canvas>
                             <div class="wheel-pointer-right" id="wheelPointer"></div>
                         </div>
 
@@ -811,7 +831,7 @@
                 <div></div>
             </div>
 
-            <div class="game-control-sidebar">
+            <div class="game-control-sidebar" id="gameControlSidebar">
                 <div class="sidebar-title">📝 In-Game Controller</div>
                 
                 <label style="margin-top:5px; margin-bottom:4px; font-size:11px;">Modify Items List:</label>
@@ -826,17 +846,6 @@
                     <button class="btn-console" onclick="quitActiveGameEngine()">Close Engine</button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="overlay-mask" id="mask"></div>
-    <div class="spin-result-popup" id="spinResultBox">
-        <h3>🎉 Selected Winner</h3>
-        <div id="spinResultValue">-</div>
-        <img id="spinResultImg" class="winner-image-frame" src="" alt="Winner Graphic Asset">
-        <div class="popup-btn-container">
-            <button class="btn-popup btn-popup-remove" onclick="removeWinnerNamePermanently()">Remove Asset</button>
-            <button class="btn-popup btn-popup-keep" onclick="closeConsoleSpinPopup()">Keep & Close</button>
         </div>
     </div>
 
@@ -884,8 +893,6 @@
     </script>
 
     <script>
-        // MASTER STRUCT ENGINE CORE DATA ARRAY
-        // Each entry: { text: "", img: "base64 or url data string", imgObj: HTMLImageElement }
         let matrixStoreData = []; 
         let currentRotationAngle = 0;
         let isSpinning = false;
@@ -901,14 +908,52 @@
 
         window.addEventListener("DOMContentLoaded", () => {
             setupDragAndDropZone();
-            // Initialize default matrix rows with some space assets
+            setupFullscreenChangeListener();
             for (let i = 0; i < 4; i++) {
                 matrixStoreData.push({ text: `Item ${i+1}`, img: "", imgObj: null });
             }
             renderStudioMatrixGUI();
         });
 
-        // DRAW STUDIO ROW SLOTS ELEMENTS ENGINE
+        function setupFullscreenChangeListener() {
+            const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+            events.forEach(evt => {
+                document.addEventListener(evt, () => {
+                    const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+                    const sidebar = document.getElementById("gameControlSidebar");
+                    if (isFull) {
+                        sidebar.classList.add("fullscreen-hide");
+                    } else {
+                        sidebar.classList.remove("fullscreen-hide");
+                    }
+                    setTimeout(() => { drawConsoleWheelGraphic(currentRotationAngle); }, 150);
+                });
+            });
+        }
+
+        function toggleAdvancedFullscreenMode() {
+            const targetElement = document.getElementById("arenaMainElement");
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFull) {
+                if (targetElement.requestFullscreen) {
+                    targetElement.requestFullscreen();
+                } else if (targetElement.webkitRequestFullscreen) {
+                    targetElement.webkitRequestFullscreen();
+                } else if (targetElement.msRequestFullscreen) {
+                    targetElement.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
         function renderStudioMatrixGUI() {
             const wrapper = document.getElementById("matrixRowsWrapper");
             wrapper.innerHTML = "";
@@ -917,13 +962,11 @@
                 const rowDiv = document.createElement("div");
                 rowDiv.className = "matrix-row";
 
-                // Index Column Number Badge
                 const indexSpan = document.createElement("span");
                 indexSpan.className = "matrix-index";
                 indexSpan.innerText = `${index + 1}.`;
                 rowDiv.appendChild(indexSpan);
 
-                // Word Text Field Input
                 const wordInput = document.createElement("input");
                 wordInput.type = "text";
                 wordInput.className = "matrix-word-input";
@@ -935,24 +978,21 @@
                 };
                 rowDiv.appendChild(wordInput);
 
-                // Media Integration Bundle (Links & Local Files)
                 const mediaBlock = document.createElement("div");
                 mediaBlock.className = "matrix-media-block";
 
                 const linkInput = document.createElement("input");
                 linkInput.type = "text";
                 linkInput.className = "matrix-link-input";
-                linkInput.placeholder = "Image Link (URL) or Upload File ->";
-                // Only show string if it is an HTTP internet web path link address asset
+                linkInput.placeholder = "Image Link (URL) or Click 📁";
                 linkInput.value = row.img.startsWith("data:") ? "[Device Storage Image File Cached]" : row.img;
                 linkInput.oninput = (e) => {
                     matrixStoreData[index].img = e.target.value;
-                    matrixStoreData[index].imgObj = null; // Clear cached instance
+                    matrixStoreData[index].imgObj = null; 
                     syncMatrixToBulkTextFields();
                 };
                 mediaBlock.appendChild(linkInput);
 
-                // Hidden Local Input Device Storage Driver File Element Picker
                 const hiddenFileInput = document.createElement("input");
                 hiddenFileInput.type = "file";
                 hiddenFileInput.accept = "image/*";
@@ -963,7 +1003,7 @@
                     const reader = new FileReader();
                     reader.onload = function(evt) {
                         matrixStoreData[index].img = evt.target.result;
-                        matrixStoreData[index].imgObj = null; // reset object binding
+                        matrixStoreData[index].imgObj = null; 
                         linkInput.value = "[Device Storage Image File Cached]";
                         syncMatrixToBulkTextFields();
                     };
@@ -971,17 +1011,14 @@
                 };
                 mediaBlock.appendChild(hiddenFileInput);
 
-                // Browse Icon Button Selector Triggers Launcher
                 const fileBtn = document.createElement("button");
                 fileBtn.className = "matrix-file-btn";
                 fileBtn.innerHTML = "📁";
-                fileBtn.title = "Upload Image File from Local Storage Drive Device";
                 fileBtn.onclick = () => hiddenFileInput.click();
                 mediaBlock.appendChild(fileBtn);
 
                 rowDiv.appendChild(mediaBlock);
 
-                // Row Deletion Element Component Core Triggers
                 const delBtn = document.createElement("button");
                 delBtn.className = "matrix-row-delete-btn";
                 delBtn.innerText = "🗑️";
@@ -1002,23 +1039,19 @@
             syncMatrixToBulkTextFields();
         }
 
-        // SYNC MECHANISM DIRECTION A: (MATRIX GRID -> TEXTAREAS CACHE BUNDLES)
         function syncMatrixToBulkTextFields() {
             const wordsList = matrixStoreData.map(r => r.text).join('\n');
-            // Only output clear web url linkages out to avoid crashing text boxes with thousands of Base64 lines raw bytes codes
             const linksList = matrixStoreData.map(r => r.img.startsWith('data:') ? '' : r.img).join('\n');
 
             document.getElementById("wordItems").value = wordsList;
             document.getElementById("imageLinks").value = linksList;
         }
 
-        // SYNC MECHANISM DIRECTION B: (BULK COPIED BOXES -> REPOPULATE MATRIX GRID INSIDE SYSTEM)
         function syncBulkTextToMatrix() {
             const bulkWordsText = document.getElementById("wordItems").value.trim();
             const wordsArray = bulkWordsText.split('\n').map(w => w.trim());
 
-            let maxLines = Math.max(wordsArray.length, matrixStoreData.length);
-            if (maxLines === 0 || (wordsArray.length === 1 && wordsArray[0] === "")) {
+            if (wordsArray.length === 0 || (wordsArray.length === 1 && wordsArray[0] === "")) {
                 matrixStoreData = [];
                 renderStudioMatrixGUI();
                 return;
@@ -1040,10 +1073,6 @@
             const bulkLinksText = document.getElementById("imageLinks").value.trim();
             const linksArray = bulkLinksText.split('\n').map(l => l.trim());
 
-            let maxLen = Math.max(matrixStoreData.length, linksArray.length);
-            if (maxLen === 0) return;
-
-            // Make sure the items match row bounds length sizes
             while (matrixStoreData.length < linksArray.length) {
                 matrixStoreData.push({ text: "", img: "", imgObj: null });
             }
@@ -1054,23 +1083,17 @@
                     matrixStoreData[i].imgObj = null; 
                 }
             }
-
             renderStudioMatrixGUI();
         }
 
-        // RUN ENGINE LOGIC CORE MANAGEMENT COMPILATION
         function getRomConfigurationPackage() {
-            // Trim empty slots away to keep rendering sleek and bug-free
             let dynamicFilterDataset = matrixStoreData.filter(item => item.text !== "" || item.img !== "");
-            
             if (dynamicFilterDataset.length === 0) {
-                alert("Please add at least some Text elements or load Image assets inside rows/boxes!");
+                alert("Please add data inside rows first!");
                 return null;
             }
-            
             const title = document.getElementById("gameTitle").value.trim() || "Spin-Wheel";
             const duration = parseInt(document.getElementById("spinDuration").value) || 5;
-
             return { title, duration, segments: dynamicFilterDataset };
         }
 
@@ -1122,7 +1145,7 @@
                     
                     bootSpinWheelRuntimeEngine(matrixStoreData, rom.duration || 5);
                 } catch (err) {
-                    alert("Invalid Game File Format Config asset!");
+                    alert("Invalid Game Config file!");
                 }
             };
             reader.readAsText(file);
@@ -1138,7 +1161,6 @@
             isSpinning = false;
             globalRequestStop = false;
 
-            // Load Canvas Image cache links loops dynamically
             matrixStoreData.forEach(seg => {
                 if (seg.img && !seg.imgObj) {
                     let img = new Image();
@@ -1152,7 +1174,7 @@
             document.getElementById("runtimeImageLinks").value = matrixStoreData.map(s => s.img.startsWith('data:') ? '' : s.img).join('\n');
             document.getElementById("spinActionBtn").innerText = "SPIN";
 
-            drawConsoleWheelGraphic(0);
+            setTimeout(() => { drawConsoleWheelGraphic(0); }, 100);
         }
 
         function syncRuntimeSidebarToWheel() {
@@ -1165,20 +1187,18 @@
 
             let loopLength = Math.max(wordsArray.length, linksArray.length);
             if (loopLength === 0 || (wordsArray.length === 1 && wordsArray[0] === "")) {
-                alert("Active element list runtime array cannot be blanked completely!");
+                alert("Element list array cannot be blanked completely!");
                 return;
             }
 
             let newMatrix = [];
             for (let i = 0; i < loopLength; i++) {
                 let txtVal = wordsArray[i] !== undefined ? wordsArray[i] : "";
-                
-                // Inherit or fetch image linkage allocations properly
                 let imgVal = "";
                 if (linksArray[i] !== undefined && linksArray[i] !== "") {
                     imgVal = linksArray[i];
                 } else if (matrixStoreData[i] && matrixStoreData[i].img.startsWith('data:')) {
-                    imgVal = matrixStoreData[i].img; // Carry over base64 if it existed here
+                    imgVal = matrixStoreData[i].img;
                 }
 
                 let seg = { text: txtVal, img: imgVal, imgObj: null };
@@ -1192,8 +1212,6 @@
             }
 
             matrixStoreData = newMatrix;
-            
-            // Sync backward changes elements down into studio panels components viewport areas directly
             renderStudioMatrixGUI();
             syncMatrixToBulkTextFields();
 
@@ -1201,11 +1219,11 @@
             drawConsoleWheelGraphic(0);
         }
 
-        // CANVAS GRAPHICS CORE WHEEL DISK RENDERING CORE ENGINE
         function drawConsoleWheelGraphic(currentRotationRad) {
             const canvas = document.getElementById("wheelCanvas");
+            if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, 580, 580);
+            ctx.clearRect(0, 0, 600, 600);
 
             const numSegs = matrixStoreData.length;
             if (numSegs === 0) return 0;
@@ -1213,13 +1231,13 @@
             const arcSize = (2 * Math.PI) / numSegs;
 
             ctx.save();
-            ctx.translate(290, 290);
+            ctx.translate(300, 300);
             ctx.rotate(currentRotationRad);
 
             for (let i = 0; i < numSegs; i++) {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
-                ctx.arc(0, 0, 280, i * arcSize, (i + 1) * arcSize);
+                ctx.arc(0, 0, 290, i * arcSize, (i + 1) * arcSize);
 
                 let colorIdx = i;
                 if (numSegs % 2 !== 0 && i === numSegs - 1) {
@@ -1239,11 +1257,11 @@
 
                 if (seg.imgObj && seg.imgObj.complete && seg.imgObj.naturalWidth !== 0) {
                     ctx.save();
-                    let translateRadius = (seg.text === "") ? 180 : 160;
+                    let translateRadius = (seg.text === "") ? 185 : 165;
                     ctx.translate(translateRadius, 0);
                     ctx.rotate(Math.PI / 2);
                     ctx.beginPath();
-                    let imageRadius = (seg.text === "") ? 32 : 24;
+                    let imageRadius = (seg.text === "") ? 35 : 26;
                     ctx.arc(0, 0, imageRadius, 0, Math.PI * 2);
                     ctx.clip();
                     ctx.drawImage(seg.imgObj, -imageRadius, -imageRadius, imageRadius*2, imageRadius*2);
@@ -1266,18 +1284,18 @@
                     ctx.font = `bold ${fontSize}px sans-serif`;
                     ctx.textAlign = "right";
                     ctx.textBaseline = "middle";
-                    ctx.fillText(seg.text, 250, 0);
+                    ctx.fillText(seg.text, 255, 0);
                 }
                 ctx.restore();
             }
             ctx.restore();
 
-            const grad = ctx.createRadialGradient(290, 290, 20, 290, 290, 280);
-            grad.addColorStop(0, 'rgba(255,255,255,0.1)');
-            grad.addColorStop(1, 'rgba(0,0,0,0.12)');
+            const grad = ctx.createRadialGradient(300, 300, 20, 300, 300, 290);
+            grad.addColorStop(0, 'rgba(255,255,255,0.05)');
+            grad.addColorStop(1, 'rgba(0,0,0,0.15)');
             ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.arc(290, 290, 280, 0, Math.PI * 2);
+            ctx.arc(300, 300, 290, 0, Math.PI * 2);
             ctx.fill();
 
             let normalizedAngle = (2 * Math.PI - (currentRotationRad % (2 * Math.PI))) % (2 * Math.PI);
@@ -1313,7 +1331,7 @@
             let startTimestamp = null;
             let startAngle = currentRotationAngle % (2 * Math.PI);
             
-            let totalRotationToTarget = (Math.PI * 2 * 10) + (Math.random() * Math.PI * 2);
+            let totalRotationToTarget = (Math.PI * 2 * 12) + (Math.random() * Math.PI * 2);
             let lastIdx = -1;
 
             function stepAnimateWheelTime(timestamp) {
@@ -1355,15 +1373,13 @@
             globalRequestStop = false;
             document.getElementById("spinActionBtn").innerText = "SPIN";
             
-            if(winnerIdx < 0 || winnerIdx >= matrixStoreData.length) {
-                winnerIdx = 0;
-            }
+            if(winnerIdx < 0 || winnerIdx >= matrixStoreData.length) winnerIdx = 0;
             
             lastWinnerIndex = winnerIdx;
             SoundFX.playWin();
 
             let winner = matrixStoreData[winnerIdx];
-            document.getElementById("spinResultValue").innerText = winner.text !== "" ? winner.text : "Selected Slot Graphic Asset Element";
+            document.getElementById("spinResultValue").innerText = winner.text !== "" ? winner.text : "Slot Graphic Asset";
             
             let resImg = document.getElementById("spinResultImg");
             if (winner.img) {
@@ -1381,8 +1397,6 @@
         function removeWinnerNamePermanently() {
             if (lastWinnerIndex > -1 && matrixStoreData.length > 0) {
                 matrixStoreData.splice(lastWinnerIndex, 1);
-                
-                // Redraw studio system and keep elements mapped properly inside containers loops
                 renderStudioMatrixGUI();
                 syncMatrixToBulkTextFields();
 
@@ -1399,6 +1413,9 @@
         }
 
         function quitActiveGameEngine() {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
             cancelAnimationFrame(animationFrameId);
             isSpinning = false;
             globalRequestStop = false;
