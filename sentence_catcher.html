@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sentence Catcher! - Bug Free Dual Engine</title>
+    <title>Sentence Catcher! - Absolute Perfect Version</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -33,7 +33,7 @@
 
     <div id="dashboard" class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-xl w-[95vw] sm:w-full border-4 border-purple-200 m-4 z-50 overflow-y-auto max-h-[90vh]">
         <h1 class="text-4xl font-black text-center mb-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-wide">Sentence Catcher! 👑</h1>
-        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">AR Dual Score Engine For Kids</p>
+        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">Dual Mode - Absolute Perfect Fix</p>
         
         <div class="bg-purple-50 p-4 rounded-2xl border-2 border-dashed border-purple-300 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -47,34 +47,41 @@
             </div>
         </div>
 
-        <div class="space-y-4 mb-6">
-            <div>
-                <label class="block text-sm font-bold mb-1.5 text-purple-700">✏️ Enter Targets (Words separated by commas OR full sentences)</label>
-                <textarea id="sentences-textarea" rows="5" class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-purple-500 text-sm shadow-inner">cat, dog, snake&#10;I am a teacher&#10;banana, apple, orange&#10;The teacher is a boy</textarea>
+        <div class="space-y-5">
+            <div class="bg-emerald-50/80 p-4 rounded-2xl border-2 border-emerald-300 shadow-sm">
+                <label class="block text-sm font-black mb-1 text-emerald-700">🔤 MODE A: Words Box (Comma Separated)</label>
+                <p class="text-[11px] text-emerald-600 font-bold mb-2">*Catch words in any order. 1 point per word.</p>
+                <textarea id="words-textarea" rows="2" class="w-full bg-white border-2 border-emerald-200 rounded-xl p-2.5 text-slate-800 font-bold focus:outline-none focus:border-emerald-500 text-sm shadow-inner mb-3" placeholder="cat, dog, snake"></textarea>
+                <button id="start-word-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 px-4 rounded-xl shadow-md text-md cursor-pointer transition">
+                    START WORD GAME 🚀
+                </button>
             </div>
-            <div>
-                <label class="block text-sm font-bold mb-1.5 text-pink-600">❌ Distractor Words (Comma separated)</label>
-                <input type="text" id="distractors-input" class="w-full bg-slate-50 border-2 border-pink-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-pink-400 text-sm shadow-inner" value="YOU, has, Pen, lemon, HE, are, bird, it">
+
+            <div class="bg-blue-50/80 p-4 rounded-2xl border-2 border-blue-300 shadow-sm">
+                <label class="block text-sm font-black mb-1 text-blue-700">📝 MODE B: Sentences Box (Full Sentence)</label>
+                <p class="text-[11px] text-blue-600 font-bold mb-2">*Catch in strict order. 1 point for a perfect sentence.</p>
+                <textarea id="sentences-textarea" rows="3" class="w-full bg-white border-2 border-blue-200 rounded-xl p-2.5 text-slate-800 font-bold focus:outline-none focus:border-blue-500 text-sm shadow-inner mb-3" placeholder="I am a teacher&#10;The teacher is a boy"></textarea>
+                <button id="start-sentence-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-3 px-4 rounded-xl shadow-md text-md cursor-pointer transition">
+                    START SENTENCE GAME 🚀
+                </button>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+                <label class="block text-sm font-bold mb-1 text-pink-600">❌ Distractor Words (Comma separated)</label>
+                <input type="text" id="distractors-input" class="w-full bg-white border-2 border-pink-200 rounded-xl p-2.5 text-slate-800 font-bold focus:outline-none focus:border-pink-400 text-sm shadow-inner" value="YOU, has, Pen, lemon, HE, are, bird, it">
             </div>
         </div>
-
-        <button id="start-btn" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg text-xl cursor-pointer text-center block transform active:scale-95 transition">
-            START GAME 🚀
-        </button>
     </div>
 
     <div id="game-screen" class="hidden fixed inset-0 w-screen h-screen z-10 flex flex-col">
-        
         <div class="absolute top-3 left-3 right-3 z-30 flex flex-col gap-1 bg-white/95 px-4 py-2.5 rounded-xl border border-purple-200 shadow-lg max-w-4xl mx-auto w-[94vw]">
             <div class="flex justify-between items-center text-xs sm:text-sm">
                 <div class="font-black text-purple-700">Level: <span id="level-display" class="text-purple-600">1</span></div>
-                
                 <div class="font-black text-pink-600 bg-purple-50 px-4 py-0.5 rounded-lg border border-purple-200 text-center">
                     <span id="target-sentence-display" class="text-lg sm:text-xl font-black"></span>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs sm:text-sm">⭐ Score: <span id="score-display">0</span></div>
-                    <div class="font-black text-slate-700 bg-purple-100 px-2.5 py-0.5 rounded-full text-xs sm:text-sm">⏱️ <span id="timer-val" class="text-purple-600">0</span>s</div>
                     <button id="fullscreen-btn" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-2 py-0.5 rounded-md transition shadow cursor-pointer">📺</button>
                     <button id="hud-quit-btn" class="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-md transition shadow cursor-pointer uppercase">Leave 🚪</button>
                 </div>
@@ -87,14 +94,12 @@
             <div id="result-dialog" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 z-40">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-purple-300 text-center mx-2">
                     <div id="result-status-icon" class="text-5xl sm:text-6xl mb-2">🎉</div>
-                    <h2 id="result-title" class="text-2xl sm:text-3xl font-black text-purple-600 mb-2">Correct!</h2>
+                    <h2 id="result-title" class="text-2xl sm:text-3xl font-black text-purple-600 mb-2">Level Complete!</h2>
                     
-                    <div class="bg-slate-50 p-4 rounded-xl border border-purple-100 mb-4 text-left space-y-1">
+                    <div id="result-detail-box" class="bg-slate-50 p-4 rounded-xl border border-purple-100 mb-4 text-left space-y-1">
                         <p class="text-xs font-bold text-slate-400 uppercase">Collected Result</p>
                         <p id="child-sentence-text" class="text-sm sm:text-md font-extrabold text-pink-500 italic"></p>
                     </div>
-                    
-                    <p id="countdown-text" class="text-xs font-bold text-purple-400 mb-4 italic">Next level automatically in 5s...</p>
 
                     <div class="flex flex-col gap-2">
                         <button id="next-level-btn" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-extrabold py-3 px-6 rounded-xl text-md shadow-lg cursor-pointer transition">
@@ -130,23 +135,19 @@
         
         let words = [];
         let isGameRunning = false;
-        let spawnTimer = 0;
-        let aiFrameCounter = 0;
         
-        let sentenceList = [];
+        let gameDataPool = []; 
         let currentLevel = 0;
         let correctSequence = [];
+        let remainingWordsToCatch = []; 
         let distractorWords = [];
         let collectedWords = [];
         
         let kidScore = 0; 
         let isSentenceMode = false; 
         let hasMistakeInCurrentLevel = false; 
-
-        let timeElapsed = 0;
-        let timerInterval;
-        let autoNextTimeout;
-        let countdownInterval;
+        let isLevelTransitionPending = false; 
+        let isSpawnLockedForSafety = false; // ⚡ Safe-Lock-Key: အလိုလို အလိုအလျောက် ထိမိခြင်းကို ကာကွယ်ရန် Variable သစ်
 
         let activeHands = [];
         let cameraEngine = null;
@@ -158,16 +159,16 @@
 
         const dashboard = document.getElementById('dashboard');
         const gameScreen = document.getElementById('game-screen');
-        const startBtn = document.getElementById('start-btn');
+        const startWordBtn = document.getElementById('start-word-btn');
+        const startSentenceBtn = document.getElementById('start-sentence-btn');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const hudQuitBtn = document.getElementById('hud-quit-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const uploadFileInput = document.getElementById('upload-file');
-        const timerVal = document.getElementById('timer-val');
         const scoreDisplay = document.getElementById('score-display');
         const targetSentDisp = document.getElementById('target-sentence-display');
         const levelDisp = document.getElementById('level-display');
         const collectedContainer = document.getElementById('collected-words-container');
+        const downloadBtn = document.getElementById('download-btn');
+        const uploadFileInput = document.getElementById('upload-file');
         
         const resultDialog = document.getElementById('result-dialog');
         const resultStatusIcon = document.getElementById('result-status-icon');
@@ -178,7 +179,6 @@
         const retryLevelBtn = document.getElementById('retry-level-btn');
         const playAgainBtn = document.getElementById('play-again-btn');
         const dialogBackBtn = document.getElementById('dialog-back-btn');
-        const countdownText = document.getElementById('countdown-text');
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -194,29 +194,33 @@
             }
         });
 
-        // DOWNLOAD TEXT LESSON
+        // DOWNLOAD TEXT FILE (.txt)
         downloadBtn.addEventListener('click', () => {
+            let txtWords = document.getElementById('words-textarea').value;
             let txtSentences = document.getElementById('sentences-textarea').value;
             let txtDistractors = document.getElementById('distractors-input').value;
-            let fileContent = `=== SENTENCES ===\n${txtSentences}\n=== DISTRACTORS ===\n${txtDistractors}`;
+            let fileContent = `=== WORDS ===\n${txtWords}\n=== SENTENCES ===\n${txtSentences}\n=== DISTRACTORS ===\n${txtDistractors}`;
             let blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
             let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Sentence_Catcher_Lesson.txt";
+            link.download = "Sentence_Catcher_TwinBox_Lesson.txt";
             link.click();
         });
 
-        // UPLOAD TEXT LESSON
+        // UPLOAD TEXT FILE (.txt)
         uploadFileInput.addEventListener('change', (e) => {
             let file = e.target.files[0];
             if (!file) return;
             let reader = new FileReader();
             reader.onload = function(event) {
                 let text = event.target.result;
-                if (text.includes("=== SENTENCES ===") && text.includes("=== DISTRACTORS ===")) {
-                    let parts = text.split("=== DISTRACTORS ===");
-                    let sentencesPart = parts[0].replace("=== SENTENCES ===", "").trim();
-                    let distractorsPart = parts[1].trim();
+                if (text.includes("=== WORDS ===") && text.includes("=== SENTENCES ===") && text.includes("=== DISTRACTORS ===")) {
+                    let parts1 = text.split("=== SENTENCES ===");
+                    let wordsPart = parts1[0].replace("=== WORDS ===", "").trim();
+                    let parts2 = parts1[1].split("=== DISTRACTORS ===");
+                    let sentencesPart = parts2[0].trim();
+                    let distractorsPart = parts2[1].trim();
+                    document.getElementById('words-textarea').value = wordsPart;
                     document.getElementById('sentences-textarea').value = sentencesPart;
                     document.getElementById('distractors-input').value = distractorsPart;
                 }
@@ -225,6 +229,7 @@
         });
 
         function preSetupAudio() {
+            if (audioCtx) return; 
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             let sampleRate = audioCtx.sampleRate;
             let duration = 0.12; 
@@ -252,21 +257,30 @@
             source.start();
         }
 
-        // Start Game
-        startBtn.addEventListener('click', () => {
-            sentenceList = document.getElementById('sentences-textarea').value.split('\n').map(s => s.trim()).filter(s => s);
+        startWordBtn.addEventListener('click', () => {
+            let inputWords = document.getElementById('words-textarea').value.trim();
+            if (inputWords.length === 0) { alert("Please enter words in the Words Box!"); return; }
+            isSentenceMode = false;
+            gameDataPool = inputWords.split('\n').map(s => s.trim()).filter(s => s);
+            startGameSetup();
+        });
+
+        startSentenceBtn.addEventListener('click', () => {
+            let inputSentences = document.getElementById('sentences-textarea').value.trim();
+            if (inputSentences.length === 0) { alert("Please enter sentences in the Sentences Box!"); return; }
+            isSentenceMode = true;
+            gameDataPool = inputSentences.split('\n').map(s => s.trim()).filter(s => s);
+            startGameSetup();
+        });
+
+        function startGameSetup() {
             distractorWords = document.getElementById('distractors-input').value.split(',').map(w => w.trim()).filter(w => w);
-
-            if(sentenceList.length === 0) {
-                alert("Please enter at least one target!");
-                return;
-            }
-
             preSetupAudio();
-
             currentLevel = 0;
             kidScore = 0; 
             scoreDisplay.innerText = kidScore;
+            isLevelTransitionPending = false;
+            isSpawnLockedForSafety = false;
             
             dashboard.classList.add('hidden');
             gameScreen.classList.remove('hidden');
@@ -274,39 +288,16 @@
             
             resizeCanvas();
             loadLevel(currentLevel);
-            
-            clearInterval(timerInterval);
-            timeElapsed = 0;
-            timerVal.innerText = timeElapsed;
-            timerInterval = setInterval(() => {
-                if (isGameRunning) {
-                    timeElapsed++;
-                    timerVal.innerText = timeElapsed;
-                }
-            }, 1000);
-
-            initCameraAndAI(); 
-        });
+            initCameraAndAIOnce(); 
+        }
 
         function loadLevel(levelIndex) {
-            clearTimeout(autoNextTimeout);
-            clearInterval(countdownInterval);
-            
-            if (levelIndex >= sentenceList.length) {
+            if (levelIndex >= gameDataPool.length) {
                 isGameRunning = false;
-                clearInterval(timerInterval);
-                
                 resultStatusIcon.innerText = "🏆";
                 resultTitle.innerText = "Game Completed!";
                 resultTitle.className = "text-3xl font-black text-purple-600 mb-2";
-                
-                resultDetailBox.innerHTML = `
-                    <p class="text-md font-bold text-slate-600 text-center"> 📊 Grand Total Score:</p>
-                    <p class="text-5xl font-black text-emerald-500 text-center mt-2">${kidScore} Points</p>
-                    <p class="text-xs font-bold text-purple-400 text-center mt-3">⏱️ Total Time Taken: ${timeElapsed} seconds</p>
-                `;
-                
-                countdownText.innerText = "Fantastic job building words & sentences!";
+                childSentenceText.innerText = `Grand Total Score: ${kidScore} Points`;
                 
                 nextLevelBtn.classList.add('hidden');
                 retryLevelBtn.classList.add('hidden');
@@ -316,17 +307,16 @@
             }
 
             levelDisp.innerText = levelIndex + 1;
-            targetSentDisp.innerText = sentenceList[levelIndex];
+            let rawLine = gameDataPool[levelIndex];
+            targetSentDisp.innerText = rawLine; 
             
-            let rawLine = sentenceList[levelIndex];
-            if (rawLine.includes(',')) {
+            if (!isSentenceMode) {
                 correctSequence = rawLine.split(',').map(w => w.trim()).filter(w => w);
-                isSentenceMode = false;
             } else {
                 correctSequence = rawLine.split(' ').map(w => w.trim()).filter(w => w);
-                isSentenceMode = true;
             }
             
+            remainingWordsToCatch = [...correctSequence]; 
             collectedWords = [];
             words = [];
             hasMistakeInCurrentLevel = false; 
@@ -336,48 +326,31 @@
             retryLevelBtn.classList.remove('hidden');
             playAgainBtn.classList.add('hidden');
             resultDialog.classList.add('hidden');
-            isGameRunning = true;
+            
+            isLevelTransitionPending = false; 
+            isSpawnLockedForSafety = false;
+            if(!isGameRunning) {
+                isGameRunning = true;
+                gameLoop(); 
+            }
         }
 
-        nextLevelBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentLevel++;
-            loadLevel(currentLevel);
-        });
-
-        retryLevelBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            loadLevel(currentLevel);
-        });
-
-        playAgainBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentLevel = 0;
-            kidScore = 0;
-            scoreDisplay.innerText = kidScore;
-            timeElapsed = 0;
-            loadLevel(currentLevel);
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (isGameRunning) {
-                    timeElapsed++;
-                    timerVal.innerText = timeElapsed;
-                }
-            }, 1000);
-        });
+        nextLevelBtn.addEventListener('click', (e) => { e.stopPropagation(); currentLevel++; loadLevel(currentLevel); });
+        retryLevelBtn.addEventListener('click', (e) => { e.stopPropagation(); loadLevel(currentLevel); });
+        playAgainBtn.addEventListener('click', (e) => { e.stopPropagation(); currentLevel = 0; kidScore = 0; scoreDisplay.innerText = kidScore; loadLevel(currentLevel); });
 
         function returnToDashboard() {
             isGameRunning = false;
-            clearInterval(timerInterval);
-            clearTimeout(autoNextTimeout);
-            clearInterval(countdownInterval);
+            isLevelTransitionPending = true;
             if (document.fullscreenElement) document.exitFullscreen();
             
             if (cameraEngine) { cameraEngine.stop(); cameraEngine = null; }
             if (handsEngine) { handsEngine.close(); handsEngine = null; }
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
             }
+
             gameScreen.classList.add('hidden');
             dashboard.classList.remove('hidden');
         }
@@ -385,7 +358,9 @@
         dialogBackBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
         hudQuitBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
 
-        function initCameraAndAI() {
+        function initCameraAndAIOnce() {
+            if (cameraEngine && handsEngine) return; 
+
             handsEngine = new Hands({
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
             });
@@ -398,6 +373,7 @@
             });
 
             handsEngine.onResults((results) => {
+                if (!isGameRunning || isLevelTransitionPending) { activeHands = []; return; }
                 activeHands = [];
                 if (results.multiHandLandmarks) {
                     for (let landmarks of results.multiHandLandmarks) {
@@ -414,41 +390,43 @@
                 navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
                 .then(function(stream) {
                     video.srcObject = stream;
-                    
                     cameraEngine = new Camera(video, {
                         onFrame: async () => {
-                            if (isGameRunning && handsEngine) {
-                                aiFrameCounter++;
-                                if (aiFrameCounter % 3 === 0) {
-                                    await handsEngine.send({ image: video });
-                                }
+                            if (isGameRunning && !isLevelTransitionPending && handsEngine) {
+                                await handsEngine.send({ image: video });
                             }
                         },
                         width: 640,
                         height: 480
                     });
-                    
                     cameraEngine.start().then(() => {
                         isGameRunning = true;
                         gameLoop();
                     });
                 })
-                .catch(function(err) {
-                    alert("Camera initializing failed!");
-                });
+                .catch(function(err) { alert("Camera blocked!"); });
             }
         }
 
         function spawnFourWordsGroup() {
-            let nextCorrectIndex = collectedWords.length;
-            let correctWord = correctSequence[nextCorrectIndex];
+            if (isLevelTransitionPending || isSpawnLockedForSafety) return; 
+            
+            let correctWord = null;
+            if (isSentenceMode) {
+                // 💡 ဝါကျစနစ်တွင် ကလေးရွေးချယ်ရမည့် နောက်တစ်လုံးကို Sequence အတိုင်း ကွက်တိလမ်းပြကျစေမည်
+                correctWord = correctSequence[collectedWords.length];
+            } else {
+                if (remainingWordsToCatch.length > 0) {
+                    correctWord = remainingWordsToCatch[0];
+                }
+            }
             
             let chosenTexts = [];
-            if (correctWord) {
-                chosenTexts.push(correctWord);
-            }
+            if (correctWord) { chosenTexts.push(correctWord); }
 
-            while (chosenTexts.length < 4) {
+            let safetyLimit = 0;
+            while (chosenTexts.length < 4 && safetyLimit < 50) {
+                safetyLimit++;
                 let randomWord;
                 if (Math.random() > 0.4 && distractorWords.length > 0) {
                     randomWord = distractorWords[Math.floor(Math.random() * distractorWords.length)];
@@ -459,43 +437,30 @@
                     chosenTexts.push(randomWord);
                 }
             }
-
+            
+            while(chosenTexts.length < 4) { chosenTexts.push("..."); }
             chosenTexts.sort(() => Math.random() - 0.5);
 
             ctx.font = "bold 26px sans-serif";
-            
-            let leftEdge1 = 25;                         
-            let leftEdge2 = 155;                        
-            let rightEdge1 = canvas.width - 155;        
-            let rightEdge2 = canvas.width - 300;        
-
-            // အပေါ်အောက် အမြင့်ခွာနှုန်းကို ၂၉၀px ပုံသေ ချထားပေးပါတယ်
             let positions = [
-                { x: leftEdge1, y: -40 },
-                { x: leftEdge2, y: -290 }, 
-                { x: rightEdge1, y: -40 },
-                { x: rightEdge2, y: -290 } 
+                { x: 25, y: -40 }, { x: 155, y: -290 }, 
+                { x: canvas.width - 155, y: -40 }, { x: canvas.width - 300, y: -290 } 
             ];
 
+            words = []; 
             for (let i = 0; i < 4; i++) {
                 let textWidth = ctx.measureText(chosenTexts[i]).width + 32;
                 words.push({
                     text: chosenTexts[i],
                     x: (i < 2) ? (positions[i].x + textWidth/2) : (positions[i].x - textWidth/2),
                     y: positions[i].y,
-                    speed: 3.4, 
-                    w: textWidth,
-                    h: 50
+                    speed: 3.4, w: textWidth, h: 50
                 });
             }
         }
 
-        // MAIN RENDERING LOOP
         function gameLoop() {
-            if (!isGameRunning) {
-                requestAnimationFrame(gameLoop);
-                return;
-            }
+            if (!isGameRunning) return;
 
             ctx.save();
             ctx.translate(canvas.width, 0);
@@ -503,69 +468,89 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.restore();
 
-            if (words.length === 0) {
-                spawnFourWordsGroup();
-            }
+            if (!isLevelTransitionPending) {
+                if (words.length === 0 && !isSpawnLockedForSafety) { spawnFourWordsGroup(); }
 
-            for (let i = words.length - 1; i >= 0; i--) {
-                let w = words[i];
-                w.y += w.speed; 
-
-                let palmTouched = false;
-                for (let hand of activeHands) {
-                    if (hand.x > (w.x - w.w/2 - 35) && hand.x < (w.x + w.w/2 + 35) &&
-                        hand.y > (w.y - 25 - 35) && hand.y < (w.y + 25 + 35)) {
-                        palmTouched = true;
-                        break;
-                    }
-                }
-
-                if (palmTouched) {
-                    collectedWords.push(w.text);
-                    updateCollectedUI();
-
-                    let expectedWord = correctSequence[collectedWords.length - 1];
+                for (let i = words.length - 1; i >= 0; i--) {
+                    let w = words[i];
+                    if (!w) continue;
                     
-                    if (w.text === expectedWord) {
-                        playPreloadedSound('correct');
-                        ctx.fillStyle = "rgba(168, 85, 247, 0.85)";
-                        
-                        if (!isSentenceMode) {
-                            kidScore += 1;
-                            scoreDisplay.innerText = kidScore;
+                    w.y += w.speed; 
+                    let palmTouched = false;
+                    for (let hand of activeHands) {
+                        // Collision box check layer bounds control
+                        if (hand.x > (w.x - w.w/2 - 45) && hand.x < (w.x + w.w/2 + 45) &&
+                            hand.y > (w.y - 25 - 45) && hand.y < (w.y + 25 + 45)) {
+                            palmTouched = true; break;
                         }
-                    } else {
-                        playPreloadedSound('wrong'); 
-                        ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
-                        hasMistakeInCurrentLevel = true; 
                     }
 
-                    ctx.beginPath();
-                    ctx.arc(w.x, w.y, 85, 0, Math.PI * 2);
-                    ctx.fill();
+                    if (palmTouched && !isLevelTransitionPending && !isSpawnLockedForSafety) {
+                        
+                        let isCorrect = false;
+                        if (isSentenceMode) {
+                            // 💡 ဆရာကြီး ညွှန်ကြားချက်အရ - ဝါကျစနစ်တွင် လက်ရှိကောက်လိုက်သော စာလုံးသည် စဉ်ဆက်မပြတ် နေရာအမှန် ဟုတ်/မဟုတ် စစ်ဆေးခြင်း
+                            if (w.text === correctSequence[collectedWords.length]) { 
+                                isCorrect = true; 
+                            }
+                        } else {
+                            let targetIdx = remainingWordsToCatch.indexOf(w.text);
+                            if (targetIdx !== -1) { 
+                                isCorrect = true;
+                                remainingWordsToCatch.splice(targetIdx, 1); 
+                            }
+                        }
 
-                    words = []; 
-                    checkSentenceComplete();
-                    break; 
-                }
+                        // ကလေးကောက်လိုက်သော စာလုံးကို ခြင်းတောင်းထဲသို့ မှန်သည်ဖြစ်စေ၊ မှားသည်ဖြစ်စေ အကုန်ထည့်ပေးခြင်း
+                        collectedWords.push(w.text);
+                        updateCollectedUI();
 
-                // Word Box Render
-                ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-                ctx.strokeStyle = "#a855f7"; 
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.roundRect(w.x - w.w/2, w.y - 25, w.w, w.h, 16);
-                ctx.fill();
-                ctx.stroke();
+                        if (isCorrect) {
+                            playPreloadedSound('correct');
+                            ctx.fillStyle = "rgba(168, 85, 247, 0.85)";
+                            
+                            if (!isSentenceMode) { kidScore += 1; scoreDisplay.innerText = kidScore; }
+                        } else {
+                            playPreloadedSound('wrong'); 
+                            ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
+                            hasMistakeInCurrentLevel = true; // ဝါကျတွင် တစ်လုံးမှားသွားကြောင်း အမှတ်အသားပြုခြင်း
+                        }
 
-                ctx.fillStyle = "#2563eb"; 
-                ctx.font = "bold 25px sans-serif";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(w.text, w.x, w.y);
+                        ctx.beginPath();
+                        ctx.arc(w.x, w.y, 85, 0, Math.PI * 2);
+                        ctx.fill();
 
-                if (w.y > canvas.height + 50) {
-                    words.splice(i, 1);
+                        // 💡 🛠️ Fix 2 (Ghost Touch Prevention): 
+                        // စာလုံးအဟောင်းတွေကို ဖျက်ပြီး အတွဲသစ်မချမီ ကလေးလက်ဖယ်နိုင်အောင် ခေတ္တ စက္ကန့်ဝက် သော့ပိတ်ပေးထားလိုက်ခြင်း
+                        words = []; 
+                        isSpawnLockedForSafety = true;
+
+                        // ဝါကျမပြည့်သေးပါက 0.4 စက္ကန့် Delay ပေးပြီးမှ နောက်စာလုံးအတွဲ ကျဆင်းစေခြင်း
+                        setTimeout(() => {
+                            isSpawnLockedForSafety = false;
+                            checkSentenceComplete();
+                        }, 400);
+                        
+                        break; 
+                    }
+
+                    if (words.length > 0) {
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+                        ctx.strokeStyle = "#a855f7"; 
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        ctx.roundRect(w.x - w.w/2, w.y - 25, w.w, w.h, 16);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.fillStyle = "#2563eb"; 
+                        ctx.font = "bold 25px sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(w.text, w.x, w.y);
+
+                        if (w.y > canvas.height + 50) { words.splice(i, 1); }
+                    }
                 }
             }
 
@@ -577,73 +562,45 @@
                 collectedContainer.innerHTML = `<span class="text-slate-400 font-medium text-xs italic">Collected targets will appear here...</span>`;
                 return;
             }
-
             collectedContainer.innerHTML = "";
             collectedWords.forEach((word, idx) => {
                 const wordBadge = document.createElement('span');
                 wordBadge.className = "bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black px-4 py-1.5 rounded-lg shadow-sm text-sm border border-purple-300";
-                
-                // 🛠️ FIX LINK: Dynamic separator matching for comma and sentence blocks
-                let rawLine = sentenceList[currentLevel] || "";
-                if (rawLine.includes(',') && idx < correctSequence.length - 1) {
-                    wordBadge.innerText = word + " ,";
-                } else {
-                    wordBadge.innerText = word;
-                }
+                wordBadge.innerText = (!isSentenceMode && idx < correctSequence.length - 1) ? word + " ," : word;
                 collectedContainer.appendChild(wordBadge);
             });
         }
 
         function checkSentenceComplete() {
-            let targetLength = correctSequence.length;
+            // 💡 🛠️ Fix 1: စာလုံး ၄ လုံးစီရင် ၄ လုံးလုံး ကလေးရွေးချယ်ပြီးသွားသည့်အချိန်ကျမှသာ Pop-up ဖွင့်ခိုင်းခြင်း
+            if (collectedWords.length >= correctSequence.length) {
+                isLevelTransitionPending = true; 
+                words = [];
 
-            if (collectedWords.length >= targetLength) {
-                isGameRunning = false; 
+                let displayCollectedResult = collectedWords.join(isSentenceMode ? ' ' : ' , ');
+                childSentenceText.innerText = displayCollectedResult;
 
-                let childSentence = collectedWords.join(' ');
-                let originalSentence = correctSequence.join(' ');
-
-                resultDetailBox.innerHTML = `
-                    <p class="text-xs font-bold text-slate-400 uppercase">Collected Result</p>
-                    <p id="child-sentence-text" class="text-sm sm:text-md font-extrabold text-pink-500 italic">${childSentence}</p>
-                `;
-
-                let isCorrectMatch = (childSentence === originalSentence);
-
-                if (isCorrectMatch) {
-                    resultStatusIcon.innerText = "🎉";
+                // ဝါကျစနစ်တွင် ၄ လုံးလုံးပြည့်သွားချိန်မှ အမှားပါ/မပါ စစ်ဆေးပြီး အမှတ်ပေးခြင်း
+                if (isSentenceMode && !hasMistakeInCurrentLevel) {
                     resultTitle.innerText = "Level Complete!";
                     resultTitle.className = "text-3xl font-black text-emerald-500 mb-2";
+                    resultStatusIcon.innerText = "🎉";
                     
-                    if (isSentenceMode && !hasMistakeInCurrentLevel) {
-                        kidScore += 1;
-                        scoreDisplay.innerText = kidScore;
-                    }
-                } else {
-                    resultStatusIcon.innerText = "❌";
-                    resultTitle.innerText = "Incorrect Order!";
+                    kidScore += 1;
+                    scoreDisplay.innerText = kidScore;
+                } else if (isSentenceMode && hasMistakeInCurrentLevel) {
+                    // စာလုံးပြည့်သွားသော်လည်း ကြားထဲတွင် မှားခဲ့ပါက အမှတ်မရဘဲ Pop-up ပွင့်စေမည်
+                    resultTitle.innerText = "Wrong Sentence Order!";
                     resultTitle.className = "text-3xl font-black text-rose-500 mb-2";
+                    resultStatusIcon.innerText = "❌";
+                } else {
+                    // စကားလုံးအတွဲစနစ် အောင်မြင်ခြင်း
+                    resultTitle.innerText = "Level Complete!";
+                    resultTitle.className = "text-3xl font-black text-emerald-500 mb-2";
+                    resultStatusIcon.innerText = "🎉";
                 }
 
-                // 🛠️ FIXED: Error logic completely patched, dialog pops up correctly instantly
                 resultDialog.classList.remove('hidden'); 
-
-                let timeLeft = 5;
-                countdownText.innerText = `Moving onward automatically in ${timeLeft}s...`;
-                
-                clearInterval(countdownInterval);
-                countdownInterval = setInterval(() => {
-                    timeLeft--;
-                    countdownText.innerText = `Moving onward automatically in ${timeLeft}s...`;
-                    if(timeLeft <= 0) clearInterval(countdownInterval);
-                }, 1000);
-
-                clearTimeout(autoNextTimeout);
-                autoNextTimeout = setTimeout(() => {
-                    // ⚡ Auto transition to the next question block securely without blocking loops
-                    currentLevel++;
-                    loadLevel(currentLevel);
-                }, 5000);
             }
         }
     </script>
