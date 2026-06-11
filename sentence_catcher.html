@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kids AR Sentence Builder - Tablet & Pro Edition</title>
+    <title>Sentence Catcher! - Bug Free Dual Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -14,7 +14,7 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 100%);
             margin: 0;
             overflow: hidden;
-            touch-action: none; /* Prevents accidental scrolling on tablets */
+            touch-action: none;
         }
         #canvas-container {
             width: 100vw;
@@ -32,8 +32,8 @@
 <body class="text-slate-800 font-sans min-h-screen flex flex-col items-center justify-center">
 
     <div id="dashboard" class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-xl w-[95vw] sm:w-full border-4 border-purple-200 m-4 z-50 overflow-y-auto max-h-[90vh]">
-        <h1 class="text-3xl sm:text-4xl font-black text-center mb-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-wide">Sentence Catcher! 👑</h1>
-        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">AR Tablet & Pro Edge Mode</p>
+        <h1 class="text-4xl font-black text-center mb-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-wide">Sentence Catcher! 👑</h1>
+        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">AR Dual Score Engine For Kids</p>
         
         <div class="bg-purple-50 p-4 rounded-2xl border-2 border-dashed border-purple-300 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -49,12 +49,12 @@
 
         <div class="space-y-4 mb-6">
             <div>
-                <label class="block text-sm font-bold mb-1.5 text-purple-700">✏️ Sentences (One sentence per line / Press Enter)</label>
-                <textarea id="sentences-textarea" rows="4" class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-purple-500 text-sm shadow-inner">I have a pencil&#10;She likes to play&#10;The cat is sleeping</textarea>
+                <label class="block text-sm font-bold mb-1.5 text-purple-700">✏️ Enter Targets (Words separated by commas OR full sentences)</label>
+                <textarea id="sentences-textarea" rows="5" class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-purple-500 text-sm shadow-inner">cat, dog, snake&#10;I am a teacher&#10;banana, apple, orange&#10;The teacher is a boy</textarea>
             </div>
             <div>
                 <label class="block text-sm font-bold mb-1.5 text-pink-600">❌ Distractor Words (Comma separated)</label>
-                <input type="text" id="distractors-input" class="w-full bg-slate-50 border-2 border-pink-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-pink-400 text-sm shadow-inner" value="YOU, has, Pen, apple, HE, are, dog, it">
+                <input type="text" id="distractors-input" class="w-full bg-slate-50 border-2 border-pink-200 rounded-xl p-3 text-slate-800 font-bold focus:outline-none focus:border-pink-400 text-sm shadow-inner" value="YOU, has, Pen, lemon, HE, are, bird, it">
             </div>
         </div>
 
@@ -65,24 +65,32 @@
 
     <div id="game-screen" class="hidden fixed inset-0 w-screen h-screen z-10 flex flex-col">
         
-        <div class="absolute top-4 left-4 right-4 z-30 flex justify-between items-center px-4 sm:px-6 py-3 bg-white rounded-2xl border-2 border-purple-200 shadow-xl max-w-4xl mx-auto w-[92vw]">
-            <div class="text-sm sm:text-md font-black text-purple-700">Level: <span id="level-display" class="text-purple-600">1</span> | 🎯 Target: <span id="target-sentence-display" class="text-pink-600 font-bold underline text-xs sm:text-sm"></span></div>
-            <div class="flex items-center gap-3 sm:gap-4">
-                <button id="fullscreen-btn" class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg transition shadow cursor-pointer">GO FULLSCREEN 📺</button>
-                <div class="text-sm sm:text-md font-black text-slate-700 bg-purple-100 px-3 sm:px-4 py-1 rounded-full">⏱️ <span id="timer-val" class="text-purple-600">0</span>s</div>
+        <div class="absolute top-3 left-3 right-3 z-30 flex flex-col gap-1 bg-white/95 px-4 py-2.5 rounded-xl border border-purple-200 shadow-lg max-w-4xl mx-auto w-[94vw]">
+            <div class="flex justify-between items-center text-xs sm:text-sm">
+                <div class="font-black text-purple-700">Level: <span id="level-display" class="text-purple-600">1</span></div>
+                
+                <div class="font-black text-pink-600 bg-purple-50 px-4 py-0.5 rounded-lg border border-purple-200 text-center">
+                    <span id="target-sentence-display" class="text-lg sm:text-xl font-black"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs sm:text-sm">⭐ Score: <span id="score-display">0</span></div>
+                    <div class="font-black text-slate-700 bg-purple-100 px-2.5 py-0.5 rounded-full text-xs sm:text-sm">⏱️ <span id="timer-val" class="text-purple-600">0</span>s</div>
+                    <button id="fullscreen-btn" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-2 py-0.5 rounded-md transition shadow cursor-pointer">📺</button>
+                    <button id="hud-quit-btn" class="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-md transition shadow cursor-pointer uppercase">Leave 🚪</button>
+                </div>
             </div>
         </div>
 
         <div id="canvas-container" class="w-full h-full">
             <canvas id="game-canvas"></canvas>
 
-            <div id="result-dialog" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-40">
+            <div id="result-dialog" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 z-40">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-purple-300 text-center mx-2">
                     <div id="result-status-icon" class="text-5xl sm:text-6xl mb-2">🎉</div>
                     <h2 id="result-title" class="text-2xl sm:text-3xl font-black text-purple-600 mb-2">Correct!</h2>
                     
-                    <div id="result-detail-box" class="bg-slate-50 p-4 rounded-xl border border-purple-100 mb-4 text-left space-y-1">
-                        <p class="text-xs font-bold text-slate-400 uppercase">Collected Sentence</p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-purple-100 mb-4 text-left space-y-1">
+                        <p class="text-xs font-bold text-slate-400 uppercase">Collected Result</p>
                         <p id="child-sentence-text" class="text-sm sm:text-md font-extrabold text-pink-500 italic"></p>
                     </div>
                     
@@ -108,7 +116,7 @@
 
         <div class="absolute bottom-2 left-4 right-4 z-30 max-w-3xl mx-auto w-[92vw] bg-white px-4 py-2 rounded-xl border-2 border-dashed border-purple-400 shadow-md text-center">
             <div id="collected-words-container" class="flex flex-wrap justify-center gap-2 min-h-[35px] items-center">
-                <span class="text-slate-400 font-medium text-xs italic">Collected words will appear here...</span>
+                <span class="text-slate-400 font-medium text-xs italic">Collected targets will appear here...</span>
             </div>
         </div>
     </div>
@@ -131,8 +139,9 @@
         let distractorWords = [];
         let collectedWords = [];
         
-        // 📈 SCORE TRACKER
-        let correctAnswersCount = 0; 
+        let kidScore = 0; 
+        let isSentenceMode = false; 
+        let hasMistakeInCurrentLevel = false; 
 
         let timeElapsed = 0;
         let timerInterval;
@@ -151,9 +160,11 @@
         const gameScreen = document.getElementById('game-screen');
         const startBtn = document.getElementById('start-btn');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const hudQuitBtn = document.getElementById('hud-quit-btn');
         const downloadBtn = document.getElementById('download-btn');
         const uploadFileInput = document.getElementById('upload-file');
         const timerVal = document.getElementById('timer-val');
+        const scoreDisplay = document.getElementById('score-display');
         const targetSentDisp = document.getElementById('target-sentence-display');
         const levelDisp = document.getElementById('level-display');
         const collectedContainer = document.getElementById('collected-words-container');
@@ -177,15 +188,13 @@
 
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => { console.log(err); });
-                fullscreenBtn.innerText = "EXIT FULLSCREEN 📺";
+                document.documentElement.requestFullscreen().catch(err => {});
             } else {
                 document.exitFullscreen();
-                fullscreenBtn.innerText = "GO FULLSCREEN 📺";
             }
         });
 
-        // 💾 DOWNLOAD TEXT FILE
+        // DOWNLOAD TEXT LESSON
         downloadBtn.addEventListener('click', () => {
             let txtSentences = document.getElementById('sentences-textarea').value;
             let txtDistractors = document.getElementById('distractors-input').value;
@@ -193,15 +202,14 @@
             let blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
             let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "AR_Sentence_Lesson.txt";
+            link.download = "Sentence_Catcher_Lesson.txt";
             link.click();
         });
 
-        // 📂 UPLOAD TEXT FILE (💡 Fix: No pop-ups, injects contents seamlessly directly)
+        // UPLOAD TEXT LESSON
         uploadFileInput.addEventListener('change', (e) => {
             let file = e.target.files[0];
             if (!file) return;
-
             let reader = new FileReader();
             reader.onload = function(event) {
                 let text = event.target.result;
@@ -209,7 +217,6 @@
                     let parts = text.split("=== DISTRACTORS ===");
                     let sentencesPart = parts[0].replace("=== SENTENCES ===", "").trim();
                     let distractorsPart = parts[1].trim();
-
                     document.getElementById('sentences-textarea').value = sentencesPart;
                     document.getElementById('distractors-input').value = distractorsPart;
                 }
@@ -251,14 +258,16 @@
             distractorWords = document.getElementById('distractors-input').value.split(',').map(w => w.trim()).filter(w => w);
 
             if(sentenceList.length === 0) {
-                alert("Please enter at least one sentence!");
+                alert("Please enter at least one target!");
                 return;
             }
 
             preSetupAudio();
 
             currentLevel = 0;
-            correctAnswersCount = 0; // Reset scores
+            kidScore = 0; 
+            scoreDisplay.innerText = kidScore;
+            
             dashboard.classList.add('hidden');
             gameScreen.classList.remove('hidden');
             resultDialog.classList.add('hidden');
@@ -283,7 +292,6 @@
             clearTimeout(autoNextTimeout);
             clearInterval(countdownInterval);
             
-            // 📊 🛠️ FINAL COMPLETE SCREEN (ဝါကျအားလုံးပြီးဆုံးပါက Pop-up ပုံစံဖြင့် ရမှတ်ပြသသည့်စနစ်)
             if (levelIndex >= sentenceList.length) {
                 isGameRunning = false;
                 clearInterval(timerInterval);
@@ -293,26 +301,35 @@
                 resultTitle.className = "text-3xl font-black text-purple-600 mb-2";
                 
                 resultDetailBox.innerHTML = `
-                    <p class="text-md font-bold text-slate-600 text-center">📊 Final Score:</p>
-                    <p class="text-3xl font-black text-emerald-500 text-center mt-1">${correctAnswersCount} / ${sentenceList.length}</p>
-                    <p class="text-xs font-bold text-purple-400 text-center mt-2">⏱️ Total Time: ${timeElapsed} seconds</p>
+                    <p class="text-md font-bold text-slate-600 text-center"> 📊 Grand Total Score:</p>
+                    <p class="text-5xl font-black text-emerald-500 text-center mt-2">${kidScore} Points</p>
+                    <p class="text-xs font-bold text-purple-400 text-center mt-3">⏱️ Total Time Taken: ${timeElapsed} seconds</p>
                 `;
                 
-                countdownText.innerText = "Excellent work building sentences!";
+                countdownText.innerText = "Fantastic job building words & sentences!";
                 
                 nextLevelBtn.classList.add('hidden');
                 retryLevelBtn.classList.add('hidden');
-                playAgainBtn.classList.remove('hidden'); // Show Play Again
+                playAgainBtn.classList.remove('hidden'); 
                 resultDialog.classList.remove('hidden');
                 return;
             }
 
             levelDisp.innerText = levelIndex + 1;
             targetSentDisp.innerText = sentenceList[levelIndex];
-            correctSequence = sentenceList[levelIndex].split(' ').map(w => w.trim()).filter(w => w);
+            
+            let rawLine = sentenceList[levelIndex];
+            if (rawLine.includes(',')) {
+                correctSequence = rawLine.split(',').map(w => w.trim()).filter(w => w);
+                isSentenceMode = false;
+            } else {
+                correctSequence = rawLine.split(' ').map(w => w.trim()).filter(w => w);
+                isSentenceMode = true;
+            }
             
             collectedWords = [];
             words = [];
+            hasMistakeInCurrentLevel = false; 
             updateCollectedUI();
             
             nextLevelBtn.classList.remove('hidden');
@@ -336,10 +353,10 @@
         playAgainBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             currentLevel = 0;
-            correctAnswersCount = 0;
+            kidScore = 0;
+            scoreDisplay.innerText = kidScore;
             timeElapsed = 0;
             loadLevel(currentLevel);
-            // Restart timer clock interval
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 if (isGameRunning) {
@@ -349,8 +366,7 @@
             }, 1000);
         });
 
-        dialogBackBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        function returnToDashboard() {
             isGameRunning = false;
             clearInterval(timerInterval);
             clearTimeout(autoNextTimeout);
@@ -364,7 +380,10 @@
             }
             gameScreen.classList.add('hidden');
             dashboard.classList.remove('hidden');
-        });
+        }
+
+        dialogBackBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
+        hudQuitBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
 
         function initCameraAndAI() {
             handsEngine = new Hands({
@@ -392,8 +411,7 @@
             });
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                // Tablet compatibility resolution bounds
-                navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } })
+                navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
                 .then(function(stream) {
                     video.srcObject = stream;
                     
@@ -421,7 +439,6 @@
             }
         }
 
-        // 💡 🛠️ Extreme Vertical & Horizontal Separation Spawning Logic (အပေါ်အောက် ဘေးဘက် လုံးဝခွာထုတ်ပေးသည့်စနစ်)
         function spawnFourWordsGroup() {
             let nextCorrectIndex = collectedWords.length;
             let correctWord = correctSequence[nextCorrectIndex];
@@ -447,19 +464,17 @@
 
             ctx.font = "bold 26px sans-serif";
             
-            // 📐 Extreme Boundary Positions - Pushed completely to tablet edges
             let leftEdge1 = 25;                         
-            let leftEdge2 = 150;                        
-            
-            let rightEdge1 = canvas.width - 150;        
-            let rightEdge2 = canvas.width - 295;        
+            let leftEdge2 = 155;                        
+            let rightEdge1 = canvas.width - 155;        
+            let rightEdge2 = canvas.width - 300;        
 
-            // ⚡ 🛠️ FIX: Extended Y-axis height delta from 90px to 250px to ensure huge vertical spacing
+            // အပေါ်အောက် အမြင့်ခွာနှုန်းကို ၂၉၀px ပုံသေ ချထားပေးပါတယ်
             let positions = [
                 { x: leftEdge1, y: -40 },
-                { x: leftEdge2, y: -290 }, // Big vertical separation gap (အပေါ်အောက် လုံးဝခွာလိုက်ပါပြီ)
+                { x: leftEdge2, y: -290 }, 
                 { x: rightEdge1, y: -40 },
-                { x: rightEdge2, y: -290 } // Big vertical separation gap
+                { x: rightEdge2, y: -290 } 
             ];
 
             for (let i = 0; i < 4; i++) {
@@ -514,9 +529,15 @@
                     if (w.text === expectedWord) {
                         playPreloadedSound('correct');
                         ctx.fillStyle = "rgba(168, 85, 247, 0.85)";
+                        
+                        if (!isSentenceMode) {
+                            kidScore += 1;
+                            scoreDisplay.innerText = kidScore;
+                        }
                     } else {
                         playPreloadedSound('wrong'); 
                         ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
+                        hasMistakeInCurrentLevel = true; 
                     }
 
                     ctx.beginPath();
@@ -528,7 +549,7 @@
                     break; 
                 }
 
-                // Render Word Box Container Boundary
+                // Word Box Render
                 ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
                 ctx.strokeStyle = "#a855f7"; 
                 ctx.lineWidth = 4;
@@ -553,15 +574,22 @@
 
         function updateCollectedUI() {
             if (collectedWords.length === 0) {
-                collectedContainer.innerHTML = `<span class="text-slate-400 font-medium text-xs italic">Collected words will appear here...</span>`;
+                collectedContainer.innerHTML = `<span class="text-slate-400 font-medium text-xs italic">Collected targets will appear here...</span>`;
                 return;
             }
 
             collectedContainer.innerHTML = "";
-            collectedWords.forEach(word => {
+            collectedWords.forEach((word, idx) => {
                 const wordBadge = document.createElement('span');
                 wordBadge.className = "bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black px-4 py-1.5 rounded-lg shadow-sm text-sm border border-purple-300";
-                wordBadge.innerText = word;
+                
+                // 🛠️ FIX LINK: Dynamic separator matching for comma and sentence blocks
+                let rawLine = sentenceList[currentLevel] || "";
+                if (rawLine.includes(',') && idx < correctSequence.length - 1) {
+                    wordBadge.innerText = word + " ,";
+                } else {
+                    wordBadge.innerText = word;
+                }
                 collectedContainer.appendChild(wordBadge);
             });
         }
@@ -575,27 +603,29 @@
                 let childSentence = collectedWords.join(' ');
                 let originalSentence = correctSequence.join(' ');
 
-                // Reset dialog content box to defaults
                 resultDetailBox.innerHTML = `
-                    <p class="text-xs font-bold text-slate-400 uppercase">Collected Sentence</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Collected Result</p>
                     <p id="child-sentence-text" class="text-sm sm:text-md font-extrabold text-pink-500 italic">${childSentence}</p>
                 `;
 
                 let isCorrectMatch = (childSentence === originalSentence);
 
                 if (isCorrectMatch) {
-                    correctAnswersCount++; // Increment count on correct build match
                     resultStatusIcon.innerText = "🎉";
-                    resultTitle.innerText = "Correct Match!";
+                    resultTitle.innerText = "Level Complete!";
                     resultTitle.className = "text-3xl font-black text-emerald-500 mb-2";
-                    nextLevelBtn.classList.remove('hidden');
+                    
+                    if (isSentenceMode && !hasMistakeInCurrentLevel) {
+                        kidScore += 1;
+                        scoreDisplay.innerText = kidScore;
+                    }
                 } else {
                     resultStatusIcon.innerText = "❌";
                     resultTitle.innerText = "Incorrect Order!";
                     resultTitle.className = "text-3xl font-black text-rose-500 mb-2";
-                    nextLevelBtn.classList.add('hidden'); 
                 }
 
+                // 🛠️ FIXED: Error logic completely patched, dialog pops up correctly instantly
                 resultDialog.classList.remove('hidden'); 
 
                 let timeLeft = 5;
@@ -610,6 +640,7 @@
 
                 clearTimeout(autoNextTimeout);
                 autoNextTimeout = setTimeout(() => {
+                    // ⚡ Auto transition to the next question block securely without blocking loops
                     currentLevel++;
                     loadLevel(currentLevel);
                 }, 5000);
