@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sentence Catcher! - Absolute Perfect Version</title>
+    <title>Sentence Catcher! - HD & Hand Tracker Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
+    <!-- 🖐️ Official Core MediaPipe Hands AI Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
@@ -31,10 +33,12 @@
 </head>
 <body class="text-slate-800 font-sans min-h-screen flex flex-col items-center justify-center">
 
+    <!-- SCREEN 1: DASHBOARD -->
     <div id="dashboard" class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-xl w-[95vw] sm:w-full border-4 border-purple-200 m-4 z-50 overflow-y-auto max-h-[90vh]">
         <h1 class="text-4xl font-black text-center mb-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-wide">Sentence Catcher! 👑</h1>
-        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">Dual Mode - Absolute Perfect Fix</p>
+        <p class="text-xs text-center font-bold text-purple-500 mb-6 uppercase tracking-wider">HD Version & Hand Trackers Active</p>
         
+        <!-- 📂 💾 Upload & Download TXT Zone -->
         <div class="bg-purple-50 p-4 rounded-2xl border-2 border-dashed border-purple-300 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
                 <label class="block text-xs font-black text-purple-700 uppercase mb-1">📂 Upload TXT Lesson</label>
@@ -48,6 +52,7 @@
         </div>
 
         <div class="space-y-5">
+            <!-- 🔤 OPTION A: WORD MODE ZONE -->
             <div class="bg-emerald-50/80 p-4 rounded-2xl border-2 border-emerald-300 shadow-sm">
                 <label class="block text-sm font-black mb-1 text-emerald-700">🔤 MODE A: Words Box (Comma Separated)</label>
                 <p class="text-[11px] text-emerald-600 font-bold mb-2">*Catch words in any order. 1 point per word.</p>
@@ -57,6 +62,7 @@
                 </button>
             </div>
 
+            <!-- 📝 OPTION B: SENTENCE MODE ZONE -->
             <div class="bg-blue-50/80 p-4 rounded-2xl border-2 border-blue-300 shadow-sm">
                 <label class="block text-sm font-black mb-1 text-blue-700">📝 MODE B: Sentences Box (Full Sentence)</label>
                 <p class="text-[11px] text-blue-600 font-bold mb-2">*Catch in strict order. 1 point for a perfect sentence.</p>
@@ -66,6 +72,7 @@
                 </button>
             </div>
 
+            <!-- DISTRACTORS -->
             <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
                 <label class="block text-sm font-bold mb-1 text-pink-600">❌ Distractor Words (Comma separated)</label>
                 <input type="text" id="distractors-input" class="w-full bg-white border-2 border-pink-200 rounded-xl p-2.5 text-slate-800 font-bold focus:outline-none focus:border-pink-400 text-sm shadow-inner" value="YOU, has, Pen, lemon, HE, are, bird, it">
@@ -73,7 +80,9 @@
         </div>
     </div>
 
+    <!-- SCREEN 2: GAME SCREEN -->
     <div id="game-screen" class="hidden fixed inset-0 w-screen h-screen z-10 flex flex-col">
+        <!-- Top HUD -->
         <div class="absolute top-3 left-3 right-3 z-30 flex flex-col gap-1 bg-white/95 px-4 py-2.5 rounded-xl border border-purple-200 shadow-lg max-w-4xl mx-auto w-[94vw]">
             <div class="flex justify-between items-center text-xs sm:text-sm">
                 <div class="font-black text-purple-700">Level: <span id="level-display" class="text-purple-600">1</span></div>
@@ -91,6 +100,7 @@
         <div id="canvas-container" class="w-full h-full">
             <canvas id="game-canvas"></canvas>
 
+            <!-- IN-GAME DIALOG -->
             <div id="result-dialog" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 z-40">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-purple-300 text-center mx-2">
                     <div id="result-status-icon" class="text-5xl sm:text-6xl mb-2">🎉</div>
@@ -126,7 +136,8 @@
         </div>
     </div>
 
-    <video id="webcam" autoplay playsinline muted style="width: 640px; height: 480px; display: none;"></video>
+    <!-- 💡 Resolution Increased to 1280x720 natively -->
+    <video id="webcam" autoplay playsinline muted style="width: 1280px; height: 720px; display: none;"></video>
 
     <script>
         const canvas = document.getElementById('game-canvas');
@@ -147,11 +158,12 @@
         let isSentenceMode = false; 
         let hasMistakeInCurrentLevel = false; 
         let isLevelTransitionPending = false; 
-        let isSpawnLockedForSafety = false; // ⚡ Safe-Lock-Key: အလိုလို အလိုအလျောက် ထိမိခြင်းကို ကာကွယ်ရန် Variable သစ်
+        let isSpawnLockedForSafety = false; 
 
         let activeHands = [];
         let cameraEngine = null;
         let handsEngine = null;
+        let aiFrameCounter = 0; // Throttle counter to prevent lag on HD video
 
         let audioCtx;
         let correctAudioBuffer = null;
@@ -194,7 +206,6 @@
             }
         });
 
-        // DOWNLOAD TEXT FILE (.txt)
         downloadBtn.addEventListener('click', () => {
             let txtWords = document.getElementById('words-textarea').value;
             let txtSentences = document.getElementById('sentences-textarea').value;
@@ -203,11 +214,10 @@
             let blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
             let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Sentence_Catcher_TwinBox_Lesson.txt";
+            link.download = "Sentence_Catcher_HD_Lesson.txt";
             link.click();
         });
 
-        // UPLOAD TEXT FILE (.txt)
         uploadFileInput.addEventListener('change', (e) => {
             let file = e.target.files[0];
             if (!file) return;
@@ -365,6 +375,7 @@
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
             });
 
+            // 💡 AI modelComplexity 0 ဖြင့်ထားရှိ၍ HD (720p) video တွင် လုံးဝ မထစ်အောင် ထိန်းညှိထားပါသည်
             handsEngine.setOptions({
                 maxNumHands: 2,           
                 modelComplexity: 0,       
@@ -387,24 +398,29 @@
             });
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+                // 💡 HD 720p Resolution Upgrade Applied Here!
+                navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: "user" } })
                 .then(function(stream) {
                     video.srcObject = stream;
                     cameraEngine = new Camera(video, {
                         onFrame: async () => {
+                            // Frame Throttle: ၃ ကြိမ်မြောက်တိုင်းမှ AI တွက်ချက်စေရန် သတ်မှတ်ခြင်းဖြင့် လုံးဝမထစ်စေပါ
                             if (isGameRunning && !isLevelTransitionPending && handsEngine) {
-                                await handsEngine.send({ image: video });
+                                aiFrameCounter++;
+                                if (aiFrameCounter % 3 === 0) {
+                                    await handsEngine.send({ image: video });
+                                }
                             }
                         },
-                        width: 640,
-                        height: 480
+                        width: 1280,
+                        height: 720
                     });
                     cameraEngine.start().then(() => {
                         isGameRunning = true;
                         gameLoop();
                     });
                 })
-                .catch(function(err) { alert("Camera blocked!"); });
+                .catch(function(err) { alert("Camera blocked or HD not supported on this device!"); });
             }
         }
 
@@ -413,7 +429,6 @@
             
             let correctWord = null;
             if (isSentenceMode) {
-                // 💡 ဝါကျစနစ်တွင် ကလေးရွေးချယ်ရမည့် နောက်တစ်လုံးကို Sequence အတိုင်း ကွက်တိလမ်းပြကျစေမည်
                 correctWord = correctSequence[collectedWords.length];
             } else {
                 if (remainingWordsToCatch.length > 0) {
@@ -442,9 +457,14 @@
             chosenTexts.sort(() => Math.random() - 0.5);
 
             ctx.font = "bold 26px sans-serif";
+            
+            // 💡 🛠️ NEW: အစွန်ဘယ်/ညာ နှင့် အလယ် ၂ လုံး ပုံစံဖြင့် ဖြန့်ကျက်ချထားသော နေရာသတ်မှတ်ချက်
+            let quarter = canvas.width / 4;
             let positions = [
-                { x: 25, y: -40 }, { x: 155, y: -290 }, 
-                { x: canvas.width - 155, y: -40 }, { x: canvas.width - 300, y: -290 } 
+                { x: Math.max(80, quarter * 0.5), y: -50 },       // Far Left
+                { x: quarter * 1.5, y: -200 },                    // Center Left
+                { x: quarter * 2.5, y: -50 },                     // Center Right
+                { x: Math.min(canvas.width - 80, quarter * 3.5), y: -200 } // Far Right
             ];
 
             words = []; 
@@ -452,7 +472,7 @@
                 let textWidth = ctx.measureText(chosenTexts[i]).width + 32;
                 words.push({
                     text: chosenTexts[i],
-                    x: (i < 2) ? (positions[i].x + textWidth/2) : (positions[i].x - textWidth/2),
+                    x: positions[i].x,
                     y: positions[i].y,
                     speed: 3.4, w: textWidth, h: 50
                 });
@@ -462,6 +482,7 @@
         function gameLoop() {
             if (!isGameRunning) return;
 
+            // 1. Draw Video Stream
             ctx.save();
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
@@ -469,6 +490,24 @@
             ctx.restore();
 
             if (!isLevelTransitionPending) {
+                
+                // 💡 🛠️ NEW: လက်ဖဝါးပေါ်တွင် ခရမ်းရောင်အဝိုင်းလေးများ (Magic Trackers) ရေးဆွဲခြင်း
+                for (let hand of activeHands) {
+                    ctx.beginPath();
+                    ctx.arc(hand.x, hand.y, 45, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(168, 85, 247, 0.4)"; // ပန်းခရမ်းရောင် အလင်း
+                    ctx.fill();
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = "rgba(168, 85, 247, 0.8)"; // အဝိုင်းဘောင်
+                    ctx.stroke();
+                    
+                    // အဝိုင်းအလယ်ဗဟို အစက်လေး
+                    ctx.beginPath();
+                    ctx.arc(hand.x, hand.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = "white";
+                    ctx.fill();
+                }
+
                 if (words.length === 0 && !isSpawnLockedForSafety) { spawnFourWordsGroup(); }
 
                 for (let i = words.length - 1; i >= 0; i--) {
@@ -478,7 +517,7 @@
                     w.y += w.speed; 
                     let palmTouched = false;
                     for (let hand of activeHands) {
-                        // Collision box check layer bounds control
+                        // Collision box logic (Hits when the Magic Tracker touches the word box)
                         if (hand.x > (w.x - w.w/2 - 45) && hand.x < (w.x + w.w/2 + 45) &&
                             hand.y > (w.y - 25 - 45) && hand.y < (w.y + 25 + 45)) {
                             palmTouched = true; break;
@@ -489,7 +528,6 @@
                         
                         let isCorrect = false;
                         if (isSentenceMode) {
-                            // 💡 ဆရာကြီး ညွှန်ကြားချက်အရ - ဝါကျစနစ်တွင် လက်ရှိကောက်လိုက်သော စာလုံးသည် စဉ်ဆက်မပြတ် နေရာအမှန် ဟုတ်/မဟုတ် စစ်ဆေးခြင်း
                             if (w.text === correctSequence[collectedWords.length]) { 
                                 isCorrect = true; 
                             }
@@ -501,7 +539,6 @@
                             }
                         }
 
-                        // ကလေးကောက်လိုက်သော စာလုံးကို ခြင်းတောင်းထဲသို့ မှန်သည်ဖြစ်စေ၊ မှားသည်ဖြစ်စေ အကုန်ထည့်ပေးခြင်း
                         collectedWords.push(w.text);
                         updateCollectedUI();
 
@@ -513,19 +550,16 @@
                         } else {
                             playPreloadedSound('wrong'); 
                             ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
-                            hasMistakeInCurrentLevel = true; // ဝါကျတွင် တစ်လုံးမှားသွားကြောင်း အမှတ်အသားပြုခြင်း
+                            hasMistakeInCurrentLevel = true; 
                         }
 
                         ctx.beginPath();
                         ctx.arc(w.x, w.y, 85, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // 💡 🛠️ Fix 2 (Ghost Touch Prevention): 
-                        // စာလုံးအဟောင်းတွေကို ဖျက်ပြီး အတွဲသစ်မချမီ ကလေးလက်ဖယ်နိုင်အောင် ခေတ္တ စက္ကန့်ဝက် သော့ပိတ်ပေးထားလိုက်ခြင်း
                         words = []; 
                         isSpawnLockedForSafety = true;
 
-                        // ဝါကျမပြည့်သေးပါက 0.4 စက္ကန့် Delay ပေးပြီးမှ နောက်စာလုံးအတွဲ ကျဆင်းစေခြင်း
                         setTimeout(() => {
                             isSpawnLockedForSafety = false;
                             checkSentenceComplete();
@@ -572,7 +606,7 @@
         }
 
         function checkSentenceComplete() {
-            // 💡 🛠️ Fix 1: စာလုံး ၄ လုံးစီရင် ၄ လုံးလုံး ကလေးရွေးချယ်ပြီးသွားသည့်အချိန်ကျမှသာ Pop-up ဖွင့်ခိုင်းခြင်း
+            // လိုအပ်သော စာလုံးအရေအတွက် အားလုံးပြည့်မှသာ Pop-up ကို ဖွင့်ခွင့်ပြုမည်
             if (collectedWords.length >= correctSequence.length) {
                 isLevelTransitionPending = true; 
                 words = [];
@@ -580,7 +614,6 @@
                 let displayCollectedResult = collectedWords.join(isSentenceMode ? ' ' : ' , ');
                 childSentenceText.innerText = displayCollectedResult;
 
-                // ဝါကျစနစ်တွင် ၄ လုံးလုံးပြည့်သွားချိန်မှ အမှားပါ/မပါ စစ်ဆေးပြီး အမှတ်ပေးခြင်း
                 if (isSentenceMode && !hasMistakeInCurrentLevel) {
                     resultTitle.innerText = "Level Complete!";
                     resultTitle.className = "text-3xl font-black text-emerald-500 mb-2";
@@ -589,12 +622,10 @@
                     kidScore += 1;
                     scoreDisplay.innerText = kidScore;
                 } else if (isSentenceMode && hasMistakeInCurrentLevel) {
-                    // စာလုံးပြည့်သွားသော်လည်း ကြားထဲတွင် မှားခဲ့ပါက အမှတ်မရဘဲ Pop-up ပွင့်စေမည်
                     resultTitle.innerText = "Wrong Sentence Order!";
                     resultTitle.className = "text-3xl font-black text-rose-500 mb-2";
                     resultStatusIcon.innerText = "❌";
                 } else {
-                    // စကားလုံးအတွဲစနစ် အောင်မြင်ခြင်း
                     resultTitle.innerText = "Level Complete!";
                     resultTitle.className = "text-3xl font-black text-emerald-500 mb-2";
                     resultStatusIcon.innerText = "🎉";
