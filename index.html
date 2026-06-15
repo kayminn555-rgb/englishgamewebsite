@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educational Arcade Game Hub</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css?family=Fredoka:wght@600;700&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp">
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp">
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp">
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp">
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp">
 
     <style>
         /* Modern Premium Console Style Base */
@@ -122,9 +115,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===================================
-           🏠 HOME PAGE CONTENT STYLE
-        ====================================== */
+        /* HOME PAGE CONTENT STYLE */
         .welcome-banner {
             background: white;
             border-radius: 32px;
@@ -177,9 +168,7 @@
             box-shadow: 0 15px 25px rgba(236, 72, 153, 0.3);
         }
 
-        /* ===================================
-           🎮 HEADERS & GRID LAYOUT
-        ====================================== */
+        /* HEADERS & GRID LAYOUT */
         .header-section {
             margin-top: 40px;
             text-align: center;
@@ -233,13 +222,13 @@
 
         .game-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 35px 5px rgba(15, 23, 42, 0.12), 0 10px 20px 5px rgba(0, 0, 0, 0.04);
         }
 
         .image-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 4/3;
             overflow: hidden;
             background: #f1f5f9;
             border-top-left-radius: 23px;
@@ -260,32 +249,6 @@
 
         .game-card:hover .game-cover-img {
             transform: scale(1.04);
-        }
-
-        /* Teacher Utilities Card Icon Size Fixing */
-        .system-icon-box {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #16a34a;
-            font-size: 2.8rem;
-            transition: transform 0.4s ease;
-        }
-
-        .bg-blue-gradient {
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
-            color: #0284c7 !important;
-        }
-        .bg-purple-gradient {
-            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%) !important;
-            color: #9333ea !important;
-        }
-
-        .game-card:hover .system-icon-box {
-            transform: scale(1.05);
         }
 
         .game-details {
@@ -317,6 +280,7 @@
             letter-spacing: 0.5px;
         }
 
+        /* 🟢 Teacher Tags တွေအတွက် အရောင်ပြောင်းရန် CSS class */
         .game-type.system-tag {
             color: #16a34a;
             background: #f0fdf4;
@@ -348,6 +312,7 @@
 </head>
 <body>
 
+    <!-- 🌟 Navigation Menu 🌟 -->
     <nav class="navbar">
         <a href="#" class="nav-logo" onclick="switchTab('homePage')"><span>Edu</span>Arcade</a>
         <div class="nav-links">
@@ -360,168 +325,222 @@
             <button class="nav-item" id="btn-teacherPage" onclick="switchTab('teacherPage')">
                 <i class="fa-solid fa-chalkboard-user"></i> Teacher
             </button>
+            <!-- 📌 နောက်ထပ် Tab အသစ်ထည့်ချင်ရင် ဒီနေရာမှာ Button ထပ်တိုးပါ -->
+            <!--
+            <button class="nav-item" id="btn-newTab" onclick="switchTab('newTab')">
+                <i class="fa-solid fa-star"></i> New Tab
+            </button>
+            -->
         </div>
     </nav>
 
+    <!-- 🏠 HOME PAGE -->
     <div id="homePage" class="tab-content active-section">
         <div class="welcome-banner">
             <h2>Welcome to <span>EduArcade</span>!</h2>
-            <p>Discover fun educational games and manage performance metrics dynamically.</p>
+            <p>Discover fun educational games and manage performance dynamically.</p>
             <a href="#" class="cta-btn" onclick="switchTab('gamesPage')">
                 Get Started <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
     </div>
 
+    <!-- 🎮 GAMES PAGE -->
     <div id="gamesPage" class="tab-content">
         <div class="header-section">
             <h1>Game Zone</h1>
             <p class="subtitle">Select a game framework below to launch the ROM instance.</p>
         </div>
-        <div class="menu-container" id="arcadeGrid">
-            </div>
+        <!-- Games Grid (JS မှ အလိုအလျောက် ဖြည့်ပေးမည်) -->
+        <div class="menu-container" id="arcadeGrid"></div>
     </div>
 
+    <!-- 👩‍🏫 TEACHER PAGE -->
     <div id="teacherPage" class="tab-content">
         <div class="header-section">
             <h1>Teacher Console</h1>
             <p class="subtitle">Access administrative utilities and analytics engines.</p>
         </div>
-        <div class="menu-container" id="teacherGrid">
-            </div>
+        <!-- Teacher Grid (JS မှ အလိုအလျောက် ဖြည့်ပေးမည်) -->
+        <div class="menu-container" id="teacherGrid"></div>
     </div>
 
-<script>
-    // Navigation Routing Engine
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(section => {
-            section.classList.remove('active-section');
-        });
-        document.querySelectorAll('.nav-links .nav-item').forEach(btn => {
-            btn.classList.remove('active');
-        });
+    <!-- 📌 Tab အသစ် ထည့်ချင်ရင် ဒီနေရာမှာ ထပ်တိုးပါ -->
+    <!--
+    <div id="newTab" class="tab-content">
+        <div class="header-section">
+            <h1>New Section</h1>
+            <p class="subtitle">Subtitle for new section.</p>
+        </div>
+        <div class="menu-container" id="newGrid"></div>
+    </div>
+    -->
 
-        document.getElementById(tabId).classList.add('active-section');
-        const activeBtn = document.getElementById('btn-' + tabId);
-        if(activeBtn) activeBtn.classList.add('active');
-    }
+    <script>
+        // --- 🧭 Navigation Routing Engine ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.remove('active-section');
+            });
+            document.querySelectorAll('.nav-links .nav-item').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-    // 🎮 Game Pack Array Configuration (Optimized WebP Framework)
-    const myArcadeGamesConfig = [
-        {
-            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp",
-            title: "Match Up Studio",
-            type: "Memory Engine",
-            link: "match_up.html"
-        },
-        {
-            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp",
-            title: "Snake & Ladder",
-            type: "Board Engine",
-            link: "snake_game.html"
-        },
-        {
-            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp",
-            title: "Behind the Card",
-            type: "Reveal Engine",
-            link: "behind_the_card.html"
-        },
-        {
-            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp",
-            title: "Spin Wheel Factory",
-            type: "Wheel Engine",
-            link: "spin_wheel.html"
-        },
-        {
-            image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp",
-            title: "Flip Game Frenzy",
-            type: "Flip Engine",
-            link: "flash_card.html"
-        },
-        {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sentence%20Catcher.webp?raw=true",
-            title: "Sentence catcher",
-            type: "Flip Engine",
-            link: "sentence_catcher.html"
-        },
-        {
-            image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-11_-2026_-09_40_10-AM.webp?raw=true",
-            title: "Tug Of War",
-            type: "Flip Engine",
-            link: "tug_of_war.html"
+            document.getElementById(tabId).classList.add('active-section');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) activeBtn.classList.add('active');
         }
-    ];
 
-    // 🏫 Teacher Section Array Configuration (Dynamic & Scalable)
-    const myTeacherUtilitiesConfig = [
-        {
-            iconClass: "fa-solid fa-user-check",
-            bgStyle: "", 
-            title: "Teacher Kay Minn",
-            type: "GAS Web App",
-            link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec"
-        },
-        {
-            iconClass: "fa-solid fa-user-check",
-            bgStyle: "bg-blue-gradient",
-            title: "Teacher Han Saw",
-            type: "GAS Web App",
-            link: "https://script.google.com/macros/s/AKfycby8v6KAnO3ajKNunwukrv9wGCFZGzZGJRILa4CXTRTOmulP5J2tNswwOYds3-xXhwPIQQ/exec"
-        },
-        {
-            iconClass: "fa-solid fa-gear",
-            bgStyle: "bg-purple-gradient",
-            title: "Listening Website",
-            type: "Listening Website",
-            link: "https://script.google.com/macros/s/AKfycbz2q1K9xPoLYxOHubvATZDzVCkEhBuBqjVuwaOLjayxYWFkb99Q1qE7FCKwFY8VRRfn/exec#"
-        }
-    ];
+        // --- 🎮 Game Pack Array Configuration ---
+        const myArcadeGamesConfig = [
+            {
+                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp",
+                title: "Match Up Studio",
+                type: "Memory Engine",
+                link: "match_up.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp",
+                title: "Snake & Ladder",
+                type: "Board Engine",
+                link: "snake_game.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp",
+                title: "Behind the Card",
+                type: "Reveal Engine",
+                link: "behind_the_card.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp",
+                title: "Spin Wheel Factory",
+                type: "Wheel Engine",
+                link: "spin_wheel.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2-2026-06_59_18-PM.webp",
+                title: "Flip Game Frenzy",
+                type: "Flip Engine",
+                link: "flash_card.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sentence%20Catcher.webp?raw=true",
+                title: "Sentence catcher",
+                type: "Flip Engine",
+                link: "sentence_catcher.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-11_-2026_-09_40_10-AM.webp?raw=true",
+                title: "Tug Of War",
+                type: "Flip Engine",
+                link: "tug_of_war.html",
+                isSystemTag: false
+            },
+            {
+                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Bingo.webp?raw=true",
+                title: "Bingo",
+                type: "Flip Engine",
+                link: "bingo.html",
+                isSystemTag: false
+            }
+        ];
 
-    // Card Generation Loop System
-    function initDashboardHub() {
-        // Render Games
-        const gameGrid = document.getElementById("arcadeGrid");
-        gameGrid.innerHTML = "";
-        myArcadeGamesConfig.forEach(game => {
-            const card = document.createElement("a");
-            card.href = game.link;
-            card.className = "game-card";
-            card.innerHTML = `
-                <div class="game-badge">Play</div>
+        // --- 🏫 Teacher Section Array Configuration ---
+        // 💡 ဤနေရာတွင် Teacher Tab အတွက် ပုံများ (image url) ကို ထည့်သွင်းနိုင်ပါပြီ
+        const myTeacherUtilitiesConfig = [
+            {
+                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
+                image: "https://placehold.co/400x300?text=Teacher+Kay+Minn", 
+                title: "Teacher Kay Minn",
+                type: "GAS Web App",
+                link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec",
+                isSystemTag: true // Teacher tag ကို အစိမ်းရောင်ဖြစ်စေရန်
+            },
+            {
+                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
+                image: "https://placehold.co/400x300?text=Teacher+Han+Saw", 
+                title: "Teacher Han Saw",
+                type: "GAS Web App",
+                link: "https://script.google.com/macros/s/AKfycby8v6KAnO3ajKNunwukrv9wGCFZGzZGJRILa4CXTRTOmulP5J2tNswwOYds3-xXhwPIQQ/exec",
+                isSystemTag: true
+            },
+            {
+                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
+                image: "https://placehold.co/400x300?text=Listening+Website", 
+                title: "Listening Website",
+                type: "Listening Website",
+                link: "https://script.google.com/macros/s/AKfycbz2q1K9xPoLYxOHubvATZDzVCkEhBuBqjVuwaOLjayxYWFkb99Q1qE7FCKwFY8VRRfn/exec#",
+                isSystemTag: true
+            }
+        ];
+
+        // --- 📌 Tab အသစ်အတွက် Array သီးသန့်ဆောက်ချင်ပါက ---
+        /*
+        const myNewTabConfig = [
+            {
+                image: "...",
+                title: "New Game",
+                type: "Action",
+                link: "#",
+                isSystemTag: false
+            }
+        ];
+        */
+
+
+        // --- ⚙️ အလွယ်တကူ Card များတည်ဆောက်ပေးသော Engine (Reusable Function) ---
+        // ဒီ Function က Array, HTML ID နဲ့ Badge နာမည်ကို လက်ခံပြီး အလိုအလျောက် Card တွေရေးပေးသွားပါမယ်။
+        function renderCards(dataArray, containerId, badgeText) {
+            const gridContainer = document.getElementById(containerId);
+            if (!gridContainer) return; // Container မရှိရင် ရပ်မည်
+
+            gridContainer.innerHTML = ""; // အရင်ရှိတာတွေ ရှင်းလင်းမည်
+            
+            dataArray.forEach(item => {
+                const card = document.createElement("a");
+                card.href = item.link;
+                
+                // ပြင်ပ Link ဆိုလျှင် New Tab ဖြင့်ဖွင့်ရန်
+                if(item.link.startsWith("http")) card.target = "_blank"; 
+                
+                card.className = "game-card";
+                
+                // isSystemTag က true ဖြစ်ရင် 'system-tag' (အစိမ်းရောင်) ကို ထည့်ပေးမည်
+                const tagClass = item.isSystemTag ? "system-tag" : "";
+
+                card.innerHTML = `
+                <div class="game-badge">${badgeText}</div>
                 <div class="image-container">
-                    <img class="game-cover-img" src="${game.image}" alt="${game.title}" loading="eager">
+                    <img class="game-cover-img" src="${item.image}" alt="${item.title}" loading="lazy">
                 </div>
                 <div class="game-details">
-                    <div class="game-title">${game.title}</div>
-                    <div class="game-type">${game.type}</div>
+                    <div class="game-title">${item.title}</div>
+                    <div class="game-type ${tagClass}">${item.type}</div>
                 </div>`;
-            gameGrid.appendChild(card);
-        });
+                
+                gridContainer.appendChild(card);
+            });
+        }
 
-        // Render Teacher Utilities
-        const teacherGrid = document.getElementById("teacherGrid");
-        teacherGrid.innerHTML = "";
-        myTeacherUtilitiesConfig.forEach(tool => {
-            const card = document.createElement("a");
-            card.href = tool.link;
-            if(tool.link !== "#") card.target = "_blank";
-            card.className = "game-card";
-            card.innerHTML = `
-                <div class="game-badge">Launch</div>
-                <div class="image-container">
-                    <div class="system-icon-box ${tool.bgStyle}">
-                        <i class="${tool.iconClass}"></i>
-                    </div>
-                </div>
-                <div class="game-details">
-                    <div class="game-title">${tool.title}</div>
-                    <div class="game-type system-tag">${tool.type}</div>
-                </div>`;
-            teacherGrid.appendChild(card);
-        });
-    }
+        // --- 🚀 System Initialization ---
+        function initDashboardHub() {
+            // ၁။ Game Tab အတွက် Card များဖန်တီးခြင်း
+            renderCards(myArcadeGamesConfig, "arcadeGrid", "Play");
 
-    window.addEventListener("DOMContentLoaded", initDashboardHub);
-</script>
+            // ၂။ Teacher Tab အတွက် Card များဖန်တီးခြင်း
+            renderCards(myTeacherUtilitiesConfig, "teacherGrid", "Launch");
+
+            // ၃။ (ရွေးချယ်ရန်) နောက်ထပ် Tab အသစ် ထပ်တိုးပါက အောက်ပါအတိုင်း ခေါ်သုံးနိုင်ပါသည်။
+            // renderCards(myNewTabConfig, "newGrid", "Open");
+        }
+
+        window.addEventListener("DOMContentLoaded", initDashboardHub);
+    </script>
 </body>
 </html>
