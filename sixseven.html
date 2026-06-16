@@ -8,7 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- MediaPipe Library for Hand Tracking (ကင်မရာအတွက် သီးသန့် library ကို ဖယ်ထုတ်ပြီး ပေါ့ပါးမြန်ဆန်အောင် လုပ်ထားသည်) -->
+  <!-- MediaPipe Library for Hand Tracking -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
   <style>
@@ -112,9 +112,10 @@
     }
   </style>
 </head>
-<body class="w-full h-screen overflow-hidden">
+<!-- Use 100dvh to fix the bottom buttons missing issue on iPads/Tablets -->
+<body class="w-full h-[100dvh] overflow-hidden bg-gray-900">
 
-  <div id="app" class="relative w-full h-screen flex flex-col justify-between">
+  <div id="app" class="relative w-full h-[100dvh] flex flex-col justify-between">
     <audio id="bg-music" loop></audio>
 
     <!-- ========================================== -->
@@ -122,7 +123,6 @@
     <!-- ========================================== -->
     <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-start bg-gradient-to-br from-[#ff5e57] via-[#ef5777] to-[#575fcf] p-4 overflow-y-auto custom-scroll">
       
-      <!-- Top Title Bar -->
       <div class="flex flex-col items-center justify-center mt-6 mb-4 text-center">
         <div class="flex items-center gap-3">
           <span class="text-7xl md:text-9xl font-black text-[#ffdd59] playful-title animate-bounce">6 7</span>
@@ -133,7 +133,6 @@
         </p>
       </div>
 
-      <!-- Quick How-to Card -->
       <div class="glass-card max-w-lg w-full p-4 mb-5 text-center">
         <p class="text-white font-semibold text-base md:text-lg">
           🙋‍♂️ <strong class="text-[#ffdd59]">How to Play:</strong> Face your <strong class="text-[#ffdd59]">PALMS UP</strong> towards the camera. Push your hands <strong class="underline">UPWARDS</strong> energetically to score! Downward motions do not count!
@@ -142,17 +141,12 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl px-2 pb-10">
         
-        <!-- Left: Roster Input Setup -->
         <div class="glass-card p-5 flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
               📝 <span>Roster & Player Import</span>
             </h3>
-            
-            <p class="text-xs text-white/80 mb-2">
-              Paste names line-by-line (e.g. "1. Kay Minn" or "Boom"). The list automatically parses numbers and formats.
-            </p>
-            
+            <p class="text-xs text-white/80 mb-2">Paste names line-by-line (e.g. "1. Kay Minn").</p>
             <textarea id="bulk-player-input" rows="6" 
               class="w-full bg-black/20 text-white placeholder-white/50 border-2 border-white/20 rounded-xl p-3 outline-none focus:border-[#ffdd59] text-sm font-bold resize-none custom-scroll"
               placeholder="1. Kay Minn&#10;2. Boom&#10;3. Happy Kid&#10;4. Swift Shaker"></textarea>
@@ -170,21 +164,16 @@
           </div>
         </div>
 
-        <!-- Right: Settings Panel -->
         <div class="glass-card p-5 flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
               ⚙️ <span>Game Parameters</span>
             </h3>
-
-            <!-- Audio Upload -->
             <div class="mb-4">
               <label class="block text-sm font-bold text-white mb-1.5">🎵 Custom Audio Track (Optional):</label>
               <input type="file" id="music-upload" accept="audio/*" 
                 class="w-full text-xs text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#ffdd59] file:text-gray-900 hover:file:bg-[#ffe375] cursor-pointer"/>
             </div>
-
-            <!-- Timer Limit -->
             <div class="mb-4">
               <label class="block text-sm font-bold text-white mb-1.5">⏱️ Set Game Duration (Seconds):</label>
               <div class="flex items-center gap-2">
@@ -193,7 +182,6 @@
               </div>
             </div>
           </div>
-
           <button onclick="startGame()" class="glass-btn w-full py-4 text-2xl uppercase tracking-wider text-white">
             🎮 Let's Play!
           </button>
@@ -201,20 +189,15 @@
 
       </div>
 
-      <!-- Live Session Standings -->
       <div class="glass-card p-5 w-full max-w-4xl mb-8">
         <div class="flex justify-between items-center mb-3">
-          <h2 class="text-2xl font-black text-white flex items-center gap-2">
-            🏆 <span>Session Leaderboard</span>
-          </h2>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">🏆 <span>Session Leaderboard</span></h2>
           <span id="total-players-start" class="text-xs bg-white/20 border border-white/30 px-3.5 py-1 rounded-full text-white font-bold">0 Active Players</span>
         </div>
-        
         <div id="leaderboard-list-start" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto custom-scroll pr-2">
           <p class="col-span-2 text-white/60 text-center italic text-sm py-4">No players scored yet! Be the first of the list.</p>
         </div>
       </div>
-
     </div>
 
     <!-- ========================================== -->
@@ -222,62 +205,55 @@
     <!-- ========================================== -->
     <div id="game-screen" class="absolute inset-0 hidden">
       
-      <!-- Native camera element (playsinline attribute သည် Tablet တွင် အရေးကြီးသည်) -->
       <div class="video-container" id="video-container">
+        <!-- added playsinline and autoplay explicitly for Tablet/iOS -->
         <video id="videoElement" autoplay playsinline muted></video>
         <canvas id="canvasElement"></canvas>
       </div>
 
-      <!-- Live HUD Overlays -->
+      <!-- Top HUD -->
       <div class="absolute inset-x-0 top-0 p-4 flex justify-between items-start pointer-events-none z-40">
-        
-        <!-- Scoreboard -->
         <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ffdd59] transform transition duration-150" id="score-container">
           <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Score</span>
           <span id="score-display" class="text-4xl md:text-6xl font-black text-[#ffdd59] playful-title">0</span>
         </div>
 
-        <!-- Challenger Name Plate -->
         <div class="glass-card px-4 py-2 flex flex-col items-center border-b-4 border-cyan-400">
           <span class="text-cyan-300 text-2xs uppercase tracking-widest font-black">Active Challenger</span>
           <span id="active-player-display" class="text-base md:text-lg font-black text-white">Guest Player</span>
         </div>
 
-        <!-- Timer -->
         <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ff5e57]" id="timer-container">
           <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Time Left</span>
           <span id="time-display" class="text-4xl md:text-6xl font-black text-[#ff5e57] playful-title">30</span>
         </div>
-
       </div>
 
-      <!-- Quick Back Controls -->
-      <div class="absolute bottom-4 left-4 flex gap-2 z-40">
-        <button onclick="toggleFullScreen()" class="glass-card p-3 text-white hover:bg-white/20 transition-all pointer-events-auto rounded-xl" title="Full Screen">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Bottom HUD: Made safe for tablets by lifting bottom-10 -->
+      <div class="absolute bottom-10 left-4 flex gap-2 z-40">
+        <button onclick="toggleFullScreen()" class="glass-card p-3 text-white hover:bg-white/20 transition-all pointer-events-auto rounded-xl shadow-lg border border-white/50" title="Full Screen">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
           </svg>
         </button>
-        <button onclick="leaveGame()" class="glass-card p-3 text-red-200 hover:bg-red-500/30 transition-all flex items-center gap-1.5 pointer-events-auto rounded-xl" title="Exit to Menu">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onclick="leaveGame()" class="glass-card p-3 text-red-100 hover:bg-red-500 transition-all flex items-center gap-1.5 pointer-events-auto rounded-xl shadow-lg border border-white/50 bg-red-500/20" title="Exit to Menu">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
-          <span class="text-sm font-black hidden sm:inline">EXIT</span>
+          <span class="text-sm font-black pr-2">EXIT</span>
         </button>
       </div>
 
-      <!-- Motion Activation Badge -->
-      <div id="hand-status" class="absolute bottom-16 inset-x-0 flex justify-center hidden pointer-events-none z-40 transition-opacity duration-300">
+      <div id="hand-status" class="absolute bottom-28 inset-x-0 flex justify-center hidden pointer-events-none z-40 transition-opacity duration-300">
         <span class="bg-[#ffdd59] text-gray-900 px-8 py-3 rounded-full font-black text-xl animate-bounce shadow-lg border-2 border-white">
           🙌 HANDS DETECTED! SHAKE UP! 🙌
         </span>
       </div>
 
-      <!-- Premium Fallback Loading overlay -->
       <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#ef5777] to-[#575fcf] z-30">
         <div class="loader mb-4"></div>
         <p class="text-[#ffdd59] font-black animate-pulse text-2xl tracking-wider playful-title">CONNECTING CAMERA...</p>
-        <p class="text-white/80 text-sm mt-1 text-center px-4">Grant access when prompted by the system!</p>
+        <p class="text-white/80 text-sm mt-1 text-center px-4">Please Wait or Allow camera permissions!</p>
       </div>
 
     </div>
@@ -287,13 +263,11 @@
     <!-- ========================================== -->
     <div id="result-screen" class="absolute inset-0 hidden z-50 flex flex-col items-center justify-start bg-gradient-to-br from-[#3c40c6] via-[#ef5777] to-[#ffdd59] p-4 overflow-y-auto custom-scroll">
       
-      <!-- Top Splash -->
       <div class="text-center mt-8 mb-4">
         <h2 class="text-6xl md:text-8xl font-black text-white uppercase playful-title tracking-tight drop-shadow-md">TIME'S UP!</h2>
         <p class="text-[#ffdd59] font-black text-2xl mt-1 uppercase tracking-widest animate-pulse">Spectacular Performance!</p>
       </div>
 
-      <!-- Scoreboard Display -->
       <div class="glass-card p-6 md:p-8 rounded-3xl w-full max-w-md flex flex-col items-center mb-6 border-4 border-[#ffdd59] shadow-2xl relative overflow-hidden">
         <div class="absolute -top-10 -left-10 w-24 h-24 bg-yellow-400 rounded-full blur-2xl opacity-50"></div>
         <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-red-400 rounded-full blur-2xl opacity-50"></div>
@@ -309,14 +283,12 @@
         </div>
       </div>
 
-      <!-- Standings -->
       <div class="glass-card p-5 w-full max-w-md mb-6">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-xl font-black text-white">🏆 Champion Standings</h2>
           <span id="total-players-end" class="text-xs bg-[#ffdd59] text-gray-900 px-3 py-1 rounded-full font-bold">0 Players</span>
         </div>
         <div id="leaderboard-list-end" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2">
-          <!-- Inject by JS -->
         </div>
       </div>
 
@@ -329,32 +301,23 @@
   </div>
 
   <script>
-    // Synth sound engine
     class SoundSynth {
-      constructor() {
-        this.ctx = null;
-      }
+      constructor() { this.ctx = null; }
       init() {
-        if (!this.ctx) {
-          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
       }
       playPop() {
         this.init();
         if (!this.ctx) return;
-        
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-
         osc.type = 'sine';
         osc.frequency.setValueAtTime(150, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
-
         gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-
         osc.start();
         osc.stop(this.ctx.currentTime + 0.15);
       }
@@ -365,12 +328,10 @@
         const gain = this.ctx.createGain();
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(1000, this.ctx.currentTime);
         gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
-
         osc.start();
         osc.stop(this.ctx.currentTime + 0.08);
       }
@@ -378,7 +339,6 @@
 
     const synth = new SoundSynth();
 
-    // DOM Elements
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const resultScreen = document.getElementById('result-screen');
@@ -400,7 +360,6 @@
     const activePlayerSelect = document.getElementById('active-player-select');
     const scoreContainer = document.getElementById('score-container');
 
-    // System States
     let score = 0;
     let timeLeft = 30;
     let timerInterval = null;
@@ -408,107 +367,70 @@
     let leaderboardRecords = [];
     let registeredPlayers = [];
 
-    // Camera control references
     let activeStream = null;
     let animationFrameId = null;
 
-    // Filters & States for dual hands
-    const HISTORY_SIZE = 12;
-    const SHAKE_THRESHOLD = 0.08;
-    
-    class HandStateTracker {
+    // ORIGINAL FAST SCORING LOGIC (ကလေးများ လွယ်ကူစွာဆော့နိုင်ရန် ပြန်လည်အသုံးပြုထားသည်)
+    const SHAKE_DIST_Y = 0.05;
+    class HandTracker {
       constructor() {
-        this.yHistory = [];
-        this.isBelowBound = true;
-        this.lowestYSinceTrigger = 1.0;
-        this.highestYSinceTrigger = 0.0;
-        this.cooldown = 0;
+        this.extY = null;
+        this.isGoingUp = false;
       }
-
       update(currentY) {
-        if (this.cooldown > 0) this.cooldown--;
-
-        this.yHistory.push(currentY);
-        if (this.yHistory.length > HISTORY_SIZE) {
-          this.yHistory.shift();
-        }
-
-        const sum = this.yHistory.reduce((acc, v) => acc + v, 0);
-        const smoothY = sum / this.yHistory.length;
-
         let didScore = false;
-
-        if (smoothY > this.lowestYSinceTrigger) {
-          this.lowestYSinceTrigger = smoothY;
-          this.isBelowBound = true;
-        }
-
-        if (this.isBelowBound) {
-          const deltaRise = this.lowestYSinceTrigger - smoothY;
-          if (deltaRise > SHAKE_THRESHOLD && this.cooldown === 0) {
-            didScore = true;
-            this.isBelowBound = false;
-            this.lowestYSinceTrigger = smoothY;
-            this.highestYSinceTrigger = smoothY;
-            this.cooldown = 6; // Debounce frames
-          }
+        if (this.extY === null) {
+          this.extY = currentY;
         } else {
-          if (smoothY < this.highestYSinceTrigger) {
-            this.highestYSinceTrigger = smoothY;
-          }
-          if (smoothY - this.highestYSinceTrigger > SHAKE_THRESHOLD * 0.7) {
-            this.isBelowBound = true;
-            this.lowestYSinceTrigger = smoothY;
+          // လက်အောက်သို့ ပြန်ချလျှင်
+          if (currentY > this.extY) {
+            this.extY = currentY;
+            this.isGoingUp = false;
+          } 
+          // လက်အပေါ်သို့ ပင့်တင်လိုက်လျှင်
+          else if (currentY < this.extY) {
+            let dy = this.extY - currentY;
+            if (dy > SHAKE_DIST_Y && !this.isGoingUp) {
+              this.isGoingUp = true;
+              this.extY = currentY;
+              didScore = true;
+            }
           }
         }
-
-        return { smoothY, didScore };
+        return { didScore };
       }
-
       reset() {
-        this.yHistory = [];
-        this.isBelowBound = true;
-        this.lowestYSinceTrigger = 1.0;
-        this.highestYSinceTrigger = 0.0;
-        this.cooldown = 0;
+        this.extY = null;
+        this.isGoingUp = false;
       }
     }
 
-    const leftHandTracker = new HandStateTracker();
-    const rightHandTracker = new HandStateTracker();
+    const leftHandTracker = new HandTracker();
+    const rightHandTracker = new HandTracker();
 
     let floatingTexts = [];
     let handVisibleTimer = null;
     let hands = null;
     let aiInitialized = false;
 
-    // Custom song upload handler
     musicUpload.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
-        const url = URL.createObjectURL(file);
-        bgMusic.src = url;
+        bgMusic.src = URL.createObjectURL(file);
       }
     });
 
-    // Clean leading line indices and extra spaces
     function parseNames(text) {
       if (!text.trim()) return [];
       return text.split('\n')
-        .map(line => {
-          let cleaned = line.replace(/^\s*\d+[\s.\-_)]*/, '').trim();
-          return cleaned;
-        })
+        .map(line => line.replace(/^\s*\d+[\s.\-_)]*/, '').trim())
         .filter(name => name.length > 0);
     }
 
     function importBulkPlayers() {
-      const rawText = bulkPlayerInput.value;
-      const parsed = parseNames(rawText);
-      
+      const parsed = parseNames(bulkPlayerInput.value);
       activePlayerSelect.innerHTML = '';
       registeredPlayers = parsed;
-
       if (parsed.length === 0) {
         const opt = document.createElement('option');
         opt.value = "Guest Player";
@@ -525,11 +447,9 @@
       updateLeaderboardUI();
     }
 
-    // Initialize state with default mock players on start
     window.addEventListener('DOMContentLoaded', () => {
       bulkPlayerInput.value = "1. Kay Minn\n2. Boom\n3. Happy Kid\n4. Swift Shaker";
       importBulkPlayers();
-      // MediaPipe AI ကို background တွင် ကြိုတင် load လုပ်ထားမည် (Click နှိပ်လျှင် တန်းပွင့်စေရန်)
       initAI();
     });
 
@@ -538,30 +458,21 @@
       hands = new Hands({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
       });
-
       hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 1, // Balance performance and accuracy on tablets
-        minDetectionConfidence: 0.65,
-        minTrackingConfidence: 0.65
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6
       });
-
       hands.onResults(onResults);
       aiInitialized = true;
     }
 
-    // Tablet & Phones တွင် အဆင်ပြေဆုံးဖြစ်စေမည့် Native HTML5 MediaDevices API
     async function startCameraStream() {
       try {
-        stopCameraStream(); // Clear existing loops
-
-        // Standard user camera constraints with adaptive resolution
+        stopCameraStream();
         const constraints = {
-          video: {
-            facingMode: "user",
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          },
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
           audio: false
         };
 
@@ -569,23 +480,22 @@
         activeStream = stream;
         videoElement.srcObject = stream;
 
-        // Force playsinline and muted for strict Tablet browser standards
+        // Tablet Requirements
         videoElement.setAttribute('playsinline', 'true');
+        videoElement.setAttribute('autoplay', 'true');
         videoElement.setAttribute('muted', 'true');
         videoElement.muted = true;
 
-        await videoElement.play();
+        videoElement.onloadedmetadata = () => {
+          videoElement.play();
+          cameraLoading.classList.add('hidden');
+          isPlaying = true;
+          startTimer();
+          tickDetection();
+        };
 
-        // ကင်မရာပွင့်သည်နှင့် Spinner ကို ချက်ချင်းဖျောက်ပေးမည် (အဝိုင်းလည်ပြီး ပိတ်နေခြင်းမှ ကာကွယ်ရန်)
-        cameraLoading.classList.add('hidden');
-        isPlaying = true;
-        startTimer();
-
-        // Detect loops
-        tickDetection();
       } catch (err) {
-        console.error("Camera access failed:", err);
-        // Error panel for user guidance
+        console.error("Camera Access Error:", err);
         cameraLoading.innerHTML = `
           <div class="p-6 text-center max-w-sm glass-card bg-[#ef5777]/90">
             <p class="text-[#ffdd59] font-black text-2xl mb-2">Camera Blocked!</p>
@@ -597,34 +507,35 @@
       }
     }
 
-    // Render loop using standard RAF for buttery smooth tablet response
-    function tickDetection() {
+    // LOCK SYSTEM TO PREVENT AI CRASH (အမှတ်မတက်တော့သည့် ပြဿနာကိုဖြေရှင်းရန်)
+    let isDetecting = false;
+    async function tickDetection() {
       if (!isPlaying) return;
-      if (videoElement.readyState >= 2) { // HAVE_CURRENT_DATA or higher
-        hands.send({ image: videoElement }).catch(err => {
-          console.log("Inference Error:", err);
-        });
+      
+      // Video Ready ဖြစ်ပြီး AI အလုပ်မများနေမှသာ အလုပ်လုပ်မည်
+      if (videoElement.readyState >= 2 && !isDetecting) {
+        isDetecting = true;
+        try {
+          await hands.send({ image: videoElement });
+        } catch (err) {
+          console.log("Inference dropped:", err);
+        }
+        isDetecting = false; // စစ်ဆေးပြီးမှ ပြန်ဖွင့်မည်
       }
+      
       animationFrameId = requestAnimationFrame(tickDetection);
     }
 
     function stopCameraStream() {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
-        activeStream = null;
-      }
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+      if (activeStream) { activeStream.getTracks().forEach(track => track.stop()); activeStream = null; }
       videoElement.srcObject = null;
+      isDetecting = false;
     }
 
     async function startGame() {
-      synth.init(); // Warm audio elements on user interaction
-      
-      const selectedTime = parseInt(timeInput.value) || 30;
-      timeLeft = selectedTime;
+      synth.init(); 
+      timeLeft = parseInt(timeInput.value) || 30;
       score = 0;
 
       leftHandTracker.reset();
@@ -638,7 +549,6 @@
       activePlayerDisplay.innerText = selectedChallenger;
       finalPlayerName.innerText = selectedChallenger;
 
-      // Swap views
       startScreen.classList.add('hidden');
       resultScreen.classList.add('hidden');
       gameScreen.classList.remove('hidden');
@@ -647,13 +557,10 @@
 
       if (bgMusic.src) {
         bgMusic.currentTime = 0;
-        bgMusic.play().catch(e => console.log("Audio playback error:", e));
+        bgMusic.play().catch(e => {});
       }
 
-      // Initialize API first
       initAI();
-
-      // Start the Native Stream API
       await startCameraStream();
     }
 
@@ -662,16 +569,10 @@
       scoreDisplay.innerText = score;
       synth.playPop();
 
-      floatingTexts.push({
-        x: x,
-        y: y,
-        life: 1.0
-      });
+      floatingTexts.push({ x: x, y: y, life: 1.0 });
 
       scoreContainer.classList.add('scale-115', 'border-white');
-      setTimeout(() => {
-        scoreContainer.classList.remove('scale-115', 'border-white');
-      }, 150);
+      setTimeout(() => { scoreContainer.classList.remove('scale-115', 'border-white'); }, 150);
     }
 
     function onResults(results) {
@@ -679,28 +580,24 @@
 
       canvasElement.width = videoElement.videoWidth || 640;
       canvasElement.height = videoElement.videoHeight || 480;
-
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         handStatus.classList.remove('hidden');
         clearTimeout(handVisibleTimer);
-        handVisibleTimer = setTimeout(() => {
-          handStatus.classList.add('hidden');
-        }, 1200);
+        handVisibleTimer = setTimeout(() => { handStatus.classList.add('hidden'); }, 1200);
 
         results.multiHandLandmarks.forEach((landmarks, index) => {
           if (index > 1) return;
 
-          const targetPoint = landmarks[9]; // Hand Center Point
+          const targetPoint = landmarks[9];
           const mirroredX = 1 - targetPoint.x;
           const mirroredY = targetPoint.y;
 
           const drawPx = mirroredX * canvasElement.width;
           const drawPy = mirroredY * canvasElement.height;
 
-          // Glowing tracking dot
           canvasCtx.beginPath();
           canvasCtx.arc(drawPx, drawPy, 18, 0, 2 * Math.PI);
           canvasCtx.fillStyle = 'rgba(255, 221, 89, 0.85)';
@@ -709,7 +606,6 @@
           canvasCtx.strokeStyle = 'white';
           canvasCtx.stroke();
 
-          // Upward indication arrow inside orb
           canvasCtx.beginPath();
           canvasCtx.moveTo(drawPx, drawPy + 8);
           canvasCtx.lineTo(drawPx, drawPy - 8);
@@ -732,28 +628,20 @@
         rightHandTracker.reset();
       }
 
-      // Render score floating indicators (+1)
       for (let i = floatingTexts.length - 1; i >= 0; i--) {
         let ft = floatingTexts[i];
-
         canvasCtx.font = "900 75px 'Fredoka One', sans-serif";
         canvasCtx.textAlign = "center";
-
         canvasCtx.strokeStyle = `rgba(0, 0, 0, ${ft.life})`;
         canvasCtx.lineWidth = 8;
         const drawX = (1 - ft.x) * canvasElement.width;
         const drawY = ft.y * canvasElement.height;
-        
         canvasCtx.strokeText("+1", drawX, drawY);
         canvasCtx.fillStyle = `rgba(255, 221, 89, ${ft.life})`;
         canvasCtx.fillText("+1", drawX, drawY);
-
         ft.life -= 0.04;
         ft.y -= 0.015;
-
-        if (ft.life <= 0) {
-          floatingTexts.splice(i, 1);
-        }
+        if (ft.life <= 0) { floatingTexts.splice(i, 1); }
       }
       canvasCtx.restore();
     }
@@ -761,18 +649,11 @@
     function startTimer() {
       clearInterval(timerInterval);
       timeDisplay.innerText = timeLeft;
-
       timerInterval = setInterval(() => {
         timeLeft--;
         timeDisplay.innerText = timeLeft;
-
-        if (timeLeft <= 5 && timeLeft > 0) {
-          synth.playTick();
-        }
-
-        if (timeLeft <= 0) {
-          endGame(false);
-        }
+        if (timeLeft <= 5 && timeLeft > 0) synth.playTick();
+        if (timeLeft <= 0) endGame(false);
       }, 1000);
     }
 
@@ -781,29 +662,23 @@
       clearInterval(timerInterval);
       bgMusic.pause();
       handStatus.classList.add('hidden');
-      stopCameraStream(); // Release camera resources immediately
+      stopCameraStream();
 
       if (!isLeave) {
         const currentPlayerName = activePlayerSelect.value || "Guest Player";
-        
         leaderboardRecords.push({ name: currentPlayerName, score: score });
         leaderboardRecords.sort((a, b) => b.score - a.score);
-
         finalScoreDisplay.innerText = score;
         updateLeaderboardUI();
-        
         gameScreen.classList.add('hidden');
         resultScreen.classList.remove('hidden');
       } else {
         resetToStart();
       }
-
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     }
 
-    function leaveGame() {
-      endGame(true);
-    }
+    function leaveGame() { endGame(true); }
 
     function resetToStart() {
       resultScreen.classList.add('hidden');
@@ -812,14 +687,22 @@
       updateLeaderboardUI();
     }
 
+    // Tablet Fullscreen Support
     function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.log(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
+      const doc = window.document;
+      const docEl = doc.documentElement;
+
+      const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+      const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+      if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if(requestFullScreen) {
+          requestFullScreen.call(docEl).catch(err => console.log(err));
+        }
+      }
+      else {
+        if(cancelFullScreen) {
+          cancelFullScreen.call(doc);
         }
       }
     }
@@ -832,32 +715,20 @@
 
       let html = '';
       leaderboardRecords.forEach((p, index) => {
-        let badge = '';
-        if (index === 0) badge = '👑 ';
-        else if (index === 1) badge = '🥈 ';
-        else if (index === 2) badge = '🥉 ';
-        else badge = `<span>#${index + 1}</span> `;
-
+        let badge = index === 0 ? '👑 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : `<span>#${index + 1}</span> `;
         html += `
           <div class="flex justify-between items-center bg-white/20 p-3.5 rounded-2xl border border-white/20 backdrop-blur-sm">
-            <span class="text-white font-extrabold text-base flex items-center gap-1">
-              ${badge} ${p.name}
-            </span>
+            <span class="text-white font-extrabold text-base flex items-center gap-1">${badge} ${p.name}</span>
             <span class="text-[#ffdd59] font-black text-lg">${p.score} SHAKES</span>
-          </div>
-        `;
+          </div>`;
       });
-
       if (leaderboardRecords.length === 0) {
         html = '<p class="col-span-2 text-white/60 text-center italic text-sm py-4">No scores set yet! Time to set some records!</p>';
       }
 
       listStart.innerHTML = html;
       listEnd.innerHTML = html;
-
-      const totalCount = registeredPlayers.length;
-      const totalText = `${totalCount} Contestant${totalCount !== 1 ? 's' : ''} in list`;
-      totalStart.innerText = totalText;
+      totalStart.innerText = `${registeredPlayers.length} Contestants in list`;
       totalEnd.innerText = `${leaderboardRecords.length} Ranked`;
     }
   </script>
