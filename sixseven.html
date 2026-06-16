@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>6 7 Shake Game - High Energy Play</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- MediaPipe Libraries for Hand Tracking -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700;900&display=swap');
+    
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f53b57, #3c40c6);
+      color: white;
+      font-family: 'Quicksand', 'Segoe UI', sans-serif;
+    }
+
+    .playful-title {
+      font-family: 'Fredoka One', cursive;
+      text-shadow: 0 8px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .video-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+    }
+
+    video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Mirror view */
+    }
+
+    canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .glass-btn {
+      background: linear-gradient(135deg, #ffdd59, #ff5e57);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      font-family: 'Fredoka One', cursive;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 10px 25px rgba(255, 94, 87, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .glass-btn:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 15px 30px rgba(255, 94, 87, 0.6);
+    }
+
+    .glass-btn:active {
+      transform: translateY(1px);
+    }
+
+    .loader {
+      border: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid #ffdd59;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Styled scrollbar for beautiful player listing */
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body class="w-full h-screen overflow-hidden">
+
+  <div id="app" class="relative w-full h-screen flex flex-col justify-between">
+    <audio id="bg-music" loop></audio>
+
+    <!-- ========================================== -->
+    <!--                START SCREEN                -->
+    <!-- ========================================== -->
+    <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-start bg-gradient-to-br from-[#ff5e57] via-[#ef5777] to-[#575fcf] p-4 overflow-y-auto custom-scroll">
+      
+      <!-- High Energy Top Header -->
+      <div class="flex flex-col items-center justify-center mt-6 mb-4 text-center">
+        <div class="flex items-center gap-3">
+          <span class="text-7xl md:text-9xl font-black text-[#ffdd59] playful-title animate-bounce">6 7</span>
+          <span class="text-5xl md:text-7xl font-black text-white uppercase tracking-wider playful-title">SHAKE!</span>
+        </div>
+        <p class="text-white text-lg md:text-xl font-bold mt-2 bg-black/20 px-4 py-1.5 rounded-full backdrop-blur-md">
+          🙌 Upward Palm Shake Challenge! 🙌
+        </p>
+      </div>
+
+      <!-- Quick Instructions Playful Card -->
+      <div class="glass-card max-w-lg w-full p-4 mb-5 text-center">
+        <p class="text-white font-semibold text-base md:text-lg">
+          🙋‍♂️ <strong class="text-[#ffdd59]">How to Play:</strong> Face your <strong class="text-[#ffdd59]">PALMS UP</strong> towards the camera. Push your hands <strong class="underline">UPWARDS</strong> energetically to score! Downward motions do not count!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl px-2 pb-10">
+        
+        <!-- Left Column: Player Setup & Paste Box -->
+        <div class="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
+              📝 <span>Roster & Player Import</span>
+            </h3>
+            
+            <p class="text-xs text-white/80 mb-2">
+              Paste names line-by-line (e.g. "1. Kay Minn" or "Boom"). The list automatically parses numbers and formats.
+            </p>
+            
+            <!-- Bulk Name Paste Area -->
+            <textarea id="bulk-player-input" rows="6" 
+              class="w-full bg-black/20 text-white placeholder-white/50 border-2 border-white/20 rounded-xl p-3 outline-none focus:border-[#ffdd59] text-sm font-bold resize-none custom-scroll"
+              placeholder="1. Kay Minn&#10;2. Boom&#10;3. Happy Kid&#10;4. Swift Shaker"></textarea>
+            
+            <button onclick="importBulkPlayers()" class="w-full mt-3 bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-xl border border-white/40 transition text-sm">
+              ✨ Sync / Update Roster
+            </button>
+          </div>
+
+          <!-- Active Player Select Dropdown -->
+          <div class="mt-4 border-t border-white/20 pt-4">
+            <label class="block text-sm font-black text-[#ffdd59] mb-1">WHO IS PLAYING NOW?</label>
+            <select id="active-player-select" class="w-full bg-white text-gray-900 font-bold p-3 rounded-xl border-none outline-none text-base">
+              <!-- Populated by JavaScript -->
+              <option value="Guest Player">Guest Player</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Right Column: Settings & Game Start -->
+        <div class="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
+              ⚙️ <span>Game Parameters</span>
+            </h3>
+
+            <!-- Custom Song Upload -->
+            <div class="mb-4">
+              <label class="block text-sm font-bold text-white mb-1.5">🎵 Custom Audio Track (Optional):</label>
+              <input type="file" id="music-upload" accept="audio/*" 
+                class="w-full text-xs text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#ffdd59] file:text-gray-900 hover:file:bg-[#ffe375] cursor-pointer"/>
+            </div>
+
+            <!-- Custom Timer -->
+            <div class="mb-4">
+              <label class="block text-sm font-bold text-white mb-1.5">⏱️ Set Game Duration (Seconds):</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="time-input" value="30" min="5" max="300" 
+                  class="w-full bg-black/20 text-white border-2 border-white/20 rounded-xl p-2.5 outline-none focus:border-[#ffdd59] text-xl text-center font-black">
+              </div>
+            </div>
+          </div>
+
+          <!-- Big Golden Play Button -->
+          <button onclick="startGame()" class="glass-btn w-full py-4 text-2xl uppercase tracking-wider text-white">
+            🎮 Let's Play!
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Live Interactive Leaderboard -->
+      <div class="glass-card p-5 w-full max-w-4xl mb-8">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            🏆 <span>Session Leaderboard</span>
+          </h2>
+          <span id="total-players-start" class="text-xs bg-white/20 border border-white/30 px-3.5 py-1 rounded-full text-white font-bold">0 Active Players</span>
+        </div>
+        
+        <div id="leaderboard-list-start" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto custom-scroll pr-2">
+          <p class="col-span-2 text-white/60 text-center italic text-sm py-4">No players scored yet! Be the first of the list.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!--                 GAME SCREEN                -->
+    <!-- ========================================== -->
+    <div id="game-screen" class="absolute inset-0 hidden">
+      
+      <!-- Video Element & Drawing Overlay -->
+      <div class="video-container" id="video-container">
+        <video id="videoElement" autoplay playsinline></video>
+        <canvas id="canvasElement"></canvas>
+      </div>
+
+      <!-- Interactive Hud Overlay -->
+      <div class="absolute inset-x-0 top-0 p-4 flex justify-between items-start pointer-events-none z-40">
+        
+        <!-- Score Board with bounce scaling -->
+        <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ffdd59] transform transition duration-150" id="score-container">
+          <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Score</span>
+          <span id="score-display" class="text-4xl md:text-6xl font-black text-[#ffdd59] playful-title">0</span>
+        </div>
+
+        <!-- Center Current Player Indicator -->
+        <div class="glass-card px-4 py-2 flex flex-col items-center border-b-4 border-cyan-400">
+          <span class="text-cyan-300 text-2xs uppercase tracking-widest font-black">Active Challenger</span>
+          <span id="active-player-display" class="text-base md:text-lg font-black text-white">Guest Player</span>
+        </div>
+
+        <!-- Timer Board -->
+        <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ff5e57]" id="timer-container">
+          <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Time Left</span>
+          <span id="time-display" class="text-4xl md:text-6xl font-black text-[#ff5e57] playful-title">30</span>
+        </div>
+
+      </div>
+
+      <!-- Action & Back Controls -->
+      <div class="absolute bottom-4 left-4 flex gap-2 z-40">
+        <button onclick="toggleFullScreen()" class="glass-card p-3 text-white hover:bg-white/20 transition-all pointer-events-auto rounded-xl" title="Full Screen">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+          </svg>
+        </button>
+        <button onclick="leaveGame()" class="glass-card p-3 text-red-200 hover:bg-red-500/30 transition-all flex items-center gap-1.5 pointer-events-auto rounded-xl" title="Exit to Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <span class="text-sm font-black hidden sm:inline">EXIT</span>
+        </button>
+      </div>
+
+      <!-- Hands Indicator Overlay -->
+      <div id="hand-status" class="absolute bottom-16 inset-x-0 flex justify-center hidden pointer-events-none z-40 transition-opacity duration-300">
+        <span class="bg-[#ffdd59] text-gray-900 px-8 py-3 rounded-full font-black text-xl animate-bounce shadow-lg border-2 border-white">
+          🙌 HANDS DETECTED! SHAKE UP! 🙌
+        </span>
+      </div>
+
+      <!-- Camera Authorization Wait Screen -->
+      <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#ef5777] to-[#575fcf] z-30">
+        <div class="loader mb-4"></div>
+        <p class="text-[#ffdd59] font-black animate-pulse text-2xl tracking-wider playful-title">WAKING UP CAMERA...</p>
+        <p class="text-white/80 text-sm mt-1">Please allow camera permissions if requested!</p>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!--                RESULT SCREEN               -->
+    <!-- ========================================== -->
+    <div id="result-screen" class="absolute inset-0 hidden z-50 flex flex-col items-center justify-start bg-gradient-to-br from-[#3c40c6] via-[#ef5777] to-[#ffdd59] p-4 overflow-y-auto custom-scroll">
+      
+      <!-- Top Splash -->
+      <div class="text-center mt-8 mb-4">
+        <h2 class="text-6xl md:text-8xl font-black text-white uppercase playful-title tracking-tight drop-shadow-md">TIME'S UP!</h2>
+        <p class="text-[#ffdd59] font-black text-2xl mt-1 uppercase tracking-widest animate-pulse">Spectacular Performance!</p>
+      </div>
+
+      <!-- Big Score Banner -->
+      <div class="glass-card p-6 md:p-8 rounded-3xl w-full max-w-md flex flex-col items-center mb-6 border-4 border-[#ffdd59] shadow-2xl relative overflow-hidden">
+        <!-- Confetti-like accent -->
+        <div class="absolute -top-10 -left-10 w-24 h-24 bg-yellow-400 rounded-full blur-2xl opacity-50"></div>
+        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-red-400 rounded-full blur-2xl opacity-50"></div>
+        
+        <span class="text-white/80 text-sm font-bold uppercase tracking-widest mb-1">Game Challenger</span>
+        <span id="final-player-name" class="text-white text-3xl font-black mb-4 playful-title text-center">Guest Player</span>
+
+        <span class="text-white/90 text-sm font-bold uppercase tracking-widest mb-1">Final Score</span>
+        <span id="final-score" class="text-7xl md:text-9xl font-black text-[#ffdd59] drop-shadow-lg playful-title">0</span>
+        
+        <div class="bg-black/20 py-1.5 px-5 rounded-full mt-2">
+          <span class="text-sm text-yellow-200 font-bold">🎉 Keep Shaking & Staying Active!</span>
+        </div>
+      </div>
+
+      <!-- Session Standings -->
+      <div class="glass-card p-5 w-full max-w-md mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xl font-black text-white">🏆 Champion Standings</h2>
+          <span id="total-players-end" class="text-xs bg-[#ffdd59] text-gray-900 px-3 py-1 rounded-full font-bold">0 Players</span>
+        </div>
+        <div id="leaderboard-list-end" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Action Play Again -->
+      <button onclick="resetToStart()" class="glass-btn w-full max-w-md py-4 text-2xl text-white mb-10">
+        🔄 PLAY NEXT / AGAIN
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Audio synthesizer helper for clean "pop/ding" sounds
+    class SoundSynth {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      playPop() {
+        this.init();
+        if (!this.ctx) return;
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        // Fun cartoon rise
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
+
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+      playTick() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1000, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+    }
+
+    const synth = new SoundSynth();
+
+    // DOM Elements
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const cameraLoading = document.getElementById('camera-loading');
+    const handStatus = document.getElementById('hand-status');
+    const videoElement = document.getElementById('videoElement');
+    const canvasElement = document.getElementById('canvasElement');
+    const canvasCtx = canvasElement.getContext('2d');
+    
+    const scoreDisplay = document.getElementById('score-display');
+    const timeDisplay = document.getElementById('time-display');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const finalPlayerName = document.getElementById('final-player-name');
+    const activePlayerDisplay = document.getElementById('active-player-display');
+    const timeInput = document.getElementById('time-input');
+    const bgMusic = document.getElementById('bg-music');
+    const musicUpload = document.getElementById('music-upload');
+    const bulkPlayerInput = document.getElementById('bulk-player-input');
+    const activePlayerSelect = document.getElementById('active-player-select');
+    const scoreContainer = document.getElementById('score-container');
+
+    // Game states
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval = null;
+    let isPlaying = false;
+    let leaderboardRecords = []; // { name, score }
+    let registeredPlayers = [];   // List of active game contestants parsed from textarea
+
+    // Jitter Filtering and Robust Shake State Management
+    const HISTORY_SIZE = 12; // Lookback window size for smoothing coordinates
+    const SHAKE_THRESHOLD = 0.08; // Normalized Y delta threshold
+    
+    // Track stats per hand (Left hand/Right hand)
+    class HandStateTracker {
+      constructor() {
+        this.yHistory = [];
+        this.isBelowBound = true; // State tracker for shake direction
+        this.lowestYSinceTrigger = 1.0; // In screen space, 1 is bottom
+        this.highestYSinceTrigger = 0.0; // In screen space, 0 is top
+        this.cooldown = 0; // Prevent rapid false double triggers
+      }
+
+      update(currentY) {
+        if (this.cooldown > 0) this.cooldown--;
+
+        // Push to rolling history window
+        this.yHistory.push(currentY);
+        if (this.yHistory.length > HISTORY_SIZE) {
+          this.yHistory.shift();
+        }
+
+        // Get moving average of Y to cut out sensor noise
+        const sum = this.yHistory.reduce((acc, v) => acc + v, 0);
+        const smoothY = sum / this.yHistory.length;
+
+        // Dynamic limits trackers within the current historical window
+        const currentMinY = Math.min(...this.yHistory); // highest point physically on screen
+        const currentMaxY = Math.max(...this.yHistory); // lowest point physically on screen
+
+        let didScore = false;
+
+        // Logic check: Detect clear transition from moving down (increasing Y) to moving up (decreasing Y)
+        if (smoothY > this.lowestYSinceTrigger) {
+          this.lowestYSinceTrigger = smoothY; // capture bottom peak
+          this.isBelowBound = true; 
+        }
+
+        if (this.isBelowBound) {
+          // If hand rises substantially above the lowest bottom peak captured
+          const deltaRise = this.lowestYSinceTrigger - smoothY; 
+          if (deltaRise > SHAKE_THRESHOLD && this.cooldown === 0) {
+            didScore = true;
+            this.isBelowBound = false; 
+            this.lowestYSinceTrigger = smoothY; // Reset tracking peak
+            this.highestYSinceTrigger = smoothY;
+            this.cooldown = 6; // Set safety frame window
+          }
+        } else {
+          // Track the rise peak to set when player starts dropping the hand again
+          if (smoothY < this.highestYSinceTrigger) {
+            this.highestYSinceTrigger = smoothY;
+          }
+          // Reset tracker when hand is pulled back downwards significantly
+          if (smoothY - this.highestYSinceTrigger > SHAKE_THRESHOLD * 0.7) {
+            this.isBelowBound = true;
+            this.lowestYSinceTrigger = smoothY;
+          }
+        }
+
+        return { smoothY, didScore };
+      }
+
+      reset() {
+        this.yHistory = [];
+        this.isBelowBound = true;
+        this.lowestYSinceTrigger = 1.0;
+        this.highestYSinceTrigger = 0.0;
+        this.cooldown = 0;
+      }
+    }
+
+    const leftHandTracker = new HandStateTracker();
+    const rightHandTracker = new HandStateTracker();
+
+    let floatingTexts = [];
+    let handVisibleTimer = null;
+    let hands = null;
+    let camera = null;
+    let aiInitialized = false;
+
+    // Handle Custom Audio Track selection
+    musicUpload.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        bgMusic.src = url;
+      }
+    });
+
+    // Extract names and format them nicely
+    function parseNames(text) {
+      if (!text.trim()) return [];
+      return text.split('\n')
+        .map(line => {
+          // Strips starting numerals e.g. "1.", "2 -", etc.
+          let cleaned = line.replace(/^\s*\d+[\s.\-_)]*/, '').trim();
+          return cleaned;
+        })
+        .filter(name => name.length > 0);
+    }
+
+    // Interactive updates as the user types or pastes
+    function importBulkPlayers() {
+      const rawText = bulkPlayerInput.value;
+      const parsed = parseNames(rawText);
+      
+      // Clear old dropdown list
+      activePlayerSelect.innerHTML = '';
+      registeredPlayers = parsed;
+
+      if (parsed.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = "Guest Player";
+        opt.textContent = "Guest Player";
+        activePlayerSelect.appendChild(opt);
+      } else {
+        parsed.forEach((name, idx) => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = `${idx + 1}. ${name}`;
+          activePlayerSelect.appendChild(opt);
+        });
+      }
+      updateLeaderboardUI();
+    }
+
+    // Auto-sync sample roster on load to give visual cues
+    window.addEventListener('DOMContentLoaded', () => {
+      bulkPlayerInput.value = "1. Kay Minn\n2. Boom\n3. Happy Kid\n4. Swift Shaker";
+      importBulkPlayers();
+    });
+
+    function initAI() {
+      if (aiInitialized) return;
+      hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+      });
+
+      hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1, // Balanced for accurate detection
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6
+      });
+
+      hands.onResults(onResults);
+      aiInitialized = true;
+    }
+
+    async function startGame() {
+      synth.init(); // Warmup oscillator ctx
+      
+      const selectedTime = parseInt(timeInput.value) || 30;
+      timeLeft = selectedTime;
+      score = 0;
+
+      // Reset internal filters
+      leftHandTracker.reset();
+      rightHandTracker.reset();
+      floatingTexts = [];
+      
+      scoreDisplay.innerText = "0";
+      timeDisplay.innerText = timeLeft;
+
+      // Track active challenger
+      const selectedChallenger = activePlayerSelect.value || "Guest Player";
+      activePlayerDisplay.innerText = selectedChallenger;
+      finalPlayerName.innerText = selectedChallenger;
+
+      // Screen Transitions
+      startScreen.classList.add('hidden');
+      resultScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      cameraLoading.classList.remove('hidden');
+      handStatus.classList.add('hidden');
+
+      // Music Audio Start
+      if (bgMusic.src) {
+        bgMusic.currentTime = 0;
+        bgMusic.play().catch(e => console.log("Audio playback error:", e));
+      }
+
+      initAI();
+
+      if (!camera) {
+        camera = new Camera(videoElement, {
+          onFrame: async () => {
+            if (isPlaying) {
+              await hands.send({ image: videoElement });
+            }
+          },
+          width: 640,
+          height: 480
+        });
+        await camera.start();
+      } else {
+        isPlaying = true;
+        cameraLoading.classList.add('hidden');
+        startTimer();
+      }
+    }
+
+    function addScore(x, y) {
+      score++;
+      scoreDisplay.innerText = score;
+      synth.playPop();
+
+      // Add high fidelity animated floating feedback on point
+      floatingTexts.push({
+        x: x,
+        y: y,
+        life: 1.0
+      });
+
+      // Joyful HUD expansion animation
+      scoreContainer.classList.add('scale-115', 'border-white');
+      setTimeout(() => {
+        scoreContainer.classList.remove('scale-115', 'border-white');
+      }, 150);
+    }
+
+    function onResults(results) {
+      if (!cameraLoading.classList.contains('hidden') && isPlaying) {
+        cameraLoading.classList.add('hidden');
+        isPlaying = true;
+        startTimer();
+      }
+
+      if (!isPlaying) return;
+
+      // Dynamically fit canvas size to streaming resolution
+      canvasElement.width = videoElement.videoWidth || 640;
+      canvasElement.height = videoElement.videoHeight || 480;
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        // Display indicator badge if hands are present
+        handStatus.classList.remove('hidden');
+        clearTimeout(handVisibleTimer);
+        handVisibleTimer = setTimeout(() => {
+          handStatus.classList.add('hidden');
+        }, 1200);
+
+        results.multiHandLandmarks.forEach((landmarks, index) => {
+          if (index > 1) return; // Support dual hand maximum
+
+          const targetPoint = landmarks[9]; // Middle finger MCP center points
+          const mirroredX = 1 - targetPoint.x;
+          const mirroredY = targetPoint.y;
+
+          const drawPx = mirroredX * canvasElement.width;
+          const drawPy = mirroredY * canvasElement.height;
+
+          // Smooth tracking feedback node (Vibrant Golden Orb)
+          canvasCtx.beginPath();
+          canvasCtx.arc(drawPx, drawPy, 18, 0, 2 * Math.PI);
+          canvasCtx.fillStyle = 'rgba(255, 221, 89, 0.85)';
+          canvasCtx.fill();
+          canvasCtx.lineWidth = 4;
+          canvasCtx.strokeStyle = 'white';
+          canvasCtx.stroke();
+
+          // Action Impulse Arrow overlay inside orb
+          canvasCtx.beginPath();
+          canvasCtx.moveTo(drawPx, drawPy + 8);
+          canvasCtx.lineTo(drawPx, drawPy - 8);
+          canvasCtx.lineTo(drawPx - 5, drawPy - 3);
+          canvasCtx.moveTo(drawPx, drawPy - 8);
+          canvasCtx.lineTo(drawPx + 5, drawPy - 3);
+          canvasCtx.strokeStyle = 'rgba(0,0,0,0.8)';
+          canvasCtx.lineWidth = 3;
+          canvasCtx.stroke();
+
+          // Apply state tracking per designated hand
+          const tracker = index === 0 ? leftHandTracker : rightHandTracker;
+          const trackingResult = tracker.update(targetPoint.y);
+
+          if (trackingResult.didScore) {
+            addScore(targetPoint.x, targetPoint.y);
+          }
+        });
+      } else {
+        leftHandTracker.reset();
+        rightHandTracker.reset();
+      }
+
+      // Render Floating Action Indicator numbers (+1)
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        let ft = floatingTexts[i];
+
+        canvasCtx.font = "900 75px 'Fredoka One', sans-serif";
+        canvasCtx.textAlign = "center";
+
+        // Double stroked text outline for high legibility
+        canvasCtx.strokeStyle = `rgba(0, 0, 0, ${ft.life})`;
+        canvasCtx.lineWidth = 8;
+        const drawX = (1 - ft.x) * canvasElement.width;
+        const drawY = ft.y * canvasElement.height;
+        
+        canvasCtx.strokeText("+1", drawX, drawY);
+        canvasCtx.fillStyle = `rgba(255, 221, 89, ${ft.life})`;
+        canvasCtx.fillText("+1", drawX, drawY);
+
+        ft.life -= 0.04;
+        ft.y -= 0.015; // Upward floating animation
+
+        if (ft.life <= 0) {
+          floatingTexts.splice(i, 1);
+        }
+      }
+      canvasCtx.restore();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeDisplay.innerText = timeLeft;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeDisplay.innerText = timeLeft;
+
+        // Play alert pulse as time gets critical
+        if (timeLeft <= 5 && timeLeft > 0) {
+          synth.playTick();
+        }
+
+        if (timeLeft <= 0) {
+          endGame(false);
+        }
+      }, 1000);
+    }
+
+    function endGame(isLeave = false) {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      bgMusic.pause();
+      handStatus.classList.add('hidden');
+
+      if (!isLeave) {
+        const currentPlayerName = activePlayerSelect.value || "Guest Player";
+        
+        // Push score and keep list organized
+        leaderboardRecords.push({ name: currentPlayerName, score: score });
+        leaderboardRecords.sort((a, b) => b.score - a.score);
+
+        finalScoreDisplay.innerText = score;
+        updateLeaderboardUI();
+        
+        gameScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+      } else {
+        resetToStart();
+      }
+
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    }
+
+    function leaveGame() {
+      // Use clean UI style instead of browser native blocks
+      endGame(true);
+    }
+
+    function resetToStart() {
+      resultScreen.classList.add('hidden');
+      gameScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      updateLeaderboardUI();
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function updateLeaderboardUI() {
+      const listStart = document.getElementById('leaderboard-list-start');
+      const listEnd = document.getElementById('leaderboard-list-end');
+      const totalStart = document.getElementById('total-players-start');
+      const totalEnd = document.getElementById('total-players-end');
+
+      let html = '';
+      leaderboardRecords.forEach((p, index) => {
+        let badge = '';
+        if (index === 0) badge = '👑 ';
+        else if (index === 1) badge = '🥈 ';
+        else if (index === 2) badge = '🥉 ';
+        else badge = `<span>#${index + 1}</span> `;
+
+        html += `
+          <div class="flex justify-between items-center bg-white/20 p-3.5 rounded-2xl border border-white/20 backdrop-blur-sm">
+            <span class="text-white font-extrabold text-base flex items-center gap-1">
+              ${badge} ${p.name}
+            </span>
+            <span class="text-[#ffdd59] font-black text-lg">${p.score} SHAKES</span>
+          </div>
+        `;
+      });
+
+      if (leaderboardRecords.length === 0) {
+        html = '<p class="col-span-2 text-white/60 text-center italic text-sm py-4">No scores set yet! Time to set some records!</p>';
+      }
+
+      listStart.innerHTML = html;
+      
+      // Map same lists to end game leaderboard screen
+      listEnd.innerHTML = html;
+
+      const totalCount = registeredPlayers.length;
+      const totalText = `${totalCount} Contestant${totalCount !== 1 ? 's' : ''} in list`;
+      totalStart.innerText = totalText;
+      totalEnd.innerText = `${leaderboardRecords.length} Ranked`;
+    }
+  </script>
+</body>
+</html>
