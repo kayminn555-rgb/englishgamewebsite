@@ -8,8 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- MediaPipe Libraries for Hand Tracking -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <!-- MediaPipe Library for Hand Tracking (ကင်မရာအတွက် သီးသန့် library ကို ဖယ်ထုတ်ပြီး ပေါ့ပါးမြန်ဆန်အောင် လုပ်ထားသည်) -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
   <style>
@@ -97,7 +96,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Styled scrollbar for beautiful player listing */
     .custom-scroll::-webkit-scrollbar {
       width: 8px;
     }
@@ -124,7 +122,7 @@
     <!-- ========================================== -->
     <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-start bg-gradient-to-br from-[#ff5e57] via-[#ef5777] to-[#575fcf] p-4 overflow-y-auto custom-scroll">
       
-      <!-- High Energy Top Header -->
+      <!-- Top Title Bar -->
       <div class="flex flex-col items-center justify-center mt-6 mb-4 text-center">
         <div class="flex items-center gap-3">
           <span class="text-7xl md:text-9xl font-black text-[#ffdd59] playful-title animate-bounce">6 7</span>
@@ -135,7 +133,7 @@
         </p>
       </div>
 
-      <!-- Quick Instructions Playful Card -->
+      <!-- Quick How-to Card -->
       <div class="glass-card max-w-lg w-full p-4 mb-5 text-center">
         <p class="text-white font-semibold text-base md:text-lg">
           🙋‍♂️ <strong class="text-[#ffdd59]">How to Play:</strong> Face your <strong class="text-[#ffdd59]">PALMS UP</strong> towards the camera. Push your hands <strong class="underline">UPWARDS</strong> energetically to score! Downward motions do not count!
@@ -144,7 +142,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl px-2 pb-10">
         
-        <!-- Left Column: Player Setup & Paste Box -->
+        <!-- Left: Roster Input Setup -->
         <div class="glass-card p-5 flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
@@ -155,7 +153,6 @@
               Paste names line-by-line (e.g. "1. Kay Minn" or "Boom"). The list automatically parses numbers and formats.
             </p>
             
-            <!-- Bulk Name Paste Area -->
             <textarea id="bulk-player-input" rows="6" 
               class="w-full bg-black/20 text-white placeholder-white/50 border-2 border-white/20 rounded-xl p-3 outline-none focus:border-[#ffdd59] text-sm font-bold resize-none custom-scroll"
               placeholder="1. Kay Minn&#10;2. Boom&#10;3. Happy Kid&#10;4. Swift Shaker"></textarea>
@@ -165,31 +162,29 @@
             </button>
           </div>
 
-          <!-- Active Player Select Dropdown -->
           <div class="mt-4 border-t border-white/20 pt-4">
             <label class="block text-sm font-black text-[#ffdd59] mb-1">WHO IS PLAYING NOW?</label>
             <select id="active-player-select" class="w-full bg-white text-gray-900 font-bold p-3 rounded-xl border-none outline-none text-base">
-              <!-- Populated by JavaScript -->
               <option value="Guest Player">Guest Player</option>
             </select>
           </div>
         </div>
 
-        <!-- Right Column: Settings & Game Start -->
+        <!-- Right: Settings Panel -->
         <div class="glass-card p-5 flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-black text-white mb-3 flex items-center gap-2">
               ⚙️ <span>Game Parameters</span>
             </h3>
 
-            <!-- Custom Song Upload -->
+            <!-- Audio Upload -->
             <div class="mb-4">
               <label class="block text-sm font-bold text-white mb-1.5">🎵 Custom Audio Track (Optional):</label>
               <input type="file" id="music-upload" accept="audio/*" 
                 class="w-full text-xs text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#ffdd59] file:text-gray-900 hover:file:bg-[#ffe375] cursor-pointer"/>
             </div>
 
-            <!-- Custom Timer -->
+            <!-- Timer Limit -->
             <div class="mb-4">
               <label class="block text-sm font-bold text-white mb-1.5">⏱️ Set Game Duration (Seconds):</label>
               <div class="flex items-center gap-2">
@@ -199,7 +194,6 @@
             </div>
           </div>
 
-          <!-- Big Golden Play Button -->
           <button onclick="startGame()" class="glass-btn w-full py-4 text-2xl uppercase tracking-wider text-white">
             🎮 Let's Play!
           </button>
@@ -207,7 +201,7 @@
 
       </div>
 
-      <!-- Live Interactive Leaderboard -->
+      <!-- Live Session Standings -->
       <div class="glass-card p-5 w-full max-w-4xl mb-8">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-2xl font-black text-white flex items-center gap-2">
@@ -228,28 +222,28 @@
     <!-- ========================================== -->
     <div id="game-screen" class="absolute inset-0 hidden">
       
-      <!-- Video Element & Drawing Overlay -->
+      <!-- Native camera element (playsinline attribute သည် Tablet တွင် အရေးကြီးသည်) -->
       <div class="video-container" id="video-container">
-        <video id="videoElement" autoplay playsinline></video>
+        <video id="videoElement" autoplay playsinline muted></video>
         <canvas id="canvasElement"></canvas>
       </div>
 
-      <!-- Interactive Hud Overlay -->
+      <!-- Live HUD Overlays -->
       <div class="absolute inset-x-0 top-0 p-4 flex justify-between items-start pointer-events-none z-40">
         
-        <!-- Score Board with bounce scaling -->
+        <!-- Scoreboard -->
         <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ffdd59] transform transition duration-150" id="score-container">
           <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Score</span>
           <span id="score-display" class="text-4xl md:text-6xl font-black text-[#ffdd59] playful-title">0</span>
         </div>
 
-        <!-- Center Current Player Indicator -->
+        <!-- Challenger Name Plate -->
         <div class="glass-card px-4 py-2 flex flex-col items-center border-b-4 border-cyan-400">
           <span class="text-cyan-300 text-2xs uppercase tracking-widest font-black">Active Challenger</span>
           <span id="active-player-display" class="text-base md:text-lg font-black text-white">Guest Player</span>
         </div>
 
-        <!-- Timer Board -->
+        <!-- Timer -->
         <div class="glass-card px-5 md:px-8 py-2 md:py-3 flex flex-col items-center border-b-8 border-[#ff5e57]" id="timer-container">
           <span class="text-white text-xs font-bold tracking-widest uppercase opacity-90">Time Left</span>
           <span id="time-display" class="text-4xl md:text-6xl font-black text-[#ff5e57] playful-title">30</span>
@@ -257,7 +251,7 @@
 
       </div>
 
-      <!-- Action & Back Controls -->
+      <!-- Quick Back Controls -->
       <div class="absolute bottom-4 left-4 flex gap-2 z-40">
         <button onclick="toggleFullScreen()" class="glass-card p-3 text-white hover:bg-white/20 transition-all pointer-events-auto rounded-xl" title="Full Screen">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,18 +266,18 @@
         </button>
       </div>
 
-      <!-- Hands Indicator Overlay -->
+      <!-- Motion Activation Badge -->
       <div id="hand-status" class="absolute bottom-16 inset-x-0 flex justify-center hidden pointer-events-none z-40 transition-opacity duration-300">
         <span class="bg-[#ffdd59] text-gray-900 px-8 py-3 rounded-full font-black text-xl animate-bounce shadow-lg border-2 border-white">
           🙌 HANDS DETECTED! SHAKE UP! 🙌
         </span>
       </div>
 
-      <!-- Camera Authorization Wait Screen -->
+      <!-- Premium Fallback Loading overlay -->
       <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#ef5777] to-[#575fcf] z-30">
         <div class="loader mb-4"></div>
-        <p class="text-[#ffdd59] font-black animate-pulse text-2xl tracking-wider playful-title">WAKING UP CAMERA...</p>
-        <p class="text-white/80 text-sm mt-1">Please allow camera permissions if requested!</p>
+        <p class="text-[#ffdd59] font-black animate-pulse text-2xl tracking-wider playful-title">CONNECTING CAMERA...</p>
+        <p class="text-white/80 text-sm mt-1 text-center px-4">Grant access when prompted by the system!</p>
       </div>
 
     </div>
@@ -299,9 +293,8 @@
         <p class="text-[#ffdd59] font-black text-2xl mt-1 uppercase tracking-widest animate-pulse">Spectacular Performance!</p>
       </div>
 
-      <!-- Big Score Banner -->
+      <!-- Scoreboard Display -->
       <div class="glass-card p-6 md:p-8 rounded-3xl w-full max-w-md flex flex-col items-center mb-6 border-4 border-[#ffdd59] shadow-2xl relative overflow-hidden">
-        <!-- Confetti-like accent -->
         <div class="absolute -top-10 -left-10 w-24 h-24 bg-yellow-400 rounded-full blur-2xl opacity-50"></div>
         <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-red-400 rounded-full blur-2xl opacity-50"></div>
         
@@ -316,18 +309,17 @@
         </div>
       </div>
 
-      <!-- Session Standings -->
+      <!-- Standings -->
       <div class="glass-card p-5 w-full max-w-md mb-6">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-xl font-black text-white">🏆 Champion Standings</h2>
           <span id="total-players-end" class="text-xs bg-[#ffdd59] text-gray-900 px-3 py-1 rounded-full font-bold">0 Players</span>
         </div>
         <div id="leaderboard-list-end" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2">
-          <!-- Populated by JS -->
+          <!-- Inject by JS -->
         </div>
       </div>
 
-      <!-- Action Play Again -->
       <button onclick="resetToStart()" class="glass-btn w-full max-w-md py-4 text-2xl text-white mb-10">
         🔄 PLAY NEXT / AGAIN
       </button>
@@ -337,7 +329,7 @@
   </div>
 
   <script>
-    // Audio synthesizer helper for clean "pop/ding" sounds
+    // Synth sound engine
     class SoundSynth {
       constructor() {
         this.ctx = null;
@@ -356,7 +348,6 @@
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
-        // Fun cartoon rise
         osc.type = 'sine';
         osc.frequency.setValueAtTime(150, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
@@ -409,69 +400,62 @@
     const activePlayerSelect = document.getElementById('active-player-select');
     const scoreContainer = document.getElementById('score-container');
 
-    // Game states
+    // System States
     let score = 0;
     let timeLeft = 30;
     let timerInterval = null;
     let isPlaying = false;
-    let leaderboardRecords = []; // { name, score }
-    let registeredPlayers = [];   // List of active game contestants parsed from textarea
+    let leaderboardRecords = [];
+    let registeredPlayers = [];
 
-    // Jitter Filtering and Robust Shake State Management
-    const HISTORY_SIZE = 12; // Lookback window size for smoothing coordinates
-    const SHAKE_THRESHOLD = 0.08; // Normalized Y delta threshold
+    // Camera control references
+    let activeStream = null;
+    let animationFrameId = null;
+
+    // Filters & States for dual hands
+    const HISTORY_SIZE = 12;
+    const SHAKE_THRESHOLD = 0.08;
     
-    // Track stats per hand (Left hand/Right hand)
     class HandStateTracker {
       constructor() {
         this.yHistory = [];
-        this.isBelowBound = true; // State tracker for shake direction
-        this.lowestYSinceTrigger = 1.0; // In screen space, 1 is bottom
-        this.highestYSinceTrigger = 0.0; // In screen space, 0 is top
-        this.cooldown = 0; // Prevent rapid false double triggers
+        this.isBelowBound = true;
+        this.lowestYSinceTrigger = 1.0;
+        this.highestYSinceTrigger = 0.0;
+        this.cooldown = 0;
       }
 
       update(currentY) {
         if (this.cooldown > 0) this.cooldown--;
 
-        // Push to rolling history window
         this.yHistory.push(currentY);
         if (this.yHistory.length > HISTORY_SIZE) {
           this.yHistory.shift();
         }
 
-        // Get moving average of Y to cut out sensor noise
         const sum = this.yHistory.reduce((acc, v) => acc + v, 0);
         const smoothY = sum / this.yHistory.length;
 
-        // Dynamic limits trackers within the current historical window
-        const currentMinY = Math.min(...this.yHistory); // highest point physically on screen
-        const currentMaxY = Math.max(...this.yHistory); // lowest point physically on screen
-
         let didScore = false;
 
-        // Logic check: Detect clear transition from moving down (increasing Y) to moving up (decreasing Y)
         if (smoothY > this.lowestYSinceTrigger) {
-          this.lowestYSinceTrigger = smoothY; // capture bottom peak
-          this.isBelowBound = true; 
+          this.lowestYSinceTrigger = smoothY;
+          this.isBelowBound = true;
         }
 
         if (this.isBelowBound) {
-          // If hand rises substantially above the lowest bottom peak captured
-          const deltaRise = this.lowestYSinceTrigger - smoothY; 
+          const deltaRise = this.lowestYSinceTrigger - smoothY;
           if (deltaRise > SHAKE_THRESHOLD && this.cooldown === 0) {
             didScore = true;
-            this.isBelowBound = false; 
-            this.lowestYSinceTrigger = smoothY; // Reset tracking peak
+            this.isBelowBound = false;
+            this.lowestYSinceTrigger = smoothY;
             this.highestYSinceTrigger = smoothY;
-            this.cooldown = 6; // Set safety frame window
+            this.cooldown = 6; // Debounce frames
           }
         } else {
-          // Track the rise peak to set when player starts dropping the hand again
           if (smoothY < this.highestYSinceTrigger) {
             this.highestYSinceTrigger = smoothY;
           }
-          // Reset tracker when hand is pulled back downwards significantly
           if (smoothY - this.highestYSinceTrigger > SHAKE_THRESHOLD * 0.7) {
             this.isBelowBound = true;
             this.lowestYSinceTrigger = smoothY;
@@ -496,10 +480,9 @@
     let floatingTexts = [];
     let handVisibleTimer = null;
     let hands = null;
-    let camera = null;
     let aiInitialized = false;
 
-    // Handle Custom Audio Track selection
+    // Custom song upload handler
     musicUpload.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
@@ -508,24 +491,21 @@
       }
     });
 
-    // Extract names and format them nicely
+    // Clean leading line indices and extra spaces
     function parseNames(text) {
       if (!text.trim()) return [];
       return text.split('\n')
         .map(line => {
-          // Strips starting numerals e.g. "1.", "2 -", etc.
           let cleaned = line.replace(/^\s*\d+[\s.\-_)]*/, '').trim();
           return cleaned;
         })
         .filter(name => name.length > 0);
     }
 
-    // Interactive updates as the user types or pastes
     function importBulkPlayers() {
       const rawText = bulkPlayerInput.value;
       const parsed = parseNames(rawText);
       
-      // Clear old dropdown list
       activePlayerSelect.innerHTML = '';
       registeredPlayers = parsed;
 
@@ -545,10 +525,12 @@
       updateLeaderboardUI();
     }
 
-    // Auto-sync sample roster on load to give visual cues
+    // Initialize state with default mock players on start
     window.addEventListener('DOMContentLoaded', () => {
       bulkPlayerInput.value = "1. Kay Minn\n2. Boom\n3. Happy Kid\n4. Swift Shaker";
       importBulkPlayers();
+      // MediaPipe AI ကို background တွင် ကြိုတင် load လုပ်ထားမည် (Click နှိပ်လျှင် တန်းပွင့်စေရန်)
+      initAI();
     });
 
     function initAI() {
@@ -559,23 +541,92 @@
 
       hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 1, // Balanced for accurate detection
-        minDetectionConfidence: 0.6,
-        minTrackingConfidence: 0.6
+        modelComplexity: 1, // Balance performance and accuracy on tablets
+        minDetectionConfidence: 0.65,
+        minTrackingConfidence: 0.65
       });
 
       hands.onResults(onResults);
       aiInitialized = true;
     }
 
+    // Tablet & Phones တွင် အဆင်ပြေဆုံးဖြစ်စေမည့် Native HTML5 MediaDevices API
+    async function startCameraStream() {
+      try {
+        stopCameraStream(); // Clear existing loops
+
+        // Standard user camera constraints with adaptive resolution
+        const constraints = {
+          video: {
+            facingMode: "user",
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        activeStream = stream;
+        videoElement.srcObject = stream;
+
+        // Force playsinline and muted for strict Tablet browser standards
+        videoElement.setAttribute('playsinline', 'true');
+        videoElement.setAttribute('muted', 'true');
+        videoElement.muted = true;
+
+        await videoElement.play();
+
+        // ကင်မရာပွင့်သည်နှင့် Spinner ကို ချက်ချင်းဖျောက်ပေးမည် (အဝိုင်းလည်ပြီး ပိတ်နေခြင်းမှ ကာကွယ်ရန်)
+        cameraLoading.classList.add('hidden');
+        isPlaying = true;
+        startTimer();
+
+        // Detect loops
+        tickDetection();
+      } catch (err) {
+        console.error("Camera access failed:", err);
+        // Error panel for user guidance
+        cameraLoading.innerHTML = `
+          <div class="p-6 text-center max-w-sm glass-card bg-[#ef5777]/90">
+            <p class="text-[#ffdd59] font-black text-2xl mb-2">Camera Blocked!</p>
+            <p class="text-white text-sm font-bold mb-4">Tablet or Browser has blocked the Camera. Please allow camera permissions and try again!</p>
+            <button onclick="startGame()" class="w-full bg-white text-gray-900 font-bold py-3 px-6 rounded-2xl mb-2 hover:bg-gray-100">Retry Permission</button>
+            <button onclick="resetToStart()" class="w-full bg-black/30 text-white font-bold py-2 px-6 rounded-2xl">Return to Lobby</button>
+          </div>
+        `;
+      }
+    }
+
+    // Render loop using standard RAF for buttery smooth tablet response
+    function tickDetection() {
+      if (!isPlaying) return;
+      if (videoElement.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+        hands.send({ image: videoElement }).catch(err => {
+          console.log("Inference Error:", err);
+        });
+      }
+      animationFrameId = requestAnimationFrame(tickDetection);
+    }
+
+    function stopCameraStream() {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        activeStream = null;
+      }
+      videoElement.srcObject = null;
+    }
+
     async function startGame() {
-      synth.init(); // Warmup oscillator ctx
+      synth.init(); // Warm audio elements on user interaction
       
       const selectedTime = parseInt(timeInput.value) || 30;
       timeLeft = selectedTime;
       score = 0;
 
-      // Reset internal filters
       leftHandTracker.reset();
       rightHandTracker.reset();
       floatingTexts = [];
@@ -583,42 +634,27 @@
       scoreDisplay.innerText = "0";
       timeDisplay.innerText = timeLeft;
 
-      // Track active challenger
       const selectedChallenger = activePlayerSelect.value || "Guest Player";
       activePlayerDisplay.innerText = selectedChallenger;
       finalPlayerName.innerText = selectedChallenger;
 
-      // Screen Transitions
+      // Swap views
       startScreen.classList.add('hidden');
       resultScreen.classList.add('hidden');
       gameScreen.classList.remove('hidden');
       cameraLoading.classList.remove('hidden');
       handStatus.classList.add('hidden');
 
-      // Music Audio Start
       if (bgMusic.src) {
         bgMusic.currentTime = 0;
         bgMusic.play().catch(e => console.log("Audio playback error:", e));
       }
 
+      // Initialize API first
       initAI();
 
-      if (!camera) {
-        camera = new Camera(videoElement, {
-          onFrame: async () => {
-            if (isPlaying) {
-              await hands.send({ image: videoElement });
-            }
-          },
-          width: 640,
-          height: 480
-        });
-        await camera.start();
-      } else {
-        isPlaying = true;
-        cameraLoading.classList.add('hidden');
-        startTimer();
-      }
+      // Start the Native Stream API
+      await startCameraStream();
     }
 
     function addScore(x, y) {
@@ -626,14 +662,12 @@
       scoreDisplay.innerText = score;
       synth.playPop();
 
-      // Add high fidelity animated floating feedback on point
       floatingTexts.push({
         x: x,
         y: y,
         life: 1.0
       });
 
-      // Joyful HUD expansion animation
       scoreContainer.classList.add('scale-115', 'border-white');
       setTimeout(() => {
         scoreContainer.classList.remove('scale-115', 'border-white');
@@ -641,15 +675,8 @@
     }
 
     function onResults(results) {
-      if (!cameraLoading.classList.contains('hidden') && isPlaying) {
-        cameraLoading.classList.add('hidden');
-        isPlaying = true;
-        startTimer();
-      }
-
       if (!isPlaying) return;
 
-      // Dynamically fit canvas size to streaming resolution
       canvasElement.width = videoElement.videoWidth || 640;
       canvasElement.height = videoElement.videoHeight || 480;
 
@@ -657,7 +684,6 @@
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        // Display indicator badge if hands are present
         handStatus.classList.remove('hidden');
         clearTimeout(handVisibleTimer);
         handVisibleTimer = setTimeout(() => {
@@ -665,16 +691,16 @@
         }, 1200);
 
         results.multiHandLandmarks.forEach((landmarks, index) => {
-          if (index > 1) return; // Support dual hand maximum
+          if (index > 1) return;
 
-          const targetPoint = landmarks[9]; // Middle finger MCP center points
+          const targetPoint = landmarks[9]; // Hand Center Point
           const mirroredX = 1 - targetPoint.x;
           const mirroredY = targetPoint.y;
 
           const drawPx = mirroredX * canvasElement.width;
           const drawPy = mirroredY * canvasElement.height;
 
-          // Smooth tracking feedback node (Vibrant Golden Orb)
+          // Glowing tracking dot
           canvasCtx.beginPath();
           canvasCtx.arc(drawPx, drawPy, 18, 0, 2 * Math.PI);
           canvasCtx.fillStyle = 'rgba(255, 221, 89, 0.85)';
@@ -683,7 +709,7 @@
           canvasCtx.strokeStyle = 'white';
           canvasCtx.stroke();
 
-          // Action Impulse Arrow overlay inside orb
+          // Upward indication arrow inside orb
           canvasCtx.beginPath();
           canvasCtx.moveTo(drawPx, drawPy + 8);
           canvasCtx.lineTo(drawPx, drawPy - 8);
@@ -694,7 +720,6 @@
           canvasCtx.lineWidth = 3;
           canvasCtx.stroke();
 
-          // Apply state tracking per designated hand
           const tracker = index === 0 ? leftHandTracker : rightHandTracker;
           const trackingResult = tracker.update(targetPoint.y);
 
@@ -707,14 +732,13 @@
         rightHandTracker.reset();
       }
 
-      // Render Floating Action Indicator numbers (+1)
+      // Render score floating indicators (+1)
       for (let i = floatingTexts.length - 1; i >= 0; i--) {
         let ft = floatingTexts[i];
 
         canvasCtx.font = "900 75px 'Fredoka One', sans-serif";
         canvasCtx.textAlign = "center";
 
-        // Double stroked text outline for high legibility
         canvasCtx.strokeStyle = `rgba(0, 0, 0, ${ft.life})`;
         canvasCtx.lineWidth = 8;
         const drawX = (1 - ft.x) * canvasElement.width;
@@ -725,7 +749,7 @@
         canvasCtx.fillText("+1", drawX, drawY);
 
         ft.life -= 0.04;
-        ft.y -= 0.015; // Upward floating animation
+        ft.y -= 0.015;
 
         if (ft.life <= 0) {
           floatingTexts.splice(i, 1);
@@ -742,7 +766,6 @@
         timeLeft--;
         timeDisplay.innerText = timeLeft;
 
-        // Play alert pulse as time gets critical
         if (timeLeft <= 5 && timeLeft > 0) {
           synth.playTick();
         }
@@ -758,11 +781,11 @@
       clearInterval(timerInterval);
       bgMusic.pause();
       handStatus.classList.add('hidden');
+      stopCameraStream(); // Release camera resources immediately
 
       if (!isLeave) {
         const currentPlayerName = activePlayerSelect.value || "Guest Player";
         
-        // Push score and keep list organized
         leaderboardRecords.push({ name: currentPlayerName, score: score });
         leaderboardRecords.sort((a, b) => b.score - a.score);
 
@@ -779,7 +802,6 @@
     }
 
     function leaveGame() {
-      // Use clean UI style instead of browser native blocks
       endGame(true);
     }
 
@@ -831,8 +853,6 @@
       }
 
       listStart.innerHTML = html;
-      
-      // Map same lists to end game leaderboard screen
       listEnd.innerHTML = html;
 
       const totalCount = registeredPlayers.length;
