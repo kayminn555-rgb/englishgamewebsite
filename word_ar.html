@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AR Holographic Word Sorter</title>
+    
+    <!-- MediaPipe AI for Hand Tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+        :root {
+            --holo-blue: #00e5ff;
+            --holo-dark-blue: #003366;
+            --holo-light: #ffffff;
+            --holo-purple: #9d00ff;
+            --holo-pink: #ff007f;
+            --bg-color: #020510;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--holo-light);
+        }
+
+        /* Subtle Hexagon Grid Background for Sci-Fi feel */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(30deg, rgba(0, 229, 255, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(0, 229, 255, 0.05) 87.5%, rgba(0, 229, 255, 0.05)),
+                linear-gradient(150deg, rgba(0, 229, 255, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(0, 229, 255, 0.05) 87.5%, rgba(0, 229, 255, 0.05)),
+                linear-gradient(30deg, rgba(0, 229, 255, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(0, 229, 255, 0.05) 87.5%, rgba(0, 229, 255, 0.05)),
+                linear-gradient(150deg, rgba(0, 229, 255, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(0, 229, 255, 0.05) 87.5%, rgba(0, 229, 255, 0.05)),
+                linear-gradient(60deg, rgba(0, 229, 255, 0.05) 25%, transparent 25.5%, transparent 75%, rgba(0, 229, 255, 0.05) 75%, rgba(0, 229, 255, 0.05)),
+                linear-gradient(60deg, rgba(0, 229, 255, 0.05) 25%, transparent 25.5%, transparent 75%, rgba(0, 229, 255, 0.05) 75%, rgba(0, 229, 255, 0.05));
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+            z-index: 998;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Camera Feed & Canvas Overlay */
+        .camera-container {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+        }
+        
+        #video-feed {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            filter: contrast(1.1) brightness(0.9) saturate(1.2); /* Clean AR look without green tint */
+        }
+
+        #ar-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* UI Overlays */
+        .ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 5, 16, 0.8);
+            pointer-events: auto;
+            transition: opacity 0.4s ease-in-out;
+            backdrop-filter: blur(8px);
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none !important;
+        }
+
+        /* Holographic Panels */
+        .holo-panel {
+            background: rgba(0, 20, 50, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-top: 3px solid var(--holo-blue);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.05);
+            border-radius: 10px;
+            padding: 40px;
+            position: relative;
+            pointer-events: auto;
+            max-width: 900px;
+            width: 90%;
+        }
+
+        h1 { 
+            font-family: 'Orbitron', sans-serif; 
+            color: var(--holo-light); 
+            font-size: 2.8rem; 
+            text-transform: uppercase;
+            text-shadow: 0 0 15px var(--holo-blue), 0 0 30px var(--holo-blue);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        /* Inputs & Buttons */
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; color: var(--holo-blue); margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; font-size: 1.1rem; }
+        input, textarea {
+            width: 100%; background: rgba(0, 15, 30, 0.7); border: 1px solid var(--holo-dark-blue);
+            color: var(--holo-light); padding: 12px; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem;
+            outline: none; transition: all 0.3s; border-radius: 5px;
+            pointer-events: auto;
+        }
+        input:focus, textarea:focus { border-color: var(--holo-blue); box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); background: rgba(0, 30, 60, 0.8); }
+        textarea { height: 100px; resize: none; }
+
+        .holo-btn {
+            background: rgba(0, 20, 40, 0.6); color: var(--holo-blue); border: 1px solid var(--holo-blue);
+            padding: 12px 30px; font-size: 1.2rem; font-family: 'Orbitron', sans-serif; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; border-radius: 30px;
+            position: relative; overflow: hidden; pointer-events: auto;
+            transition: all 0.3s; box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .holo-btn:hover, .holo-btn.pinched { 
+            background: var(--holo-blue); color: var(--bg-color); 
+            box-shadow: 0 0 30px var(--holo-blue), inset 0 0 10px rgba(255,255,255,0.5); 
+            border-color: var(--holo-light);
+        }
+        
+        .holo-btn.purple { border-color: var(--holo-purple); color: var(--holo-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.2); }
+        .holo-btn.purple:hover, .holo-btn.purple.pinched { background: var(--holo-purple); color: #fff; box-shadow: 0 0 30px var(--holo-purple); border-color: var(--holo-light); }
+        
+        .holo-btn.pink { border-color: var(--holo-pink); color: var(--holo-pink); box-shadow: 0 0 15px rgba(255, 0, 127, 0.2); }
+        .holo-btn.pink:hover, .holo-btn.pink.pinched { background: var(--holo-pink); color: #fff; box-shadow: 0 0 30px var(--holo-pink); border-color: var(--holo-light); }
+
+        /* Game UI */
+        .hud {
+            position: absolute; top: 20px; font-size: 1.4rem; font-family: 'Orbitron', sans-serif;
+            background: rgba(0, 15, 30, 0.7); padding: 8px 20px; border-radius: 20px;
+            border: 1px solid rgba(0, 229, 255, 0.3); pointer-events: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        #score-display { left: 20px; color: var(--holo-light); }
+        #remain-display { right: 20px; color: var(--holo-light); }
+        
+        #game-controls {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 15px; z-index: 100; pointer-events: auto;
+        }
+        #game-controls .holo-btn { padding: 8px 20px; font-size: 0.9rem; }
+
+        /* Sci-Fi Galaxy Spawner */
+        .galaxy-container {
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            width: 250px; height: 250px;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        
+        .galaxy-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid transparent;
+        }
+        .ring-outer { 
+            width: 220px; height: 220px; border-top: 2px solid var(--holo-blue); border-bottom: 2px solid var(--holo-purple);
+            animation: spin 8s linear infinite; filter: drop-shadow(0 0 10px var(--holo-blue));
+        }
+        .ring-inner { 
+            width: 150px; height: 150px; border-left: 2px solid var(--holo-pink); border-right: 2px solid var(--holo-blue);
+            animation: spin-reverse 5s linear infinite;
+        }
+        .galaxy-core {
+            width: 50px; height: 50px; border-radius: 50%; background: var(--holo-light);
+            box-shadow: 0 0 30px var(--holo-light), 0 0 60px var(--holo-blue), 0 0 100px var(--holo-purple);
+            animation: pulse-core 2s ease-in-out infinite alternate;
+        }
+
+        /* Target Baskets */
+        .target-basket {
+            position: absolute; bottom: 5%; width: 28vw; height: 150px;
+            background: linear-gradient(to top, rgba(0, 30, 60, 0.8), rgba(0, 10, 20, 0.2));
+            border: 2px solid var(--holo-blue); border-top: none;
+            border-radius: 0 0 30px 30px;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: auto; transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .target-basket::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--holo-light), transparent);
+            box-shadow: 0 0 15px var(--holo-light);
+        }
+        
+        #left-basket { left: 5%; }
+        #right-basket { right: 5%; }
+        
+        .basket-title {
+            position: absolute; top: -40px;
+            font-size: 2.2rem; font-weight: bold; font-family: 'Orbitron', sans-serif;
+            color: var(--holo-light); text-shadow: 0 0 15px var(--holo-blue), 0 0 30px var(--holo-purple);
+            letter-spacing: 3px; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 10px;
+        }
+
+        .glow-correct { background: linear-gradient(to top, rgba(0, 229, 255, 0.8), rgba(0, 229, 255, 0.2)); border-color: var(--holo-light); box-shadow: 0 0 50px var(--holo-blue); }
+        .glow-wrong { background: linear-gradient(to top, rgba(255, 0, 127, 0.8), rgba(255, 0, 127, 0.2)); border-color: var(--holo-pink); box-shadow: 0 0 50px var(--holo-pink); }
+
+        /* Draggable Word (Hologram Packet) */
+        .holo-word {
+            position: absolute; padding: 18px 35px;
+            background: rgba(0, 20, 40, 0.85);
+            border: 2px solid var(--holo-blue); color: var(--holo-light);
+            font-size: 2rem; font-family: 'Orbitron', sans-serif; font-weight: bold;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
+            transform: translate(-50%, -50%);
+            z-index: 1000; cursor: grab; white-space: nowrap;
+            pointer-events: auto; touch-action: none; 
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .holo-word.spawn { animation: materialize 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .holo-word.grabbed { 
+            border-color: var(--holo-purple); background: rgba(30, 0, 60, 0.9);
+            box-shadow: 0 0 40px var(--holo-purple), inset 0 0 20px var(--holo-purple);
+            transform: translate(-50%, -50%) scale(1.15); 
+            cursor: grabbing;
+        }
+
+        /* Loading */
+        #loading-ai {
+            position: absolute; top: 20px; left: 20px; background: rgba(0, 15, 30, 0.8);
+            color: var(--holo-blue); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--holo-blue);
+            font-family: 'Orbitron', sans-serif; font-size: 1rem; z-index: 999; animation: pulse-opacity 1.5s infinite;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        /* Animations */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+        @keyframes pulse-core { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
+        @keyframes materialize { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        @keyframes pulse-opacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .flex-row { display: flex; gap: 30px; width: 100%; margin-bottom: 30px;}
+        .flex-col { flex: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- Camera & Canvas Layer -->
+    <div class="camera-container">
+        <video id="video-feed" autoplay playsinline></video>
+        <canvas id="ar-canvas"></canvas>
+    </div>
+
+    <div id="loading-ai">INITIALIZING AR SENSORS...</div>
+
+    <!-- UI Overlay Layer -->
+    <div class="ui-layer" id="ui-layer">
+        
+        <!-- Dashboard Screen -->
+        <div id="screen-dashboard" class="screen">
+            <div class="holo-panel">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1>SYSTEM CONFIG</h1>
+                    <p style="color: var(--holo-blue); font-size: 1.2rem; letter-spacing: 3px;">AR VOCABULARY MATRIX</p>
+                </div>
+
+                <div class="flex-row">
+                    <div class="flex-col">
+                        <div class="input-group">
+                            <label>LEFT TARGET ID</label>
+                            <input type="text" id="left-name" value="NOUN">
+                            <label style="margin-top: 15px;">DATA PAYLOAD (Comma separated)</label>
+                            <textarea id="left-words">Apple, Table, Water, System, Planet</textarea>
+                        </div>
+                    </div>
+                    <div class="flex-col">
+                        <div class="input-group">
+                            <label>RIGHT TARGET ID</label>
+                            <input type="text" id="right-name" value="VERB">
+                            <label style="margin-top: 15px;">DATA PAYLOAD (Comma separated)</label>
+                            <textarea id="right-words">Run, Compute, Analyze, Fly, Jump</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 10px;">
+                    <button id="btn-start" class="holo-btn" onclick="startGame()">INITIALIZE</button>
+                    <!-- Fullscreen button on dashboard -->
+                    <button id="btn-fs-dash" class="holo-btn purple" onclick="toggleFullscreen()" style="margin-left: 15px;">FULLSCREEN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="screen-game" class="screen hidden" style="background: transparent; backdrop-filter: none; pointer-events: none;">
+            
+            <div id="game-controls">
+                <button id="btn-dash" class="holo-btn pink" onclick="showDashboard()">DASHBOARD</button>
+                <button id="btn-restart" class="holo-btn purple" onclick="playAgain()">RESTART</button>
+                <button id="btn-fullscreen" class="holo-btn" onclick="toggleFullscreen()">FULLSCREEN</button>
+            </div>
+
+            <div class="hud" id="score-display">SCORE: <span id="score-val" style="color: var(--holo-blue); font-size: 1.6rem;">0</span></div>
+            <div class="hud" id="remain-display">REMAINING: <span id="remain-val" style="color: var(--holo-purple); font-size: 1.6rem;">0</span></div>
+
+            <!-- Galaxy Spawner -->
+            <div class="galaxy-container">
+                <div class="galaxy-ring ring-outer"></div>
+                <div class="galaxy-ring ring-inner"></div>
+                <div class="galaxy-core"></div>
+            </div>
+
+            <!-- Baskets -->
+            <div id="left-basket" class="target-basket">
+                <div class="basket-title" id="lb-title">NOUN</div>
+            </div>
+            <div id="right-basket" class="target-basket">
+                <div class="basket-title" id="rb-title">VERB</div>
+            </div>
+
+            <!-- Word Element Container -->
+            <div id="word-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="screen-gameover" class="screen hidden">
+            <div class="holo-panel" style="text-align: center; max-width: 600px;">
+                <h1>SEQUENCE COMPLETE</h1>
+                <p style="color: var(--holo-blue); font-size: 1.2rem; margin-bottom: 20px;">FINAL DIAGNOSTIC</p>
+                
+                <div style="font-size: 5rem; font-family: 'Orbitron'; color: var(--holo-light); text-shadow: 0 0 20px var(--holo-blue); margin-bottom: 30px;">
+                    <span id="final-score">0</span> <span style="font-size: 2.5rem; color: rgba(255,255,255,0.5);">/ <span id="total-words">0</span></span>
+                </div>
+
+                <div style="display: flex; gap: 20px; justify-content: center;">
+                    <button id="btn-playagain" class="holo-btn" onclick="playAgain()">PLAY AGAIN</button>
+                    <button id="btn-todash" class="holo-btn pink" onclick="showDashboard()">SYSTEM CONFIG</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Game Logic & AI Script -->
+    <script>
+        // --- Sound Engine (Clean Sci-Fi Beeps) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                const now = audioCtx.currentTime;
+                if (type === 'spawn') {
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1600, now + 0.15);
+                    gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.2, now + 0.05); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (type === 'grab' || type === 'click') {
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(1000, now);
+                    gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.15, now + 0.02); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if (type === 'correct') {
+                    osc.type = 'square'; osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(880, now + 0.1);
+                    gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.2, now + 0.05); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                    gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                }
+            } catch(e){}
+        }
+
+        // --- Global Variables ---
+        let gameWords = [];
+        let currentWordIndex = 0;
+        let score = 0;
+        let currentScreen = 'dashboard';
+        
+        // Physics & Interaction State
+        let wordEl = null;
+        let isWordGrabbed = false;
+        let wordPos = { x: 0, y: 0 };
+        let smoothedHandPos = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        
+        // Mouse/Touch Drag state (Overrides AR when active)
+        let isPointerDragging = false;
+        let pointerOffset = { x: 0, y: 0 };
+
+        const smoothing = 0.6; 
+        const pinchStartThreshold = 0.06;
+        const pinchHoldThreshold = 0.15; // Keeps grab stable
+
+        let hoveredBtn = null;
+        let isClickingBtn = false;
+        let pinchCooldown = false;
+
+        const screens = {
+            dashboard: document.getElementById('screen-dashboard'),
+            game: document.getElementById('screen-game'),
+            gameover: document.getElementById('screen-gameover')
+        };
+        const wordContainer = document.getElementById('word-container');
+        const canvas = document.getElementById('ar-canvas');
+        const ctx = canvas.getContext('2d');
+        const videoElement = document.getElementById('video-feed');
+
+        // Allow click events to register properly for mouse/touch
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                playSound('click');
+            });
+        });
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if(!isWordGrabbed) {
+                wordPos = { x: window.innerWidth / 2, y: window.innerHeight * 0.2 };
+                updateWordDOMPosition();
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Reliable Fullscreen Implementation
+        function toggleFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement && !document.mozFullScreenElement &&
+                !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                if (elem.requestFullscreen) { elem.requestFullscreen(); }
+                else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+                else if (elem.mozRequestFullScreen) { elem.mozRequestFullScreen(); }
+                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT); }
+                document.getElementById('btn-fullscreen').innerText = "EXIT FS";
+                if(document.getElementById('btn-fs-dash')) document.getElementById('btn-fs-dash').innerText = "EXIT FS";
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+                else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+                else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+                else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+                document.getElementById('btn-fullscreen').innerText = "FULLSCREEN";
+                if(document.getElementById('btn-fs-dash')) document.getElementById('btn-fs-dash').innerText = "FULLSCREEN";
+            }
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[screenName].classList.remove('hidden');
+            currentScreen = screenName;
+            
+            if(screenName !== 'game') {
+                wordContainer.innerHTML = '';
+                isWordGrabbed = false;
+                isPointerDragging = false;
+            }
+        }
+
+        function showDashboard() { switchScreen('dashboard'); }
+
+        function parseWords() {
+            const lName = document.getElementById('left-name').value.toUpperCase();
+            const rName = document.getElementById('right-name').value.toUpperCase();
+            document.getElementById('lb-title').innerText = lName;
+            document.getElementById('rb-title').innerText = rName;
+
+            const lWords = document.getElementById('left-words').value.split(',').map(w => w.trim()).filter(w=>w);
+            const rWords = document.getElementById('right-words').value.split(',').map(w => w.trim()).filter(w=>w);
+
+            gameWords = [];
+            lWords.forEach(w => gameWords.push({ text: w, target: 'left' }));
+            rWords.forEach(w => gameWords.push({ text: w, target: 'right' }));
+            
+            shuffleArray(gameWords);
+        }
+
+        function startGame() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            parseWords();
+            if(gameWords.length === 0) return alert("System Notice: Please enter data payloads.");
+            
+            score = 0; currentWordIndex = 0;
+            updateHUD(); switchScreen('game'); spawnWord();
+        }
+
+        function playAgain() {
+            shuffleArray(gameWords);
+            score = 0; currentWordIndex = 0;
+            updateHUD(); switchScreen('game'); spawnWord();
+        }
+
+        function updateHUD() {
+            document.getElementById('score-val').innerText = score;
+            document.getElementById('remain-val').innerText = gameWords.length - currentWordIndex;
+        }
+
+        function spawnWord() {
+            wordContainer.innerHTML = '';
+            isPointerDragging = false;
+            if (currentWordIndex >= gameWords.length) { endGame(); return; }
+
+            const w = gameWords[currentWordIndex];
+            wordEl = document.createElement('div');
+            wordEl.className = 'holo-word spawn';
+            wordEl.innerText = w.text;
+            
+            wordPos = { x: window.innerWidth / 2, y: window.innerHeight * 0.2 };
+            isWordGrabbed = false;
+            updateWordDOMPosition();
+            
+            // Pointer Events for Mouse/Touch support
+            wordEl.addEventListener('pointerdown', handlePointerDown);
+            
+            wordContainer.appendChild(wordEl);
+            playSound('spawn');
+            setTimeout(() => { if(wordEl) wordEl.classList.remove('spawn'); }, 500);
+        }
+
+        function updateWordDOMPosition() {
+            if (wordEl) {
+                // Ensure word stays within screen bounds
+                const padding = 50;
+                let finalX = Math.max(padding, Math.min(window.innerWidth - padding, wordPos.x));
+                let finalY = Math.max(padding, Math.min(window.innerHeight - padding, wordPos.y));
+                
+                wordEl.style.left = `${finalX}px`;
+                wordEl.style.top = `${finalY}px`;
+            }
+        }
+
+        function endGame() {
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('total-words').innerText = gameWords.length;
+            switchScreen('gameover');
+        }
+
+        // --- Pointer (Mouse/Touch) Logic ---
+        function handlePointerDown(e) {
+            if(!wordEl) return;
+            isPointerDragging = true;
+            isWordGrabbed = true; // Tell AR logic we have it
+            wordEl.classList.add('grabbed');
+            playSound('grab');
+            
+            const rect = wordEl.getBoundingClientRect();
+            pointerOffset = {
+                x: e.clientX - (rect.left + rect.width/2),
+                y: e.clientY - (rect.top + rect.height/2)
+            };
+            
+            // Capture pointer so dragging outside bounds works
+            wordEl.setPointerCapture(e.pointerId);
+        }
+
+        // Handle move/up globally to ensure smooth dragging
+        document.addEventListener('pointermove', (e) => {
+            if (isPointerDragging && wordEl) {
+                wordPos.x = e.clientX - pointerOffset.x;
+                wordPos.y = e.clientY - pointerOffset.y;
+                updateWordDOMPosition();
+            }
+        });
+
+        document.addEventListener('pointerup', (e) => {
+            if (isPointerDragging) {
+                isPointerDragging = false;
+                isWordGrabbed = false;
+                if(wordEl) {
+                    wordEl.classList.remove('grabbed');
+                    wordEl.releasePointerCapture(e.pointerId);
+                }
+                handleDrop();
+            }
+        });
+
+
+        // --- Collision Logic ---
+        function checkIntersection(px, py, element, padding = 30) {
+            const rect = element.getBoundingClientRect();
+            return (px >= rect.left - padding && px <= rect.right + padding && 
+                    py >= rect.top - padding && py <= rect.bottom + padding);
+        }
+
+        function handleDrop() {
+            if(!wordEl || currentScreen !== 'game') return;
+            const lBasket = document.getElementById('left-basket');
+            const rBasket = document.getElementById('right-basket');
+            
+            const currentObj = gameWords[currentWordIndex];
+            let dropped = false; let isCorrect = false;
+
+            // Check Drop over Baskets
+            if (checkIntersection(wordPos.x, wordPos.y, lBasket, 20)) {
+                dropped = true; isCorrect = (currentObj.target === 'left');
+                flashBasket(lBasket, isCorrect);
+            } 
+            else if (checkIntersection(wordPos.x, wordPos.y, rBasket, 20)) {
+                dropped = true; isCorrect = (currentObj.target === 'right');
+                flashBasket(rBasket, isCorrect);
+            }
+
+            if (dropped) {
+                if (isCorrect) { score++; playSound('correct'); } 
+                else { playSound('wrong'); }
+                
+                updateHUD();
+                wordContainer.innerHTML = ''; 
+                wordEl = null;
+                currentWordIndex++;
+                setTimeout(spawnWord, 600);
+            } else {
+                // Snap back to galaxy
+                wordPos = { x: window.innerWidth / 2, y: window.innerHeight * 0.2 };
+                updateWordDOMPosition();
+            }
+        }
+
+        function flashBasket(basket, isCorrect) {
+            const cls = isCorrect ? 'glow-correct' : 'glow-wrong';
+            basket.classList.add(cls);
+            setTimeout(() => basket.classList.remove(cls), 500);
+        }
+
+
+        function getActiveButtons() {
+            if (currentScreen === 'dashboard') return [document.getElementById('btn-start'), document.getElementById('btn-fs-dash')];
+            if (currentScreen === 'game') return [document.getElementById('btn-dash'), document.getElementById('btn-restart'), document.getElementById('btn-fullscreen')];
+            if (currentScreen === 'gameover') return [document.getElementById('btn-playagain'), document.getElementById('btn-todash')];
+            return [];
+        }
+
+
+        // --- MediaPipe AR Logic ---
+        const hands = new Hands({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }});
+        
+        hands.setOptions({
+            maxNumHands: 1, 
+            modelComplexity: 1, 
+            minDetectionConfidence: 0.6,
+            minTrackingConfidence: 0.6
+        });
+
+        hands.onResults(onHandResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+                document.getElementById('loading-ai').style.display = 'none';
+            },
+            width: 1280, height: 720, facingMode: 'user'
+        });
+        camera.start();
+
+        function onHandResults(results) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                const thumbTip = landmarks[4];
+                const indexTip = landmarks[8];
+
+                const dx = thumbTip.x - indexTip.x;
+                const dy = thumbTip.y - indexTip.y;
+                const dz = thumbTip.z - indexTip.z;
+                const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+                const rawX = (1 - ((thumbTip.x + indexTip.x) / 2)) * canvas.width;
+                const rawY = ((thumbTip.y + indexTip.y) / 2) * canvas.height;
+
+                smoothedHandPos.x = smoothedHandPos.x + (rawX - smoothedHandPos.x) * smoothing;
+                smoothedHandPos.y = smoothedHandPos.y + (rawY - smoothedHandPos.y) * smoothing;
+
+                const pinchX = smoothedHandPos.x;
+                const pinchY = smoothedHandPos.y;
+
+                // Don't interfere if user is currently using Mouse/Touch
+                if(isPointerDragging) return;
+
+                const currentThreshold = (isWordGrabbed || isClickingBtn) ? pinchHoldThreshold : pinchStartThreshold;
+                const isPinching = distance < currentThreshold;
+
+                // Draw Holographic AR Cursor
+                ctx.beginPath();
+                ctx.arc(pinchX, pinchY, isPinching ? 12 : 25, 0, 2 * Math.PI);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = isPinching ? '#9d00ff' : '#00e5ff';
+                if(isWordGrabbed) { ctx.fillStyle = 'rgba(157, 0, 255, 0.3)'; ctx.fill(); }
+                ctx.stroke();
+
+                // Inner dot for precision
+                ctx.beginPath();
+                ctx.arc(pinchX, pinchY, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+
+                // 1. Handle AR Buttons Interaction
+                let overAnyBtn = false;
+                const buttons = getActiveButtons();
+                
+                buttons.forEach(btn => {
+                    if(!btn) return;
+                    if (checkIntersection(pinchX, pinchY, btn, 15)) {
+                        overAnyBtn = true;
+                        if (hoveredBtn !== btn) { hoveredBtn = btn; }
+                        
+                        if (isPinching && !isClickingBtn && !pinchCooldown) {
+                            isClickingBtn = true;
+                            btn.classList.add('pinched');
+                            playSound('click');
+                            
+                            setTimeout(() => {
+                                btn.click();
+                                btn.classList.remove('pinched');
+                            }, 200);
+
+                            pinchCooldown = true;
+                            setTimeout(() => pinchCooldown = false, 1000);
+                        }
+                    } else if (hoveredBtn === btn) {
+                        hoveredBtn = null;
+                        btn.classList.remove('pinched');
+                    }
+                });
+
+                if (!isPinching) isClickingBtn = false;
+
+
+                // 2. Handle Word Physics
+                if (currentScreen === 'game' && !overAnyBtn) {
+                    if (isPinching) {
+                        if (!isWordGrabbed && wordEl) {
+                            // Hitbox matching DOM position
+                            if (checkIntersection(pinchX, pinchY, wordEl, 60)) { 
+                                isWordGrabbed = true;
+                                wordEl.classList.add('grabbed');
+                                playSound('grab');
+                            }
+                        }
+                        
+                        if (isWordGrabbed) {
+                            wordPos.x = pinchX;
+                            wordPos.y = pinchY;
+                            updateWordDOMPosition();
+                        }
+                    } else {
+                        if (isWordGrabbed) {
+                            isWordGrabbed = false;
+                            if(wordEl) wordEl.classList.remove('grabbed');
+                            handleDrop();
+                        }
+                    }
+                }
+
+            } else {
+                // Hand lost
+                if (isWordGrabbed && !isPointerDragging) {
+                    isWordGrabbed = false;
+                    if(wordEl) wordEl.classList.remove('grabbed');
+                    handleDrop();
+                }
+                if (hoveredBtn) {
+                    hoveredBtn.classList.remove('pinched');
+                    hoveredBtn = null;
+                    isClickingBtn = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
