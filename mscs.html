@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Minn's Checking System</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=Sarabun:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body { 
+      font-family: 'Sarabun', 'Inter', sans-serif; 
+      background-color: #f0fdf4; 
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat; 
+      transition: all 0.4s ease; 
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block !important; }
+    
+    .tab-btn { 
+      border-left: 4px solid transparent; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      width: 100%; 
+      text-align: left; 
+      padding: 12px 16px; 
+      font-weight: 600; 
+      cursor: pointer; 
+    }
+    .tab-btn:hover { 
+      background-color: #f0fdf4; 
+      color: #16a34a; 
+      padding-left: 22px; 
+      border-left: 4px solid #bbf7d0; 
+    }
+    .tab-btn.active { 
+      border-left: 4px solid #16a34a !important; 
+      color: #166534 !important; 
+      font-weight: bold !important; 
+      background-color: #dcfce7; 
+      padding-left: 22px; 
+    }
+    
+    .action-btn-glow { transition: all 0.2s ease-in-out; }
+    .action-btn-glow:hover { 
+      transform: translateY(-1.5px); 
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); 
+      filter: brightness(1.06); 
+    }
+    .action-btn-orange:hover { box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); }
+    .action-btn-gray:hover { box-shadow: 0 4px 12px rgba(55, 65, 81, 0.2); }
+    
+    #sidebar-menu { 
+      position: fixed; 
+      top: 0; 
+      left: -280px; 
+      width: 280px; 
+      height: 100%; 
+      background: white; 
+      box-shadow: 4px 0 15px rgba(0,0,0,0.08); 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      z-index: 100; 
+      overflow-y: auto; 
+    }
+    #sidebar-menu.open { left: 0; }
+    
+    #sidebar-overlay {
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.35); 
+      display: none; 
+      z-index: 90; 
+      backdrop-filter: blur(1.5px); 
+    }
+    #sidebar-overlay.show { display: block; }
+    
+    #login-gateway-screen {
+      background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true');
+      background-size: 100% 100% !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      height: 100vh !important;
+    }
+
+    #login-gateway-screen.liverpool-gateway {
+      background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp') !important;
+    }
+    
+    /* ONE PIECE THEME STYLES */
+    body.onepiece-mode {
+      background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true');
+      background-size: 100% calc(100vh - 60px) !important;
+      background-position: center 60px !important;
+      background-attachment: fixed !important;
+      background-repeat: no-repeat !important;
+    }
+    body.onepiece-mode.bg-white { 
+      background-color: rgba(255, 255, 255, 0.96); 
+      border-color: #e2e8f0; 
+      backdrop-filter: blur(4px); 
+    }
+    body.onepiece-mode #teacher-top-bar { 
+      background-color: #dfa119 !important; 
+      border-bottom: 3px solid #1e3a8a; 
+    }
+    body.onepiece-mode #current-active-tab-title { 
+      background-color: #1e3a8a !important; 
+      color: #ffffff !important; 
+      font-weight: 900; 
+    }
+    body.onepiece-mode .tab-btn:hover { 
+      background-color: #fef3c7; 
+      color: #b45309;
+      border-left-color: #fcd34d; 
+    }
+    body.onepiece-mode .tab-btn.active { 
+      border-left: 4px solid #dfa119 !important; 
+      color: #b45309 !important; 
+      background-color: #fef3c7; 
+    }
+    body.onepiece-mode .text-green-900 { color: #b45309 !important; }
+    body.onepiece-mode.bg-green-50 { background-color: #fffbeb !important; border-color: #fde68a !important; }
+    body.onepiece-mode.border-green-100 { border-color: #fde68a !important; }
+    body.onepiece-mode .border-green-300 { border-color: #fde68a !important; }
+    body.onepiece-mode .bg-green-600 { background-color: #dfa119 !important; }
+    body.onepiece-mode .bg-green-600:hover { background-color: #b45309 !important; }
+    body.onepiece-mode.action-btn-glow:hover { box-shadow: 0 4px 12px rgba(223, 161, 25, 0.4) !important; }
+    body.onepiece-mode .bg-green-50/20 { background-color: rgba(254, 251, 235, 0.6) !important; }
+
+    /* LIVERPOOL THEME STYLES */
+    body.liverpool-mode {
+      background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp');
+      background-size: 100% calc(100vh - 60px) !important;
+      background-position: center 60px !important;
+      background-attachment: fixed !important;
+      background-repeat: no-repeat !important;
+    }
+    body.liverpool-mode #teacher-top-bar { 
+      background-color: #c8102e !important; 
+      border-bottom: 3px solid #f6eb61; 
+    }
+    body.liverpool-mode #current-active-tab-title { 
+      background-color: #f6eb61 !important; 
+      color: #c8102e !important; 
+      font-weight: 900; 
+    }
+    body.liverpool-mode .tab-btn:hover { 
+      background-color: #fde8e8; 
+      color: #c8102e;
+      border-left-color: #f6eb61; 
+    }
+    body.liverpool-mode .tab-btn.active { 
+      border-left: 4px solid #c8102e !important; 
+      color: #c8102e !important; 
+      background-color: #fde8e8; 
+    }
+    body.liverpool-mode .text-green-900 { color: #c8102e !important; }
+    body.liverpool-mode .bg-green-600 { background-color: #c8102e !important; }
+    body.liverpool-mode .bg-green-600:hover { background-color: #a00c22 !important; }
+    body.liverpool-mode .border-green-300 { border-color: #f8b4b4 !important; }
+    body.liverpool-mode .bg-green-50 { background-color: #fdf2f2 !important; border-color: #f8b4b4 !important; }
+    
+    .theme-switch-container { 
+      display: flex; 
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 16px; 
+      margin: 8px; 
+      background: #f8fafc; 
+      border-radius: 12px; 
+      border: 1px solid #e2e8f0; 
+    }
+    
+    /* ====== CARD DESIGN CONFIGURATION ====== */
+    .student-card {
+      width: 86mm !important;
+      height: 54mm !important;
+      min-width: 86mm !important;
+      min-height: 54mm !important;
+      position: relative;
+      background-color: #ffffff;
+      overflow: hidden;
+      box-sizing: border-box;
+      border-radius: 6mm;
+    }
+    
+    .card-content-wrapper { 
+      position: relative; 
+      z-index: 10; 
+      width: 100%; 
+      height: 100%; 
+      box-sizing: border-box; 
+    }
+    
+    .info-value-text { 
+      font-family: 'Sarabun', Arial, sans-serif; 
+      font-weight: 800; 
+      color: #000000 !important; 
+      white-space: nowrap; 
+      overflow: visible; 
+      text-overflow: ellipsis;
+      line-height: 0.3; 
+    }
+
+    body.liverpool-mode .info-value-text {
+      color: #090000 !important;
+    }
+    
+    .qr-container-box {
+      position: absolute;
+      top: 19.5mm; 
+      right: 9.5mm; 
+      width: 14.5mm;
+      height: 14.5mm;
+      background: transparent; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+    }
+    .qr-container-box img, .qr-container-box canvas { width: 100% !important; height: 100% !important; object-fit: contain; }
+    
+    .barcode-tray-wrapper {
+      position: absolute;
+      top: 35.5mm; 
+      right: 4.5mm;
+      width: 21.5mm;
+      height: 7.5mm;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 40;
+      border-radius: 0.8mm;
+      padding: 0.4mm;
+    }
+    .barcode-tray-wrapper svg { width: 100% !important; height: 100% !important; }
+    .card-wrapper-spacer { margin: 10px; display: inline-block; }
+    
+    .scanner-viewport video {
+      transform: scaleX(-1) !important;
+    }
+    
+    @media print {
+      @page { size: A4 portrait; margin: 15mm 4mm 4mm 4mm !important; }
+      body { background-color: #ffffff !important; margin: 0mm !important; padding: 0mm !important; }
+      .hide-on-print { display: none !important; }
+      
+      #print-area { 
+        display: grid !important; 
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: repeat(4, auto) !important; 
+        row-gap: 8mm !important; 
+        column-gap: 6mm !important; 
+        width: 202mm !important; 
+        margin: 0mm auto !important; 
+        padding: 12mm 0mm !important; 
+        box-sizing: border-box !important; 
+        background: transparent !important;
+        page-break-after: always !important; 
+      }
+      .card-wrapper-spacer { 
+        margin: 0mm !important; 
+        padding: 0mm !important; 
+        display: flex !important; 
+        justify-content: center !important; 
+        page-break-inside: avoid !important; 
+        break-inside: avoid !important; 
+      }
+      .student-card { 
+        page-break-inside: avoid !important; 
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+      }
+      .card-excluded, .card-action-bar { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <div id="sidebar-overlay" class="hide-on-print" onclick="toggleSidebar(false)"></div>
+  
+  <div id="sidebar-menu" class="hide-on-print flex flex-col justify-between">
+    <div>
+      <div class="p-5 border-b flex items-center justify-between bg-gradient-to-r from-green-50 to-green-100">
+        <div class="flex items-center space-x-2">
+          <img src="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/Logo.jpg" class="w-9 h-9 rounded-full object-contain border-2 border-green-600 shadow-sm">
+          <span class="font-black text-green-900 text-sm tracking-wide" id="menu-header-text">Control Menu</span>
+        </div>
+        <button onclick="toggleSidebar(false)" class="text-2xl font-bold text-gray-400 hover:text-red-500 transition px-2">&times;</button>
+      </div>
+      
+      <div class="theme-switch-container hide-on-print">
+        <span class="text-xs font-bold text-gray-700">Select System Theme</span>
+        <select id="theme-selector-dropdown" onchange="changeSystemThemeStyle(this.value)" class="w-full p-2 border rounded-xl bg-white text-xs font-semibold outline-none">
+          <option value="default">Default Green Theme</option>
+          <option value="onepiece">One Piece Theme</option>
+          <option value="liverpool">Liverpool FC Theme</option>
+        </select>
+      </div>
+      
+      <nav class="mt-1 space-y-1 px-2">
+        <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>1. Main Scanner</span></button>
+        <button onclick="switchTab('tab1_fast')" id="btn-tab1_fast" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>1.1 Fast Scanner</span></button>
+        <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>2. Cards Generator</span></button>
+        <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>3. Add Lesson</span></button>
+        <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>4. Teacher Review</span></button>
+        <button onclick="switchTab('tab5')" id="btn-tab5" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>5. Tracker Status</span></button>
+        <button onclick="switchTab('tab6')" id="btn-tab6" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>6. Homework Board</span></button>
+      </nav>
+    </div>
+    
+    <div class="p-4 border-t bg-red-50">
+      <button onclick="logoutSessionBackToGateway(); toggleSidebar(false);" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center space-x-1 shadow-md hover:shadow-lg">
+        <span>Exit Dashboard</span>
+      </button>
+    </div>
+  </div>
+
+  <header id="teacher-top-bar" class="hidden bg-white shadow-sm border-b p-4 hide-on-print sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <button onclick="toggleSidebar(true)" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-4 py-2 rounded-xl text-sm flex items-center space-x-2 transition action-btn-glow action-btn-gray"><span>Menu</span></button>
+      <div class="flex items-center space-x-2">
+        <span id="current-active-tab-title" class="text-xs md:text-sm font-bold text-green-900 bg-green-100 px-3 py-1 rounded-full">1. Main Scanner</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="login-gateway-screen" class="fixed inset-0 flex items-center justify-center z-50 p-4">
+    <div class="bg-white border rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-gray-100 bg-opacity-95 backdrop-filter blur-sm">
+      <img id="gateway-logo-img" src="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/Logo.jpg" class="w-20 h-20 mx-auto rounded-full border-2 border-green-600 shadow-md mb-4 object-contain">
+      <h1 class="text-xl md:text-2xl font-black text-green-900 tracking-wide mb-2">Welcome from Teacher Minn's Checking System</h1>
+      <p class="text-xs text-gray-500 font-medium mb-8">Please choose your identity access role card</p>
+      
+      <div class="space-y-3">
+        <button onclick="enterAsStudent()" class="w-full bg-white border-2 border-green-500 hover:bg-green-50 text-green-700 font-bold py-4 px-6 rounded-2xl shadow-sm text-md flex items-center justify-center space-x-2 transition transform hover:-translate-y-0.5"><span>นักเรียน (Student Entry)</span></button>
+        <button onclick="showTeacherLoginModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-2xl shadow-md text-md flex items-center justify-center space-x-2 transition action-btn-glow"><span>คุณครู (Teacher Portal)</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="teacher-auth-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white border rounded-3xl p-6 max-w-sm w-full shadow-2xl relative border-gray-100">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2"><span>Teacher Verification</span></h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Enter Secret Code</label>
+          <input type="password" id="teacher-pass-input" placeholder="...." class="w-full p-3 border-2 rounded-xl text-center text-xl font-mono outline-none focus:border-green-600 tracking-widest">
+        </div>
+        
+        <div id="auth-error-msg" class="text-xs text-red-600 font-bold hidden text-center">Invalid code entry. Try again!</div>
+        
+        <div class="flex space-x-2">
+          <button onclick="closeTeacherModal()" class="flex-1 bg-gray-100 text-gray-600 font-bold py-2.5 rounded-xl text-sm action-btn-glow action-btn-gray">Back</button>
+          <button onclick="verifyTeacherCode()" class="flex-1 bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm shadow action-btn-glow">Login</button>
+        </div>
+        
+        <div class="text-center pt-2 border-t">
+          <button onclick="showRecoveryTray()" class="text-xs text-blue-600 hover:underline font-medium">Forgot Secret Code? Click here</button>
+        </div>
+        
+        <div id="recovery-tray" class="hidden bg-blue-50 p-3 rounded-xl border border-blue-100 text-center space-y-2">
+          <p class="text-[11px] text-blue-800 font-semibold">Type Teacher's Registered Phone to reset/view</p>
+          <input type="text" id="recovery-phone-input" placeholder="e.g... 09..." class="w-full p-2 border rounded-lg text-center text-sm font-mono outline-none">
+          <button onclick="processPasswordRecovery()" class="w-full bg-blue-600 text-white text-xs font-bold py-1.5 rounded-lg">Verify Phone</button>
+        </div>
+        
+        <div id="change-pass-tray" class="hidden bg-purple-50 p-3 rounded-xl border border-purple-100 text-center space-y-2">
+          <p class="text-[11px] text-purple-800 font-bold">Create/Update New Code</p>
+          <input type="text" id="new-password-input" placeholder="Enter new code..." class="w-full p-2 border rounded-lg text-center text-sm font-mono outline-none">
+          <button onclick="saveNewPasswordAdministrative()" class="w-full bg-purple-600 text-white text-xs font-bold py-1.5 rounded-lg">Update Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="system-master-frame" class="hidden">
+    <div class="max-w-6xl mx-auto p-4 md:p-6">
+      
+      <!-- TAB 1: MAIN SCANNER -->
+      <div id="tab1" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-green-900 pb-2 border-b">1. Attendance Main Entry</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Select Class</label>
+            <select id="scanner-class" onchange="onClassChangeScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
+              <option value="">-- Choose Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Select Current Lesson</label>
+            <select id="scanner-lesson" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
+              <option value="">-- Choose Lesson --</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="md:col-span-1 p-5 bg-green-50 rounded-2xl border border-green-100 flex flex-col justify-between">
+            <div>
+              <label class="block text-sm font-bold text-green-900 mb-2">Hardware Barcode/QR Laser Capture Input</label>
+              <input type="text" id="hardware-scanner-input" placeholder="Point Laser or Type ID here..." class="w-full p-3 border-2 border-green-300 rounded-xl font-mono text-lg bg-white focus:outline-none focus:border-green-600">
+            </div>
+            <button onclick="triggerManualSubmit()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-bold text-sm mt-3 action-btn-glow">Submit ID</button>
+          </div>
+          
+          <div class="md:col-span-2 p-5 bg-green-50 rounded-2xl border border-green-100">
+            <label class="block text-sm font-bold text-green-900 mb-2">Device Camera Capture Scan Module (Mirror Mode)</label>
+            <div class="flex space-x-2 mb-3">
+              <button onclick="startMainCameraEngine()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Start Camera Scan</button>
+              <button onclick="stopMainCameraEngine()" class="bg-gray-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow action-btn-gray">Stop</button>
+            </div>
+            <div id="main-reader-viewport" class="scanner-viewport w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-green-300"></div>
+          </div>
+        </div>
+        
+        <div id="scan-status" class="mt-4 p-3 rounded-xl text-center font-bold hidden"></div>
+        
+        <div id="emergency-section" class="mt-8 border-t pt-6 hidden">
+          <h3 class="text-lg font-bold text-gray-800 mb-3">Manual Checklist Board</h3>
+          <div id="manual-checklist-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-2xl border"></div>
+        </div>
+      </div>
+      
+      <!-- TAB 1.1: FAST SCANNER -->
+      <div id="tab1_fast" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-blue-900 pb-2 border-b">1.1 Fast Continuous Attendance Scanner (No Pop-ups)</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Class</label>
+            <select id="fast-scanner-class" onchange="onClassChangeFastScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
+              <option value="">-- Choose Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Current Lesson</label>
+            <select id="fast-scanner-lesson" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
+              <option value="">-- Choose Lesson --</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="md:col-span-1 p-5 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col justify-between">
+            <div>
+              <label class="block text-sm font-bold text-blue-900 mb-2">Continuous Laser Focus Engine</label>
+              <input type="text" id="fast-hardware-input" placeholder="Scan continuously..." class="w-full p-3 border-2 border-blue-300 rounded-xl font-mono text-lg bg-white outline-none">
+            </div>
+            <button onclick="triggerFastManualSubmit()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-bold text-sm mt-3 action-btn-glow">Submit ID</button>
+          </div>
+          
+          <div class="md:col-span-2 p-5 bg-purple-50 rounded-2xl border border-purple-100">
+            <label class="block text-sm font-bold text-purple-900 mb-2">Smartphone Camera Lens Scan Module (Mirror Mode)</label>
+            <div class="flex space-x-2 mb-3">
+              <button onclick="startFastCameraEngine()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Start Camera Scan</button>
+              <button onclick="stopFastCameraEngine()" class="bg-gray-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow action-btn-gray">Stop</button>
+            </div>
+            <div id="fast-reader-viewport" class="scanner-viewport w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
+          </div>
+        </div>
+        
+        <div id="fast-scan-status-toast" class="mt-2 p-3 text-center font-bold rounded-xl hidden"></div>
+        
+        <div class="mt-6">
+          <h3 class="text-sm font-bold text-gray-800 mb-2 flex justify-between items-center">
+            <span>Scanned Queue on Current Sheet Session</span>
+            <button onclick="clearFastScannerQueue()" class="text-xs text-red-500 hover:underline">Clear List Grid View</button>
+          </h3>
+          
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="w-full text-left border-collapse bg-white">
+              <thead>
+                <tr class="bg-gray-100 text-gray-700 text-xs font-bold">
+                  <th class="p-2 border-b">No.</th>
+                  <th class="p-2 border-b">Time</th>
+                  <th class="p-2 border-b">Student ID</th>
+                  <th class="p-2 border-b">Student Name</th>
+                  <th class="p-2 border-b">Class</th>
+                  <th class="p-2 border-b">Status</th>
+                </tr>
+              </thead>
+              <tbody id="fast-queue-table-body" class="text-gray-700 text-xs font-semibold">
+                <tr id="fast-queue-empty-row">
+                  <td colspan="6" class="p-4 text-gray-400 italic text-center">No students scanned yet in this fast window stream session.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TAB 2: CARDS GENERATOR -->
+      <div id="tab2" class="tab-content bg-white rounded-2xl border p-6 shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2 hide-on-print">2. Card Generation Engine</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-green-50 p-4 rounded-xl hide-on-print">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Filter Class Target</label>
+            <select id="generator-class" class="w-full p-2 border rounded-lg bg-white">
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div class="flex items-end space-x-2">
+            <button onclick="generateCardsByClass()" class="bg-green-600 text-white px-5 py-2 h-10 rounded-lg hover:bg-green-700 font-bold text-sm flex-1 action-btn-glow">Generate LaSalle Cards</button>
+            <button onclick="window.print()" class="bg-gray-700 text-white px-4 py-2 h-10 rounded-lg hover:bg-gray-800 font-bold text-sm flex-1 action-btn-glow action-btn-gray">Print Page Layout</button>
+          </div>
+        </div>
+        
+        <div id="print-area" class="p-2 bg-gray-50 rounded-xl min-h-[300px] text-center"></div>
+      </div>
+      
+      <!-- TAB 3: ADD LESSON -->
+      <div id="tab3" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">3. Lesson Management</h2>
+        <div class="space-y-4 max-w-md">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Target Main Grade</label>
+            <select id="lesson-grade" class="w-full p-2 border rounded-lg">
+              <option value="Grade 1">Grade 1</option><option value="Grade 2">Grade 2</option>
+              <option value="Grade 3">Grade 3</option><option value="Grade 4">Grade 4</option>
+              <option value="Grade 5">Grade 5</option><option value="Grade 6">Grade 6</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Lesson Topic Title</label>
+            <input type="text" id="lesson-name" placeholder="e.g., Unit 1 Speaking" class="w-full p-2 border rounded-lg">
+          </div>
+          <button onclick="saveNewLesson()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-bold action-btn-glow">Save Topic</button>
+          <div id="lesson-status" class="mt-2 text-sm font-semibold hidden"></div>
+        </div>
+      </div>
+      
+      <!-- TAB 4: TEACHER REVIEW -->
+      <div id="tab4" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-green-900 border-b pb-2">4. Teacher Master Record History Review</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Type Student ID & Search</label>
+            <div class="flex space-x-2">
+              <input type="text" id="review-scanner-input" placeholder="Type Student ID..." class="flex-1 p-2 border rounded-lg bg-white font-mono outline-none">
+              <button onclick="triggerReviewSearch()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-bold hover:bg-green-700 action-btn-glow">Search Records</button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">or Choose Class to look up</label>
+            <select id="review-class" onchange="loadStudentsForReview()" class="w-full p-2 border rounded-lg bg-white">
+              <option value="">-- Choose Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Student from Class List</label>
+            <select id="review-student" onchange="fetchStudentHistory()" class="w-full p-2 border rounded-lg bg-white font-semibold">
+              <option value="">-- Select Student --</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-green-600 text-white text-sm font-bold">
+                <th class="p-3 border-b">Submission Date & Time</th>
+                <th class="p-3 border-b">Student ID</th>
+                <th class="p-3 border-b">Student Name</th>
+                <th class="p-3 border-b">Class</th>
+                <th class="p-3 border-b">Lesson Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="text-gray-700 text-sm bg-white divide-y">
+              <tr><td colspan="5" class="p-4 text-center text-gray-400 italic">No search performed yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- TAB 5: TRACKER STATUS -->
+      <div id="tab5" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-green-900 border-b pb-2">5. Lesson Submission Live Tracker</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Class</label>
+            <select id="tracker-class" onchange="loadLessonsForTracker()" class="w-full p-2 border rounded-lg bg-white">
+              <option value="">-- Choose Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Lesson</label>
+            <select id="tracker-lesson" class="w-full p-2 border rounded-lg bg-white">
+              <option value="">-- Choose Lesson --</option>
+            </select>
+          </div>
+          <button onclick="fetchTrackerStatus()" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 h-10 text-sm action-btn-glow">Check Tracker</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="border border-green-200 rounded-xl overflow-hidden bg-white">
+            <div class="bg-green-600 text-white p-3 font-bold flex justify-between"><span>Submitted List</span><span id="count-submitted">0</span></div>
+            <div class="p-2 max-h-96 overflow-y-auto"><ul id="list-submitted" class="divide-y text-sm font-semibold"></ul></div>
+          </div>
+          <div class="border border-red-200 rounded-xl overflow-hidden bg-white">
+            <div class="bg-red-500 text-white p-3 font-bold flex justify-between"><span>Missing List</span><span id="count-missing">0</span></div>
+            <div class="p-2 max-h-96 overflow-y-auto"><ul id="list-missing" class="divide-y text-sm font-semibold text-red-700"></ul></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TAB 6: HOMEWORK BOARD -->
+      <div id="tab6" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
+        <h2 class="text-xl font-bold mb-4 text-green-700 border-b pb-2">6. Homework Assignment System</h2>
+        
+        <div class="mb-5 p-4 bg-orange-50/60 rounded-xl border border-orange-200 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div>
+            <label class="block text-xs font-bold text-orange-800 mb-1">Select Target Class for New Homework</label>
+            <select id="homework-topic-class-select" class="w-full p-2 border rounded-lg bg-white text-sm">
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-orange-800 mb-1">Type Registered Homework Title</label>
+            <input type="text" id="homework-title-input" placeholder="e.g., Math Homework Week 1" class="w-full p-2.5 border rounded-lg bg-white font-medium text-sm">
+          </div>
+          <button onclick="saveNewHomeworkTopicExplicit()" type="button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg text-sm shadow-md block" style="background-color: #ea580c !important; color: #ffffff !important;">+ Add Topic</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-green-50 p-4 rounded-xl border border-green-100">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">1. Select Target Class</label>
+            <select id="homework-class" onchange="onHomeworkClassChange()" class="w-full p-2.5 border rounded-lg bg-white font-medium">
+              <option value="">-- Choose Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option>
+              <option value="2/1">2/1</option><option value="2/2">2/2</option>
+              <option value="3/1">3/1</option><option value="3/2">3/2</option>
+              <option value="4/1">4/1</option><option value="4/2">4/2</option>
+              <option value="5/1">5/1</option><option value="5/2">5/2</option>
+              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">2. Select Registered Homework Node</label>
+            <select id="homework-topic-dropdown" onchange="fetchHomeworkTrackerStatus()" class="w-full p-2.5 border rounded-lg bg-white font-medium text-sm">
+              <option value="">-- Choose Topic --</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+            <label class="block text-sm font-bold text-orange-800 mb-1">1. Assignment Mode: Scan ID to assign</label>
+            <div class="flex space-x-2">
+              <input type="text" id="homework-assign-input" placeholder="Scan QR to ASSIGN..." class="flex-1 p-2 border rounded-lg text-sm font-mono">
+              <button onclick="triggerHomeworkAssign()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2 rounded-lg text-xs action-btn-glow action-btn-orange">Assigned</button>
+            </div>
+          </div>
+          
+          <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+            <label class="block text-sm font-bold text-green-900 mb-1">2. Submission Mode: Scan ID to check homework</label>
+            <div class="flex space-x-2">
+              <input type="text" id="homework-submit-input" placeholder="Scan QR to SUBMIT..." class="flex-1 p-2 border rounded-lg text-sm font-mono">
+              <button onclick="triggerHomeworkSubmit()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-lg text-xs action-btn-glow">Submit Homework</button>
+            </div>
+          </div>
+
+          <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+            <label class="block text-sm font-bold text-purple-900 mb-2">3. Smartphone Camera Scanner (Mirror Mode)</label>
+            <div class="flex space-x-2 mb-2">
+              <button onclick="startHomeworkCameraEngine()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1 rounded-lg text-xs action-btn-glow">Start Cam</button>
+              <button onclick="stopHomeworkCameraEngine()" class="bg-gray-500 text-white font-bold px-3 py-1 rounded-lg text-xs action-btn-glow action-btn-gray">Stop</button>
+            </div>
+            <div id="homework-reader-viewport" class="scanner-viewport w-full max-w-[120px] mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
+          </div>
+        </div>
+        
+        <div id="homework-status" class="mt-2 p-3 text-center font-bold rounded-xl hidden"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div class="bg-gray-50 border rounded-xl p-4 shadow-sm md:col-span-1">
+            <h3 class="font-bold text-gray-800 border-b pb-2 mb-2 text-sm">Assign Checkbox List</h3>
+            <div id="homework-checklist-container" class="space-y-2 max-h-96 overflow-y-auto text-xs">
+              <p class="text-gray-400 italic">Please select class first...</p>
+            </div>
+          </div>
+          
+          <div class="md:col-span-2 bg-white border rounded-xl p-4 shadow-sm">
+            <div class="flex justify-between items-center border-b pb-2 mb-3">
+              <h3 class="font-bold text-blue-900 text-sm">Homework Tracker Status Grid</h3>
+              <button onclick="fetchHomeworkTrackerStatus()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3 py-1.5 rounded action-btn-glow">Refresh Board</button>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="border border-green-100 rounded-lg overflow-hidden">
+                <div class="bg-green-600 text-white p-2 text-xs font-bold flex justify-between"><span>Submitted List</span><span id="hw-count-submitted">0</span></div>
+                <ul id="hw-list-submitted" class="p-2 max-h-64 overflow-y-auto text-xs space-y-1 font-semibold divide-y"></ul>
+              </div>
+              <div class="border border-red-100 rounded-lg overflow-hidden">
+                <div class="bg-red-500 text-white p-2 text-xs font-bold flex justify-between"><span>Missing List</span><span id="hw-count-missing">0</span></div>
+                <ul id="hw-list-missing" class="p-2 max-h-64 overflow-y-auto text-xs space-y-1 text-red-600 font-semibold"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- STUDENT VIEW -->
+  <div id="student-isolated-frame" class="hidden p-4 md:p-8 max-w-4xl mx-auto">
+    <div class="text-center mb-6">
+      <img id="student-isolated-logo" src="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/Logo.jpg" class="w-16 h-16 mx-auto rounded-full border shadow mb-2 object-contain">
+      <h2 class="text-2xl font-black text-green-900 mb-1" id="student-isolated-title">ระบบตรวจสอบข้อมูลนักเรียน (Student Portal)</h2>
+      <p class="text-xs text-gray-500 font-medium">กรอกรหัสนักเรียนเพื่อตรวจสอบสถานะการส่งงานของคุณ</p>
+    </div>
+    
+    <div class="max-w-md mx-auto bg-white border border-green-200 p-5 rounded-2xl shadow-md mb-6 text-center" id="student-inquiry-box">
+      <label class="block text-sm font-bold text-green-800 mb-2" id="student-inquiry-label">กรุณากรอกรหัสนักเรียนของคุณ (Enter Student ID)</label>
+      <div class="flex space-x-2">
+        <input type="text" id="kid-id-input" placeholder="รหัสนักเรียน (ID)..." class="flex-1 p-3 border-2 border-green-300 rounded-xl font-mono text-center text-lg bg-gray-50 outline-none">
+        <button onclick="triggerKidInquiryLookup()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow action-btn-glow">ตรวจสอบ</button>
+      </div>
+    </div>
+    
+    <div id="kid-result-zone" class="hidden">
+      <div class="bg-white border border-green-300 rounded-2xl p-4 mb-5 flex flex-wrap items-center justify-between shadow-sm" id="student-profile-summary-box">
+        <div class="space-y-0.5">
+          <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">โปรไฟล์นักเรียน (Profile)</div>
+          <h3 id="kid-profile-name" class="text-lg font-black text-slate-800">LOADING...</h3>
+        </div>
+        <div class="flex space-x-3 text-xs mt-2 sm:mt-0 font-bold">
+          <span class="px-3 py-1 bg-blue-50 text-blue-800 rounded-lg border border-blue-100">รหัส: <span id="kid-profile-id">-</span></span>
+          <span class="px-3 py-1 bg-purple-50 text-purple-800 rounded-lg border border-purple-100">ชั้นเรียน : <span id="kid-profile-class">-</span></span>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="border border-green-300 rounded-2xl overflow-hidden shadow-sm bg-white" id="student-done-box">
+          <div class="bg-green-600 text-white p-3 font-bold flex justify-between items-center text-xs">
+            <span>งานที่ส่งแล้ว (Submitted Lessons)</span>
+            <span id="kid-count-done" class="bg-white text-green-700 text-xs px-2.5 py-0.5 rounded-full font-black">0</span>
+          </div>
+          <div class="p-3 max-h-80 overflow-y-auto bg-green-50/20"><ul id="kid-list-done" class="space-y-1.5 text-xs font-bold text-slate-700"></ul></div>
+        </div>
+        
+        <div class="border border-red-300 rounded-2xl overflow-hidden shadow-sm bg-white">
+          <div class="bg-red-500 text-white p-3 font-bold flex justify-between items-center text-xs">
+            <span>X งานที่ยังไม่ส่ง (Missing Lessons)</span>
+            <span id="kid-count-miss" class="bg-white text-red-600 text-xs px-2.5 py-0.5 rounded-full font-black">0</span>
+          </div>
+          <div class="p-3 max-h-80 overflow-y-auto bg-red-50/20"><ul id="kid-list-miss" class="space-y-1.5 text-xs font-bold text-red-600"></ul></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-8">
+      <button onclick="logoutSessionBackToGateway()" class="bg-gray-200 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl border hover:bg-gray-300 action-btn-glow action-btn-gray">กลับสู่หน้าแรก (Main Menu)</button>
+    </div>
+  </div>
+
+  <!-- TV POPUP MODAL -->
+  <div id="tv-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+    <div class="bg-gradient-to-b from-blue-600 to-indigo-900 border-4 border-white text-white rounded-3xl p-8 md:p-12 max-w-2xl w-11/12 text-center shadow-2xl">
+      <h1 id="tv-header-title" class="text-4xl font-extrabold mb-4 text-green-300">SUBMISSION RECEIVED</h1>
+      <hr class="border-blue-400 opacity-40 my-4">
+      <div class="bg-black bg-opacity-30 p-6 rounded-2xl border border-white border-opacity-10 mb-6">
+        <div id="tv-student-name" class="text-4xl md:text-5xl font-black text-yellow-300">LOADING...</div>
+        <div id="tv-student-id" class="text-lg font-mono text-blue-200 mt-2">ID: 0000</div>
+      </div>
+      <div id="tv-lesson-title" class="text-xl text-gray-100 font-medium italic">Lesson Node</div>
+      <button onclick="closeTvModal()" class="mt-6 bg-green-500 hover:bg-green-600 text-white text-xl font-bold px-12 py-3.5 rounded-xl shadow-md w-full sm:w-auto action-btn-glow">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzk4jDi61TX2U0AOEo15_yrCdeEdTmW23hqZ5LNUVgRg5Szs5Oz7ZcGEDyWZtWJ7jTrGw/exec"; 
+
+    async function runGAS(action, params = {}) {
+      try {
+        params.action = action;
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(params)
+        });
+        if (!response.ok) {
+          throw new Error("HTTP connection failed status: " + response.status);
+        }
+        const data = await response.json();
+        if (data && data.error) {
+          console.error("Backend Error Response: ", data.error);
+          return null;
+        }
+        return data;
+      } catch (err) {
+        console.error("Network interface error calling GAS API: ", err);
+        return null;
+      }
+    }
+
+    var MASTER_SECRET_KEY = "1234";
+    var fastScannerIndexCount = 0;
+    
+    var html5QrScannerMain = null;
+    var html5QrScannerFast = null;
+    var html5QrScannerHomework = null;
+    var scanThrottleLock = false;
+
+    function changeSystemThemeStyle(themeValue) {
+      document.body.classList.remove('onepiece-mode', 'liverpool-mode');
+      document.getElementById('login-gateway-screen').classList.remove('liverpool-gateway');
+      localStorage.setItem('activeSystemThemeStyle', themeValue);
+      
+      if (themeValue === 'onepiece') {
+        document.body.classList.add('onepiece-mode');
+      } else if (themeValue === 'liverpool') {
+        document.body.classList.add('liverpool-mode');
+        document.getElementById('login-gateway-screen').classList.add('liverpool-gateway');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const savedTheme = localStorage.getItem('activeSystemThemeStyle') || 'default';
+      const selector = document.getElementById('theme-selector-dropdown');
+      if (selector) selector.value = savedTheme;
+      changeSystemThemeStyle(savedTheme);
+    });
+
+    function toggleSidebar(openState) {
+      var sidebar = document.getElementById('sidebar-menu');
+      var overlay = document.getElementById('sidebar-overlay');
+      if (openState) { sidebar.classList.add('open'); overlay.classList.add('show'); }
+      else { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+    }
+
+    function enterAsStudent() {
+      document.getElementById('login-gateway-screen').classList.add('hidden');
+      document.getElementById('student-isolated-frame').classList.remove('hidden');
+      document.getElementById('student-isolated-frame').querySelector('#kid-id-input').focus();
+    }
+
+    function showTeacherLoginModal() {
+      document.getElementById('teacher-auth-modal').classList.remove('hidden');
+      document.getElementById('auth-error-msg').classList.add('hidden');
+      document.getElementById('teacher-pass-input').value = "";
+      document.getElementById('teacher-pass-input').focus();
+    }
+
+    function closeTeacherModal() {
+      document.getElementById('teacher-auth-modal').classList.add('hidden'); 
+    }
+
+    function verifyTeacherCode() {
+      var typedCode = document.getElementById('teacher-pass-input').value.trim();
+      if (typedCode === MASTER_SECRET_KEY) {
+        document.getElementById('teacher-auth-modal').classList.add('hidden');
+        document.getElementById('login-gateway-screen').classList.add('hidden');
+        document.getElementById('system-master-frame').classList.remove('hidden');
+        document.getElementById('teacher-top-bar').classList.remove('hidden');
+        switchTab('tab1');
+      } else { 
+        document.getElementById('auth-error-msg').classList.remove('hidden'); 
+        beep(); 
+      }
+    }
+
+    function showRecoveryTray() { 
+      var tray = document.getElementById('recovery-tray');
+      tray.classList.toggle('hidden'); 
+      document.getElementById('recovery-phone-input').focus(); 
+    }
+
+    function processPasswordRecovery() {
+      var phone = document.getElementById('recovery-phone-input').value.trim();
+      if (phone === "0955363803") {
+        alert("SYSTEM KEY FOUND! \nYour current password code is: " + MASTER_SECRET_KEY);
+        document.getElementById('change-pass-tray').classList.remove('hidden');
+        document.getElementById('new-password-input').focus();
+      } else { 
+        alert("X Phone number mismatch!"); 
+      }
+    }
+
+    function saveNewPasswordAdministrative() {
+      var newCode = document.getElementById('new-password-input').value.trim();
+      if(!newCode) { alert("Code input cannot be empty."); return; }
+      MASTER_SECRET_KEY = newCode;
+      alert("SUCCESS! \nTeacher password updated to: " + MASTER_SECRET_KEY);
+      document.getElementById('change-pass-tray').classList.add('hidden');
+      document.getElementById('recovery-tray').classList.add('hidden');
+      document.getElementById('teacher-pass-input').focus();
+    }
+
+    function logoutSessionBackToGateway() {
+      stopMainCameraEngine();
+      stopFastCameraEngine();
+      stopHomeworkCameraEngine();
+      document.getElementById('system-master-frame').classList.add('hidden');
+      document.getElementById('student-isolated-frame').classList.add('hidden');
+      document.getElementById('teacher-top-bar').classList.add('hidden');
+      document.getElementById('login-gateway-screen').classList.remove('hidden');
+      document.getElementById('student-isolated-frame').querySelector('#kid-id-input').value='';
+      document.getElementById('kid-result-zone').classList.add('hidden');
+    }
+
+    function switchTab(tabId) {
+      var contents = document.getElementsByClassName('tab-content');
+      for (var i=0; i < contents.length; i++) { 
+        contents[i].style.setProperty('display', 'none', 'important');
+      }
+      var buttons = document.getElementsByClassName('tab-btn');
+      for (var i=0; i< buttons.length; i++) { 
+        buttons[i].classList.remove('active'); 
+      }
+      var activeBtnNode = document.getElementById('btn-' + tabId);
+      if(activeBtnNode) { 
+        document.getElementById('current-active-tab-title').textContent = activeBtnNode.textContent.trim(); 
+      }
+      document.getElementById(tabId).style.setProperty('display', 'block', 'important');
+      if(document.getElementById('btn-' + tabId)) { 
+        document.getElementById('btn-' + tabId).classList.add('active'); 
+      }
+      toggleSidebar(false);
+      
+      if (tabId === 'tab1') {
+        document.getElementById('hardware-scanner-input').focus();
+      } else {
+        stopMainCameraEngine();
+      }
+      
+      if (tabId === 'tab1_fast') {
+        document.getElementById('fast-hardware-input').focus();
+      } else {
+        stopFastCameraEngine();
+      }
+      
+      if (tabId !== 'tab6') {
+        stopHomeworkCameraEngine();
+      }
+    }
+
+    function beep() { 
+      var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator(); 
+      osc.connect(audioCtx.destination); 
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1); 
+    }
+
+    function onClassChangeScanner() { 
+      loadLessonsForScanner(); 
+      loadEmergencyChecklist(); 
+    }
+
+    async function loadLessonsForScanner() {
+      var cls = document.getElementById('scanner-class').value; 
+      var dropdown = document.getElementById('scanner-lesson');
+      dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>'; 
+      if(!cls) return;
+      var grade = 'Grade 3';
+      if (cls.indexOf('1') === 0) grade = 'Grade 1'; 
+      else if (cls.indexOf('2') === 0) grade = 'Grade 2';
+      else if (cls.indexOf('3') === 0) grade = 'Grade 3'; 
+      else if (cls.indexOf('4') === 0) grade = 'Grade 4'; 
+      else if (cls.indexOf('5') === 0) grade = 'Grade 5'; 
+      else if (cls.indexOf('6') === 0) grade = 'Grade 6';
+      
+      dropdown.innerHTML = '<option value="">Loading lessons...</option>';
+      const lessons = await runGAS("getLessonsByGrade", { grade: grade });
+      dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (lessons && lessons.length > 0) {
+        lessons.forEach(function(l) {
+          var opt = document.createElement('option');
+          opt.value = l;
+          opt.textContent = l;
+          dropdown.appendChild(opt);
+        });
+      }
+    }
+
+    async function loadEmergencyChecklist() {
+      var selectedClass = document.getElementById('scanner-class').value; 
+      var container = document.getElementById('manual-checklist-container'); 
+      var section = document.getElementById('emergency-section');
+      if (!selectedClass) { section.style.display = 'none'; return; }
+      
+      container.innerHTML = '<p class="text-gray-500">Loading...</p>'; 
+      section.style.display = 'block';
+      
+      const students = await runGAS("getStudentsByClass", { className: selectedClass });
+      container.innerHTML='';
+      if (students && students.length > 0) {
+        students.forEach(function(student) {
+          var label = document.createElement('label'); 
+          label.className = "flex items-center space-x-2 bg-white p-2 rounded-xl border cursor-pointer hover:bg-green-50";
+          label.innerHTML = '<input type="checkbox" onchange="submitManualCheck(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-5 w-5 text-green-600"><span class="select-none font-semibold text-sm">'+student.name+' ('+student.id+')</span>';
+          container.appendChild(label);
+        });
+      } else {
+        container.innerHTML = '<p class="text-red-500">No students found.</p>';
+      }
+    }
+
+    async function submitManualCheck(cb, id, name, className) {
+      if (!cb.checked) return; 
+      var lesson = document.getElementById('scanner-lesson').value;
+      if (!lesson) { 
+        alert("Please select a Current Lesson first!"); 
+        cb.checked = false; 
+        return; 
+      }
+      beep(); 
+      openTvModal(name, id, lesson, "ATTENDANCE RECEIVED"); 
+      cb.disabled = true;
+      await runGAS("saveRecord", { studentId: id, name: name, className: className, lesson: lesson });
+    }
+
+    function triggerManualSubmit() {
+      var inputEl = document.getElementById('hardware-scanner-input'); 
+      var value = inputEl.value.trim(); 
+      inputEl.value=''; 
+      if (!value) return;
+      var selectedClass = document.getElementById('scanner-class').value; 
+      var selectedLesson = document.getElementById('scanner-lesson').value; 
+      if (!selectedClass || !selectedLesson) { 
+        alert("Please select Class and Lesson Topic first!");
+        return; 
+      }
+      processSubmittedId(value, selectedClass, selectedLesson);
+    }
+
+    async function processSubmittedId(id, cls, lesson) {
+      beep(); 
+      var status = document.getElementById('scan-status'); 
+      status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-yellow-100 text-yellow-800 block"; 
+      status.textContent = "Processing...";
+      
+      const students = await runGAS("getStudentsByClass", { className: cls });
+      if (students) {
+        var match = students.find(s => s.id.toString().toLowerCase() === id.toLowerCase());
+        if(!match) { 
+          status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; 
+          status.textContent = "ID Not Found in Class!"; 
+          return; 
+        }
+        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-green-100 text-green-800 block"; 
+        status.textContent = "Success!";
+        openTvModal(match.name, match.id, lesson, "ATTENDANCE RECEIVED");
+        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson });
+      } else {
+        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; 
+        status.textContent = "Error loading class database.";
+      }
+    }
+
+    function startMainCameraEngine() {
+      var cls = document.getElementById('scanner-class').value; 
+      var lesson = document.getElementById('scanner-lesson').value; 
+      if(!cls || !lesson) { 
+        alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
+        return; 
+      }
+      document.getElementById('main-reader-viewport').innerHTML = ""; 
+      if(!html5QrScannerMain) {
+        html5QrScannerMain = new Html5Qrcode("main-reader-viewport");
+      }
+      html5QrScannerMain.start(
+        { facingMode: "user" }, 
+        { fps: 15, qrbox: { width: 220, height: 220 } }, 
+        function (message) { 
+          if (scanThrottleLock) return; 
+          scanThrottleLock = true;
+          processSubmittedId(message, cls, lesson); 
+          setTimeout(function() { scanThrottleLock = false; }, 2600); 
+        }, 
+        function(err) {}
+      ).catch(e => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) { 
+          html5QrScannerMain.start(
+            { facingMode: "user" }, 
+            { fps: 15, qrbox: { width: 220, height: 220 } }, 
+            function(msg) { 
+              if (scanThrottleLock) return; 
+              scanThrottleLock = true; 
+              processSubmittedId(msg, cls, lesson); 
+              setTimeout(function() { scanThrottleLock = false; }, 2600); 
+            }, 
+            function(err){}
+          ); 
+        })
+        .catch(error => { alert("Camera Access Blocked or Not Found!"); });
+      });
+    }
+
+    function stopMainCameraEngine() { 
+      if(html5QrScannerMain && html5QrScannerMain.isScanning) { 
+        html5QrScannerMain.stop().then(() => {
+          document.getElementById('main-reader-viewport').innerHTML = ''; 
+        }); 
+      } 
+    }
+
+    function onClassChangeFastScanner() {
+      var cls = document.getElementById('fast-scanner-class').value; 
+      var dropdown = document.getElementById('fast-scanner-lesson');
+      dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>'; 
+      if(!cls) return;
+      var grade = 'Grade 3';
+      if (cls.indexOf('1') === 0) grade = 'Grade 1'; 
+      else if (cls.indexOf('2') === 0) grade = 'Grade 2';
+      else if (cls.indexOf('3') === 0) grade = 'Grade 3'; 
+      else if (cls.indexOf('4') === 0) grade = 'Grade 4'; 
+      else if (cls.indexOf('5') === 0) grade = 'Grade 5'; 
+      else if (cls.indexOf('6') === 0) grade = 'Grade 6';
+      
+      dropdown.innerHTML = '<option value="">Loading lessons...</option>';
+      runGAS("getLessonsByGrade", { grade: grade }).then(lessons => {
+        dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>';
+        if (lessons) {
+          lessons.forEach(function(l) {
+            var opt = document.createElement('option');
+            opt.value = l;
+            opt.textContent = l;
+            dropdown.appendChild(opt);
+          });
+        }
+      });
+    }
+
+    function triggerFastManualSubmit() {
+      var inputEl = document.getElementById('fast-hardware-input'); 
+      var value = inputEl.value.trim();
+      inputEl.value = ''; 
+      if (!value) return;
+      var selectedClass = document.getElementById('fast-scanner-class').value; 
+      var selectedLesson = document.getElementById('fast-scanner-lesson').value;
+      if (!selectedClass || !selectedLesson) { 
+        alert("Please select Class and Lesson Topic first!");
+        inputEl.focus(); 
+        return; 
+      }
+      processFastContinuousId(value, selectedClass, selectedLesson);
+    }
+
+    async function processFastContinuousId(id, cls, lesson) {
+      beep(); 
+      var toast = document.getElementById('fast-scan-status-toast'); 
+      toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block";
+      toast.textContent = "Checking ID: " + id + "...";
+      
+      const students = await runGAS("getStudentsByClass", { className: cls });
+      if (students) {
+        var match = students.find(s => s.id.toString().toLowerCase() === id.toLowerCase());
+        if(!match) { 
+          toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+          toast.textContent = "X ID " + id + " not found in Class " + cls;
+          document.getElementById('fast-hardware-input').focus(); 
+          return; 
+        }
+        toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
+        toast.textContent = match.name + " (" + match.id + ") Received Successfully!";
+        
+        var emptyRow = document.getElementById('fast-queue-empty-row'); 
+        if (emptyRow) emptyRow.remove(); 
+        fastScannerIndexCount++;
+        
+        var tbody = document.getElementById('fast-queue-table-body'); 
+        var tr = document.createElement('tr'); 
+        tr.className = "bg-green-50/50 hover:bg-green-50 transition";
+        var now = new Date(); 
+        var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+        tr.innerHTML = '<td class="p-2 border-b text-gray-500">'+fastScannerIndexCount+'</td><td class="p-2 border-b font-mono text-gray-600">'+timeStr+'</td><td class="p-2 border-b font-bold text-blue-700">'+match.id+'</td><td class="p-2 border-b font-bold text-gray-900">'+match.name+'</td><td class="p-2 border-b">'+match.className+'</td><td class="p-2 border-b text-green-600 font-bold">Saved</td>';
+        tbody.insertBefore(tr, tbody.firstChild); 
+        
+        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson });
+        document.getElementById('fast-hardware-input').focus();
+      } else {
+        toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+        toast.textContent = "Failed to load database records.";
+      }
+    }
+
+    function startFastCameraEngine() {
+      var cls = document.getElementById('fast-scanner-class').value; 
+      var lesson = document.getElementById('fast-scanner-lesson').value; 
+      if(!cls || !lesson) { 
+        alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
+        return; 
+      }
+      document.getElementById('fast-reader-viewport').innerHTML = ""; 
+      if(!html5QrScannerFast) html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
+      
+      html5QrScannerFast.start(
+        { facingMode: "user" }, 
+        { fps: 15, qrbox: { width: 220, height: 220 } }, 
+        function (message) { 
+          if (scanThrottleLock) return; 
+          scanThrottleLock = true;
+          processFastContinuousId(message, cls, lesson); 
+          setTimeout(function() { scanThrottleLock = false; }, 2600); 
+        }, 
+        function(err) {}
+      ).catch(e => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) { 
+          html5QrScannerFast.start(
+            { facingMode: "user" }, 
+            { fps: 15, qrbox: { width: 220, height: 220 } }, 
+            function(msg) { 
+              if (scanThrottleLock) return;
+              scanThrottleLock = true; 
+              processFastContinuousId(msg, cls, lesson); 
+              setTimeout(function() { scanThrottleLock = false; }, 2600); 
+            }, 
+            function(err){}
+          ); 
+        })
+        .catch(error => { alert("Camera Blocked!"); });
+      });
+    }
+
+    function stopFastCameraEngine() { 
+      if(html5QrScannerFast && html5QrScannerFast.isScanning) { 
+        html5QrScannerFast.stop().then(() => {
+          document.getElementById('fast-reader-viewport').innerHTML = ''; 
+        }); 
+      } 
+    }
+
+    function clearFastScannerQueue() {
+      var tbody = document.getElementById('fast-queue-table-body');
+      tbody.innerHTML = '<tr id="fast-queue-empty-row"><td colspan="6" class="p-4 text-gray-400 italic text-center">No students scanned yet in this fast window stream session.</td></tr>';
+      fastScannerIndexCount = 0;
+    }
+
+    // =========================================================
+    //  TAB 2: CARD GENERATION SYSTEM
+    // =========================================================
+    async function generateCardsByClass() {
+      var cls = document.getElementById('generator-class').value; 
+      var area = document.getElementById('print-area'); 
+      area.innerHTML = '<p class="text-gray-500">Generating Cards Layout...</p>';
+      
+      const students = await runGAS("getStudentsByClass", { className: cls });
+      area.innerHTML = ""; 
+      if (!students || students.length === 0) { 
+        area.innerHTML = '<p class="text-red-600 font-bold">No students found!</p>'; 
+        return; 
+      }
+
+      // Check current theme to pick correct background template card
+      const currentTheme = localStorage.getItem('activeSystemThemeStyle') || 'default';
+      let cardBgUrl = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/One%20piece%20Card.webp";
+      if (currentTheme === 'liverpool') {
+        cardBgUrl = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-01_29_13-AM.webp";
+      }
+      
+      students.forEach(function(student, index) {
+        var masterWrapper = document.createElement('div'); 
+        masterWrapper.id = "card-wrapper" + index; 
+        masterWrapper.className = "card-wrapper-spacer flex flex-col space-y-2 p-1 bg-white rounded-2xl border border-gray-100";
+        
+        var actionBar = document.createElement('div'); 
+        actionBar.className = "card-action-bar border-b pb-1 text-xs hide-on-print flex justify-between items-center px-1";
+        actionBar.innerHTML = '<label class="inline-flex items-center cursor-pointer select-none"><input type="checkbox" checked onchange="toggleCardSelection(this, '+index+')" class="form-checkbox text-green-600 rounded"><span class="ml-1 font-bold text-gray-700">Include</span></label><button onclick="downloadSingleCard('+index+', \''+student.name+'\')" class="bg-green-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">Download</button>';
+        masterWrapper.appendChild(actionBar);
+        
+        var card = document.createElement('div'); 
+        card.id = "target-card-render-" + index; 
+        card.className = "student-card text-left";
+        
+        card.innerHTML = 
+          '<img src="' + cardBgUrl + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" />' +
+          '<div class="card-content-wrapper" style="position: relative; z-index: 10; width: 100%; height: 100%;">' +
+            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 26.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
+            '<div class="info-value-text" style="position: absolute; top: 26.2mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.id + '</div>' +
+            '<div class="info-value-text" style="position: absolute; top: 32.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div>' +
+            '<div class="qr-container-box"><div id="code-'+index+'" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div></div>' +
+            '<div class="barcode-tray-wrapper"><svg id="bc-'+index+'"></svg></div>' +
+          '</div>';
+        
+        masterWrapper.appendChild(card); 
+        area.appendChild(masterWrapper);
+        
+        new QRCode(document.getElementById('code-'+index), { 
+          text: student.id, 
+          width: 120, 
+          height: 120,
+          colorDark : "#000000",
+          colorLight : "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        }); 
+        
+        JsBarcode("#bc-"+index, student.id, { 
+          format: "CODE128", 
+          width: 1.2, 
+          height: 20,
+          displayValue: true, 
+          fontSize: 8, 
+          fontOptions: "bold", 
+          margin: 0 
+        });
+      });
+    }
+
+    async function downloadSingleCard(index, studentName) { 
+      var targetElement = document.getElementById("target-card-render-" + index); 
+      window.scrollTo(0, 0);
+      await document.fonts.ready;
+      html2canvas(targetElement, {
+        useCORS: true, 
+        allowTaint: false, 
+        scale: 4, 
+        backgroundColor: "#ffffff", 
+        onclone: function(clonedDoc) {
+          var clonedCard = clonedDoc.getElementById("target-card-render-" + index);
+          if(clonedCard) clonedCard.style.transform = "none";
+        }
+      }).then(function(canvas) { 
+        var image = canvas.toDataURL("image/png", 1.0); 
+        var link = document.createElement('a'); 
+        link.download = studentName.replace(/\s+/g, '_') + "_LaSalle_Card.png"; 
+        link.href = image; 
+        link.click(); 
+      }); 
+    }
+
+    function toggleCardSelection(cb, index) { 
+      var wrapper = document.getElementById("card-wrapper" + index); 
+      if(cb.checked) {
+        wrapper.classList.remove("card-excluded", "opacity-20"); 
+      } else {
+        wrapper.classList.add("card-excluded", "opacity-20"); 
+      }
+    }
+
+    // =========================================================
+    //  TAB 3: LESSON MANAGEMENT LOGIC
+    // =========================================================
+    async function saveNewLesson() { 
+      var grade = document.getElementById('lesson-grade').value; 
+      var name = document.getElementById('lesson-name').value.trim(); 
+      var status = document.getElementById('lesson-status'); 
+      if(!name) return; 
+      status.className = "text-gray-500 text-sm block"; 
+      status.textContent = "Saving...";
+      
+      const msg = await runGAS("addLesson", { grade: grade, lessonName: name });
+      if (msg) {
+        status.className = "text-green-600 text-sm block"; 
+        status.textContent = msg; 
+        document.getElementById('lesson-name').value = '';
+      } else {
+        status.className = "text-red-600 text-sm block"; 
+        status.textContent = "Failed to add lesson.";
+      }
+    }
+
+    // =========================================================
+    //  TAB 4: TEACHER REVIEW
+    // =========================================================
+    async function loadStudentsForReview() { 
+      var cls = document.getElementById('review-class').value; 
+      var dropdown = document.getElementById('review-student');
+      dropdown.innerHTML = '<option value="">-- Loading list... --</option>';
+      
+      const students = await runGAS("getStudentsByClass", { className: cls });
+      dropdown.innerHTML = '<option value="">-- Select Student --</option>'; 
+      if (students) {
+        students.forEach(function(s) { 
+          var opt = document.createElement('option'); 
+          opt.value = s.id; 
+          opt.textContent = s.name + " (" + s.id + ")";
+          dropdown.appendChild(opt); 
+        }); 
+      }
+    }
+
+    function triggerReviewSearch() { 
+      var inputEl = document.getElementById('review-scanner-input'); 
+      var studentId = inputEl.value.trim();
+      if(!studentId) { alert("Please type a student ID first!"); return; } 
+      beep();
+      fetchStudentHistoryByIdDirect(studentId); 
+    }
+
+    function fetchStudentHistory() { 
+      var id = document.getElementById('review-student').value; 
+      if(!id) return; 
+      fetchStudentHistoryByIdDirect(id); 
+    }
+
+    async function fetchStudentHistoryByIdDirect(id) {
+      var tbody = document.getElementById('history-table-body'); 
+      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 font-semibold">Loading...</td></tr>';
+      
+      const records = await runGAS("getStudentRecords", { studentId: id });
+      tbody.innerHTML = ''; 
+      if (!records || records.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500 font-bold">No records found!</td></tr>'; 
+        return; 
+      } 
+      records.forEach(function(r) { 
+        var tr = document.createElement('tr'); 
+        tr.className = "text-center hover:bg-gray-50"; 
+        tr.innerHTML = '<td class="p-3 border-b font-mono text-gray-600">'+r.timestamp+'</td><td class="p-3 border-b font-bold text-blue-700">'+r.id+'</td><td class="p-3 border-b text-left font-semibold">'+r.name+'</td><td class="p-3 border-b font-medium">'+r.className+'</td><td class="p-3 border-b text-left text-gray-800 font-semibold">'+r.lesson+'</td>';
+        tbody.appendChild(tr); 
+      }); 
+    }
+
+    // =========================================================
+    //  TAB 5: TRACKER STATUS LOGIC
+    // =========================================================
+    async function loadLessonsForTracker() {
+      var cls = document.getElementById('tracker-class').value; 
+      var dropdown = document.getElementById('tracker-lesson'); 
+      var grade = 'Grade 3';
+      if (cls.indexOf('1') === 0) grade = 'Grade 1'; 
+      else if (cls.indexOf('2') === 0) grade = 'Grade 2';
+      else if (cls.indexOf('3') === 0) grade = 'Grade 3'; 
+      else if (cls.indexOf('4') === 0) grade = 'Grade 4'; 
+      else if (cls.indexOf('5') === 0) grade = 'Grade 5'; 
+      else if (cls.indexOf('6') === 0) grade = 'Grade 6';
+      
+      dropdown.innerHTML = '<option value="">Loading lessons...</option>';
+      const lessons = await runGAS("getLessonsByGrade", { grade: grade });
+      dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>'; 
+      if (lessons) {
+        lessons.forEach(function(l) { 
+          var opt = document.createElement('option'); 
+          opt.value = l; 
+          opt.textContent = l;
+          dropdown.appendChild(opt); 
+        }); 
+      }
+    }
+
+    async function fetchTrackerStatus() {
+      var cls = document.getElementById('tracker-class').value; 
+      var lesson = document.getElementById('tracker-lesson').value; 
+      var subUl = document.getElementById('list-submitted'); 
+      var misUl = document.getElementById('list-missing'); 
+      
+      subUl.innerHTML = '<li>Loading...</li>'; 
+      misUl.innerHTML = '<li>Loading...</li>';
+      
+      const res = await runGAS("getSubmissionTracker", { className: cls, lessonName: lesson });
+      if (res) {
+        document.getElementById('count-submitted').textContent = res.submitted.length;
+        document.getElementById('count-missing').textContent = res.missing.length;
+        subUl.innerHTML=''; 
+        misUl.innerHTML='';
+        
+        if(res.submitted.length === 0) { 
+          subUl.innerHTML = '<li>No submissions.</li>'; 
+        } else {
+          res.submitted.forEach(function(s) { 
+            var li = document.createElement('li'); 
+            li.className = "p-2 bg-green-50 my-1 rounded flex justify-between"; 
+            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-gray-600">'+s.id+'</span>';
+            subUl.appendChild(li); 
+          }); 
+        }
+        if(res.missing.length === 0) { 
+          misUl.innerHTML = '<li>Perfect!</li>'; 
+        } else {
+          res.missing.forEach(function(s) { 
+            var li = document.createElement('li'); 
+            li.className = "p-2 bg-red-50 my-1 rounded flex justify-between"; 
+            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-red-500">'+s.id+'</span>'; 
+            misUl.appendChild(li); 
+          }); 
+        } 
+      } else {
+        subUl.innerHTML = '<li class="text-red-500">Error loading status.</li>';
+        misUl.innerHTML = '<li class="text-red-500">Error loading status.</li>';
+      }
+    }
+
+    // =========================================================
+    //  STUDENT ISOLATED PORTAL LOGIC
+    // =========================================================
+    async function triggerKidInquiryLookup() {
+      var inputEl = document.getElementById('student-isolated-frame').querySelector('#kid-id-input');
+      var kidId = inputEl.value.trim(); 
+      if(!kidId) return; 
+      beep();
+      
+      var resZone = document.getElementById('kid-result-zone'); 
+      var doneUl = document.getElementById('kid-list-done'); 
+      var missUl = document.getElementById('kid-list-miss'); 
+      resZone.classList.remove('hidden');
+      
+      document.getElementById('kid-profile-name').textContent = "กำลังโหลดข้อมูล ...";
+      doneUl.innerHTML = '<li>กำลังโหลด...</li>'; 
+      missUl.innerHTML = '<li>กำลังโหลด...</li>';
+      
+      const res = await runGAS("getStudentSubmissionSummary", { studentId: kidId });
+      if (!res || res.error) { 
+        document.getElementById('kid-profile-name').textContent = "x ไม่พบรหัสประจำตัวนี้ในระบบ"; 
+        doneUl.innerHTML = '';
+        missUl.innerHTML = '';
+        return; 
+      }
+      
+      document.getElementById('kid-profile-name').textContent = res.student.name;
+      document.getElementById('kid-profile-id').textContent = res.student.id;
+      document.getElementById('kid-profile-class').textContent = res.student.className;
+      document.getElementById('kid-count-done').textContent = res.submitted.length;
+      document.getElementById('kid-count-miss').textContent = res.missing.length;
+      doneUl.innerHTML=''; 
+      missUl.innerHTML = '';
+      
+      if(res.submitted.length === 0) { 
+        doneUl.innerHTML = '<li class="p-2 text-gray-400 font-normal italic">ยังไม่มีประวัติการส่งงาน</li>'; 
+      } else { 
+        res.submitted.forEach(function(l) { 
+          var li = document.createElement('li'); 
+          li.className = "p-2 bg-green-50 rounded-lg border border-green-200 text-green-800 flex justify-between items-center"; 
+          li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-green-200 px-2 py-0.5 rounded-full text-green-900 font-black">ส่งแล้ว</span>'; 
+          doneUl.appendChild(li); 
+        }); 
+      }
+      
+      if(res.missing.length === 0) { 
+        missUl.innerHTML = '<li class="p-3 bg-green-100 text-green-800 rounded-xl text-center font-bold">ยินดีด้วย! คุณส่งงานครบทุกชิ้นเรียบร้อยแล้ว</li>'; 
+      } else { 
+        res.missing.forEach(function(l) { 
+          var li = document.createElement('li'); 
+          li.className = "p-2 bg-red-50 rounded-lg border border-red-200 text-red-700 flex justify-between items-center";
+          li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-red-200 px-2 py-0.5 rounded-full text-red-900 font-black">ยังไม่ส่ง</span>'; 
+          missUl.appendChild(li); 
+        }); 
+      }
+    }
+
+    function openTvModal(name, id, topic, headerText) {
+      document.getElementById('tv-header-title').textContent = headerText;
+      document.getElementById('tv-student-name').textContent = name.toUpperCase();
+      document.getElementById('tv-student-id').textContent = "ID: " + id;
+      document.getElementById('tv-lesson-title').textContent = topic;
+      document.getElementById('tv-modal').classList.remove('hidden'); 
+    }
+
+    function closeTvModal() { 
+      document.getElementById('tv-modal').classList.add('hidden'); 
+      if (document.getElementById('system-master-frame').style.display !== 'none') { 
+        if (document.getElementById('btn-tab1').classList.contains('active')) {
+          document.getElementById('hardware-scanner-input').focus(); 
+        }
+        if (document.getElementById('btn-tab1_fast').classList.contains('active')) {
+          document.getElementById('fast-hardware-input').focus(); 
+        }
+      } 
+    }
+
+    // =========================================================
+    //  TAB 6: HOMEWORK MANAGEMENT SYSTEM
+    // =========================================================
+    async function saveNewHomeworkTopicExplicit() {
+      var cls = document.getElementById('homework-topic-class-select').value;
+      var title = document.getElementById('homework-title-input').value.trim();
+      if(!title) { alert("Please type Homework Title first!"); return; }
+      
+      const msg = await runGAS("addHomeworkTopic", { cls: cls, title: title });
+      if (msg) {
+        alert(msg); 
+        document.getElementById('homework-title-input').value = '';
+        document.getElementById('homework-class').value = cls;
+        onHomeworkClassChange();
+      } else {
+        alert("Error adding homework topic.");
+      }
+    }
+
+    function onHomeworkClassChange() {
+      loadHomeworkTopicsDropdown();
+      loadHomeworkChecklist();
+    }
+
+    async function loadHomeworkTopicsDropdown() {
+      var cls = document.getElementById('homework-class').value;
+      var dropdown = document.getElementById('homework-topic-dropdown');
+      dropdown.innerHTML = '<option value="">-- Choose Topic --</option>';
+      if(!cls) return;
+      
+      const topics = await runGAS("getHomeworkTopicsByClass", { className: cls });
+      if (topics) {
+        topics.forEach(t => { 
+          dropdown.innerHTML += '<option value="'+t+'">'+t+'</option>'; 
+        });
+        fetchHomeworkTrackerStatus();
+      }
+    }
+
+    async function loadHomeworkChecklist() {
+      var selectedClass = document.getElementById('homework-class').value;
+      var container = document.getElementById('homework-checklist-container');
+      if(!selectedClass) { 
+        container.innerHTML = '<p class="text-gray-400 italic">Please select class...</p>'; 
+        return; 
+      }
+      container.innerHTML = '<p class="text-gray-500">Loading...</p>';
+      
+      const students = await runGAS("getStudentsByClass", { className: selectedClass });
+      container.innerHTML = '';
+      if (students) {
+        students.forEach(function(student) {
+          var div = document.createElement('div'); 
+          div.className = "flex items-center space-x-2 bg-white p-2 rounded-lg border";
+          div.innerHTML = '<input type="checkbox" onchange="submitHomeworkAssignManual(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-4 w-4 text-orange-500"><span class="font-medium">'+student.name+' ('+student.id+')</span>';
+          container.appendChild(div);
+        });
+      }
+    }
+
+    async function submitHomeworkAssignManual(cb, id, name, className) { 
+      if(!cb.checked) return;
+      var hwTitle = document.getElementById('homework-topic-dropdown').value;
+      if(!hwTitle) { 
+        alert("Please select Homework Topic Node from Dropdown list first!"); 
+        cb.checked = false; 
+        return; 
+      }
+      beep(); 
+      cb.disabled = true; 
+      cb.parentElement.classList.add('opacity-40');
+      
+      await runGAS("assignHomework", { studentId: id, name: name, className: className, homeworkTitle: hwTitle });
+      fetchHomeworkTrackerStatus();
+    }
+
+    async function triggerHomeworkAssign() {
+      var inputEl = document.getElementById('homework-assign-input');
+      var idValue = inputEl.value.trim(); 
+      inputEl.value=''; 
+      if(!idValue) return;
+      var hwClass = document.getElementById('homework-class').value;
+      var hwTitle = document.getElementById('homework-topic-dropdown').value;
+      if(!hwClass || !hwTitle) { 
+        alert("Please select Class and choose Homework title node first."); 
+        return; 
+      }
+      
+      beep(); 
+      var status = document.getElementById('homework-status');
+      status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; 
+      status.textContent = "Assigning...";
+      
+      const students = await runGAS("getStudentsByClass", { className: hwClass });
+      if (students) {
+        var match = students.find(s => s.id.toString().toLowerCase() == idValue.toLowerCase());
+        if(!match) { 
+          status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+          status.textContent = "ID Not Found!"; 
+          return; 
+        }
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
+        status.textContent = match.name + " assigned!";
+        
+        await runGAS("assignHomework", { studentId: match.id, name: match.name, className: match.className, homeworkTitle: hwTitle });
+        fetchHomeworkTrackerStatus();
+      }
+    }
+
+    async function triggerHomeworkSubmit() {
+      var inputEl = document.getElementById('homework-submit-input');
+      var idValue = inputEl.value.trim(); 
+      inputEl.value=''; 
+      if(!idValue) return;
+      var hwTitle = document.getElementById('homework-topic-dropdown').value;
+      if(!hwTitle) { 
+        alert("Please select Homework title node dropdown context row to accept!"); 
+        return; 
+      }
+      
+      beep(); 
+      var status = document.getElementById('homework-status');
+      status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; 
+      status.textContent = "Verifying...";
+      
+      const responseString = await runGAS("submitHomework", { studentId: idValue, homeworkTitle: hwTitle });
+      if (responseString) {
+        if (responseString.indexOf("Error") === 0) { 
+          status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+          status.textContent = responseString;
+          return; 
+        }
+        var studentNameParsed = responseString.split("|")[1] || "Student";
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
+        status.textContent = "Homework from " + studentNameParsed + " accepted!";
+        openTvModal(studentNameParsed, idValue, hwTitle, "HOMEWORK RECEIVED *");
+        fetchHomeworkTrackerStatus();
+      } else {
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+        status.textContent = "Error submitting homework record.";
+      }
+    }
+
+    async function fetchHomeworkTrackerStatus() {
+      var hwClass = document.getElementById('homework-class').value;
+      var hwTitle = document.getElementById('homework-topic-dropdown').value;
+      var subUl = document.getElementById('hw-list-submitted'); 
+      var misUl = document.getElementById('hw-list-missing');
+      
+      if(!hwClass || !hwTitle) {
+        subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>';
+        misUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>';
+        document.getElementById('hw-count-submitted').textContent = '0';
+        document.getElementById('hw-count-missing').textContent = '0';
+        return;
+      }
+      
+      subUl.innerHTML = '<li>Loading...</li>'; 
+      misUl.innerHTML = '<li>Loading...</li>';
+      
+      const res = await runGAS("getHomeworkTracker", { className: hwClass, homeworkTitle: hwTitle });
+      if (res) {
+        document.getElementById('hw-count-submitted').textContent = res.submitted.length;
+        document.getElementById('hw-count-missing').textContent = res.missing.length;
+        subUl.innerHTML=''; 
+        misUl.innerHTML = '';
+        
+        if(res.submitted.length === 0) { 
+          subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>'; 
+        } else {
+          res.submitted.forEach(function(s) {
+            var li = document.createElement('li'); 
+            li.className = "p-1.5 bg-green-50 rounded border border-green-200 flex justify-between items-center";
+            li.innerHTML = '<span>'+s.name+' <b class="text-gray-400">('+s.id+')</b></span><button onclick="executeUndoHomeworkSubmission(\''+s.id+'\', \''+hwTitle+'\')" class="bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded transition">X Remove</button>';
+            subUl.appendChild(li);
+          });
+        }
+        
+        if(res.missing.length === 0) { 
+          misUl.innerHTML = '<li class="p-1 text-green-600 font-bold font-normal">All submitted!</li>'; 
+        } else { 
+          res.missing.forEach(function(s) {
+            var li = document.createElement('li'); 
+            li.className = "p-1.5 bg-red-50 rounded border border-red-200 flex justify-between";
+            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-red-400 text-[10px]">'+s.id+'</span>'; 
+            misUl.appendChild(li);
+          });
+        }
+      }
+    }
+
+    async function executeUndoHomeworkSubmission(studentId, title) { 
+      if(!confirm("Are you sure?")) return; 
+      beep(); 
+      const res = await runGAS("revertHomeworkSubmission", { studentId: studentId, homeworkTitle: title });
+      if (res === "Reverted") {
+        fetchHomeworkTrackerStatus(); 
+      } 
+    }
+
+    function startHomeworkCameraEngine() {
+      var hwTitle = document.getElementById('homework-topic-dropdown').value;
+      if(!hwTitle) { 
+        alert("Please select Homework title dropdown node context before launching camera!"); 
+        return; 
+      }
+      document.getElementById('homework-reader-viewport').innerHTML = ""; 
+      if(!html5QrScannerHomework) html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
+      
+      html5QrScannerHomework.start(
+        { facingMode: "user" }, 
+        { fps: 15, qrbox: { width: 100, height: 100 } }, 
+        function (message) { 
+          if (scanThrottleLock) return; 
+          scanThrottleLock = true;
+          
+          document.getElementById('homework-submit-input').value = message;
+          triggerHomeworkSubmit();
+          
+          setTimeout(function() { scanThrottleLock = false; }, 2600); 
+        }, 
+        function(err) {}
+      ).catch(e => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) { 
+          html5QrScannerHomework.start(
+            { facingMode: "user" }, 
+            { fps: 15, qrbox: { width: 100, height: 100 } }, 
+            function(msg) { 
+              if (scanThrottleLock) return;
+              scanThrottleLock = true; 
+              
+              document.getElementById('homework-submit-input').value = msg;
+              triggerHomeworkSubmit();
+              
+              setTimeout(function() { scanThrottleLock = false; }, 2600); 
+            }, 
+            function(err){}
+          ); 
+        })
+        .catch(error => { alert("Camera Access Denied!"); });
+      });
+    }
+
+    function stopHomeworkCameraEngine() {
+      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { 
+        html5QrScannerHomework.stop().then(() => {
+          document.getElementById('homework-reader-viewport').innerHTML = ''; 
+        }); 
+      }
+    }
+
+    // =========================================================
+    //  DOM EVENT LISTENERS
+    // =========================================================
+    document.getElementById('hardware-scanner-input').addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') triggerManualSubmit(); 
+    });
+    document.getElementById('fast-hardware-input').addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') triggerFastManualSubmit(); 
+    });
+    document.getElementById('teacher-pass-input').addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') verifyTeacherCode(); 
+    });
+    document.getElementById('kid-id-input').addEventListener('keypress', function(e) { 
+      if(e.key === 'Enter') triggerKidInquiryLookup(); 
+    });
+    document.getElementById('homework-assign-input').addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') triggerHomeworkAssign(); 
+    });
+    document.getElementById('homework-submit-input').addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') triggerHomeworkSubmit(); 
+    });
+  </script>
+</body>
+</html>
