@@ -4,7 +4,7 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Han's Checking System</title>
+  <title>Teacher Minn's Checking System</title>
   
   <link href="https://fonts.googleapis.com/css?family=Sarabun:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -82,19 +82,12 @@
     }
     #sidebar-overlay.show { display: block; }
     
-    #login-gateway-screen {
-      background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true');
-      background-size: 100% 100% !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
-      height: 100vh !important;
-    }
-
-    #login-gateway-screen.liverpool-gateway {
-      background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp') !important;
+    /* Mirror styling for FRONT camera only */
+    .scanner-viewport.mirror-active video {
+      transform: scaleX(-1) !important;
     }
     
-    /* ONE PIECE THEME STYLES */
+    /* ====== ONE PIECE THEME CONFIG ====== */
     body.onepiece-mode {
       background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true');
       background-size: 100% calc(100vh - 60px) !important;
@@ -102,7 +95,7 @@
       background-attachment: fixed !important;
       background-repeat: no-repeat !important;
     }
-    body.onepiece-mode.bg-white { 
+    body.onepiece-mode .bg-white { 
       background-color: rgba(255, 255, 255, 0.96); 
       border-color: #e2e8f0; 
       backdrop-filter: blur(4px); 
@@ -127,21 +120,26 @@
       background-color: #fef3c7; 
     }
     body.onepiece-mode .text-green-900 { color: #b45309 !important; }
-    body.onepiece-mode.bg-green-50 { background-color: #fffbeb !important; border-color: #fde68a !important; }
-    body.onepiece-mode.border-green-100 { border-color: #fde68a !important; }
+    body.onepiece-mode .bg-green-50 { background-color: #fffbeb !important; border-color: #fde68a !important; }
+    body.onepiece-mode .border-green-100 { border-color: #fde68a !important; }
     body.onepiece-mode .border-green-300 { border-color: #fde68a !important; }
     body.onepiece-mode .bg-green-600 { background-color: #dfa119 !important; }
     body.onepiece-mode .bg-green-600:hover { background-color: #b45309 !important; }
-    body.onepiece-mode.action-btn-glow:hover { box-shadow: 0 4px 12px rgba(223, 161, 25, 0.4) !important; }
+    body.onepiece-mode .action-btn-glow:hover { box-shadow: 0 4px 12px rgba(223, 161, 25, 0.4) !important; }
     body.onepiece-mode .bg-green-50/20 { background-color: rgba(254, 251, 235, 0.6) !important; }
 
-    /* LIVERPOOL THEME STYLES */
+    /* ====== LIVERPOOL THEME CONFIG ====== */
     body.liverpool-mode {
       background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp');
-      background-size: 100% calc(100vh - 60px) !important;
-      background-position: center 60px !important;
+      background-size: cover !important;
+      background-position: center !important;
       background-attachment: fixed !important;
       background-repeat: no-repeat !important;
+    }
+    body.liverpool-mode .bg-white { 
+      background-color: rgba(255, 255, 255, 0.97); 
+      border-color: #f3f4f6; 
+      backdrop-filter: blur(5px); 
     }
     body.liverpool-mode #teacher-top-bar { 
       background-color: #c8102e !important; 
@@ -155,23 +153,25 @@
     body.liverpool-mode .tab-btn:hover { 
       background-color: #fde8e8; 
       color: #c8102e;
-      border-left-color: #f6eb61; 
+      border-left-color: #fecaca; 
     }
     body.liverpool-mode .tab-btn.active { 
       border-left: 4px solid #c8102e !important; 
       color: #c8102e !important; 
-      background-color: #fde8e8; 
+      background-color: #fee2e2; 
     }
     body.liverpool-mode .text-green-900 { color: #c8102e !important; }
+    body.liverpool-mode .bg-green-50 { background-color: #fef2f2 !important; border-color: #fca5a5 !important; }
+    body.liverpool-mode .border-green-100 { border-color: #fca5a5 !important; }
+    body.liverpool-mode .border-green-300 { border-color: #fca5a5 !important; }
     body.liverpool-mode .bg-green-600 { background-color: #c8102e !important; }
-    body.liverpool-mode .bg-green-600:hover { background-color: #a00c22 !important; }
-    body.liverpool-mode .border-green-300 { border-color: #f8b4b4 !important; }
-    body.liverpool-mode .bg-green-50 { background-color: #fdf2f2 !important; border-color: #f8b4b4 !important; }
+    body.liverpool-mode .bg-green-600:hover { background-color: #a00d25 !important; }
+    body.liverpool-mode .action-btn-glow:hover { box-shadow: 0 4px 12px rgba(200, 16, 46, 0.4) !important; }
+    body.liverpool-mode .bg-green-50/20 { background-color: rgba(254, 242, 242, 0.6) !important; }
     
     .theme-switch-container { 
       display: flex; 
       flex-direction: column;
-      gap: 6px;
       padding: 12px 16px; 
       margin: 8px; 
       background: #f8fafc; 
@@ -209,15 +209,11 @@
       text-overflow: ellipsis;
       line-height: 0.3; 
     }
-
-    body.liverpool-mode .info-value-text {
-      color: #090000 !important;
-    }
     
     .qr-container-box {
       position: absolute;
       top: 19.5mm; 
-      right: 9.5mm; 
+      right: 8mm; 
       width: 14.5mm;
       height: 14.5mm;
       background: transparent; 
@@ -246,10 +242,6 @@
     }
     .barcode-tray-wrapper svg { width: 100% !important; height: 100% !important; }
     .card-wrapper-spacer { margin: 10px; display: inline-block; }
-    
-    .scanner-viewport video {
-      transform: scaleX(-1) !important;
-    }
     
     @media print {
       @page { size: A4 portrait; margin: 15mm 4mm 4mm 4mm !important; }
@@ -302,9 +294,9 @@
       </div>
       
       <div class="theme-switch-container hide-on-print">
-        <span class="text-xs font-bold text-gray-700">Select System Theme</span>
-        <select id="theme-selector-dropdown" onchange="changeSystemThemeStyle(this.value)" class="w-full p-2 border rounded-xl bg-white text-xs font-semibold outline-none">
-          <option value="default">Default Green Theme</option>
+        <label for="theme-selector-dropdown" class="text-xs font-bold text-gray-500 mb-1">Select System Theme</label>
+        <select id="theme-selector-dropdown" onchange="applySystemTheme(this.value)" class="w-full p-2 border rounded-xl text-xs font-semibold bg-white outline-none">
+          <option value="default">Default Green</option>
           <option value="onepiece">One Piece Theme</option>
           <option value="liverpool">Liverpool FC Theme</option>
         </select>
@@ -322,7 +314,7 @@
     </div>
     
     <div class="p-4 border-t bg-red-50">
-      <button onclick="logoutSessionBackToGateway(); toggleSidebar(false);" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center space-x-1 shadow-md hover:shadow-lg">
+      <button onclick="logoutSessionBackToGateway(); toggleSidebar(false);" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py.2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center space-x-1 shadow-md hover:shadow-lg">
         <span>Exit Dashboard</span>
       </button>
     </div>
@@ -389,7 +381,6 @@
   <div id="system-master-frame" class="hidden">
     <div class="max-w-6xl mx-auto p-4 md:p-6">
       
-      <!-- TAB 1: MAIN SCANNER -->
       <div id="tab1" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-900 pb-2 border-b">1. Attendance Main Entry</h2>
         
@@ -424,12 +415,13 @@
           </div>
           
           <div class="md:col-span-2 p-5 bg-green-50 rounded-2xl border border-green-100">
-            <label class="block text-sm font-bold text-green-900 mb-2">Device Camera Capture Scan Module (Mirror Mode)</label>
+            <label class="block text-sm font-bold text-green-900 mb-2">Device Camera Capture Scan Module</label>
             <div class="flex space-x-2 mb-3">
               <button onclick="startMainCameraEngine()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Start Camera Scan</button>
+              <button onclick="switchMainCameraFacing()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Switch Cam 🔄</button>
               <button onclick="stopMainCameraEngine()" class="bg-gray-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow action-btn-gray">Stop</button>
             </div>
-            <div id="main-reader-viewport" class="scanner-viewport w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-green-300"></div>
+            <div id="main-reader-viewport" class="scanner-viewport mirror-active w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-green-300"></div>
           </div>
         </div>
         
@@ -441,7 +433,6 @@
         </div>
       </div>
       
-      <!-- TAB 1.1: FAST SCANNER -->
       <div id="tab1_fast" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-blue-900 pb-2 border-b">1.1 Fast Continuous Attendance Scanner (No Pop-ups)</h2>
         
@@ -476,12 +467,13 @@
           </div>
           
           <div class="md:col-span-2 p-5 bg-purple-50 rounded-2xl border border-purple-100">
-            <label class="block text-sm font-bold text-purple-900 mb-2">Smartphone Camera Lens Scan Module (Mirror Mode)</label>
+            <label class="block text-sm font-bold text-purple-900 mb-2">Smartphone Camera Lens Scan Module</label>
             <div class="flex space-x-2 mb-3">
               <button onclick="startFastCameraEngine()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Start Camera Scan</button>
+              <button onclick="switchFastCameraFacing()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow">Switch Cam 🔄</button>
               <button onclick="stopFastCameraEngine()" class="bg-gray-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs action-btn-glow action-btn-gray">Stop</button>
             </div>
-            <div id="fast-reader-viewport" class="scanner-viewport w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
+            <div id="fast-reader-viewport" class="scanner-viewport mirror-active w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
           </div>
         </div>
         
@@ -515,7 +507,6 @@
         </div>
       </div>
       
-      <!-- TAB 2: CARDS GENERATOR -->
       <div id="tab2" class="tab-content bg-white rounded-2xl border p-6 shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2 hide-on-print">2. Card Generation Engine</h2>
         
@@ -540,7 +531,6 @@
         <div id="print-area" class="p-2 bg-gray-50 rounded-xl min-h-[300px] text-center"></div>
       </div>
       
-      <!-- TAB 3: ADD LESSON -->
       <div id="tab3" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">3. Lesson Management</h2>
         <div class="space-y-4 max-w-md">
@@ -561,7 +551,6 @@
         </div>
       </div>
       
-      <!-- TAB 4: TEACHER REVIEW -->
       <div id="tab4" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-900 border-b pb-2">4. Teacher Master Record History Review</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
@@ -610,7 +599,6 @@
         </div>
       </div>
       
-      <!-- TAB 5: TRACKER STATUS -->
       <div id="tab5" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-900 border-b pb-2">5. Lesson Submission Live Tracker</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
@@ -647,7 +635,6 @@
         </div>
       </div>
       
-      <!-- TAB 6: HOMEWORK BOARD -->
       <div id="tab6" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-700 border-b pb-2">6. Homework Assignment System</h2>
         
@@ -709,12 +696,13 @@
           </div>
 
           <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
-            <label class="block text-sm font-bold text-purple-900 mb-2">3. Smartphone Camera Scanner (Mirror Mode)</label>
+            <label class="block text-sm font-bold text-purple-900 mb-2">3. Smartphone Camera Scanner</label>
             <div class="flex space-x-2 mb-2">
               <button onclick="startHomeworkCameraEngine()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1 rounded-lg text-xs action-btn-glow">Start Cam</button>
+              <button onclick="switchHomeworkCameraFacing()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-lg text-xs action-btn-glow">Switch 🔄</button>
               <button onclick="stopHomeworkCameraEngine()" class="bg-gray-500 text-white font-bold px-3 py-1 rounded-lg text-xs action-btn-glow action-btn-gray">Stop</button>
             </div>
-            <div id="homework-reader-viewport" class="scanner-viewport w-full max-w-[120px] mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
+            <div id="homework-reader-viewport" class="scanner-viewport mirror-active w-full max-w-[120px] mx-auto rounded-xl overflow-hidden bg-black aspect-square border border-purple-300"></div>
           </div>
         </div>
         
@@ -751,7 +739,6 @@
     </div>
   </div>
 
-  <!-- STUDENT VIEW -->
   <div id="student-isolated-frame" class="hidden p-4 md:p-8 max-w-4xl mx-auto">
     <div class="text-center mb-6">
       <img id="student-isolated-logo" src="https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/Logo.jpg" class="w-16 h-16 mx-auto rounded-full border shadow mb-2 object-contain">
@@ -803,7 +790,6 @@
     </div>
   </div>
 
-  <!-- TV POPUP MODAL -->
   <div id="tv-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
     <div class="bg-gradient-to-b from-blue-600 to-indigo-900 border-4 border-white text-white rounded-3xl p-8 md:p-12 max-w-2xl w-11/12 text-center shadow-2xl">
       <h1 id="tv-header-title" class="text-4xl font-extrabold mb-4 text-green-300">SUBMISSION RECEIVED</h1>
@@ -854,24 +840,26 @@
     var html5QrScannerHomework = null;
     var scanThrottleLock = false;
 
-    function changeSystemThemeStyle(themeValue) {
+    // CAMERA FACING MANAGEMENT STATE VARIABLES
+    var mainCamFacingMode = "user";
+    var fastCamFacingMode = "user";
+    var homeworkCamFacingMode = "user";
+
+    function applySystemTheme(themeName) {
       document.body.classList.remove('onepiece-mode', 'liverpool-mode');
-      document.getElementById('login-gateway-screen').classList.remove('liverpool-gateway');
-      localStorage.setItem('activeSystemThemeStyle', themeValue);
-      
-      if (themeValue === 'onepiece') {
+      if (themeName === 'onepiece') {
         document.body.classList.add('onepiece-mode');
-      } else if (themeValue === 'liverpool') {
+      } else if (themeName === 'liverpool') {
         document.body.classList.add('liverpool-mode');
-        document.getElementById('login-gateway-screen').classList.add('liverpool-gateway');
       }
+      localStorage.setItem('selectedSystemThemeActive', themeName);
+      const ddn = document.getElementById('theme-selector-dropdown');
+      if (ddn) ddn.value = themeName;
     }
 
     window.addEventListener('DOMContentLoaded', (event) => {
-      const savedTheme = localStorage.getItem('activeSystemThemeStyle') || 'default';
-      const selector = document.getElementById('theme-selector-dropdown');
-      if (selector) selector.value = savedTheme;
-      changeSystemThemeStyle(savedTheme);
+      const savedTheme = localStorage.getItem('selectedSystemThemeActive') || 'default';
+      applySystemTheme(savedTheme);
     });
 
     function toggleSidebar(openState) {
@@ -975,13 +963,11 @@
       } else {
         stopMainCameraEngine();
       }
-      
       if (tabId === 'tab1_fast') {
         document.getElementById('fast-hardware-input').focus();
       } else {
         stopFastCameraEngine();
       }
-      
       if (tabId !== 'tab6') {
         stopHomeworkCameraEngine();
       }
@@ -1108,12 +1094,16 @@
         alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
         return; 
       }
-      document.getElementById('main-reader-viewport').innerHTML = ""; 
-      if(!html5QrScannerMain) {
-        html5QrScannerMain = new Html5Qrcode("main-reader-viewport");
-      }
+      
+      var vp = document.getElementById('main-reader-viewport');
+      vp.innerHTML = ""; 
+      if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+      else { vp.classList.remove('mirror-active'); }
+
+      if(!html5QrScannerMain) { html5QrScannerMain = new Html5Qrcode("main-reader-viewport"); }
+      
       html5QrScannerMain.start(
-        { facingMode: "user" }, 
+        { facingMode: mainCamFacingMode }, 
         { fps: 15, qrbox: { width: 220, height: 220 } }, 
         function (message) { 
           if (scanThrottleLock) return; 
@@ -1123,10 +1113,10 @@
         }, 
         function(err) {}
       ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: mainCamFacingMode } })
         .then(function(stream) { 
           html5QrScannerMain.start(
-            { facingMode: "user" }, 
+            { facingMode: mainCamFacingMode }, 
             { fps: 15, qrbox: { width: 220, height: 220 } }, 
             function(msg) { 
               if (scanThrottleLock) return; 
@@ -1139,6 +1129,17 @@
         })
         .catch(error => { alert("Camera Access Blocked or Not Found!"); });
       });
+    }
+
+    function switchMainCameraFacing() {
+      mainCamFacingMode = (mainCamFacingMode === "user") ? "environment" : "user";
+      if(html5QrScannerMain && html5QrScannerMain.isScanning) {
+        html5QrScannerMain.stop().then(() => { startMainCameraEngine(); });
+      } else {
+        var vp = document.getElementById('main-reader-viewport');
+        if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+        else { vp.classList.remove('mirror-active'); }
+      }
     }
 
     function stopMainCameraEngine() { 
@@ -1236,11 +1237,16 @@
         alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
         return; 
       }
-      document.getElementById('fast-reader-viewport').innerHTML = ""; 
+      
+      var vp = document.getElementById('fast-reader-viewport');
+      vp.innerHTML = ""; 
+      if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+      else { vp.classList.remove('mirror-active'); }
+
       if(!html5QrScannerFast) html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
       
       html5QrScannerFast.start(
-        { facingMode: "user" }, 
+        { facingMode: fastCamFacingMode }, 
         { fps: 15, qrbox: { width: 220, height: 220 } }, 
         function (message) { 
           if (scanThrottleLock) return; 
@@ -1250,10 +1256,10 @@
         }, 
         function(err) {}
       ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: fastCamFacingMode } })
         .then(function(stream) { 
           html5QrScannerFast.start(
-            { facingMode: "user" }, 
+            { facingMode: fastCamFacingMode }, 
             { fps: 15, qrbox: { width: 220, height: 220 } }, 
             function(msg) { 
               if (scanThrottleLock) return;
@@ -1266,6 +1272,17 @@
         })
         .catch(error => { alert("Camera Blocked!"); });
       });
+    }
+
+    function switchFastCameraFacing() {
+      fastCamFacingMode = (fastCamFacingMode === "user") ? "environment" : "user";
+      if(html5QrScannerFast && html5QrScannerFast.isScanning) {
+        html5QrScannerFast.stop().then(() => { startFastCameraEngine(); });
+      } else {
+        var vp = document.getElementById('fast-reader-viewport');
+        if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+        else { vp.classList.remove('mirror-active'); }
+      }
     }
 
     function stopFastCameraEngine() { 
@@ -1282,9 +1299,6 @@
       fastScannerIndexCount = 0;
     }
 
-    // =========================================================
-    //  TAB 2: CARD GENERATION SYSTEM
-    // =========================================================
     async function generateCardsByClass() {
       var cls = document.getElementById('generator-class').value; 
       var area = document.getElementById('print-area'); 
@@ -1297,13 +1311,13 @@
         return; 
       }
 
-      // Check current theme to pick correct background template card
-      const currentTheme = localStorage.getItem('activeSystemThemeStyle') || 'default';
-      let cardBgUrl = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/One%20piece%20Card.webp";
-      if (currentTheme === 'liverpool') {
-        cardBgUrl = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-01_29_13-AM.webp";
-      }
+      const currentActiveTheme = localStorage.getItem('selectedSystemThemeActive') || 'default';
+      let templateImageSrc = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/One%20piece%20Card.webp"; 
       
+      if (currentActiveTheme === 'liverpool') {
+        templateImageSrc = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-01_29_13-AM.webp";
+      }
+
       students.forEach(function(student, index) {
         var masterWrapper = document.createElement('div'); 
         masterWrapper.id = "card-wrapper" + index; 
@@ -1319,11 +1333,11 @@
         card.className = "student-card text-left";
         
         card.innerHTML = 
-          '<img src="' + cardBgUrl + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" />' +
+          '<img src="' + templateImageSrc + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" />' +
           '<div class="card-content-wrapper" style="position: relative; z-index: 10; width: 100%; height: 100%;">' +
-            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 26.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
+            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 23.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
             '<div class="info-value-text" style="position: absolute; top: 26.2mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.id + '</div>' +
-            '<div class="info-value-text" style="position: absolute; top: 32.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div>' +
+            '<div class="info-value-text" style="position: absolute; top: 31.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div>' +
             '<div class="qr-container-box"><div id="code-'+index+'" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div></div>' +
             '<div class="barcode-tray-wrapper"><svg id="bc-'+index+'"></svg></div>' +
           '</div>';
@@ -1368,7 +1382,7 @@
       }).then(function(canvas) { 
         var image = canvas.toDataURL("image/png", 1.0); 
         var link = document.createElement('a'); 
-        link.download = studentName.replace(/\s+/g, '_') + "_LaSalle_Card.png"; 
+        link.download = studentName.replace(/\s+/g, '_') + "_Card.png"; 
         link.href = image; 
         link.click(); 
       }); 
@@ -1383,9 +1397,6 @@
       }
     }
 
-    // =========================================================
-    //  TAB 3: LESSON MANAGEMENT LOGIC
-    // =========================================================
     async function saveNewLesson() { 
       var grade = document.getElementById('lesson-grade').value; 
       var name = document.getElementById('lesson-name').value.trim(); 
@@ -1405,9 +1416,6 @@
       }
     }
 
-    // =========================================================
-    //  TAB 4: TEACHER REVIEW
-    // =========================================================
     async function loadStudentsForReview() { 
       var cls = document.getElementById('review-class').value; 
       var dropdown = document.getElementById('review-student');
@@ -1457,9 +1465,6 @@
       }); 
     }
 
-    // =========================================================
-    //  TAB 5: TRACKER STATUS LOGIC
-    // =========================================================
     async function loadLessonsForTracker() {
       var cls = document.getElementById('tracker-class').value; 
       var dropdown = document.getElementById('tracker-lesson'); 
@@ -1526,9 +1531,6 @@
       }
     }
 
-    // =========================================================
-    //  STUDENT ISOLATED PORTAL LOGIC
-    // =========================================================
     async function triggerKidInquiryLookup() {
       var inputEl = document.getElementById('student-isolated-frame').querySelector('#kid-id-input');
       var kidId = inputEl.value.trim(); 
@@ -1603,9 +1605,6 @@
       } 
     }
 
-    // =========================================================
-    //  TAB 6: HOMEWORK MANAGEMENT SYSTEM
-    // =========================================================
     async function saveNewHomeworkTopicExplicit() {
       var cls = document.getElementById('homework-topic-class-select').value;
       var title = document.getElementById('homework-title-input').value.trim();
@@ -1809,35 +1808,36 @@
         alert("Please select Homework title dropdown node context before launching camera!"); 
         return; 
       }
-      document.getElementById('homework-reader-viewport').innerHTML = ""; 
+      
+      var vp = document.getElementById('homework-reader-viewport');
+      vp.innerHTML = ""; 
+      if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+      else { vp.classList.remove('mirror-active'); }
+
       if(!html5QrScannerHomework) html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
       
       html5QrScannerHomework.start(
-        { facingMode: "user" }, 
+        { facingMode: homeworkCamFacingMode }, 
         { fps: 15, qrbox: { width: 100, height: 100 } }, 
         function (message) { 
           if (scanThrottleLock) return; 
           scanThrottleLock = true;
-          
           document.getElementById('homework-submit-input').value = message;
           triggerHomeworkSubmit();
-          
           setTimeout(function() { scanThrottleLock = false; }, 2600); 
         }, 
         function(err) {}
       ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: homeworkCamFacingMode } })
         .then(function(stream) { 
           html5QrScannerHomework.start(
-            { facingMode: "user" }, 
+            { facingMode: homeworkCamFacingMode }, 
             { fps: 15, qrbox: { width: 100, height: 100 } }, 
             function(msg) { 
               if (scanThrottleLock) return;
               scanThrottleLock = true; 
-              
               document.getElementById('homework-submit-input').value = msg;
               triggerHomeworkSubmit();
-              
               setTimeout(function() { scanThrottleLock = false; }, 2600); 
             }, 
             function(err){}
@@ -1845,6 +1845,17 @@
         })
         .catch(error => { alert("Camera Access Denied!"); });
       });
+    }
+
+    function switchHomeworkCameraFacing() {
+      homeworkCamFacingMode = (homeworkCamFacingMode === "user") ? "environment" : "user";
+      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) {
+        html5QrScannerHomework.stop().then(() => { startHomeworkCameraEngine(); });
+      } else {
+        var vp = document.getElementById('homework-reader-viewport');
+        if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
+        else { vp.classList.remove('mirror-active'); }
+      }
     }
 
     function stopHomeworkCameraEngine() {
@@ -1855,9 +1866,6 @@
       }
     }
 
-    // =========================================================
-    //  DOM EVENT LISTENERS
-    // =========================================================
     document.getElementById('hardware-scanner-input').addEventListener('keypress', function(e) {
       if(e.key === 'Enter') triggerManualSubmit(); 
     });
