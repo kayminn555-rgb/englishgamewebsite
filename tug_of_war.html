@@ -125,7 +125,7 @@
             border-radius: 8px;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            /* ပြိုင်တူနှိပ်လို့ရအောင် touch-action ကို none ပြောင်းလိုက်ပါတယ် */
+            /* ပြိုင်တူနှိပ်လို့ရအောင် touch-action ကို none ထားပါတယ် */
             touch-action: none; 
         }
         button.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
@@ -248,7 +248,6 @@
             cursor: pointer; 
             user-select: none; 
             transition: all 0.15s ease;
-            /* Multi-touch ပိတ်မသွားအောင် touch-action: none ပြောင်းလဲထားပါတယ် */
             touch-action: none; 
         }
         .word-card:hover { transform: translateY(-2px); border-color: #94a3b8; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
@@ -357,8 +356,8 @@
                     <div id="blue-pool" class="words-pool"></div>
                 </div>
                 <div class="action-btns">
-                    <button class="btn btn-check" onclick="checkAnswer('blue')">Submit</button>
-                    <button class="btn btn-clear" onclick="clearAnswers('blue')">Reset</button>
+                    <button class="btn btn-check" id="btn-blue-submit">Submit</button>
+                    <button class="btn btn-clear" id="btn-blue-reset">Reset</button>
                 </div>
             </div>
 
@@ -370,8 +369,8 @@
                     <div id="red-pool" class="words-pool"></div>
                 </div>
                 <div class="action-btns">
-                    <button class="btn btn-check" onclick="checkAnswer('red')">Submit</button>
-                    <button class="btn btn-clear" onclick="clearAnswers('red')">Reset</button>
+                    <button class="btn btn-check" id="btn-red-submit">Submit</button>
+                    <button class="btn btn-clear" id="btn-red-reset">Reset</button>
                 </div>
             </div>
         </div>
@@ -613,9 +612,8 @@
                 card.className = 'word-card'; 
                 card.innerText = word;
                 
-                /* Tablet Multi-touch ပြိုင်တူနှိပ်လို့ရအောင် အဓိက ပြင်ဆင်လိုက်တဲ့အပိုင်း (ontouchstart သုံးထားပါတယ်) */
                 card.ontouchstart = (e) => {
-                    e.preventDefault(); // browser zoom/scroll ဖြစ်သွားတာကိုတားဆီးတယ်
+                    e.preventDefault(); 
                     selectWord(team, word, card);
                 };
                 card.onclick = (e) => { 
@@ -637,7 +635,6 @@
         }
 
         function selectWord(team, word, element) {
-            // စာလုံးက ကွယ်နေပြီးသားဆိုရင် ထပ်နှိပ်မရအောင် တားဆီးထားခြင်း
             if (element.style.visibility === 'hidden') return; 
             
             if(team === 'blue') blueSelectedWords.push(word);
@@ -748,6 +745,40 @@
             setupTeamQuestion('blue');
             setupTeamQuestion('red');
         }
+
+        // --- SUBMIT နှင့် RESET ခလုတ်များကို MULTI-TOUCH ရရှိအောင် စီစဉ်ပေးခြင်း ---
+        
+        // Blue Team Buttons Touch Event
+        document.getElementById('btn-blue-submit').ontouchstart = function(e) {
+            e.preventDefault();
+            checkAnswer('blue');
+        };
+        document.getElementById('btn-blue-submit').onclick = function() {
+            checkAnswer('blue');
+        };
+        document.getElementById('btn-blue-reset').ontouchstart = function(e) {
+            e.preventDefault();
+            clearAnswers('blue');
+        };
+        document.getElementById('btn-blue-reset').onclick = function() {
+            clearAnswers('blue');
+        };
+
+        // Red Team Buttons Touch Event
+        document.getElementById('btn-red-submit').ontouchstart = function(e) {
+            e.preventDefault();
+            checkAnswer('red');
+        };
+        document.getElementById('btn-red-submit').onclick = function() {
+            checkAnswer('red');
+        };
+        document.getElementById('btn-red-reset').ontouchstart = function(e) {
+            e.preventDefault();
+            clearAnswers('red');
+        };
+        document.getElementById('btn-red-reset').onclick = function() {
+            clearAnswers('red');
+        };
 
         renderSentenceList();
     </script>
