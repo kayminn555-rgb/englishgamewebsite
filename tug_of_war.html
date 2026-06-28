@@ -26,6 +26,8 @@
             height: 100vh;
             box-sizing: border-box;
             overflow-x: hidden;
+            /* ကလေးတွေ ပြိုင်တူနှိပ်ရင်း screen ကြီး ရွေ့မသွားအောင် overlay scrolling ကို ပိတ်ထားခြင်း */
+            touch-action: none; 
         }
 
         .container {
@@ -39,11 +41,13 @@
         }
 
         /* --- DASHBOARD STYLE --- */
-        #dashboard { 
-            display: block; 
+        #dashboard {
+            display: block;
             width: 100%;
+            /* Dashboard မှာတော့ scroll ပြန်ဆွဲလို့ရအောင် touch ပြန်ဖွင့်ပေးထားပါတယ် */
+            touch-action: auto; 
         }
-        
+       
         .dashboard-header {
             margin-bottom: 20px;
         }
@@ -79,7 +83,7 @@
             box-sizing: border-box;
             outline: none;
         }
-        
+       
         .file-controls {
             display: flex;
             gap: 10px;
@@ -112,16 +116,17 @@
             font-family: inherit;
         }
 
-        button.btn { 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            border: none; 
-            border-radius: 8px; 
+        button.btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            touch-action: manipulation;
+            /* ပြိုင်တူနှိပ်လို့ရအောင် touch-action ကို none ပြောင်းလိုက်ပါတယ် */
+            touch-action: none; 
         }
         button.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         button.btn:active { transform: translateY(0); }
@@ -133,19 +138,19 @@
         .btn-file { background: #64748b; color: white; font-size: 14px; }
         .btn-delete { background: #ef4444; color: white; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
 
-        #sentence-list { margin: 12px 0; max-height: 120px; overflow-y: auto; background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        #sentence-list { margin: 12px 0; max-height: 120px; overflow-y: auto; background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; touch-action: auto; }
         .list-item { background: #f8fafc; padding: 8px 12px; margin-bottom: 6px; border-radius: 6px; border-left: 4px solid var(--primary-blue); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
 
         /* --- GAME SCREEN STYLE --- */
-        #game-screen { 
-            display: none; 
-            position: relative; 
-            height: calc(100vh - 40px); 
-            flex-direction: column; 
+        #game-screen {
+            display: none;
+            position: relative;
+            height: calc(100vh - 40px);
+            flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
         }
-        
+       
         /* Fixed Game Screen Viewport Height for Tablet Fullscreen */
         :fullscreen #game-screen {
             height: 100vh;
@@ -161,7 +166,7 @@
         .score-blue { color: var(--primary-blue); }
         .score-red { color: var(--primary-red); }
         .match-timer { background: #34495e; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 16px; }
-        .btn-back { background: #94a3b8; color: white; }
+        .btn-back { background: #94a3b8; color: white; touch-action: auto !important; }
 
         /* Tug of War Canvas area */
         .rope-field-wrapper {
@@ -184,7 +189,7 @@
         #rope-field {
             position: relative;
             width: 100%;
-            height: 250px; 
+            height: 250px;
             border-radius: 12px;
             border: 3px solid #cbd5e1;
             background-color: #ffffff;
@@ -200,16 +205,16 @@
         #moving-bar-image {
             position: absolute;
             top: 0;
-            left: 50%; 
+            left: 50%;
             transform: translateX(-50%);
-            width: 1400px; 
+            width: 1400px;
             height: 100%;
             background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/7f705245e0b875fa98941074dd029ee4d2ae3216/Luffy.webp');
-            background-size: contain; 
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            animation: constantTug 0.3s infinite ease-in-out; 
+            animation: constantTug 0.3s infinite ease-in-out;
         }
 
         #center-line {
@@ -232,8 +237,20 @@
         .slots-container, .words-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; min-height: 55px; padding: 10px; border-radius: 8px; }
         .slots-container { background: rgba(255,255,255,0.85); border: 2px dashed #cbd5e1; }
         .words-pool { background: rgba(0,0,0,0.01); }
-        
-        .word-card { padding: 12px 18px; background: white; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; transition: all 0.15s ease; touch-action: manipulation; }
+       
+        .word-card { 
+            padding: 12px 18px;
+            background: white; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            user-select: none; 
+            transition: all 0.15s ease;
+            /* Multi-touch ပိတ်မသွားအောင် touch-action: none ပြောင်းလဲထားပါတယ် */
+            touch-action: none; 
+        }
         .word-card:hover { transform: translateY(-2px); border-color: #94a3b8; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
         .blue-placed { background: #3498db !important; color: white; border-color: #2980b9 !important; }
         .red-placed { background: #e74c3c !important; color: white; border-color: #c0392b !important; }
@@ -272,7 +289,7 @@
             <h2>Grammar & Word Tug of War - Teacher Dashboard</h2>
             <p style="color: #64748b; margin: 5px 0 0 0;">Setup Team names and paste words/phrases (one per line) to begin the match.</p>
         </div>
-        
+       
         <div class="team-selection-box">
             <div class="team-input-group">
                 <label for="team-left-name">⬅️ Left Side Team Name (Blue Side)</label>
@@ -308,22 +325,23 @@
         <div id="winner-popup">
             <div id="winner-title">🥇 WINNER! 🥇</div>
             <div id="winner-msg">Match results loader template.</div>
-            <button class="btn btn-start" onclick="closePopupAndExit()" style="margin: 0; width: auto; padding: 12px 40px;">Go to Dashboard</button>
+            <button class="btn btn-start" onclick="closePopupAndExit()" style="margin: 0; width: auto; padding: 12px 40px; touch-action: auto !important;">Go to Dashboard</button>
         </div>
 
         <div class="game-top-bar">
             <button class="btn btn-back" onclick="backToDashboard()">⬅️ Dashboard</button>
             <div class="match-timer">⏰ Time: <span id="timer-text">00:00</span></div>
+           
             <div class="score-board">
                 <div class="score-blue"><span id="lbl-blue-team">Blue Team</span>: <span id="blue-score-text">0</span></div>
                 <div class="score-red"><span id="lbl-red-team">Red Team</span>: <span id="red-score-text">0</span></div>
             </div>
         </div>
-        
+       
         <div class="rope-field-wrapper">
             <div id="field-blue-name" class="field-team-label label-left">Blue Team</div>
             <div id="field-red-name" class="field-team-label label-right">Red Team</div>
-            
+           
             <div id="rope-field">
                 <div id="center-line"></div>
                 <div id="moving-bar-image"></div>
@@ -367,18 +385,17 @@
             { mode: "word", text: "I am a teacher", parts: ["I", "am", "a", "teacher"], correctOrder: ["I", "am", "a", "teacher"] }
         ];
 
-        let barPosition = 50; 
+        let barPosition = 50;
         let currentBlueSentence, currentRedSentence;
         let blueSelectedWords = [];
         let redSelectedWords = [];
         let blueScore = 0;
         let redScore = 0;
-        
+       
         let blueQuestionIdx = 0;
         let redQuestionIdx = 0;
         let maxQuestions = 4;
         let isMatchOver = false;
-
         let timerInterval;
         let totalSeconds = 0;
         let blueEndTime, redEndTime;
@@ -388,38 +405,33 @@
 
         // AUDIO ENGINE
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             if (type === 'success') {
                 osc.type = 'triangle';
                 gain.gain.setValueAtTime(0.45, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
-                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); 
-                osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.24); 
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16);
+                osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.24);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.45);
             } else if (type === 'error') {
                 osc.type = 'sawtooth';
                 gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(120.00, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(120.00, audioCtx.currentTime);
                 osc.frequency.linearRampToValueAtTime(80.00, audioCtx.currentTime + 0.25);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             }
         }
 
-        // 🚀 NEW FUNCTION: Trigger full screen auto mode for tablet when play clicks
         function launchGameWithFullscreen() {
             if(sentenceDatabase.length === 0) return alert("Please add some questions first!");
-            
-            // Enter Fullscreen View Mode automatically
             let gameContainer = document.documentElement;
             if (gameContainer.requestFullscreen) {
                 gameContainer.requestFullscreen().catch(err => {
@@ -429,10 +441,9 @@
                 gameContainer.webkitRequestFullscreen();
             }
 
-            // Init Team names configurations
             blueTeamName = document.getElementById('team-left-name').value.trim() || "Blue Team";
             redTeamName = document.getElementById('team-right-name').value.trim() || "Red Team";
-            
+           
             document.getElementById('lbl-blue-team').innerText = blueTeamName;
             document.getElementById('lbl-red-team').innerText = redTeamName;
             document.getElementById('title-blue-team').innerText = blueTeamName;
@@ -452,8 +463,6 @@
 
         function backToDashboard() {
             clearInterval(timerInterval);
-            
-            // Exit Fullscreen View Mode automatically on return
             if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
@@ -461,7 +470,6 @@
                     document.webkitExitFullscreen();
                 }
             }
-
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
         }
@@ -488,7 +496,6 @@
                     }
                 }
             });
-
             document.getElementById('bulk-input-text').value = "";
             renderSentenceList();
         }
@@ -575,7 +582,6 @@
         function setupTeamQuestion(team) {
             if(isMatchOver) return;
             let idx = (team === 'blue') ? blueQuestionIdx : redQuestionIdx;
-            
             if (idx >= maxQuestions) {
                 document.getElementById(`${team}-pool`).innerHTML = "<h3>All questions done!</h3>";
                 if(team === 'blue' && !blueEndTime) blueEndTime = totalSeconds;
@@ -586,29 +592,43 @@
 
             let targetSentence = sentenceDatabase[idx];
             let scrambled = shuffle(targetSentence.parts);
-
             if(team === 'blue') {
-                currentBlueSentence = targetSentence; blueSelectedWords = [];
+                currentBlueSentence = targetSentence;
+                blueSelectedWords = [];
                 document.getElementById('blue-counter').innerText = `Question: ${blueQuestionIdx + 1} / ${maxQuestions}`;
                 renderPool('blue', scrambled); renderSlots('blue');
             } else {
-                currentRedSentence = targetSentence; redSelectedWords = [];
+                currentRedSentence = targetSentence;
+                redSelectedWords = [];
                 document.getElementById('red-counter').innerText = `Question: ${redQuestionIdx + 1} / ${maxQuestions}`;
                 renderPool('red', scrambled); renderSlots('red');
             }
         }
 
         function renderPool(team, words) {
-            let pool = document.getElementById(`${team}-pool`); pool.innerHTML = "";
+            let pool = document.getElementById(`${team}-pool`);
+            pool.innerHTML = "";
             words.forEach(word => {
-                let card = document.createElement('div'); card.className = 'word-card'; card.innerText = word;
-                card.onclick = () => { selectWord(team, word, card); };
+                let card = document.createElement('div'); 
+                card.className = 'word-card'; 
+                card.innerText = word;
+                
+                /* Tablet Multi-touch ပြိုင်တူနှိပ်လို့ရအောင် အဓိက ပြင်ဆင်လိုက်တဲ့အပိုင်း (ontouchstart သုံးထားပါတယ်) */
+                card.ontouchstart = (e) => {
+                    e.preventDefault(); // browser zoom/scroll ဖြစ်သွားတာကိုတားဆီးတယ်
+                    selectWord(team, word, card);
+                };
+                card.onclick = (e) => { 
+                    selectWord(team, word, card); 
+                };
+                
                 pool.appendChild(card);
             });
         }
 
         function renderSlots(team) {
-            let slots = document.getElementById(`${team}-slots`); slots.innerHTML = "";
+            let slots = document.getElementById(`${team}-slots`);
+            slots.innerHTML = "";
             let selected = (team === 'blue') ? blueSelectedWords : redSelectedWords;
             selected.forEach(word => {
                 let card = document.createElement('div'); card.className = `word-card ${team}-placed`; card.innerText = word;
@@ -617,7 +637,11 @@
         }
 
         function selectWord(team, word, element) {
-            if(team === 'blue') blueSelectedWords.push(word); else redSelectedWords.push(word);
+            // စာလုံးက ကွယ်နေပြီးသားဆိုရင် ထပ်နှိပ်မရအောင် တားဆီးထားခြင်း
+            if (element.style.visibility === 'hidden') return; 
+            
+            if(team === 'blue') blueSelectedWords.push(word);
+            else redSelectedWords.push(word);
             element.style.visibility = 'hidden';
             renderSlots(team);
         }
@@ -628,7 +652,6 @@
             if(isMatchOver) return;
             let selected = (team === 'blue') ? blueSelectedWords : redSelectedWords;
             let current = (team === 'blue') ? currentBlueSentence : currentRedSentence;
-
             if(selected.length < current.correctOrder.length) return;
 
             let isCorrect = true;
@@ -637,21 +660,20 @@
             }
 
             if(isCorrect) {
-                playSound('success'); 
+                playSound('success');
                 let stepSize = 22 / maxQuestions;
 
                 if(team === 'blue') {
-                    blueScore++; 
-                    barPosition -= stepSize; 
+                    blueScore++;
+                    barPosition -= stepSize;
                     document.getElementById('blue-score-text').innerText = blueScore;
                 } else {
-                    redScore++; 
-                    barPosition += stepSize; 
+                    redScore++;
+                    barPosition += stepSize;
                     document.getElementById('red-score-text').innerText = redScore;
                 }
-                
+               
                 updateBarUI();
-
                 if(blueScore === maxQuestions) {
                     showWinnerWindow(`${blueTeamName.toUpperCase()} WINS! 🏆`, `Perfect Match! They scored a perfect ${maxQuestions}/${maxQuestions} correctly!`);
                     return;
@@ -660,7 +682,7 @@
                     return;
                 }
             } else {
-                playSound('error'); 
+                playSound('error');
                 clearAnswers(team);
             }
 
@@ -678,7 +700,7 @@
             if(blueQuestionIdx >= maxQuestions && redQuestionIdx >= maxQuestions && !isMatchOver) {
                 isMatchOver = true;
                 clearInterval(timerInterval);
-                
+               
                 setTimeout(() => {
                     if(blueScore > redScore) {
                         document.getElementById('moving-bar-image').style.left = '28%';
