@@ -213,7 +213,7 @@
     .qr-container-box {
       position: absolute;
       top: 19.5mm; 
-      right: 8mm; 
+      right: 9.5mm; 
       width: 14.5mm;
       height: 14.5mm;
       background: transparent; 
@@ -1088,49 +1088,36 @@
     }
 
     function startMainCameraEngine() {
-      var cls = document.getElementById('scanner-class').value; 
-      var lesson = document.getElementById('scanner-lesson').value; 
-      if(!cls || !lesson) { 
-        alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
-        return; 
-      }
-      
-      var vp = document.getElementById('main-reader-viewport');
-      vp.innerHTML = ""; 
-      if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-      else { vp.classList.remove('mirror-active'); }
-
-      if(!html5QrScannerMain) { html5QrScannerMain = new Html5Qrcode("main-reader-viewport"); }
-      
+      let currentFacing = mainCamFacingMode;
+      html5QrScannerMain = new Html5Qrcode("main-reader-viewport");
+      // fps တိုးမြှင့်ခြင်း၊ qrbox ဘောင်ဖြုတ်ခြင်းနှင့် Tablet အရောင်မှန်ရန် resolution constraint ထည့်သွင်းခြင်း
+      const config = { 
+        fps: 25, 
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: currentFacing,
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      };
       html5QrScannerMain.start(
-        { facingMode: mainCamFacingMode }, 
-        { fps: 15, qrbox: { width: 220, height: 220 } }, 
-        function (message) { 
-          if (scanThrottleLock) return; 
-          scanThrottleLock = true;
-          processSubmittedId(message, cls, lesson); 
-          setTimeout(function() { scanThrottleLock = false; }, 2600); 
-        }, 
-        function(err) {}
-      ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: mainCamFacingMode } })
-        .then(function(stream) { 
-          html5QrScannerMain.start(
-            { facingMode: mainCamFacingMode }, 
-            { fps: 15, qrbox: { width: 220, height: 220 } }, 
-            function(msg) { 
-              if (scanThrottleLock) return; 
-              scanThrottleLock = true; 
-              processSubmittedId(msg, cls, lesson); 
-              setTimeout(function() { scanThrottleLock = false; }, 2600); 
-            }, 
-            function(err){}
-          ); 
-        })
-        .catch(error => { alert("Camera Access Blocked or Not Found!"); });
+        { facingMode: currentFacing },
+        config,
+        (decodedText, decodedResult) => {
+          document.getElementById('hardware-scanner-input').value = decodedText;
+          triggerManualSubmit();
+          html5QrScannerMain.pause(true);
+          setTimeout(() => { try { html5QrScannerMain.resume(); } catch(e){} }, 1500);
+        },
+        (errorMessage) => {}
+      ).then(() => {
+        var vp = document.getElementById('main-reader-viewport');
+        // Mirror active ကို အမြဲတမ်း ဖြုတ်ချထားပြီး ကင်မရာပုံရိပ်အတိုင်း တန်းဖတ်စေခြင်း
+        if(vp) { vp.classList.remove('mirror-active'); }
+      }).catch(err => {
+        console.error("Main Camera Error: ", err);
       });
     }
-
     function switchMainCameraFacing() {
       mainCamFacingMode = (mainCamFacingMode === "user") ? "environment" : "user";
       if(html5QrScannerMain && html5QrScannerMain.isScanning) {
@@ -1231,46 +1218,32 @@
     }
 
     function startFastCameraEngine() {
-      var cls = document.getElementById('fast-scanner-class').value; 
-      var lesson = document.getElementById('fast-scanner-lesson').value; 
-      if(!cls || !lesson) { 
-        alert("Please choose Class and select Lesson Topic Node before camera launch!"); 
-        return; 
-      }
-      
-      var vp = document.getElementById('fast-reader-viewport');
-      vp.innerHTML = ""; 
-      if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-      else { vp.classList.remove('mirror-active'); }
-
-      if(!html5QrScannerFast) html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
-      
+      let currentFacing = fastCamFacingMode;
+      html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
+      const config = { 
+        fps: 25, 
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: currentFacing,
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      };
       html5QrScannerFast.start(
-        { facingMode: fastCamFacingMode }, 
-        { fps: 15, qrbox: { width: 220, height: 220 } }, 
-        function (message) { 
-          if (scanThrottleLock) return; 
-          scanThrottleLock = true;
-          processFastContinuousId(message, cls, lesson); 
-          setTimeout(function() { scanThrottleLock = false; }, 2600); 
-        }, 
-        function(err) {}
-      ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: fastCamFacingMode } })
-        .then(function(stream) { 
-          html5QrScannerFast.start(
-            { facingMode: fastCamFacingMode }, 
-            { fps: 15, qrbox: { width: 220, height: 220 } }, 
-            function(msg) { 
-              if (scanThrottleLock) return;
-              scanThrottleLock = true; 
-              processFastContinuousId(msg, cls, lesson); 
-              setTimeout(function() { scanThrottleLock = false; }, 2600); 
-            }, 
-            function(err){}
-          ); 
-        })
-        .catch(error => { alert("Camera Blocked!"); });
+        { facingMode: currentFacing },
+        config,
+        (decodedText, decodedResult) => {
+          document.getElementById('fast-hardware-input').value = decodedText;
+          triggerFastManualSubmit();
+          html5QrScannerFast.pause(true);
+          setTimeout(() => { try { html5QrScannerFast.resume(); } catch(e){} }, 1200);
+        },
+        (errorMessage) => {}
+      ).then(() => {
+        var vp = document.getElementById('fast-reader-viewport');
+        if(vp) { vp.classList.remove('mirror-active'); }
+      }).catch(err => {
+        console.error("Fast Camera Error: ", err);
       });
     }
 
@@ -1335,7 +1308,7 @@
         card.innerHTML = 
           '<img src="' + templateImageSrc + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" />' +
           '<div class="card-content-wrapper" style="position: relative; z-index: 10; width: 100%; height: 100%;">' +
-            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 23.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
+            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 25.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
             '<div class="info-value-text" style="position: absolute; top: 26.2mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.id + '</div>' +
             '<div class="info-value-text" style="position: absolute; top: 31.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div>' +
             '<div class="qr-container-box"><div id="code-'+index+'" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div></div>' +
@@ -1803,50 +1776,34 @@
     }
 
     function startHomeworkCameraEngine() {
-      var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwTitle) { 
-        alert("Please select Homework title dropdown node context before launching camera!"); 
-        return; 
-      }
-      
-      var vp = document.getElementById('homework-reader-viewport');
-      vp.innerHTML = ""; 
-      if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-      else { vp.classList.remove('mirror-active'); }
-
-      if(!html5QrScannerHomework) html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
-      
+      let currentFacing = homeworkCamFacingMode;
+      html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
+      const config = { 
+        fps: 25, 
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: currentFacing,
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      };
       html5QrScannerHomework.start(
-        { facingMode: homeworkCamFacingMode }, 
-        { fps: 15, qrbox: { width: 100, height: 100 } }, 
-        function (message) { 
-          if (scanThrottleLock) return; 
-          scanThrottleLock = true;
-          document.getElementById('homework-submit-input').value = message;
+        { facingMode: currentFacing },
+        config,
+        (decodedText, decodedResult) => {
+          document.getElementById('homework-submit-input').value = decodedText;
           triggerHomeworkSubmit();
-          setTimeout(function() { scanThrottleLock = false; }, 2600); 
-        }, 
-        function(err) {}
-      ).catch(e => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: homeworkCamFacingMode } })
-        .then(function(stream) { 
-          html5QrScannerHomework.start(
-            { facingMode: homeworkCamFacingMode }, 
-            { fps: 15, qrbox: { width: 100, height: 100 } }, 
-            function(msg) { 
-              if (scanThrottleLock) return;
-              scanThrottleLock = true; 
-              document.getElementById('homework-submit-input').value = msg;
-              triggerHomeworkSubmit();
-              setTimeout(function() { scanThrottleLock = false; }, 2600); 
-            }, 
-            function(err){}
-          ); 
-        })
-        .catch(error => { alert("Camera Access Denied!"); });
+          html5QrScannerHomework.pause(true);
+          setTimeout(() => { try { html5QrScannerHomework.resume(); } catch(e){} }, 1500);
+        },
+        (errorMessage) => {}
+      ).then(() => {
+        var vp = document.getElementById('homework-reader-viewport');
+        if(vp) { vp.classList.remove('mirror-active'); }
+      }).catch(err => {
+        console.error("Homework Camera Error: ", err);
       });
     }
-
     function switchHomeworkCameraFacing() {
       homeworkCamFacingMode = (homeworkCamFacingMode === "user") ? "environment" : "user";
       if(html5QrScannerHomework && html5QrScannerHomework.isScanning) {
