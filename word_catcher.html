@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spelling Slicer - Choose the Correct Word</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+   
+    <!-- Official MediaPipe Hands AI Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+   
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #f5f3ff 100%);
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #webcam {
+            display: none;
+        }
+        /* Fun cheerful animations */
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in {
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        /* Cheerful scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px;}
+        ::-webkit-scrollbar-thumb { background: #60a5fa; border-radius: 8px; border: 2px solid #f8fafc;}
+    </style>
+</head>
+<body class="text-slate-800 font-sans min-h-screen flex flex-col items-center justify-center">
+
+    <!-- SCREEN 1: DASHBOARD -->
+    <div id="dashboard" class="bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] shadow-[0_15px_40px_rgba(59,130,246,0.15)] border-4 border-white max-w-lg w-[95vw] sm:w-full m-4 z-50 overflow-y-auto max-h-[90vh] pop-in">
+        <h1 class="text-5xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-500 tracking-wide uppercase">Word Chooser</h1>
+        <p class="text-xs text-center font-bold text-slate-500 mb-8 uppercase tracking-widest bg-slate-100 rounded-full py-1.5 inline-block px-5 mx-auto w-fit block">Find the correct spelling</p>
+       
+        <!-- Upload & Download TXT Zone -->
+        <div class="bg-blue-50 p-4 rounded-2xl border-2 border-blue-100 mb-6 flex flex-col gap-3 shadow-sm">
+            <label class="block text-xs font-black text-blue-600 uppercase">📂 Lesson Data (TXT)</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input type="file" id="upload-file" accept=".txt" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-blue-500 file:text-white hover:file:bg-blue-600 cursor-pointer transition shadow-sm">
+                <button id="download-btn" class="w-full bg-white hover:bg-slate-50 text-blue-700 font-black py-2 px-3 rounded-xl text-xs transition border-2 border-blue-200 shadow-sm">
+                    💾 Save to TXT
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- WORD LIST INPUT -->
+            <div class="bg-emerald-50 p-5 rounded-2xl border-2 border-emerald-100 shadow-sm">
+                <label class="block text-base font-black mb-1 text-emerald-700 uppercase">🔤 Vocabulary Words</label>
+                <p class="text-xs text-emerald-600/70 font-bold mb-3">Enter words separated by commas. The AI will automatically generate 3 misspelled options for each word.</p>
+                <textarea id="words-textarea" rows="4" class="w-full bg-white border-2 border-emerald-200 rounded-xl p-4 text-slate-700 font-bold focus:outline-none focus:border-emerald-400 text-base shadow-inner mb-4" placeholder="apple, banana, teacher, student, school">apple, banana, teacher, student, computer</textarea>
+                <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white font-black py-4 px-4 rounded-xl shadow-lg text-xl cursor-pointer transition uppercase tracking-wider transform hover:scale-[1.02]">
+                    Start Game 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: GAMEPLAY SCREEN -->
+    <div id="game-screen" class="hidden fixed inset-0 w-screen h-screen z-10 flex flex-col">
+        <!-- Minimal HUD -->
+        <div class="absolute top-5 left-5 right-5 z-30 flex justify-between items-center bg-white/90 backdrop-blur-md px-6 py-4 rounded-3xl border-4 border-white shadow-xl max-w-5xl mx-auto w-[92vw]">
+            
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-100 px-4 py-2 rounded-2xl border-2 border-blue-200 text-center">
+                    <span class="text-[10px] block uppercase font-black text-blue-600 tracking-wider">Word</span>
+                    <span class="font-mono text-2xl font-black text-blue-700" id="level-display">1/10</span>
+                </div>
+            </div>
+
+            <div class="text-center hidden sm:block">
+                <span class="text-sm font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-4 py-1.5 rounded-full">Slice the correct spelling!</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-100 px-5 py-2 rounded-2xl border-2 border-amber-200 text-center">
+                    <span class="text-[10px] block uppercase font-black text-amber-600 tracking-wider">Time</span>
+                    <span class="font-mono text-2xl font-black text-amber-700" id="timer-display">00:00</span>
+                </div>
+                <div class="bg-emerald-100 px-5 py-2 rounded-2xl border-2 border-emerald-200 text-center">
+                    <span class="text-[10px] block uppercase font-black text-emerald-600 tracking-wider">Score</span>
+                    <span class="font-mono text-2xl font-black text-emerald-700" id="score-display">0</span>
+                </div>
+                <button id="hud-quit-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-black px-4 py-3 rounded-2xl transition shadow-sm cursor-pointer border-2 border-slate-200">❌</button>
+            </div>
+        </div>
+
+        <div id="canvas-container" class="w-full h-full bg-slate-100">
+            <canvas id="game-canvas"></canvas>
+
+            <!-- RESULT DIALOG -->
+            <div id="result-dialog" class="hidden absolute inset-0 bg-slate-800/50 backdrop-blur-md flex items-center justify-center p-4 z-40">
+                <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full border-8 border-white text-center pop-in">
+                    <div id="result-status-icon" class="text-7xl mb-4">🏆</div>
+                    <h2 id="result-title" class="text-4xl font-black text-blue-500 mb-2 uppercase tracking-wide">Game Over!</h2>
+                   
+                    <div class="bg-blue-50 p-6 rounded-2xl border-2 border-blue-100 mb-6 flex flex-col gap-3">
+                        <div>
+                            <p class="text-[12px] font-black text-blue-400 uppercase tracking-wider mb-1">Final Score</p>
+                            <p id="final-score-text" class="text-4xl font-black text-blue-600 font-mono"></p>
+                        </div>
+                        <div class="border-t-2 border-blue-200 pt-3">
+                            <p class="text-[12px] font-black text-blue-400 uppercase tracking-wider mb-1">Time Taken</p>
+                            <p id="final-time-text" class="text-2xl font-black text-blue-600 font-mono"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="play-again-btn" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-black py-4 px-6 rounded-2xl text-lg transition uppercase tracking-wider shadow-lg cursor-pointer">Play Again 🔄</button>
+                        <button id="dialog-back-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black py-3 px-6 rounded-2xl text-sm border-2 border-slate-200 transition uppercase tracking-wider cursor-pointer">Back to Menu 🏠</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden webcam -->
+    <video id="webcam" autoplay playsinline muted></video>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const video = document.getElementById('webcam');
+
+        let items = []; 
+        let slicedPieces = []; 
+        let particles = []; 
+        let isGameRunning = false;
+       
+        let gameDataPool = [];
+        let currentWordIndex = 0;
+        let kidScore = 0;
+        let isTransitioning = false; // Locks the screen while moving to next word
+
+        // Timer variables
+        let totalSeconds = 0;
+        let timerInterval = null;
+
+        let activeHandIndexTip = null; 
+        let handTrails = []; 
+        let mouseTrail = []; 
+        let isMouseDown = false;
+
+        let cameraEngine = null;
+        let handsEngine = null;
+        let isAiProcessing = false; 
+
+        // Physics timing for lag-free rendering
+        let lastFrameTime = performance.now();
+        let audioCtx = null;
+
+        const dashboard = document.getElementById('dashboard');
+        const gameScreen = document.getElementById('game-screen');
+        const startBtn = document.getElementById('start-btn');
+        const hudQuitBtn = document.getElementById('hud-quit-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisp = document.getElementById('level-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const downloadBtn = document.getElementById('download-btn');
+        const uploadFileInput = document.getElementById('upload-file');
+       
+        const resultDialog = document.getElementById('result-dialog');
+        const finalScoreText = document.getElementById('final-score-text');
+        const finalTimeText = document.getElementById('final-time-text');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const dialogBackBtn = document.getElementById('dialog-back-btn');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => { if(isGameRunning) resizeCanvas(); });
+
+        // Config IO
+        downloadBtn.addEventListener('click', () => {
+            let txtWords = document.getElementById('words-textarea').value;
+            let fileContent = `=== WORDS ===\n${txtWords}`;
+            let blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Spelling_Slicer.txt";
+            link.click();
+        });
+
+        uploadFileInput.addEventListener('change', (e) => {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let text = event.target.result;
+                if (text.includes("=== WORDS ===")) {
+                    let wordsPart = text.replace("=== WORDS ===", "").trim();
+                    document.getElementById('words-textarea').value = wordsPart;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Timer Logic
+        function startTimer() {
+            stopTimer();
+            totalSeconds = 0;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            let mins = Math.floor(totalSeconds / 60);
+            let secs = totalSeconds % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Auto Typo Generator Logic
+        function generateTypos(word, count=3) {
+            let results = [];
+            let attempts = 0;
+            let len = word.length;
+            
+            while(results.length < count && attempts < 100) {
+                attempts++;
+                let arr = word.split('');
+                let type = Math.floor(Math.random() * 3);
+                
+                if (len > 3) {
+                    if (type === 0) { 
+                        // Swap adjacent characters
+                        let idx = Math.floor(Math.random() * (len - 1));
+                        let temp = arr[idx]; 
+                        arr[idx] = arr[idx+1]; 
+                        arr[idx+1] = temp;
+                    } else if (type === 1) { 
+                        // Duplicate a letter
+                        let idx = Math.floor(Math.random() * len);
+                        arr.splice(idx, 0, arr[idx]);
+                    } else { 
+                        // Delete a letter
+                        let idx = Math.floor(Math.random() * len);
+                        arr.splice(idx, 1);
+                    }
+                } else if (len > 1) {
+                    // For small words, just swap
+                    let temp = arr[0]; arr[0] = arr[1]; arr[1] = temp;
+                } else {
+                    // For 1 letter words (rare), append a random letter
+                    arr.push(String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+                }
+                
+                let typo = arr.join('');
+                if (typo !== word && !results.includes(typo)) {
+                    results.push(typo);
+                }
+            }
+
+            // Fallback if loop didn't find unique ones
+            while(results.length < count) {
+                results.push(word + String.fromCharCode(97 + Math.floor(Math.random() * 26)));
+            }
+            return results;
+        }
+
+        // Audio
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSynthSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            
+            if (type === 'slice') {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1000, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } 
+            else if (type === 'correct') {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.15); 
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+            else if (type === 'wrong') {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        startBtn.addEventListener('click', () => {
+            let inputWords = document.getElementById('words-textarea').value.trim();
+            if (inputWords.length === 0) return;
+            
+            // Clean up the list, remove empties
+            gameDataPool = inputWords.split(',').map(s => s.trim()).filter(s => s);
+            startGameSetup();
+        });
+
+        function startGameSetup() {
+            currentWordIndex = 0;
+            kidScore = 0;
+            scoreDisplay.innerText = kidScore;
+            isTransitioning = false;
+           
+            dashboard.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            resultDialog.classList.add('hidden');
+           
+            resizeCanvas();
+            startTimer(); // Start the timer when the game begins
+            loadNextRound();
+            initCameraAndAIOnce();
+        }
+
+        function loadNextRound() {
+            if (currentWordIndex >= gameDataPool.length) {
+                isGameRunning = false;
+                stopTimer(); // Stop timer on game over
+                finalScoreText.innerText = `${kidScore} / ${gameDataPool.length}`;
+                
+                let mins = Math.floor(totalSeconds / 60);
+                let secs = totalSeconds % 60;
+                finalTimeText.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                resultDialog.classList.remove('hidden');
+                return;
+            }
+
+            levelDisp.innerText = `${currentWordIndex + 1}/${gameDataPool.length}`;
+            let correctWord = gameDataPool[currentWordIndex];
+            
+            // Setup 4 static boxes
+            items = [];
+            slicedPieces = [];
+            particles = [];
+            handTrails = [];
+            mouseTrail = [];
+            
+            let typos = generateTypos(correctWord, 3);
+            let optionsList = [correctWord, ...typos];
+            
+            // Shuffle the 4 options so the correct one is at a random position
+            optionsList.sort(() => Math.random() - 0.5);
+            
+            ctx.font = "900 34px sans-serif";
+            
+            // Standardize responsive positions (Left Top, Left Bottom, Right Top, Right Bottom)
+            let positions = [
+                { cx: canvas.width * 0.25, cy: canvas.height * 0.40 },
+                { cx: canvas.width * 0.25, cy: canvas.height * 0.70 },
+                { cx: canvas.width * 0.75, cy: canvas.height * 0.40 },
+                { cx: canvas.width * 0.75, cy: canvas.height * 0.70 }
+            ];
+
+            for (let i = 0; i < 4; i++) {
+                let text = optionsList[i];
+                // Dynamic width calculation based on text length + generous padding
+                let boxWidth = ctx.measureText(text).width + 90; 
+                if (boxWidth < 180) boxWidth = 180; // Minimum width
+
+                items.push({
+                    text: text,
+                    isCorrect: (text === correctWord),
+                    x: positions[i].cx,
+                    y: positions[i].cy,
+                    w: boxWidth,
+                    h: 85,
+                    isSliced: false
+                });
+            }
+           
+            isTransitioning = false;
+            lastFrameTime = performance.now();
+            
+            if(!isGameRunning) {
+                isGameRunning = true;
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        playAgainBtn.addEventListener('click', (e) => { e.stopPropagation(); startGameSetup(); });
+
+        function returnToDashboard() {
+            isGameRunning = false;
+            isTransitioning = true;
+            stopTimer(); // Ensure timer stops if quitting
+            if (document.fullscreenElement) document.exitFullscreen();
+           
+            if (cameraEngine) { cameraEngine.stop(); cameraEngine = null; }
+            if (handsEngine) { handsEngine.close(); handsEngine = null; }
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+
+            gameScreen.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+        }
+
+        dialogBackBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
+        hudQuitBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToDashboard(); });
+
+        // Setup AI & Camera
+        function initCameraAndAIOnce() {
+            setupPointerTrails();
+            if (cameraEngine && handsEngine) return;
+
+            handsEngine = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            // Model complexity 0 for zero lag
+            handsEngine.setOptions({
+                maxNumHands: 1, 
+                modelComplexity: 0,      
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            handsEngine.onResults((results) => {
+                if (!isGameRunning || isTransitioning) { 
+                    activeHandIndexTip = null;
+                    return; 
+                }
+                
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    let indexTip = results.multiHandLandmarks[0][8]; 
+                    
+                    let hx = (1 - indexTip.x) * canvas.width;
+                    let hy = indexTip.y * canvas.height;
+
+                    activeHandIndexTip = { x: hx, y: hy };
+                    handTrails.push({ x: hx, y: hy, time: Date.now() });
+                } else {
+                    activeHandIndexTip = null;
+                }
+            });
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    
+                    cameraEngine = new Camera(video, {
+                        onFrame: async () => {
+                            if (isGameRunning && !isTransitioning && handsEngine && !isAiProcessing) {
+                                isAiProcessing = true;
+                                // Pass the raw video feed for improved quality and tracking accuracy
+                                try {
+                                    await handsEngine.send({ image: video });
+                                } catch (e) {}
+                                isAiProcessing = false;
+                            }
+                        }
+                    });
+                    cameraEngine.start().then(() => {
+                        isGameRunning = true;
+                        lastFrameTime = performance.now();
+                        requestAnimationFrame(gameLoop);
+                    });
+                })
+                .catch(function(err) {
+                    isGameRunning = true;
+                    lastFrameTime = performance.now();
+                    requestAnimationFrame(gameLoop);
+                });
+            } else {
+                isGameRunning = true;
+                lastFrameTime = performance.now();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Touch/Mouse logic
+        function setupPointerTrails() {
+            const handleDragMove = (evt) => {
+                if (!isGameRunning || isTransitioning) return;
+                let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                let clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                mouseTrail.push({ x: clientX, y: clientY, time: Date.now() });
+            };
+            window.addEventListener('mousedown', (e) => { isMouseDown = true; mouseTrail = []; handleDragMove(e); });
+            window.addEventListener('mousemove', (e) => { if (isMouseDown) handleDragMove(e); });
+            window.addEventListener('mouseup', () => { isMouseDown = false; });
+            window.addEventListener('touchstart', (e) => { isMouseDown = true; mouseTrail = []; handleDragMove(e); }, { passive: true });
+            window.addEventListener('touchmove', (e) => { handleDragMove(e); }, { passive: true });
+            window.addEventListener('touchend', () => { isMouseDown = false; });
+        }
+
+        function spawnSliceSplash(x, y, color) {
+            for (let index = 0; index < 30; index++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    radius: Math.random() * 6 + 4,
+                    color: color,
+                    alpha: 1,
+                    decay: Math.random() * 0.03 + 0.015
+                });
+            }
+        }
+
+        function checkIntersection(segmentStart, segmentEnd, itemBox) {
+            let dx = segmentEnd.x - segmentStart.x;
+            let dy = segmentEnd.y - segmentStart.y;
+            let len = Math.sqrt(dx * dx + dy * dy);
+            if (len === 0) return false;
+
+            const steps = 5;
+            for (let step = 0; step <= steps; step++) {
+                let ratio = step / steps;
+                let px = segmentStart.x + dx * ratio;
+                let py = segmentStart.y + dy * ratio;
+
+                let hW = itemBox.w / 2;
+                let hH = itemBox.h / 2;
+                if (px >= itemBox.x - hW && px <= itemBox.x + hW && py >= itemBox.y - hH && py <= itemBox.y + hH) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // MAIN GAME LOOP (Time-Delta Physics for 60fps Smoothness)
+        function gameLoop(currentTime) {
+            if (!isGameRunning) return;
+
+            let dt = currentTime - lastFrameTime;
+            lastFrameTime = currentTime;
+            let timeScale = dt / 16.66; 
+            if (timeScale > 5) timeScale = 5; 
+
+            // 1. Draw raw, natural camera
+            if (video.readyState >= 2) {
+                ctx.save();
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.globalAlpha = 1.0; 
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            } else {
+                ctx.fillStyle = '#e0f2fe';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Soft overlay to make UI pop slightly
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Time-based trail decay
+            const now = Date.now();
+            handTrails = handTrails.filter(pt => now - pt.time < 120); 
+            mouseTrail = mouseTrail.filter(pt => now - pt.time < 120);
+
+            drawBladePointer();
+            drawTrails();
+
+            if (!isTransitioning) {
+                for (let index = items.length - 1; index >= 0; index--) {
+                    let item = items[index];
+
+                    // Removed the float animation to keep words perfectly still and smooth
+
+                    let isTargetHit = false;
+                    let slicePoints = [];
+                    
+                    if (handTrails.length > 1) {
+                        for (let idx = 1; idx < handTrails.length; idx++) {
+                            slicePoints.push({ prev: handTrails[idx - 1], curr: handTrails[idx] });
+                        }
+                    }
+                    if (mouseTrail.length > 1) {
+                        for (let idx = 1; idx < mouseTrail.length; idx++) {
+                            slicePoints.push({ prev: mouseTrail[idx - 1], curr: mouseTrail[idx] });
+                        }
+                    }
+
+                    for (let slash of slicePoints) {
+                        if (checkIntersection(slash.prev, slash.curr, item)) {
+                            isTargetHit = true;
+                            break;
+                        }
+                    }
+
+                    if (isTargetHit && !item.isSliced) {
+                        item.isSliced = true;
+                        playSynthSound('slice');
+                        isTransitioning = true; // Lock interactions
+
+                        if (item.isCorrect) {
+                            playSynthSound('correct');
+                            spawnSliceSplash(item.x, item.y, '#34d399'); // Green particles for correct
+                            kidScore += 1;
+                            scoreDisplay.innerText = kidScore;
+                        } else {
+                            playSynthSound('wrong');
+                            spawnSliceSplash(item.x, item.y, '#ef4444'); // Red particles for wrong
+                        }
+
+                        // Split animation for sliced item
+                        let splitIndex = Math.floor(item.text.length / 2);
+                        let leftPart = item.text.substring(0, splitIndex);
+                        let rightPart = item.text.substring(splitIndex);
+
+                        slicedPieces.push({
+                            text: leftPart, x: item.x - 20, y: item.y,
+                            vx: -6, vy: -4, rotation: 0, rotSpeed: -0.1, alpha: 1
+                        });
+                        slicedPieces.push({
+                            text: rightPart, x: item.x + 20, y: item.y,
+                            vx: 6, vy: -4, rotation: 0, rotSpeed: 0.1, alpha: 1
+                        });
+
+                        items.splice(index, 1);
+                        
+                        // Proceed to next word after delay
+                        setTimeout(() => {
+                            currentWordIndex++;
+                            loadNextRound();
+                        }, 800);
+                        
+                        continue;
+                    }
+
+                    // DRAW ALL STATIC BOXES WITH EXACT SAME BLUE COLOR (As Requested)
+                    ctx.save();
+                    ctx.translate(item.x, item.y);
+
+                    ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'; // Blue Glow
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = '#3b82f6'; // Same Bright Blue for both correct and wrong
+                    ctx.strokeStyle = '#ffffff'; // White inner border
+                    ctx.lineWidth = 4;
+                    
+                    ctx.beginPath();
+                    ctx.roundRect(-item.w / 2, -item.h / 2, item.w, item.h, 20);
+                    ctx.fill(); ctx.stroke();
+                    
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.font = '900 34px sans-serif'; 
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(item.text, 0, 0);
+
+                    ctx.restore();
+                }
+            }
+
+            // Animate sliced pieces falling away
+            for (let idx = slicedPieces.length - 1; idx >= 0; idx--) {
+                let half = slicedPieces[idx];
+                half.vy += (0.6 * timeScale); // Gravity
+                half.x += (half.vx * timeScale);
+                half.y += (half.vy * timeScale);
+                half.rotation += (half.rotSpeed * timeScale);
+                half.alpha -= (0.04 * timeScale);
+
+                if (half.alpha <= 0) {
+                    slicedPieces.splice(idx, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.translate(half.x, half.y);
+                ctx.rotate(half.rotation);
+                ctx.globalAlpha = half.alpha;
+                ctx.fillStyle = '#3b82f6';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.font = '900 32px sans-serif';
+                let wM = ctx.measureText(half.text).width + 24;
+                ctx.beginPath();
+                ctx.roundRect(-wM / 2, -22, wM, 44, 12);
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(half.text, 0, 0);
+                ctx.restore();
+            }
+
+            // Particles Animation
+            for (let idx = particles.length - 1; idx >= 0; idx--) {
+                let part = particles[idx];
+                part.x += (part.vx * timeScale);
+                part.y += (part.vy * timeScale);
+                part.alpha -= (part.decay * timeScale);
+
+                if (part.alpha <= 0) {
+                    particles.splice(idx, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = part.alpha;
+                ctx.beginPath();
+                ctx.arc(part.x, part.y, part.radius, 0, Math.PI * 2);
+                ctx.fillStyle = part.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            ctx.globalAlpha = 1.0;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Pointer
+        function drawBladePointer() {
+            if (!activeHandIndexTip) return;
+            ctx.save();
+            ctx.shadowColor = '#f472b6';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#ec4899'; // Bright Pink pointer
+            ctx.beginPath();
+            ctx.arc(activeHandIndexTip.x, activeHandIndexTip.y, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(activeHandIndexTip.x, activeHandIndexTip.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Trails
+        function drawTrails() {
+            if (handTrails.length > 1) drawGlowRibbon(handTrails, '#ec4899', '#db2777'); // Pink laser
+            if (mouseTrail.length > 1 && isMouseDown) drawGlowRibbon(mouseTrail, '#34d399', '#059669'); // Green laser
+        }
+
+        function drawGlowRibbon(pointsArray, startColor, endColor) {
+            ctx.save();
+            ctx.shadowColor = endColor;
+            ctx.shadowBlur = 15;
+            for (let idx = 1; idx < pointsArray.length; idx++) {
+                let ratio = idx / pointsArray.length;
+                ctx.beginPath();
+                ctx.moveTo(pointsArray[idx - 1].x, pointsArray[idx - 1].y);
+                ctx.lineTo(pointsArray[idx].x, pointsArray[idx].y);
+                ctx.lineWidth = ratio * 16; 
+                ctx.strokeStyle = startColor;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            for (let idx = 1; idx < pointsArray.length; idx++) {
+                if (idx === 1) ctx.moveTo(pointsArray[idx - 1].x, pointsArray[idx - 1].y);
+                else ctx.lineTo(pointsArray[idx].x, pointsArray[idx].y);
+            }
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+            ctx.restore();
+        }
+    </script>
+</body>
+</html>
