@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>English Sentence Tug of War - Luffy Edition (Firebase Live)</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --primary-blue: #3498db;
+            --primary-red: #e74c3c;
+            --light-blue: #e3f2fd;
+            --light-red: #ffebee;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            touch-action: none; 
+        }
+
+        .container {
+            width: 98%;
+            max-width: 1280px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        /* ROLE SELECTION BOX STYLE */
+        .role-selection-wrapper {
+            background: #f8fafc;
+            border: 2px solid #3498db;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .role-btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .role-btn {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .role-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        /* --- DASHBOARD STYLE --- */
+        #dashboard {
+            display: block;
+            width: 100%;
+            touch-action: auto; 
+        }
+       
+        .dashboard-header {
+            margin-bottom: 20px;
+        }
+
+        .team-selection-box {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .team-input-group {
+            flex: 1;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary-blue);
+        }
+        .team-input-group.red-side {
+            border-left: 5px solid var(--primary-red);
+        }
+        .team-input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .team-input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+       
+        .file-controls {
+            display: flex;
+            gap: 10px;
+            background: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .dashboard-box textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            resize: none;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+
+        button.btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            touch-action: none; 
+        }
+        button.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        button.btn:active { transform: translateY(0); }
+
+        .btn-box-add { background: #2ecc71; color: white; width: 100%; padding: 14px; }
+        .btn-box-add:hover { background: #27ae60; }
+        .btn-start { background: var(--primary-blue); color: white; width: 100%; padding: 16px; font-size: 18px; margin-top: 15px; }
+        .btn-start:hover { background: #2574a9; }
+        .btn-file { background: #64748b; color: white; font-size: 14px; }
+        .btn-delete { background: #ef4444; color: white; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
+
+        #sentence-list { margin: 12px 0; max-height: 120px; overflow-y: auto; background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; touch-action: auto; }
+        .list-item { background: #f8fafc; padding: 8px 12px; margin-bottom: 6px; border-radius: 6px; border-left: 4px solid var(--primary-blue); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* --- GAME SCREEN STYLE --- */
+        #game-screen {
+            display: none;
+            position: relative;
+            height: calc(100vh - 40px);
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+       
+        :fullscreen #game-screen {
+            height: 100vh;
+            padding: 20px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        .score-board { display: flex; gap: 40px; font-size: 22px; font-weight: bold; }
+        .score-blue { color: var(--primary-blue); }
+        .score-red { color: var(--primary-red); }
+        .match-timer { background: #34495e; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 16px; }
+        .btn-back { background: #94a3b8; color: white; touch-action: auto !important; }
+
+        .rope-field-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .field-team-label {
+            position: absolute;
+            top: -32px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .label-left { left: 5px; color: var(--primary-blue); }
+        .label-right { right: 5px; color: var(--primary-red); }
+
+        #rope-field {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            border: 3px solid #cbd5e1;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        @keyframes constantTug {
+            0% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(3px); }
+            100% { transform: translateX(-50%) translateY(0px); }
+        }
+
+        #moving-bar-image {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1400px;
+            height: 100%;
+            background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/7f705245e0b875fa98941074dd029ee4d2ae3216/Luffy.webp');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            animation: constantTug 0.3s infinite ease-in-out;
+        }
+
+        #center-line {
+            position: absolute;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            border-left: 3px dashed #e74c3c;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .game-sides { display: flex; justify-content: space-between; gap: 55px; width: 100%; flex-grow: 1; overflow: hidden; margin-bottom: 10px; }
+        .player-box { width: 50%; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;}
+        #blue-team { background-color: var(--light-blue); border: 3px solid var(--primary-blue); }
+        #red-team { background-color: var(--light-red); border: 3px solid var(--primary-red); }
+        .target-counter { font-size: 15px; color: #64748b; margin-bottom: 8px; font-weight: bold; }
+
+        .slots-container, .words-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; min-height: 55px; padding: 10px; border-radius: 8px; }
+        .slots-container { background: rgba(255,255,255,0.85); border: 2px dashed #cbd5e1; }
+        .words-pool { background: rgba(0,0,0,0.01); }
+       
+        .word-card { 
+            padding: 12px 18px;
+            background: white; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            user-select: none; 
+            transition: all 0.15s ease;
+            touch-action: none; 
+        }
+        .word-card:hover { transform: translateY(-2px); border-color: #94a3b8; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
+        .blue-placed { background: #3498db !important; color: white; border-color: #2980b9 !important; }
+        .red-placed { background: #e74c3c !important; color: white; border-color: #c0392b !important; }
+
+        .action-btns { display: flex; gap: 12px; justify-content: center; margin-top: auto; padding-top: 10px; align-items: center; }
+        .btn-check { background: #2ecc71; color: white; flex-grow: 1; padding: 14px; }
+        .btn-check:hover { background: #27ae60; }
+        .btn-clear { background: #94a3b8; color: white; padding: 14px; }
+
+        /* --- OVERLAY DIALOG POP-UP --- */
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index:99; }
+        #winner-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px 50px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+            z-index: 100;
+            text-align: center;
+            border: 3px solid #f1c40f;
+            width: 450px;
+            max-width: 85%;
+        }
+        #winner-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; color: #1e293b; }
+        #winner-msg { font-size: 18px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div id="dashboard" class="container">
+        <div class="role-selection-wrapper">
+            <strong>🎮 Select Your Role for this Device:</strong>
+            <div class="role-btn-group">
+                <button class="role-btn active" id="role-teacher" onclick="setDeviceRole('teacher')">💻 Teacher / Laptop View</button>
+                <button class="role-btn" id="role-blue" onclick="setDeviceRole('blue')">📱 Blue Player (Left Phone)</button>
+                <button class="role-btn" id="role-red" onclick="setDeviceRole('red')">📱 Red Player (Right Phone)</button>
+            </div>
+        </div>
+
+        <div id="teacher-setup-area">
+            <div class="dashboard-header">
+                <h2>Grammar & Word Tug of War - Teacher Dashboard</h2>
+                <p style="color: #64748b; margin: 5px 0 0 0;">Setup Team names and paste words/phrases (one per line) to begin the match.</p>
+            </div>
+           
+            <div class="team-selection-box">
+                <div class="team-input-group">
+                    <label for="team-left-name">⬅️ Left Side Team Name (Blue Side)</label>
+                    <input type="text" id="team-left-name" value="Blue Team" oninput="syncSetupToFirebase()">
+                </div>
+                <div class="team-input-group red-side">
+                    <label for="team-right-name">➡️ Right Side Team Name (Red Side)</label>
+                    <input type="text" id="team-right-name" value="Red Team" oninput="syncSetupToFirebase()">
+                </div>
+            </div>
+
+            <div class="file-controls">
+                <strong>Database Backup (.txt):</strong>
+                <button class="btn btn-file" onclick="downloadTxtFile()">💾 Download Pool</button>
+                <input type="file" id="upload-file-input" accept=".txt" style="display: none;" onchange="uploadTxtFile(event)">
+                <button class="btn btn-file" onclick="document.getElementById('upload-file-input').click()">📂 Upload Pool</button>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Input Words & Sentences Pool (One per line)</h3>
+                <textarea id="bulk-input-text" placeholder="Cat&#10;Dog&#10;I am a boy&#10;I am a teacher"></textarea>
+                <button class="btn btn-add btn-box-add" onclick="processBulkInput()">+ Process & Add to Match Pool</button>
+            </div>
+
+            <h3>Active Match Question Pool (<span id="pool-count-text">4</span> Items):</h3>
+            <div id="sentence-list"></div>
+
+            <button class="btn btn-start" onclick="launchGameWithFullscreen()">🚀 Start Tug of War Match</button>
+        </div>
+        
+        <div id="player-waiting-area" style="display: none; padding: 40px; text-align: center;">
+            <h2 style="color: #3498db;">📱 Connected to Live Server!</h2>
+            <p style="font-size: 18px; color: #64748b;">Please wait for the teacher to launch the match from the Laptop...</p>
+        </div>
+    </div>
+
+    <div id="game-screen" class="container">
+        <div id="popup-overlay" class="overlay"></div>
+        <div id="winner-popup">
+            <div id="winner-title">🥇 WINNER! 🥇</div>
+            <div id="winner-msg">Match results loader template.</div>
+            <button class="btn btn-start" id="btn-popup-close" style="margin: 0; width: auto; padding: 12px 40px; touch-action: auto !important;">Go to Dashboard</button>
+        </div>
+
+        <div class="game-top-bar">
+            <button class="btn btn-back" id="btn-back-dash" onclick="backToDashboard()">⬅️ Dashboard</button>
+            <div class="match-timer">⏰ Time: <span id="timer-text">00:00</span></div>
+           
+            <div class="score-board">
+                <div class="score-blue"><span id="lbl-blue-team">Blue Team</span>: <span id="blue-score-text">0</span></div>
+                <div class="score-red"><span id="lbl-red-team">Red Team</span>: <span id="red-score-text">0</span></div>
+            </div>
+        </div>
+       
+        <div class="rope-field-wrapper" id="rope-field-container">
+            <div id="field-blue-name" class="field-team-label label-left">Blue Team</div>
+            <div id="field-red-name" class="field-team-label label-right">Red Team</div>
+           
+            <div id="rope-field">
+                <div id="center-line"></div>
+                <div id="moving-bar-image"></div>
+            </div>
+        </div>
+
+        <div class="game-sides" id="game-playground-sides">
+            <div id="blue-team" class="player-box">
+                <div>
+                    <h2 id="title-blue-team">Blue Team</h2>
+                    <div id="blue-counter" class="target-counter">Question: 1 / 4</div>
+                    <div id="blue-slots" class="slots-container"></div>
+                    <div id="blue-pool" class="words-pool"></div>
+                </div>
+                <div class="action-btns">
+                    <button class="btn btn-check" id="btn-blue-submit">Submit</button>
+                    <button class="btn btn-clear" id="btn-blue-reset">Reset</button>
+                </div>
+            </div>
+
+            <div id="red-team" class="player-box">
+                <div>
+                    <h2 id="title-red-team">Red Team</h2>
+                    <div id="red-counter" class="target-counter">Question: 1 / 4</div>
+                    <div id="red-slots" class="slots-container"></div>
+                    <div id="red-pool" class="words-pool"></div>
+                </div>
+                <div class="action-btns">
+                    <button class="btn btn-check" id="btn-red-submit">Submit</button>
+                    <button class="btn btn-clear" id="btn-red-reset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTQUKZH-qzYBc5xs8GTr1YhdUDi6uEoTE",
+            authDomain: "tug-of-war-e58ce.firebaseapp.com",
+            projectId: "tug-of-war-e58ce",
+            storageBucket: "tug-of-war-e58ce.firebasestorage.app",
+            messagingSenderId: "856275724437",
+            appId: "1:856275724437:web:68347886b78d12d870539c",
+            databaseURL: "https://tug-of-war-e58ce-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref("tug_of_war_match");
+
+        let currentRole = "teacher"; // Role types: teacher, blue, red
+
+        let sentenceDatabase = [
+            { mode: "letter", text: "Cat", parts: ["C", "a", "t"], correctOrder: ["C", "a", "t"] },
+            { mode: "letter", text: "Dog", parts: ["D", "o", "g"], correctOrder: ["D", "o", "g"] },
+            { mode: "word", text: "I am a boy", parts: ["I", "am", "a", "boy"], correctOrder: ["I", "am", "a", "boy"] },
+            { mode: "word", text: "I am a teacher", parts: ["I", "am", "a", "teacher"], correctOrder: ["I", "am", "a", "teacher"] }
+        ];
+
+        let barPosition = 50;
+        let currentBlueSentence, currentRedSentence;
+        let blueSelectedWords = [];
+        let redSelectedWords = [];
+        let blueScore = 0;
+        let redScore = 0;
+       
+        let blueQuestionIdx = 0;
+        let redQuestionIdx = 0;
+        let maxQuestions = 4;
+        let isMatchOver = false;
+        let timerInterval;
+        let totalSeconds = 0;
+        let blueEndTime, redEndTime;
+
+        let blueTeamName = "Blue Team";
+        let redTeamName = "Red Team";
+
+        // AUDIO ENGINE
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            if (type === 'success') {
+                osc.type = 'triangle';
+                gain.gain.setValueAtTime(0.45, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16);
+                osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.24);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(120.00, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80.00, audioCtx.currentTime + 0.25);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // ROLE TOGGLE LOGIC
+        function setDeviceRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`role-${role}`).classList.add('active');
+
+            if (role === 'teacher') {
+                document.getElementById('teacher-setup-area').style.display = 'block';
+                document.getElementById('player-waiting-area').style.display = 'none';
+                document.getElementById('btn-back-dash').style.display = 'inline-block';
+            } else {
+                document.getElementById('teacher-setup-area').style.display = 'none';
+                document.getElementById('player-waiting-area').style.display = 'block';
+                document.getElementById('btn-back-dash').style.display = 'none';
+            }
+            adjustLayoutForRole();
+        }
+
+        function adjustLayoutForRole() {
+            const blueSideBox = document.getElementById('blue-team');
+            const redSideBox = document.getElementById('red-team');
+            const ropeContainer = document.getElementById('rope-field-container');
+            const playGroundSides = document.getElementById('game-playground-sides');
+
+            // Reset Default styles
+            blueSideBox.style.display = 'flex'; blueSideBox.style.width = '50%';
+            redSideBox.style.display = 'flex'; redSideBox.style.width = '50%';
+            ropeContainer.style.display = 'block';
+            playGroundSides.style.display = 'flex';
+
+            if (currentRole === 'teacher') {
+                // Laptop view only needs the rope big and basic info indicators
+                blueSideBox.style.display = 'none';
+                redSideBox.style.display = 'none';
+                playGroundSides.style.display = 'none';
+                document.getElementById('rope-field').style.height = '450px';
+            } else if (currentRole === 'blue') {
+                // Blue phone view hides Red side controls
+                redSideBox.style.display = 'none';
+                blueSideBox.style.width = '100%';
+                document.getElementById('rope-field').style.height = '120px'; // smaller indicator
+            } else if (currentRole === 'red') {
+                // Red phone view hides Blue side controls
+                blueSideBox.style.display = 'none';
+                redSideBox.style.width = '100%';
+                document.getElementById('rope-field').style.height = '120px'; // smaller indicator
+            }
+        }
+
+        // SYNC SETUP CHANGES FROM TEACHER LAPTOP TO FIREBASE
+        function syncSetupToFirebase() {
+            if (currentRole !== 'teacher') return;
+            db.update({
+                blueTeamName: document.getElementById('team-left-name').value.trim() || "Blue Team",
+                redTeamName: document.getElementById('team-right-name').value.trim() || "Red Team",
+                sentenceDatabase: sentenceDatabase
+            });
+        }
+
+        // --- FIREBASE LIVE LISTENERS FOR REAL-TIME UPDATE ---
+        db.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            // Update local state based on live server database
+            if (data.blueTeamName) blueTeamName = data.blueTeamName;
+            if (data.redTeamName) redTeamName = data.redTeamName;
+            if (data.sentenceDatabase) {
+                sentenceDatabase = data.sentenceDatabase;
+                maxQuestions = sentenceDatabase.length;
+                if (currentRole !== 'teacher') renderSentenceList();
+            }
+            
+            // Sync UI Titles
+            document.getElementById('lbl-blue-team').innerText = blueTeamName;
+            document.getElementById('lbl-red-team').innerText = redTeamName;
+            document.getElementById('title-blue-team').innerText = blueTeamName;
+            document.getElementById('title-red-team').innerText = redTeamName;
+            document.getElementById('field-blue-name').innerText = "⬅️ " + blueTeamName;
+            document.getElementById('field-red-name').innerText = redTeamName + " ➡️";
+
+            // Sync Game Screen State (Start / End Match Live Trigger)
+            if (data.gameActive) {
+                if (document.getElementById('game-screen').style.display !== 'flex') {
+                    document.getElementById('dashboard').style.display = 'none';
+                    document.getElementById('game-screen').style.display = 'flex';
+                    adjustLayoutForRole();
+                }
+            } else {
+                if (document.getElementById('game-screen').style.display === 'flex') {
+                    document.getElementById('game-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                }
+            }
+
+            // Sync Core Variables & UI Layouts
+            if (data.barPosition !== undefined) {
+                barPosition = data.barPosition;
+                updateBarUI();
+            }
+            if (data.blueScore !== undefined) document.getElementById('blue-score-text').innerText = data.blueScore;
+            if (data.redScore !== undefined) document.getElementById('red-score-text').innerText = data.redScore;
+            if (data.timerText !== undefined) document.getElementById('timer-text').innerText = data.timerText;
+
+            // Sync Question indices & render pool structures specifically for players
+            if (data.blueQuestionIdx !== undefined && blueQuestionIdx !== data.blueQuestionIdx) {
+                blueQuestionIdx = data.blueQuestionIdx;
+                setupTeamQuestion('blue', false); // false means don't push to firebase to avoid recursion loop
+            }
+            if (data.redQuestionIdx !== undefined && redQuestionIdx !== data.redQuestionIdx) {
+                redQuestionIdx = data.redQuestionIdx;
+                setupTeamQuestion('red', false);
+            }
+
+            // Sync Winner popups
+            if (data.winnerPopup) {
+                showWinnerWindow(data.winnerPopup.title, data.winnerPopup.msg, false);
+            } else {
+                document.getElementById('popup-overlay').style.display = 'none';
+                document.getElementById('winner-popup').style.display = 'none';
+            }
+        });
+
+
+        function launchGameWithFullscreen() {
+            if(sentenceDatabase.length === 0) return alert("Please add some questions first!");
+            if(currentRole === 'teacher') {
+                let gameContainer = document.documentElement;
+                if (gameContainer.requestFullscreen) {
+                    gameContainer.requestFullscreen().catch(() => {});
+                }
+            }
+
+            blueTeamName = document.getElementById('team-left-name').value.trim() || "Blue Team";
+            redTeamName = document.getElementById('team-right-name').value.trim() || "Red Team";
+            maxQuestions = sentenceDatabase.length;
+            isMatchOver = false;
+            blueEndTime = null; redEndTime = null;
+
+            // Push game initial live stats state to Firebase Realtime Server
+            db.update({
+                gameActive: true,
+                blueTeamName: blueTeamName,
+                redTeamName: redTeamName,
+                barPosition: 50,
+                blueScore: 0,
+                redScore: 0,
+                blueQuestionIdx: 0,
+                redQuestionIdx: 0,
+                timerText: "00:00",
+                winnerPopup: null
+            });
+
+            if (currentRole === 'teacher') startTimer();
+            resetGameLocal();
+        }
+
+        function backToDashboard() {
+            if (currentRole === 'teacher') {
+                clearInterval(timerInterval);
+                db.update({ gameActive: false, winnerPopup: null });
+            }
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        function processBulkInput() {
+            let rawLines = document.getElementById('bulk-input-text').value.split('\n');
+            if (document.getElementById('bulk-input-text').value.trim() === "") return;
+
+            rawLines.forEach(line => {
+                let cleanLine = line.trim();
+                if(cleanLine === "") return;
+
+                if(cleanLine.includes(" ")) {
+                    let rawWords = cleanLine.split(" ");
+                    let validWords = [];
+                    rawWords.forEach(w => { if(w.trim() !== "") validWords.push(w.trim()); });
+                    if(validWords.length >= 2) {
+                        sentenceDatabase.push({ mode: "word", text: cleanLine, parts: validWords, correctOrder: [...validWords] });
+                    }
+                } else {
+                    let letters = cleanLine.split("");
+                    if(letters.length > 0) {
+                        sentenceDatabase.push({ mode: "letter", text: cleanLine, parts: letters, correctOrder: [...letters] });
+                    }
+                }
+            });
+            document.getElementById('bulk-input-text').value = "";
+            renderSentenceList();
+            syncSetupToFirebase();
+        }
+
+        function deleteQuestion(index) {
+            sentenceDatabase.splice(index, 1);
+            renderSentenceList();
+            syncSetupToFirebase();
+        }
+
+        function renderSentenceList() {
+            let listDiv = document.getElementById('sentence-list');
+            if (!listDiv) return;
+            listDiv.innerHTML = "";
+            document.getElementById('pool-count-text').innerText = sentenceDatabase.length;
+            sentenceDatabase.forEach((s, i) => {
+                let div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <div>${i + 1}. [${s.mode.toUpperCase()}] ➔ <strong>${s.text}</strong> (Slots: ${s.parts.length})</div>
+                    <button class="btn btn-delete" onclick="deleteQuestion(${i})">❌ Delete</button>
+                `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function downloadTxtFile() {
+            if(sentenceDatabase.length === 0) return;
+            let fileContent = "";
+            sentenceDatabase.forEach(s => { fileContent += `${s.mode}|${s.text}\n`; });
+            let blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+            let tempAnchor = document.createElement("a");
+            tempAnchor.download = "tug_of_war_pool.txt";
+            tempAnchor.href = window.URL.createObjectURL(blob);
+            tempAnchor.click();
+        }
+
+        function uploadTxtFile(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let lines = e.target.result.split('\n');
+                sentenceDatabase = [];
+                lines.forEach(line => {
+                    if(line.trim() === "") return;
+                    let tokens = line.split("|");
+                    if(tokens.length < 2) return;
+                    let mode = tokens[0].trim();
+                    let text = tokens[1].trim();
+
+                    if(mode === "letter") {
+                        let parts = text.split("");
+                        sentenceDatabase.push({ mode: "letter", text: text, parts: parts, correctOrder: [...parts] });
+                    } else if(mode === "word") {
+                        let rawParts = text.split(" ");
+                        let parts = [];
+                        rawParts.forEach(p => { if(p.trim() !== "") parts.push(p.trim()); });
+                        sentenceDatabase.push({ mode: "word", text: text, parts: parts, correctOrder: [...parts] });
+                    }
+                });
+                renderSentenceList();
+                syncSetupToFirebase();
+            };
+            reader.readAsText(file);
+        }
+
+        function startTimer() {
+            totalSeconds = 0;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                let mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+                let secs = (totalSeconds % 60).toString().padStart(2, '0');
+                let formattedTime = `${mins}:${secs}`;
+                document.getElementById('timer-text').innerText = formattedTime;
+                db.update({ timerText: formattedTime });
+            }, 1000);
+        }
+
+        function shuffle(array) { return array.slice().sort(() => Math.random() - 0.5); }
+
+        function setupTeamQuestion(team, shouldPushFirebase = true) {
+            let idx = (team === 'blue') ? blueQuestionIdx : redQuestionIdx;
+            if (idx >= maxQuestions) {
+                document.getElementById(`${team}-pool`).innerHTML = "<h3>All questions done!</h3>";
+                if(team === 'blue' && !blueEndTime) blueEndTime = totalSeconds;
+                if(team === 'red' && !redEndTime) redEndTime = totalSeconds;
+                if (currentRole === 'teacher') checkFinalMatchEnd();
+                return;
+            }
+
+            let targetSentence = sentenceDatabase[idx];
+            let scrambled = shuffle(targetSentence.parts);
+            if(team === 'blue') {
+                currentBlueSentence = targetSentence;
+                blueSelectedWords = [];
+                document.getElementById('blue-counter').innerText = `Question: ${blueQuestionIdx + 1} / ${maxQuestions}`;
+                renderPool('blue', scrambled); renderSlots('blue');
+            } else {
+                currentRedSentence = targetSentence;
+                redSelectedWords = [];
+                document.getElementById('red-counter').innerText = `Question: ${redQuestionIdx + 1} / ${maxQuestions}`;
+                renderPool('red', scrambled); renderSlots('red');
+            }
+
+            if (shouldPushFirebase && currentRole === 'teacher') {
+                db.update({ [`${team}QuestionIdx`]: idx });
+            }
+        }
+
+        function renderPool(team, words) {
+            let pool = document.getElementById(`${team}-pool`);
+            pool.innerHTML = "";
+            words.forEach(word => {
+                let card = document.createElement('div'); 
+                card.className = 'word-card'; 
+                card.innerText = word;
+                
+                card.ontouchstart = (e) => {
+                    e.preventDefault(); 
+                    selectWord(team, word, card);
+                };
+                card.onclick = (e) => { 
+                    selectWord(team, word, card); 
+                };
+                
+                pool.appendChild(card);
+            });
+        }
+
+        function renderSlots(team) {
+            let slots = document.getElementById(`${team}-slots`);
+            slots.innerHTML = "";
+            let selected = (team === 'blue') ? blueSelectedWords : redSelectedWords;
+            selected.forEach(word => {
+                let card = document.createElement('div'); card.className = `word-card ${team}-placed`; card.innerText = word;
+                slots.appendChild(card);
+            });
+        }
+
+        function selectWord(team, word, element) {
+            if (element.style.visibility === 'hidden') return; 
+            
+            if(team === 'blue') blueSelectedWords.push(word);
+            else redSelectedWords.push(word);
+            element.style.visibility = 'hidden';
+            renderSlots(team);
+        }
+
+        function clearAnswers(team) { setupTeamQuestion(team, false); }
+
+        function checkAnswer(team) {
+            let selected = (team === 'blue') ? blueSelectedWords : redSelectedWords;
+            let current = (team === 'blue') ? currentBlueSentence : currentRedSentence;
+            if(!current || selected.length < current.correctOrder.length) return;
+
+            let isCorrect = true;
+            for(let i=0; i<current.correctOrder.length; i++) {
+                if(selected[i] !== current.correctOrder[i]) { isCorrect = false; break; }
+            }
+
+            if(isCorrect) {
+                playSound('success');
+                let stepSize = 22 / maxQuestions;
+                let currentBlueScore = parseInt(document.getElementById('blue-score-text').innerText);
+                let currentRedScore = parseInt(document.getElementById('red-score-text').innerText);
+
+                if(team === 'blue') {
+                    currentBlueScore++;
+                    barPosition -= stepSize;
+                } else {
+                    currentRedScore++;
+                    barPosition += stepSize;
+                }
+               
+                // Push real-time answer update scores to Firebase server
+                db.update({
+                    barPosition: barPosition,
+                    blueScore: currentBlueScore,
+                    redScore: currentRedScore,
+                    [`${team}QuestionIdx`]: (team === 'blue' ? blueQuestionIdx + 1 : redQuestionIdx + 1)
+                });
+
+                if(currentBlueScore === maxQuestions) {
+                    showWinnerWindow(`${blueTeamName.toUpperCase()} WINS! 🏆`, `Perfect Match! They scored a perfect ${maxQuestions}/${maxQuestions} correctly!`);
+                    return;
+                } else if(currentRedScore === maxQuestions) {
+                    showWinnerWindow(`${redTeamName.toUpperCase()} WINS! 🏆`, `Perfect Match! They scored a perfect ${maxQuestions}/${maxQuestions} correctly!`);
+                    return;
+                }
+            } else {
+                playSound('error');
+                clearAnswers(team);
+            }
+        }
+
+        function updateBarUI() {
+            if(barPosition < 28) barPosition = 28;
+            if(barPosition > 72) barPosition = 72;
+            document.getElementById('moving-bar-image').style.left = barPosition + '%';
+        }
+
+        function checkFinalMatchEnd() {
+            let liveBlueIdx = blueQuestionIdx;
+            let liveRedIdx = redQuestionIdx;
+            let liveBlueScore = parseInt(document.getElementById('blue-score-text').innerText);
+            let liveRedScore = parseInt(document.getElementById('red-score-text').innerText);
+
+            if(liveBlueIdx >= maxQuestions && liveRedIdx >= maxQuestions && !isMatchOver) {
+                isMatchOver = true;
+                clearInterval(timerInterval);
+               
+                setTimeout(() => {
+                    if(liveBlueScore > liveRedScore) {
+                        showWinnerWindow(`${blueTeamName.toUpperCase()} WINS! 🏆`, `Score Winner! They scored higher with ${liveBlueScore} points.`);
+                    } else if(liveRedScore > liveBlueScore) {
+                        showWinnerWindow(`${redTeamName.toUpperCase()} WINS! 🏆`, `Score Winner! They scored higher with ${liveRedScore} points.`);
+                    } else {
+                        if(blueEndTime < redEndTime) {
+                            showWinnerWindow(`${blueTeamName.toUpperCase()} WINS! 🏆`, `Speed Race Winner! Scores were equal, but they completed all entries faster.`);
+                        } else if(redEndTime < blueEndTime) {
+                            showWinnerWindow(`${redTeamName.toUpperCase()} WINS! 🏆`, `Speed Race Winner! Scores were equal, but they completed all entries faster.`);
+                        } else {
+                            showWinnerWindow("IT'S A DRAW! 🤝", `Absolute Tie! Both teams finished with identical scores and completion times.`);
+                        }
+                    }
+                }, 600);
+            }
+        }
+
+        function showWinnerWindow(title, msg, pushToFirebase = true) {
+            document.getElementById('winner-title').innerText = title;
+            document.getElementById('winner-msg').innerText = msg;
+            document.getElementById('popup-overlay').style.display = 'block';
+            document.getElementById('winner-popup').style.display = 'block';
+
+            if (pushToFirebase && currentRole === 'teacher') {
+                db.update({ winnerPopup: { title: title, msg: msg } });
+            }
+        }
+
+        function closePopupAndExit() {
+            document.getElementById('popup-overlay').style.display = 'none';
+            document.getElementById('winner-popup').style.display = 'none';
+            backToDashboard();
+        }
+
+        function resetGameLocal() {
+            barPosition = 50;
+            blueScore = 0; redScore = 0;
+            blueQuestionIdx = 0; redQuestionIdx = 0;
+            document.getElementById('blue-score-text').innerText = "0";
+            document.getElementById('red-score-text').innerText = "0";
+            document.getElementById('timer-text').innerText = "00:00";
+            document.getElementById('moving-bar-image').style.left = '50%';
+            setupTeamQuestion('blue', false);
+            setupTeamQuestion('red', false);
+        }
+
+        // --- SUBMIT / RESET BUTTON INTERFACES (TOUCH COMPATIBLE) ---
+        document.getElementById('btn-blue-submit').ontouchstart = (e) => { e.preventDefault(); checkAnswer('blue'); };
+        document.getElementById('btn-blue-submit').onclick = () => { checkAnswer('blue'); };
+        document.getElementById('btn-blue-reset').ontouchstart = (e) => { e.preventDefault(); clearAnswers('blue'); };
+        document.getElementById('btn-blue-reset').onclick = () => { clearAnswers('blue'); };
+
+        document.getElementById('btn-red-submit').ontouchstart = (e) => { e.preventDefault(); checkAnswer('red'); };
+        document.getElementById('btn-red-submit').onclick = () => { checkAnswer('red'); };
+        document.getElementById('btn-red-reset').ontouchstart = (e) => { e.preventDefault(); clearAnswers('red'); };
+        document.getElementById('btn-red-reset').onclick = () => { clearAnswers('red'); };
+        
+        document.getElementById('btn-popup-close').ontouchstart = (e) => { e.preventDefault(); closePopupAndExit(); };
+        document.getElementById('btn-popup-close').onclick = () => { closePopupAndExit(); };
+
+        renderSentenceList();
+    </script>
+</body>
+</html>
