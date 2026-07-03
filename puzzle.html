@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AR Magic Sliding Puzzle</title>
-    <!-- Tailwind CSS လိုင်ဘရီ -->
+    <!-- Tailwind CSS လိုင်ဘရီ ချိတ်ဆက်ခြင်း -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icon များအတွက် FontAwesome လိုင်ဘရီ -->
+    <!-- Icon များအတွက် FontAwesome ချိတ်ဆက်ခြင်း -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- MediaPipe လက်လှုပ်ရှားမှု ခြေရာခံစနစ်အတွက် သော့ချက်ဖိုင်များ -->
+    <!-- MediaPipe လက်ချောင်းခြေရာခံစနစ်သုံး လိုင်ဘရီများ -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -17,11 +17,11 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; background-color: #111827; touch-action: none; }
         
-        /* ပဟေဠိကစားကွင်း Layout */
+        /* ပဟေဠိ ဘောင်အကျယ်အဝန်းကို မျက်နှာပြင်အမျိုးမျိုးအတွက် ချိန်ညှိခြင်း */
         #puzzle-wrapper {
             position: relative;
-            width: min(85vw, 85vh, 480px);
-            height: min(85vw, 85vh, 480px);
+            width: min(80vw, 80vh, 460px);
+            height: min(80vw, 80vh, 460px);
             margin: auto;
         }
 
@@ -35,6 +35,7 @@
             backdrop-filter: blur(4px);
         }
         
+        /* ကတ်ပြားအကွက်လေးများ၏ Background အနေအထား */
         .puzzle-tile {
             position: absolute;
             background-size: var(--puzzle-width) var(--puzzle-height);
@@ -45,21 +46,21 @@
             border-radius: 6px;
         }
 
-        .puzzle-tile:active { transform: scale(0.98); }
-        .puzzle-tile.empty { background: transparent !important; border: none; box-shadow: none; cursor: default; }
+        /* Empty Tile အတွက် သတ်မှတ်ချက် */
+        .puzzle-tile.empty { background: transparent !important; border: none !important; box-shadow: none !important; cursor: default; }
         
-        /* လက်ညှိုးတည့်တည့်ရောက်နေစဉ် အလင်းပေးမည့်ပုံစံ */
-        .puzzle-tile.hand-hover {
-            border: 3.5px solid #4ade80;
-            box-shadow: 0 0 20px #4ade80;
+        /* လက်ညှိုးတည့်တည့်ရောက်နေချိန်တွင် ပြသမည့် အရောင်ဘောင် */
+        .puzzle-tile.hand-hover-valid {
+            border: 4px solid #3b82f6 !important;
+            box-shadow: 0 0 25px #3b82f6 !important;
             z-index: 10;
         }
 
-        /* AR ကင်မရာ မြင်ကွင်းပတ်ဝန်းကျင် */
+        /* AR ကင်မရာမြင်ကွင်း */
         #ar-view { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; background: #000; }
         #webcam-video { display: none; }
         
-        /* ကင်မရာပုံရိပ်ကို မှန်ကြည့်သကဲ့သို့ (Selfie Mirror) ပြုလုပ်ရန် CSS သုံးထားခြင်း */
+        /* ကင်မရာ Mirror effect သုံးရန် canvas ကို ပြောင်းပြန်လှန်ထားခြင်း */
         #output-canvas { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             object-fit: cover; 
@@ -69,13 +70,15 @@
         #game-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
         #game-ui > * { pointer-events: auto; }
 
+        /* လမ်းညွှန်ချက် အနက်ရောင်ဘား */
         .pinch-indicator {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.85); color: white; padding: 12px 24px; border-radius: 30px;
             display: flex; align-items: center; gap: 10px; font-weight: bold;
-            z-index: 50; transition: background-color 0.2s, transform 0.2s;
+            z-index: 50; transition: background-color 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9rem;
         }
 
         .preview-text {
@@ -85,20 +88,36 @@
         }
 
         #dashboard { background-color: #f3f4f6; }
-        .image-list-container::-webkit-scrollbar { width: 6px; }
-        .image-list-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* လက်ညှိုးထိပ်တွင် အမြဲကပ်ပါမည့် တောက်ပသော Cursor အဝိုင်းလေး */
+        #ar-cursor {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #3b82f6;
+            border-radius: 50%;
+            background-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 15px #3b82f6;
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- DASHBOARD PANEL (ဂိမ်းပြင်ဆင်သတ်မှတ်ရာနေရာ) -->
+    <!-- Perfect alignment floating pointer -->
+    <div id="ar-cursor"></div>
+
+    <!-- DASHBOARD PANEL (ဂိမ်းပြင်ဆင်သတ်မှတ်ခန်း) -->
     <div id="dashboard" class="min-h-screen flex items-center justify-center p-4 w-full absolute top-0 left-0 z-50">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 flex flex-col md:flex-row gap-6">
             
             <div class="flex-1 space-y-5">
                 <div>
                     <h1 class="text-3xl font-extrabold text-indigo-600 mb-2"><i class="fa-solid fa-puzzle-piece mr-2"></i>AR Magic Puzzle</h1>
-                    <p class="text-gray-500 text-sm">Upload images, choose difficulty, and play with air gestures!</p>
+                    <p class="text-gray-500 text-sm">Upload images, choose difficulty, and slide cards with your index finger!</p>
                 </div>
 
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
@@ -155,54 +174,89 @@
         </div>
     </div>
 
-    <!-- LOADING SCREEN (ကင်မရာဖွင့်နေစဉ် စောင့်ဆိုင်းရန်) -->
+    <!-- LOADING SCREEN -->
     <div id="loading-screen" class="hidden fixed inset-0 bg-black/90 z-[100] flex flex-col justify-center items-center text-white">
         <i class="fa-solid fa-spinner fa-spin text-5xl mb-4 text-indigo-400"></i>
         <h2 class="text-xl font-bold">Initializing AR Camera...</h2>
         <p class="text-gray-400 mt-2 text-sm">Please allow camera access.</p>
     </div>
 
-    <!-- AR GAME SCREEN (ဂိမ်းကစားကွင်း မြင်ကွင်း) -->
+    <!-- AR GAME SCREEN -->
     <div id="ar-view" class="hidden">
         <video id="webcam-video" autoplay playsinline></video>
         <canvas id="output-canvas"></canvas>
         
         <div class="pinch-indicator" id="gesture-hint">
-            <i class="fa-solid fa-hand-pointer"></i> Pinch (Thumb + Index) to move!
+            <i class="fa-solid fa-hand-pointer"></i> Move your Index Finger over a highlighted card to slide!
         </div>
 
         <div id="preview-text" class="preview-text hidden">Memorize...</div>
         <div id="win-text" class="preview-text hidden text-green-400 !text-5xl"><i class="fa-solid fa-trophy mb-4 block"></i>You Win!</div>
 
+        <!-- PAUSED OVERLAY -->
+        <div id="pause-overlay" class="hidden absolute inset-0 bg-black/60 z-40 flex items-center justify-center">
+            <div class="text-center text-white">
+                <i class="fa-solid fa-circle-pause text-6xl text-amber-400 mb-3 animate-pulse"></i>
+                <h2 class="text-3xl font-extrabold tracking-wide">GAME PAUSED</h2>
+                <p class="text-gray-300 mt-2 text-sm">Click 'Start' to resume and play!</p>
+            </div>
+        </div>
+
         <div id="game-ui">
-            <!-- အပေါ်ဘက်ထိန်းချုပ်ခလုတ်များ -->
-            <div class="absolute top-4 w-full px-4 flex justify-between items-center z-30">
-                <button onclick="backToDashboard()" class="bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-full transition border border-white/30 text-sm">
-                    <i class="fa-solid fa-home mr-1"></i> Back
-                </button>
-                <div class="flex gap-2">
-                    <!-- မူရင်းပုံစံကို ပြန်ကြည့်ရန် "View" ခလုတ် -->
-                    <button id="view-btn" onclick="showOriginalImage()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full font-bold transition border border-white/30 text-sm shadow-md active:scale-95">
-                        <i class="fa-solid fa-eye mr-1"></i> View
-                    </button>
-                    <div class="text-white font-bold bg-black/60 px-4 py-2 rounded-full text-sm">
-                        Moves: <span id="move-counter">0</span>
+            <!-- Header Controls -->
+            <div class="absolute top-4 w-full px-4 flex flex-col gap-2 z-50">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex gap-2">
+                        <button onclick="backToDashboard()" class="bg-black/60 hover:bg-black/80 text-white px-3 py-2 rounded-full transition border border-white/30 text-xs font-bold shadow-md">
+                            <i class="fa-solid fa-home"></i>
+                        </button>
+                        <button onclick="toggleFullScreen()" class="bg-black/60 hover:bg-black/80 text-white px-3 py-2 rounded-full transition border border-white/30 text-xs font-bold shadow-md">
+                            <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Full Screen
+                        </button>
                     </div>
+
+                    <div class="flex gap-2 items-center">
+                        <div class="text-white font-extrabold bg-black/70 px-3 py-2 rounded-full text-xs border border-white/20 flex items-center gap-1">
+                            <i class="fa-solid fa-clock text-amber-400"></i> Time: <span id="game-timer">00:00</span>
+                        </div>
+                        <div class="text-white font-extrabold bg-black/70 px-3 py-2 rounded-full text-xs border border-white/20">
+                            Moves: <span id="move-counter">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controllers Bar -->
+                <div class="flex justify-between items-center w-full bg-black/45 p-2 rounded-xl border border-white/10 backdrop-blur-sm">
+                    <div class="flex gap-1.5">
+                        <button id="start-game-btn" onclick="resumeGameTimer()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-black shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-play"></i> Start
+                        </button>
+                        <button id="stop-game-btn" onclick="pauseGameTimer()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-black shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-pause"></i> Stop
+                        </button>
+                        <button id="play-again-btn" onclick="replayPuzzle()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-black shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-arrows-rotate"></i> Play Again
+                        </button>
+                    </div>
+                    
+                    <button id="view-btn" onclick="showOriginalImage()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-black transition border border-white/20 shadow flex items-center gap-1">
+                        <i class="fa-solid fa-eye"></i> View Reference
+                    </button>
                 </div>
             </div>
 
-            <!-- Puzzle ဇယားကွက် သေတ္တာ -->
+            <!-- Puzzle Grid Canvas -->
             <div id="puzzle-wrapper">
                 <div id="puzzle-container"></div>
+                
+                <!-- [အသစ်ထည့်သွင်းထားသော တည်ငြိမ်သည့် Preview Overlay] -->
+                <div id="puzzle-preview-overlay" class="absolute inset-0 bg-cover bg-center rounded-xl z-30 hidden transition-opacity duration-300"></div>
             </div>
 
-            <!-- အောက်ဘက် navigation ခလုတ်များ -->
+            <!-- Bottom slide changers -->
             <div class="absolute bottom-6 w-full px-6 flex justify-center gap-4 z-30">
                 <button onclick="prevPuzzle()" class="bg-indigo-600/80 hover:bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg transition flex justify-center items-center text-xl border border-white/50">
                     <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <button onclick="replayPuzzle()" class="bg-gray-600/80 hover:bg-gray-600 text-white w-12 h-12 rounded-full shadow-lg transition flex justify-center items-center text-lg border border-white/50">
-                    <i class="fa-solid fa-rotate-right"></i>
                 </button>
                 <button onclick="nextPuzzle()" class="bg-indigo-600/80 hover:bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg transition flex justify-center items-center text-xl border border-white/50">
                     <i class="fa-solid fa-chevron-right"></i>
@@ -211,20 +265,20 @@
         </div>
     </div>
 
-    <!-- မူရင်းရုပ်ပုံပြသပေးမည့် Popup Modal -->
+    <!-- Original reference modal popup -->
     <div id="image-preview-modal" class="hidden fixed inset-0 bg-black/85 z-[60] flex items-center justify-center p-6">
-        <div class="relative bg-white p-4 rounded-2xl max-w-md w-full shadow-2xl flex flex-col items-center">
+        <div class="relative bg-white p-4 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col items-center">
             <button onclick="hideOriginalImage()" class="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition text-lg font-bold">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-gray-800 font-extrabold mb-3 text-lg text-center">Original Image Reference</h3>
-            <img id="modal-preview-img" class="max-h-[50vh] object-contain rounded-lg border shadow-inner w-full mb-3" src="" alt="Original Preview">
-            <p class="text-xs text-gray-500 font-medium text-center">Pinch anywhere or click the "X" to close and resume</p>
+            <h3 class="text-gray-800 font-extrabold mb-3 text-lg text-center">Reference Image</h3>
+            <img id="modal-preview-img" class="max-h-[45vh] object-contain rounded-lg border shadow-inner w-full mb-3" src="" alt="Original Preview">
+            <p class="text-xs text-gray-500 font-semibold text-center">Touch reference or click 'X' to close and resume</p>
         </div>
     </div>
 
     <script>
-        // --- Game State များနှင့် Global Variables အချက်အလက်များ ---
+        // --- ဂိမ်း၏ သတ်မှတ်ချက်များနှင့် သော့ချက် State စာရင်းများ ---
         let playlist = ["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"]; 
         let currentImageIndex = 0;
         let gridSize = 3;
@@ -239,28 +293,37 @@
         let moves = 0;
         let isAnimating = false;
 
-        // AR စနစ် သတ်မှတ်ချက်များ
+        // အချိန်မှတ်နာရီ (Timer) အတွက် state
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let isTimerActive = false;
+
+        // [Bug Fix]: pending timeouts များကို ရှင်းလင်းရန် global variable သတ်မှတ်ခြင်း
+        let previewTimeout = null;
+
+        // AR လက်လှုပ်ရှားမှု စနစ်သုံး variable များ
         let hands = null;
         let camera = null;
-        let lastPinchTime = 0;
         let isEngineRunning = false;
         let hoveredTile = null;
-        let wasPinching = false;
 
-        // --- dynamic အသံလှိုင်းထုတ်လုပ်ပေးမည့် synthesizer စနစ် (Web Audio API) ---
-        // အကွက်ရွှေ့သံ (Woody/Click Sound)
+        // လက်ညှိုးတိုက်ရိုက်ရွှေ့မှု ပိုမိုကောင်းမွန်စေရန် နှောင့်နှေးချိန် (Debounce) စနစ်
+        let lastMoveTime = 0;
+        const MOVE_COOLDOWN = 600; // အကွက်ရွှေ့ခြင်းတစ်ခုပြီးတိုင်း 600ms ခေတ္တစောင့်မည်
+
+        // --- Web Audio API စနစ်သုံး dynamic အသံထုတ်လုပ်စနစ် ---
         function playSlideSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 
-                osc.type = 'triangle'; // ချောမွေ့သဘာဝကျသောအသံပေးရန်
-                osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.1); // လျင်မြန်စွာအသံတက်သွားစေရန်
+                osc.type = 'triangle'; 
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(340, audioCtx.currentTime + 0.1); 
                 
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12); // အမြန်ငြိမ်းသွားစေရန်
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12); 
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -268,15 +331,14 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.12);
             } catch (e) {
-                console.warn("AudioContext blocking error:", e);
+                console.warn(e);
             }
         }
 
-        // ဂိမ်းနိုင်သွားသောအခါထွက်မည့် အောင်နိုင်သံ (Victory Music chords)
         function playWinSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5 chords
+                const notes = [261.63, 329.63, 392.00, 523.25]; 
                 notes.forEach((freq, i) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -284,21 +346,75 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
                     
-                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.08);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.08 + 0.25);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.08 + 0.3);
                     
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     
                     osc.start(audioCtx.currentTime + i * 0.08);
-                    osc.stop(audioCtx.currentTime + i * 0.08 + 0.25);
+                    osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
                 });
             } catch (e) {
                 console.warn(e);
             }
         }
 
-        // --- Dashboard image management ---
+        // --- Full Screen စနစ် အဖွင့်/အပိတ် ---
+        function toggleFullScreen() {
+            const icon = document.getElementById('fullscreen-icon');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    icon.className = "fa-solid fa-compress";
+                }).catch(err => {
+                    console.error("Error enabling fullscreen:", err);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    icon.className = "fa-solid fa-expand";
+                });
+            }
+        }
+
+        // --- Timer (အချိန်မှတ်နာရီ) စနစ်များ ---
+        function resetGameTimer() {
+            stopGameTimer();
+            secondsElapsed = 0;
+            document.getElementById('game-timer').innerText = "00:00";
+        }
+
+        function startGameTimer() {
+            if (isTimerActive) return;
+            isTimerActive = true;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('game-timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopGameTimer() {
+            isTimerActive = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function pauseGameTimer() {
+            if (!isPlaying) return;
+            stopGameTimer();
+            document.getElementById('pause-overlay').classList.remove('hidden');
+        }
+
+        function resumeGameTimer() {
+            if (!isPlaying) return;
+            startGameTimer();
+            document.getElementById('pause-overlay').classList.add('hidden');
+        }
+
+        // --- Dashboard စနစ်သုံး ပုံစာရင်း စီမံခန့်ခွဲမှု ---
         function updatePlaylistUI() {
             const list = document.getElementById('image-list');
             const empty = document.getElementById('empty-state');
@@ -358,7 +474,7 @@
 
         updatePlaylistUI();
 
-        // --- Game Setup Flow ---
+        // --- ဂိမ်းစတင်ခြင်းနှင့် ရွေ့ပြောင်းခြင်း ---
         async function startGame() {
             gridSize = parseInt(document.querySelector('input[name="gridSize"]:checked').value);
             currentImageIndex = 0;
@@ -382,7 +498,14 @@
         function backToDashboard() {
             document.getElementById('ar-view').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('ar-cursor').style.display = 'none';
             hideOriginalImage();
+            stopGameTimer();
+            // [Bug Fix]: Dashboard ပြန်သွားပါက လက်ရှိ preview timeout ကို ဖျက်ပစ်ခြင်း
+            if (previewTimeout) {
+                clearTimeout(previewTimeout);
+                previewTimeout = null;
+            }
             isPlaying = false;
         }
 
@@ -403,7 +526,7 @@
             loadPuzzle();
         }
 
-        // --- View Popup Control ---
+        // --- Reference Image Popup Control ---
         function showOriginalImage() {
             const modal = document.getElementById('image-preview-modal');
             const modalImg = document.getElementById('modal-preview-img');
@@ -416,7 +539,7 @@
             modal.classList.add('hidden');
         }
 
-        // Window Resize recalculation
+        // Resize လုပ်လျှင် ဇယားကွက်အချိုးအစားများ ပြန်လည်ပြင်ဆင်ခြင်း
         window.addEventListener('resize', () => {
             if(document.getElementById('ar-view').classList.contains('hidden')) return;
             measureContainer();
@@ -441,19 +564,29 @@
             container.style.setProperty('--puzzle-height', `${puzzleHeight}px`);
         }
 
-        // --- Puzzle Slicing & Gameplay Logic ---
+        // --- Puzzle Slicing & Moving Mechanics ---
         function loadPuzzle() {
+            // [Bug Fix]: ယခင်ပွင့်နေသော Preview timer အဟောင်းကို လုံးဝဖျက်ထုတ်ပစ်ခြင်း
+            if (previewTimeout) {
+                clearTimeout(previewTimeout);
+                previewTimeout = null;
+            }
+
             isPlaying = false;
             moves = 0;
             document.getElementById('move-counter').innerText = moves;
             document.getElementById('win-text').classList.add('hidden');
+            document.getElementById('pause-overlay').classList.add('hidden');
             hideOriginalImage();
+            resetGameTimer();
             
             const container = document.getElementById('puzzle-container');
             container.innerHTML = '';
             tiles = [];
             const imgSrc = playlist[currentImageIndex];
 
+            // [Bug Fix - Single Empty Tile]: ၉ ကွက်မြောက် tile (index 8) အား အမြဲတမ်း Empty သီးသန့်အဖြစ်သာ သတ်မှတ်ထားမည်။
+            // Preview phase တွင် class ကို ပြောင်းလဲခြင်း မပြုလုပ်တော့သောကြောင့် အကွက်လွတ်နှစ်ကွက်ပွားစရာ အကြောင်းမရှိတော့ပါ။
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
                     const isLast = (x === gridSize - 1 && y === gridSize - 1);
@@ -470,6 +603,7 @@
                     
                     if (isLast) {
                         tile.classList.add('empty');
+                        tile.style.backgroundImage = 'none'; 
                         emptyPos = { x, y };
                     } else {
                         tile.style.backgroundImage = `url('${imgSrc}')`;
@@ -486,19 +620,19 @@
                 }
             }
 
+            // [အသစ်ထည့်သွင်းထားသော တည်ငြိမ်သည့် Preview Overlay]
+            const previewOverlay = document.getElementById('puzzle-preview-overlay');
+            previewOverlay.style.backgroundImage = `url('${imgSrc}')`;
+            previewOverlay.classList.remove('hidden');
+            
             const previewText = document.getElementById('preview-text');
             previewText.classList.remove('hidden');
             previewText.innerText = "Memorize...";
-            
-            const lastTile = tiles[tiles.length-1];
-            lastTile.style.backgroundImage = `url('${imgSrc}')`;
-            lastTile.style.backgroundPosition = `100% 100%`;
-            lastTile.classList.remove('empty');
 
-            setTimeout(() => {
+            // ၃ စက္ကန့်ပြသပြီးနောက်မှ Shuffle ကို စတင်ခေါ်ယူမည်
+            previewTimeout = setTimeout(() => {
                 previewText.innerText = "Shuffling...";
-                lastTile.style.backgroundImage = 'none';
-                lastTile.classList.add('empty');
+                previewOverlay.classList.add('hidden'); // Preview ပုံရိပ်ကို ဝှက်ခြင်း
                 
                 shufflePuzzle();
             }, 3000);
@@ -530,6 +664,8 @@
             document.getElementById('preview-text').classList.add('hidden');
             isAnimating = false;
             isPlaying = true;
+            
+            startGameTimer();
         }
 
         function isAdjacentLogic(tile) {
@@ -542,9 +678,11 @@
 
         function attemptMove(tile) {
             if (!isPlaying || isAnimating) return;
+            if (!document.getElementById('pause-overlay').classList.contains('hidden')) return;
+
             if (isAdjacentLogic(tile)) {
                 swapWithEmpty(tile, false);
-                playSlideSound(); // အသံမြည်စေရန် ခေါ်ယူခြင်း
+                playSlideSound(); 
                 moves++;
                 document.getElementById('move-counter').innerText = moves;
                 checkWin();
@@ -556,6 +694,12 @@
                 const tx = parseInt(tile.dataset.x);
                 const ty = parseInt(tile.dataset.y);
                 const emptyTile = tiles.find(t => t.classList.contains('empty'));
+
+                if (!emptyTile) {
+                    console.warn("Empty tile desynced. Recovery initiated.");
+                    resolve();
+                    return;
+                }
 
                 tile.dataset.x = emptyPos.x;
                 tile.dataset.y = emptyPos.y;
@@ -587,7 +731,8 @@
 
             if (isWin) {
                 isPlaying = false;
-                playWinSound(); // အောင်ပွဲခံတေးသံမြည်စေရန်
+                stopGameTimer();
+                playWinSound(); 
                 document.getElementById('win-text').classList.remove('hidden');
                 
                 const emptyTile = tiles.find(t => t.classList.contains('empty'));
@@ -597,11 +742,12 @@
             }
         }
 
-        // --- AR Hand Tracking (MediaPipe & Scale-Invariant Pinch Logic) ---
+        // --- AR လက်လှုပ်ရှားမှု ခြေရာခံခြင်းစနစ် (Perfect Aspect Mapping & Webcam Setup) ---
         async function initAR() {
             const videoElement = document.getElementById('webcam-video');
             const canvasElement = document.getElementById('output-canvas');
             const canvasCtx = canvasElement.getContext('2d');
+            const cursorElement = document.getElementById('ar-cursor');
 
             function onResults(results) {
                 canvasElement.width = window.innerWidth;
@@ -609,64 +755,47 @@
                 
                 canvasCtx.save();
                 canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                
-                // CSS က Mirror လှန်ထားပြီးဖြစ်၍ canvasCtx ပုံမှန်အတိုင်းဆွဲမည် (Double Mirroring မဖြစ်စေရန်)
                 canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
                 
-                let isPinchingNow = false;
                 let normalizedX = 0.5;
                 let normalizedY = 0.5;
 
                 if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                     const landmarks = results.multiHandLandmarks[0];
                     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ffffff', lineWidth: 2});
-                    drawLandmarks(canvasCtx, landmarks, {color: '#4ade80', lineWidth: 1, radius: 3});
+                    drawLandmarks(canvasCtx, landmarks, {color: '#3b82f6', lineWidth: 1, radius: 3});
                     
                     const indexTip = landmarks[8];
-                    const thumbTip = landmarks[4];
-                    const indexMCP = landmarks[5]; // လက်ညှိုး အဆစ်
 
-                    normalizedX = indexTip.x;
-                    normalizedY = indexTip.y;
-
-                    // [သေချာကိုက်ညီသည့် Pinch Detector စနစ်သစ်]
-                    // လက်ညှိုးအရှည်ကို Knuckle မှ Tip အထိ တိုင်းတာသည်
-                    const indexLength = Math.sqrt(
-                        Math.pow(indexMCP.x - indexTip.x, 2) + 
-                        Math.pow(indexMCP.y - indexTip.y, 2) +
-                        Math.pow(indexMCP.z - indexTip.z, 2)
-                    );
-
-                    // လက်ညှိုးထိပ်နှင့် လက်မထိပ်ကြား အကွာအဝေးကို တိုင်းတာသည်
-                    const pinchDist = Math.sqrt(
-                        Math.pow(indexTip.x - thumbTip.x, 2) + 
-                        Math.pow(indexTip.y - thumbTip.y, 2) +
-                        Math.pow(indexTip.z - thumbTip.z, 2)
-                    );
-
-                    // လက်ချောင်းအရှည်ပေါ်မူတည်ပြီး နှိုင်းယှဉ်ချက်အချိုးဖြင့် pinch ကို စစ်ဆေးသည်
-                    // ဤနည်းသည် ကစားသမား ကင်မရာနှင့်နီးသည်ဖြစ်စေ၊ ဝေးသည်ဖြစ်စေ ၁၀၀% တိကျပါသည်
-                    const pinchRatio = pinchDist / (indexLength || 1);
-                    isPinchingNow = pinchRatio < 0.55; 
-
-                    // လက်ညှိုးထိပ်တွင် ခြေရာခံပြသပေးမည့် စက်ဝိုင်းလေးအား ဆွဲပေးခြင်း
-                    const pointerX = indexTip.x * canvasElement.width;
-                    const pointerY = indexTip.y * canvasElement.height;
+                    // [သေချာကိုက်ညီသည့် စံပြစနစ်သစ် - Cover Scaling Aspect Fix]: 
+                    // webcam-video အရွယ်အစားနှင့် viewport မျက်နှာပြင် scale များကို အတိအကျ ညှိယူပေးခြင်း
+                    const videoW = videoElement.videoWidth || 640;
+                    const videoH = videoElement.videoHeight || 480;
+                    const canvasW = canvasElement.width;
+                    const canvasH = canvasElement.height;
                     
-                    // Pinch လုပ်လိုက်သောအခါ ကျုံ့ဝင်သွားစေရန် တွက်ချက်ခြင်း
-                    const outerRadius = isPinchingNow ? 12 : 24;
+                    // covers aspect ratio calculation
+                    const scale = Math.max(canvasW / videoW, canvasH / videoH);
+                    
+                    const scaledW = videoW * scale;
+                    const scaledH = videoH * scale;
 
-                    canvasCtx.beginPath();
-                    canvasCtx.arc(pointerX, pointerY, outerRadius, 0, 2 * Math.PI);
-                    canvasCtx.fillStyle = isPinchingNow ? 'rgba(59, 130, 246, 0.85)' : 'rgba(74, 222, 128, 0.5)';
-                    canvasCtx.fill();
-                    canvasCtx.strokeStyle = '#ffffff';
-                    canvasCtx.lineWidth = 3;
-                    canvasCtx.stroke();
+                    const offsetX = (canvasW - scaledW) / 2;
+                    const offsetY = (canvasH - scaledH) / 2;
 
-                    handleHandInteraction(normalizedX, normalizedY, isPinchingNow, canvasElement.width, canvasElement.height);
+                    // Perfect Mirroring horizontal mapping coordinates
+                    const pointerX = (1 - indexTip.x) * scaledW + offsetX;
+                    const pointerY = indexTip.y * scaledH + offsetY;
+                    
+                    // DOM Cursor ၏ တည်နေရာအား လက်ညှိုးထိပ်နှင့် ထပ်တူကျအောင် ထိန်းချုပ်ခြင်း
+                    cursorElement.style.display = 'block';
+                    cursorElement.style.left = `${pointerX}px`;
+                    cursorElement.style.top = `${pointerY}px`;
+
+                    handleHandInteraction(pointerX, pointerY);
                 } else {
                     clearHover();
+                    cursorElement.style.display = 'none';
                 }
                 
                 canvasCtx.restore();
@@ -709,51 +838,50 @@
 
         function clearHover() {
             if(hoveredTile) {
-                hoveredTile.classList.remove('hand-hover');
+                hoveredTile.classList.remove('hand-hover-valid');
                 hoveredTile = null;
             }
         }
 
-        function handleHandInteraction(rawX, rawY, isPinching, canvasW, canvasH) {
-            // Mirroring Coordinates Conversion 
-            // ညာဘက်ရွှေ့လျှင် ညာဘက်သို့ ကာဆာရွေ့လျားစေရန် (1-rawX) ဖြင့် တွက်ချက်ပေးထားသည်
-            const screenX = (1 - rawX) * window.innerWidth; 
-            const screenY = rawY * window.innerHeight;
-
+        function handleHandInteraction(screenX, screenY) {
             const modal = document.getElementById('image-preview-modal');
             const isModalOpen = !modal.classList.contains('hidden');
 
-            // Image Reference modal ပွင့်နေစဉ် pinch လုပ်လျှင် ပြန်ပိတ်ရန်
             if (isModalOpen) {
-                if (isPinching && !wasPinching) {
-                    hideOriginalImage();
-                }
-                wasPinching = isPinching;
                 return; 
             }
 
             if (!isPlaying || isAnimating) {
                 clearHover();
-                wasPinching = isPinching;
                 return;
             }
 
-            const indicator = document.getElementById('gesture-hint');
+            if (!document.getElementById('pause-overlay').classList.contains('hidden')) {
+                clearHover();
+                return;
+            }
+
             const containerRect = document.getElementById('puzzle-container').getBoundingClientRect();
             const viewBtn = document.getElementById('view-btn');
             const viewBtnRect = viewBtn.getBoundingClientRect();
 
-            // "View" Button ဧရိယာအပေါ် လက်ရှိနေမှု စစ်ဆေးခြင်း
+            // "View" Button အပေါ် လက်ညှိုး ရောက်ရှိနေမှု စစ်ဆေးခြင်း
             const isOverViewBtn = (screenX >= viewBtnRect.left && screenX <= viewBtnRect.right &&
                                    screenY >= viewBtnRect.top && screenY <= viewBtnRect.bottom);
 
             if (isOverViewBtn) {
                 viewBtn.classList.add('bg-amber-600', 'scale-110');
+                const now = Date.now();
+                if (now - lastMoveTime > MOVE_COOLDOWN) {
+                    showOriginalImage();
+                    lastMoveTime = now;
+                }
+                return;
             } else {
                 viewBtn.classList.remove('bg-amber-600', 'scale-110');
             }
 
-            // Puzzle အကွက်များအပေါ် လက်ရှိနေမှု စစ်ဆေးခြင်း
+            // Puzzle ဇယားကွက်များအပေါ် လက်ညှိုးရောက်ရှိနေမှု စစ်ဆေးခြင်း
             let overTile = null;
             if (screenX >= containerRect.left && screenX <= containerRect.right &&
                 screenY >= containerRect.top && screenY <= containerRect.bottom) {
@@ -764,42 +892,29 @@
                 const col = Math.floor(localX / tileSizeW);
                 const row = Math.floor(localY / tileSizeH);
                 
-                overTile = tiles.find(t => parseInt(t.dataset.x) === col && parseInt(t.dataset.y) === row);
+                if (col >= 0 && col < gridSize && row >= 0 && row < gridSize) {
+                    overTile = tiles.find(t => parseInt(t.dataset.x) === col && parseInt(t.dataset.y) === row);
+                }
             }
 
-            // ရွှေ့လို့ရမည့် tile များပေါ်တွင် စိမ်းရောင် ဘောင်လင်းစေရန်
+            // လက်ညှိုးသည် ရွှေ့ခွင့်ရှိသော tile အပေါ်တွင် ရောက်နေပါက
             if (overTile && !overTile.classList.contains('empty') && isAdjacentLogic(overTile)) {
                 if (hoveredTile !== overTile) {
                     clearHover();
                     hoveredTile = overTile;
-                    hoveredTile.classList.add('hand-hover');
+                    hoveredTile.classList.add('hand-hover-valid'); 
+                }
+
+                // တို့ထိလိုက်ရုံဖြင့် အလိုအလျောက် ရွှေ့လျားမှုစနစ်
+                const now = Date.now();
+                if (now - lastMoveTime > MOVE_COOLDOWN) {
+                    attemptMove(hoveredTile);
+                    lastMoveTime = now;
+                    clearHover();
                 }
             } else {
                 clearHover();
             }
-
-            // [FIXED] လက်မနှင့် လက်ညှိုး ထိလိုက်သည့်အချိန် (ညှစ်လိုက်သည့် trigger သက်ရောက်မှု) တွင်သာ ရွေ့မည်ဖြစ်သည်
-            if (isPinching) {
-                indicator.style.backgroundColor = 'rgba(59, 130, 246, 0.9)'; 
-                indicator.innerHTML = '<i class="fa-solid fa-hand-fist"></i> Grabbed!';
-
-                const now = Date.now();
-                if (!wasPinching && (now - lastPinchTime > 400)) { 
-                    if (isOverViewBtn) {
-                        showOriginalImage();
-                        lastPinchTime = now;
-                    } else if (hoveredTile) {
-                        attemptMove(hoveredTile);
-                        lastPinchTime = now;
-                        clearHover();
-                    }
-                }
-            } else {
-                indicator.style.backgroundColor = 'rgba(0,0,0,0.85)';
-                indicator.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> Pinch (Thumb + Index) to move!';
-            }
-
-            wasPinching = isPinching;
         }
     </script>
 </body>
