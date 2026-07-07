@@ -34,6 +34,7 @@
             overflow-x: hidden;
             background-color: var(--bg-main);
             -webkit-font-smoothing: antialiased;
+            user-select: none;
         }
 
         /* Ambient Background Blobs */
@@ -87,7 +88,7 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .nav-links { display: flex; gap: 8px; }
+        .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
         .nav-item {
             text-decoration: none; color: var(--text-gray); font-weight: 700; font-size: 1rem;
             padding: 10px 20px; border-radius: 16px; cursor: pointer;
@@ -147,6 +148,7 @@
             display: flex; justify-content: center; align-items: center;
             perspective: 1200px; overflow: hidden; position: relative;
             margin-top: 10px;
+            touch-action: pan-y; /* Allows normal vertical scrolling while catching horizontal swipes */
         }
 
         .game-card {
@@ -208,7 +210,7 @@
         .play-overlay .btn-play-now:hover { transform: scale(1.05); }
 
         /* ==========================================
-           GRID LAYOUT (TEACHER & CUSTOM TABS)
+           GRID LAYOUT (DYNAMIC TABS)
            ========================================== */
         .grid-container {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -235,7 +237,7 @@
         }
 
         /* ==========================================
-           ADMIN TOOL: FAB & MODAL
+           ADMIN TOOL: FAB, MODALS & TAB CONTROLS
            ========================================== */
         .fab-btn {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%;
@@ -255,8 +257,9 @@
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .modal-box {
-            background: white; width: 90%; max-width: 450px; border-radius: 24px; padding: 30px;
+            background: white; width: 90%; max-width: 480px; border-radius: 24px; padding: 30px;
             transform: translateY(30px) scale(0.9); transition: 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            max-height: 90vh; overflow-y: auto;
         }
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
 
@@ -272,12 +275,23 @@
         }
         .form-control:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
+        .tab-creation-box {
+            background: #f1f5f9; padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px dashed #cbd5e1;
+        }
+        .tab-creation-box h4 { margin: 0 0 10px 0; font-family: 'Fredoka'; font-size: 1.05rem; color: var(--primary); }
+
         .submit-btn {
             width: 100%; padding: 14px; border-radius: 12px; border: none;
             background: var(--primary); color: white; font-weight: bold;
             font-size: 1.1rem; cursor: pointer; margin-top: 15px; transition: 0.2s;
         }
         .submit-btn:hover { background: #2563eb; }
+
+        .secondary-btn {
+            background: var(--text-gray); color: white; border: none; padding: 10px 15px; border-radius: 10px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 5px;
+        }
+        .secondary-btn:hover { background: var(--text-dark); }
 
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
@@ -298,19 +312,20 @@
 </head>
 <body>
 
-    <!-- 🎨 Background -->
+    <!-- 🎨 Ambient Background Orbs -->
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- 🌟 Navigation -->
+    <!-- 🌟 Glassmorphism Top Navigation -->
     <nav class="navbar">
         <a href="#" class="nav-logo" onclick="window.switchTab('homePage')">
             <i class="fa-solid fa-gamepad"></i> <span>EduArcade</span>
         </a>
-        <div class="nav-links">
+        <div class="nav-links" id="dynamicNavLinks">
+            <!-- Default Static Tabs -->
             <button class="nav-item active" id="btn-homePage" onclick="window.switchTab('homePage')">
                 <i class="fa-solid fa-house"></i> Home
             </button>
@@ -320,9 +335,7 @@
             <button class="nav-item" id="btn-teacherPage" onclick="window.switchTab('teacherPage')">
                 <i class="fa-solid fa-chalkboard-user"></i> Teacher
             </button>
-            <button class="nav-item" id="btn-customPage" onclick="window.switchTab('customPage')">
-                <i class="fa-solid fa-star"></i> Custom
-            </button>
+            <!-- Custom Tabs will be injected here dynamically -->
         </div>
     </nav>
 
@@ -341,7 +354,7 @@
     <div id="gamesPage" class="tab-content">
         <div class="header-section">
             <h1>Game Collection</h1>
-            <p class="subtitle">Scroll to browse. Click the center game to play.</p>
+            <p class="subtitle">Scroll or swipe left/right to browse. Click the center game to play.</p>
         </div>
         <div class="carousel-scene" id="arcadeCarousel">
             <!-- Cards injected via JS -->
@@ -352,71 +365,111 @@
     <div id="teacherPage" class="tab-content">
         <div class="header-section">
             <h1>Teacher Console</h1>
-            <p class="subtitle">Management tools and analytics</p>
+            <p class="subtitle">Management tools and school utility channels</p>
         </div>
         <div class="grid-container" id="teacherGrid"></div>
     </div>
 
-    <!-- ⭐ CUSTOM PAGE (NEW TAB FEATURE) -->
-    <div id="customPage" class="tab-content">
-        <div class="header-section">
-            <h1>Custom Zone</h1>
-            <p class="subtitle">Your customized and added external educational links</p>
-        </div>
-        <div class="grid-container" id="customGrid"></div>
+    <!-- 📁 DYNAMIC TABS ROOT CONTAINER -->
+    <div id="dynamicTabsContainer">
+        <!-- Containers matching custom tabs will be generated dynamically -->
     </div>
 
-    
-    <!-- ➕ Admin Add Tool -->
-    <button class="fab-btn" onclick="document.getElementById('addLinkModal').classList.add('active')" title="Add New Link">
+    <!-- ➕ Admin Resource Creator & Tab Manager -->
+    <button class="fab-btn" onclick="window.openModal()" title="Add Custom Links or Custom Tabs">
         <i class="fa-solid fa-plus"></i>
     </button>
 
-    <!-- 📝 Modal Form (All English UI) -->
+    <!-- 📝 Dynamic Hub Modal -->
     <div class="modal-overlay" id="addLinkModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-link"></i> Add New Link</h3>
-                <button class="close-btn" onclick="document.getElementById('addLinkModal').classList.remove('active')">&times;</button>
+                <h3><i class="fa-solid fa-gears"></i> Hub Console</h3>
+                <button class="close-btn" onclick="window.closeModal()">&times;</button>
             </div>
+            
+            <!-- 📁 Part A: Dynamic Tab Creator -->
+            <div class="tab-creation-box">
+                <h4>Create Custom Category Tab</h4>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <input type="text" class="form-control" id="formNewTabName" placeholder="Enter Unique Tab Name">
+                </div>
+                <button type="button" class="secondary-btn" onclick="window.handleCreateCustomTab()">
+                    <i class="fa-solid fa-folder-plus"></i> Create Tab
+                </button>
+            </div>
+
+            <!-- 🔗 Part B: Add Resource Form -->
             <form id="addLinkForm" onsubmit="window.handleFormSubmit(event)">
+                <h4 style="margin: 0 0 10px 0; font-family: 'Fredoka'; color: var(--primary);">Add Link to Selected Tab</h4>
                 <div class="form-group">
-                    <label>Category</label>
+                    <label>Destination Tab</label>
                     <select class="form-control" id="formCategory" required>
-                        <option value="game">Game Library</option>
+                        <option value="game">Games Collection</option>
                         <option value="teacher">Teacher Console</option>
-                        <option value="custom">Custom Tab</option>
+                        <!-- Dynamic Custom Tabs options will be appended here -->
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" class="form-control" id="formTitle" placeholder="e.g., Math Quiz" required>
+                    <label>Title Name</label>
+                    <input type="text" class="form-control" id="formTitle" placeholder="e.g., Science Lab Tracker" required>
                 </div>
                 <div class="form-group">
                     <label>Image URL</label>
                     <input type="url" class="form-control" id="formImage" placeholder="https://..." required>
                 </div>
                 <div class="form-group">
-                    <label>Type / Engine</label>
-                    <input type="text" class="form-control" id="formType" placeholder="e.g., Quiz Engine" required>
+                    <label>Engine / Label Description</label>
+                    <input type="text" class="form-control" id="formType" placeholder="e.g., Simulator Web" required>
                 </div>
                 <div class="form-group">
-                    <label>Website Link</label>
-                    <input type="text" class="form-control" id="formLink" placeholder="link.html or https://..." required>
+                    <label>Resource Link</label>
+                    <input type="text" class="form-control" id="formLink" placeholder="filename.html or https://..." required>
                 </div>
-                <button type="submit" class="submit-btn" id="submitBtn">Save to Hub</button>
+                <button type="submit" class="submit-btn" id="submitBtn">Save Resource</button>
             </form>
         </div>
     </div>
 
-    <!-- 🍞 Toast Notification -->
+    <!-- 🍞 Sounding / System Feedback -->
     <div class="toast" id="sysToast">
         <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> 
         <span id="toastMsg">Success</span>
     </div>
 
     <script>
-        // 📦 ORIGINAL DATA (Preserved Exactly)
+        // 🔊 HTML5 WEB AUDIO API SYNTHESIZER (For instant retro game sounds)
+        let audioCtx = null;
+        function playBlipSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                // Classic synth pulse blip sound
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.08);
+                
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {
+                console.log("Audio not allowed yet or not supported", e);
+            }
+        }
+
+        // 📦 ORIGINAL DATA (Preserved and unaltered)
         const originalGamesConfig = [
             { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp", title: "Match Up Studio", type: "Memory Engine", link: "match_up.html" },
             { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp", title: "Snake & Ladder", type: "Board Engine", link: "snake_game.html" },
@@ -442,20 +495,34 @@
             { image: "https://placehold.co/400x300/d1fae5/10b981?text=Listening+Web", title: "Teacher Minn's Listening", type: "Website", link: "https://minn-listening.super.site/" }
         ];
 
+        // Global lists for Firestore updates
         window.dbGames = [];
         window.dbTeachers = [];
-        window.dbCustom = []; // Custom tab dynamic storage
+        window.dbCustomTabs = []; // Holds dynamically created navigation tabs
+        window.dbCustomLinks = []; // Holds items categorized inside dynamic custom tabs
 
-        // 🧭 Navigation Switcher
+        // 🧭 Dynamic Navigation & Routing Module
         window.switchTab = function(tabId) {
+            playBlipSound();
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active-section'));
             document.querySelectorAll('.nav-links .nav-item').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active-section');
+            
+            const targetSec = document.getElementById(tabId);
+            if(targetSec) targetSec.classList.add('active-section');
+            
             const btn = document.getElementById('btn-' + tabId);
             if(btn) btn.classList.add('active');
         };
 
-        // 💿 3D CAROUSEL LOGIC
+        // Modal Operations
+        window.openModal = function() {
+            document.getElementById('addLinkModal').classList.add('active');
+        };
+        window.closeModal = function() {
+            document.getElementById('addLinkModal').classList.remove('active');
+        };
+
+        // 💿 3D CAROUSEL GRAPHICS MODULE
         let carouselCurrentIndex = 0;
         let carouselTargetIndex = 0;
         let allGamesCombined = [];
@@ -497,13 +564,16 @@
             if (diff > total / 2) diff -= total;
 
             if (diff === 0) {
+                // If it is already centered, launch the link
                 window.open(link, target);
             } else {
+                // Bring to center and play blip sound
                 carouselTargetIndex += diff;
+                playBlipSound();
             }
         };
 
-        // Touchpad & Wheel Speed Guard
+        // 🖱️ Mouse Wheel and Trackpad speed controller
         const scene = document.getElementById('arcadeCarousel');
         let isWheelCooldown = false;
 
@@ -518,11 +588,39 @@
                     carouselTargetIndex -= 1;
                 }
                 
+                playBlipSound();
                 isWheelCooldown = true;
-                setTimeout(() => { isWheelCooldown = false; }, 200); 
+                setTimeout(() => { isWheelCooldown = false; }, 220); 
             }
         }, { passive: false });
 
+        // 📱 Touch and Drag/Swipe Handler for Mobile/Tablets
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        scene.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        scene.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleTouchSwipe();
+        }, { passive: true });
+
+        function handleTouchSwipe() {
+            const threshold = 50; // minimum touch gesture pixel travel to slide
+            if (touchStartX - touchEndX > threshold) {
+                // Swiped Left -> show next game card
+                carouselTargetIndex += 1;
+                playBlipSound();
+            } else if (touchEndX - touchStartX > threshold) {
+                // Swiped Right -> show previous game card
+                carouselTargetIndex -= 1;
+                playBlipSound();
+            }
+        }
+
+        // Realtime 3D Matrix Loop
         function updateCarouselPosition() {
             const items = document.querySelectorAll('.game-card');
             const total = items.length;
@@ -586,34 +684,78 @@
             });
         };
 
-        // ⭐ Render Custom Tab Cards
-        window.renderCustomCards = function() {
-            const container = document.getElementById("customGrid");
-            container.innerHTML = "";
-            
-            if(window.dbCustom.length === 0) {
-                container.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray); font-weight: 600;">
-                    <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 10px; display: block; color: var(--primary);"></i>
-                    No custom links added yet. Click the "+" button below to add your first resource!
-                </div>`;
-                return;
-            }
+        // 📁 DYNAMIC TABS BUILDER ENGINE
+        window.buildDynamicTabs = function() {
+            const navContainer = document.getElementById("dynamicNavLinks");
+            const dynamicTabsRoot = document.getElementById("dynamicTabsContainer");
+            const categorySelect = document.getElementById("formCategory");
 
-            window.dbCustom.forEach(item => {
-                const target = item.link.startsWith("http") ? "_blank" : "_self";
-                const html = `
-                <a href="${item.link}" target="${target}" class="premium-card">
-                    <img src="${item.image}" alt="${item.title}" class="card-img" loading="lazy">
-                    <div class="card-content">
-                        <h3 class="card-title">${item.title}</h3>
-                        <span class="card-tag"><i class="fa-solid fa-star"></i> ${item.type}</span>
+            // Reset dynamically generated sections
+            document.querySelectorAll('.dynamic-nav-item').forEach(el => el.remove());
+            dynamicTabsRoot.innerHTML = "";
+
+            // Reset dynamic dropdown list options but retain 'game' & 'teacher' defaults
+            categorySelect.innerHTML = `
+                <option value="game">Games Collection</option>
+                <option value="teacher">Teacher Console</option>
+            `;
+
+            window.dbCustomTabs.forEach(tab => {
+                // 1. Append navigation option button
+                const navBtn = document.createElement("button");
+                navBtn.className = "nav-item dynamic-nav-item";
+                navBtn.id = `btn-${tab.id}`;
+                navBtn.onclick = () => window.switchTab(tab.id);
+                navBtn.innerHTML = `<i class="fa-solid fa-star"></i> ${tab.name}`;
+                navContainer.appendChild(navBtn);
+
+                // 2. Add resource dropdown selector in creator panel
+                const dropOption = document.createElement("option");
+                dropOption.value = tab.id;
+                dropOption.textContent = tab.name;
+                categorySelect.appendChild(dropOption);
+
+                // 3. Create grid section frame in document structure
+                const sectionDiv = document.createElement("div");
+                sectionDiv.id = tab.id;
+                sectionDiv.className = "tab-content";
+                
+                // Filter matching links for this dynamic tab
+                const filteredLinks = window.dbCustomLinks.filter(link => link.category === tab.id);
+                let linksHtml = "";
+
+                if(filteredLinks.length === 0) {
+                    linksHtml = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray); font-weight: 600;">
+                        <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 10px; display: block; color: var(--primary);"></i>
+                        Empty Category folder. Click "+" in the bottom right corner to upload resources into ${tab.name}!
+                    </div>`;
+                } else {
+                    filteredLinks.forEach(item => {
+                        const target = item.link.startsWith("http") ? "_blank" : "_self";
+                        linksHtml += `
+                        <a href="${item.link}" target="${target}" class="premium-card">
+                            <img src="${item.image}" alt="${item.title}" class="card-img" loading="lazy">
+                            <div class="card-content">
+                                <h3 class="card-title">${item.title}</h3>
+                                <span class="card-tag"><i class="fa-solid fa-bolt"></i> ${item.type}</span>
+                            </div>
+                        </a>`;
+                    });
+                }
+
+                sectionDiv.innerHTML = `
+                    <div class="header-section">
+                        <h1>${tab.name}</h1>
+                        <p class="subtitle">Custom dynamic tab zone</p>
                     </div>
-                </a>`;
-                container.insertAdjacentHTML('beforeend', html);
+                    <div class="grid-container">${linksHtml}</div>
+                `;
+                dynamicTabsRoot.appendChild(sectionDiv);
             });
         };
 
+        // Custom Toast Dialog UI
         window.showToast = function(msg, isError = false) {
             const toast = document.getElementById('sysToast');
             const icon = toast.querySelector('i');
@@ -627,14 +769,14 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
-        // Initialize Rendering
+        // Render Base Setup
         window.renderGameBooks();
         window.renderTeacherCards();
-        window.renderCustomCards();
+        window.buildDynamicTabs();
     </script>
 
     <!-- ==========================================
-         FIREBASE DATABASE LOGIC
+         FIREBASE REALTIME COLLABORATIVE DB LOGIC
          ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -649,6 +791,7 @@
 
         let currentUser = null;
 
+        // Auto Anonymous Auth Engine
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -656,37 +799,87 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (e) { console.error("Auth error", e); }
+            } catch (e) { console.error("Firebase Security Handshake failed:", e); }
         };
 
         onAuthStateChanged(auth, (user) => {
-            if(user) { currentUser = user; setupFirestoreListener(); }
+            if(user) { currentUser = user; setupRealtimeListeners(); }
         });
         
         initAuth();
 
-        function setupFirestoreListener() {
+        // Dual Realtime Observers (Custom Tabs + Custom Links)
+        function setupRealtimeListeners() {
             if (!currentUser) return;
+            
+            // Collection Reference paths obeying strict rule constraints
+            const tabsRef = collection(db, 'artifacts', appId, 'public', 'data', 'customTabs');
             const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
 
+            // Listen for changes in dynamic custom tab configurations
+            onSnapshot(tabsRef, (snapshot) => {
+                window.dbCustomTabs = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    window.dbCustomTabs.push({ id: doc.id, name: data.name });
+                });
+                window.buildDynamicTabs();
+            }, (err) => console.error("Tabs Sync Error: ", err));
+
+            // Listen for changes in dynamic links
             onSnapshot(linksRef, (snapshot) => {
                 window.dbGames = []; 
                 window.dbTeachers = [];
-                window.dbCustom = [];
+                window.dbCustomLinks = [];
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if(data.category === 'game') window.dbGames.push(data);
-                    if(data.category === 'teacher') window.dbTeachers.push(data);
-                    if(data.category === 'custom') window.dbCustom.push(data);
+                    if(data.category === 'game') {
+                        window.dbGames.push(data);
+                    } else if(data.category === 'teacher') {
+                        window.dbTeachers.push(data);
+                    } else {
+                        window.dbCustomLinks.push(data);
+                    }
                 });
                 
                 window.renderGameBooks(); 
                 window.renderTeacherCards();
-                window.renderCustomCards();
-            }, (error) => { console.error("Firestore error", error); });
+                window.buildDynamicTabs();
+            }, (error) => { console.error("Links Sync Error: ", error); });
         }
 
+        // Create a Dynamic Category Tab
+        window.handleCreateCustomTab = async function() {
+            const tabInput = document.getElementById("formNewTabName");
+            const rawName = tabInput.value.trim();
+            if(!rawName) {
+                window.showToast("Tab name cannot be empty", true);
+                return;
+            }
+
+            // Simple Tab Sanitization for HTML ID values
+            const tabId = "tab_" + rawName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+            try {
+                if(currentUser) {
+                    // Save to customTabs database path matching strict rules
+                    const tabsRef = collection(db, 'artifacts', appId, 'public', 'data', 'customTabs');
+                    await addDoc(tabsRef, { name: rawName, tabId: tabId, createdAt: Date.now() });
+                } else {
+                    // Offline fallback simulator
+                    window.dbCustomTabs.push({ id: tabId, name: rawName });
+                    window.buildDynamicTabs();
+                }
+                tabInput.value = "";
+                window.showToast(`Category tab "${rawName}" created!`);
+            } catch(e) {
+                console.error(e);
+                window.showToast("Failed to create tab", true);
+            }
+        };
+
+        // Submit and Save Custom Resources to Tabs
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -706,22 +899,23 @@
                     const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
                     await addDoc(linksRef, newData);
                 } else {
+                    // Local emulation update
                     if(newData.category === 'game') window.dbGames.push(newData);
                     else if(newData.category === 'teacher') window.dbTeachers.push(newData);
-                    else window.dbCustom.push(newData);
+                    else window.dbCustomLinks.push(newData);
                     
                     window.renderGameBooks(); 
                     window.renderTeacherCards();
-                    window.renderCustomCards();
+                    window.buildDynamicTabs();
                 }
                 
-                document.getElementById('addLinkModal').classList.remove('active');
+                window.closeModal();
                 document.getElementById('addLinkForm').reset();
-                window.showToast("Link added successfully!");
+                window.showToast("Resource saved successfully!");
             } catch(err) {
                 console.error(err); window.showToast("Failed to save link", true);
             } finally {
-                btn.innerText = "Save to Hub"; btn.disabled = false;
+                btn.innerText = "Save Resource"; btn.disabled = false;
             }
         };
     </script>
