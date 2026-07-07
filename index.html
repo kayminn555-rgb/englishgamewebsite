@@ -7,599 +7,723 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css?family=Fredoka:wght@600;700&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Modern Premium Console Style Base */
+        /* ==========================================
+           LIGHT PREMIUM & COLORFUL THEME
+           ========================================== */
+        :root {
+            --bg-main: #f8fafc;
+            --text-dark: #0f172a;
+            --text-gray: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            
+            /* Vibrant Accents */
+            --primary: #3b82f6;
+            --secondary: #ec4899;
+            --tertiary: #8b5cf6;
+            --success: #10b981;
+        }
+
         html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            font-family: 'Quicksand', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: #1e293b;
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-dark);
             overflow-x: hidden;
+            background-color: var(--bg-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding-bottom: 60px;
-            box-sizing: border-box;
+        /* Ambient Background Blobs */
+        .bg-blobs {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
+        }
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5;
+            animation: float 12s infinite alternate ease-in-out;
+        }
+        .blob-1 { width: 400px; height: 400px; background: #bfdbfe; top: -10%; left: -10%; }
+        .blob-2 { width: 350px; height: 350px; background: #fbcfe8; bottom: -10%; right: -5%; animation-delay: -4s; }
+        .blob-3 { width: 300px; height: 300px; background: #e9d5ff; top: 40%; left: 30%; animation-delay: -8s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.1); }
         }
 
-        /* Top Navigation Menu Bar */
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        body {
+            display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 80px;
+        }
+
+        /* ==========================================
+           MODERN NAVIGATION
+           ========================================== */
         .navbar {
             width: 100%;
-            background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 15px 40px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 15px 40px; box-sizing: border-box;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .nav-logo {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #0f172a;
-            text-decoration: none;
+            font-family: 'Fredoka', sans-serif; font-size: 1.8rem; font-weight: 700;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
         }
-
+        .nav-logo i { color: var(--primary); }
         .nav-logo span {
-            background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* Menu Tab Buttons */
+        .nav-links { display: flex; gap: 8px; }
         .nav-item {
-            text-decoration: none;
-            color: #475569;
-            font-weight: 700;
-            font-size: 0.95rem;
-            padding: 10px 18px;
-            border-radius: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            border: none;
-            background: transparent;
-            font-family: 'Quicksand', sans-serif;
+            text-decoration: none; color: var(--text-gray); font-weight: 700; font-size: 1rem;
+            padding: 10px 20px; border-radius: 16px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+            border: none; background: transparent; font-family: 'Quicksand', sans-serif;
         }
-
-        .nav-item:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-
-        /* Active Tab Status */
+        .nav-item:hover { background: rgba(255,255,255,0.9); color: var(--text-dark); }
         .nav-item.active {
-            background: #eff6ff;
-            color: #3b82f6;
+            background: white; color: var(--primary);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15); border: 1px solid white;
         }
 
-        /* Content Sections Control */
+        /* ==========================================
+           TAB SECTIONS
+           ========================================== */
         .tab-content {
-            display: none;
-            width: 100%;
-            max-width: 1200px;
-            padding: 0 20px;
-            box-sizing: border-box;
-            animation: fadeIn 0.4s ease;
+            display: none; width: 100%; max-width: 1300px;
+            padding: 20px; box-sizing: border-box; animation: fadeIn 0.4s ease-out forwards;
         }
+        .tab-content.active-section { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .tab-content.active-section {
-            display: block;
+        .header-section { margin: 30px 0 10px 0; text-align: center; }
+        h1 { font-family: 'Fredoka', sans-serif; font-size: 3rem; margin: 0 0 8px 0; color: var(--text-dark); }
+        .subtitle { font-size: 1.1rem; font-weight: 600; color: var(--text-gray); margin: 0; }
+
+        /* ==========================================
+           HOME PAGE
+           ========================================== */
+        .hero-card {
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px);
+            border: 1px solid white; border-radius: 30px;
+            padding: 60px 40px; text-align: center; max-width: 800px; width: 100%; margin: 50px auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-card h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 3.2rem; margin: 0 0 15px 0;
+            background: linear-gradient(to right, var(--primary), var(--tertiary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        /* HOME PAGE CONTENT STYLE */
-        .welcome-banner {
-            background: white;
-            border-radius: 32px;
-            padding: 60px 30px;
-            text-align: center;
-            margin-top: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            border: 1px solid rgba(255,255,255,0.8);
-        }
-
-        .welcome-banner h2 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 3rem;
-            margin: 0 0 15px 0;
-            color: #1e1b4b;
-        }
-
-        .welcome-banner h2 span {
-            background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .welcome-banner p {
-            font-size: 1.2rem;
-            color: #64748b;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
-            line-height: 1.6;
-            font-weight: 600;
-        }
-
+        .hero-card p { font-size: 1.2rem; color: var(--text-gray); margin-bottom: 40px; font-weight: 600; line-height: 1.6;}
+        
         .cta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 32px;
-            background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
-            color: white;
-            font-weight: 900;
-            font-size: 1.1rem;
-            text-decoration: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.2);
-            transition: all 0.3s ease;
+            padding: 16px 45px; font-size: 1.1rem; font-weight: 800; color: white; text-decoration: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 30px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3); transition: all 0.3s;
+        }
+        .cta-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 15px 25px rgba(236, 72, 153, 0.4); }
+
+        /* ==========================================
+           🎮 3D INFINITE CAROUSEL (SLEEK CARDS)
+           ========================================== */
+        .carousel-scene {
+            width: 100%; height: 500px;
+            display: flex; justify-content: center; align-items: center;
+            perspective: 1200px; overflow: hidden; position: relative;
+            margin-top: 10px;
         }
 
-        .cta-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 15px 25px rgba(236, 72, 153, 0.3);
-        }
-
-        /* HEADERS & GRID LAYOUT */
-        .header-section {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        h1 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0 0 8px 0;
-        }
-
-        h1 span {
-            background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            font-size: 1.05rem;
-            color: #64748b;
-            font-weight: 600;
-            margin: 0 0 40px 0;
-            line-height: 1.6;
-        }
-
-        .menu-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
-            width: 100%;
-            padding: 10px 0;
-            box-sizing: border-box;
-        }
-
-        /* Premium Console Card Frame */
         .game-card {
-            background: #ffffff;
-            border-radius: 24px;
-            overflow: hidden;
-            text-decoration: none;
-            color: #1e293b;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .game-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 35px 5px rgba(15, 23, 42, 0.12), 0 10px 20px 5px rgba(0, 0, 0, 0.04);
-        }
-
-        .image-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4/3;
-            overflow: hidden;
-            background: #f1f5f9;
-            border-top-left-radius: 23px;
-            border-top-right-radius: 23px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .game-cover-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .game-card:hover .game-cover-img {
-            transform: scale(1.04);
-        }
-
-        .game-details {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: #ffffff;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .game-title {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #0f172a;
-            margin: 0;
-        }
-
-        .game-type {
-            align-self: flex-start;
-            font-size: 0.75rem;
-            color: #3b82f6;
-            background: #eff6ff;
-            text-transform: uppercase;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        /* 🟢 Teacher Tags တွေအတွက် အရောင်ပြောင်းရန် CSS class */
-        .game-type.system-tag {
-            color: #16a34a;
-            background: #f0fdf4;
-        }
-
-        .game-badge {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.95);
-            color: #0f172a;
-            padding: 6px 14px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            z-index: 10;
+            width: 250px; height: 350px;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s;
+            cursor: pointer;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            border: 2px solid transparent;
         }
 
-        /* Mobile Layout */
-        @media (max-width: 640px) {
-            .navbar { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .welcome-banner h2 { font-size: 2.2rem; }
+        .game-card.active {
+            border: 2px solid white;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .game-card img {
+            width: 100%; height: 100%; 
+            object-fit: contain;
+            background-color: #f1f5f9;
+            padding: 5px; box-sizing: border-box;
+        }
+
+        .card-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(15,23,42, 0.95) 0%, rgba(15,23,42, 0.8) 60%, transparent 100%);
+            padding: 30px 15px 15px 15px; color: white;
+            text-align: center;
+            transform: translateY(100%); transition: transform 0.3s ease;
+        }
+        
+        .game-card.active .card-info {
+            transform: translateY(0);
+        }
+
+        .card-info h4 { font-family: 'Fredoka', sans-serif; font-size: 1.2rem; margin: 0 0 5px 0; }
+        .card-info span { font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
+
+        .play-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease; z-index: 10;
+        }
+        .game-card.active:hover .play-overlay { opacity: 1; }
+        
+        .play-overlay .btn-play-now {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 14px 28px; border-radius: 30px; font-weight: 800;
+            font-size: 1.1rem; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: scale(0.9); transition: all 0.3s;
+        }
+        .game-card.active:hover .play-overlay .btn-play-now { transform: scale(1); }
+        .play-overlay .btn-play-now:hover { transform: scale(1.05); }
+
+        /* ==========================================
+           GRID LAYOUT (TEACHER & CUSTOM TABS)
+           ========================================== */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px; padding: 20px 0;
+        }
+
+        .premium-card {
+            background: white; border-radius: 20px; overflow: hidden; text-decoration: none;
+            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: all 0.3s ease; position: relative;
+            display: flex; flex-direction: column;
+        }
+        .premium-card:hover {
+            transform: translateY(-8px); border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.15);
+        }
+
+        .card-img { width: 100%; height: 180px; object-fit: cover; }
+        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;}
+        .card-title { font-family: 'Fredoka', sans-serif; font-size: 1.25rem; color: var(--text-dark); margin: 0 0 15px 0; line-height: 1.3;}
+        .card-tag {
+            align-self: flex-start; padding: 6px 14px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+            background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; text-transform: uppercase;
+        }
+
+        /* ==========================================
+           ADMIN TOOL: FAB & MODAL
+           ========================================== */
+        .fab-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%;
+            background: white; color: var(--primary); font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0;
+            cursor: pointer; z-index: 1000; transition: all 0.3s ease;
+        }
+        .fab-btn:hover { background: var(--primary); color: white; transform: scale(1.1) rotate(90deg); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-box {
+            background: white; width: 90%; max-width: 450px; border-radius: 24px; padding: 30px;
+            transform: translateY(30px) scale(0.9); transition: 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-family: 'Fredoka'; margin: 0; font-size: 1.5rem; color: var(--text-dark); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-gray); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem;}
+        .form-control {
+            width: 100%; padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #cbd5e1;
+            color: var(--text-dark); font-family: inherit; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;
+        }
+        .form-control:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .submit-btn {
+            width: 100%; padding: 14px; border-radius: 12px; border: none;
+            background: var(--primary); color: white; font-weight: bold;
+            font-size: 1.1rem; cursor: pointer; margin-top: 15px; transition: 0.2s;
+        }
+        .submit-btn:hover { background: #2563eb; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: white; border: 1px solid #e2e8f0; color: var(--text-dark); padding: 12px 24px;
+            border-radius: 30px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3000; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px; flex-direction: column; gap: 15px; }
+            .hero-card h2 { font-size: 2.5rem; }
             h1 { font-size: 2.2rem; }
-            .menu-container { grid-template-columns: 1fr; gap: 24px; }
+            .carousel-scene { height: 400px; }
+            .game-card { width: 200px; height: 280px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 🌟 Navigation Menu 🌟 -->
+    <!-- 🎨 Background -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- 🌟 Navigation -->
     <nav class="navbar">
-        <a href="#" class="nav-logo" onclick="switchTab('homePage')"><span>Edu</span>Arcade</a>
+        <a href="#" class="nav-logo" onclick="window.switchTab('homePage')">
+            <i class="fa-solid fa-gamepad"></i> <span>EduArcade</span>
+        </a>
         <div class="nav-links">
-            <button class="nav-item active" id="btn-homePage" onclick="switchTab('homePage')">
+            <button class="nav-item active" id="btn-homePage" onclick="window.switchTab('homePage')">
                 <i class="fa-solid fa-house"></i> Home
             </button>
-            <button class="nav-item" id="btn-gamesPage" onclick="switchTab('gamesPage')">
-                <i class="fa-solid fa-gamepad"></i> Games
+            <button class="nav-item" id="btn-gamesPage" onclick="window.switchTab('gamesPage')">
+                <i class="fa-solid fa-dice"></i> Games
             </button>
-            <button class="nav-item" id="btn-teacherPage" onclick="switchTab('teacherPage')">
+            <button class="nav-item" id="btn-teacherPage" onclick="window.switchTab('teacherPage')">
                 <i class="fa-solid fa-chalkboard-user"></i> Teacher
             </button>
-            <!-- 📌 နောက်ထပ် Tab အသစ်ထည့်ချင်ရင် ဒီနေရာမှာ Button ထပ်တိုးပါ -->
-            <!--
-            <button class="nav-item" id="btn-newTab" onclick="switchTab('newTab')">
-                <i class="fa-solid fa-star"></i> New Tab
+            <button class="nav-item" id="btn-customPage" onclick="window.switchTab('customPage')">
+                <i class="fa-solid fa-star"></i> Custom
             </button>
-            -->
         </div>
     </nav>
 
     <!-- 🏠 HOME PAGE -->
     <div id="homePage" class="tab-content active-section">
-        <div class="welcome-banner">
-            <h2>Welcome to <span>EduArcade</span>!</h2>
-            <p>Discover fun educational games and manage performance dynamically.</p>
-            <a href="#" class="cta-btn" onclick="switchTab('gamesPage')">
-                Get Started <i class="fa-solid fa-arrow-right"></i>
-            </a>
+        <div class="hero-card">
+            <h2>Level Up Your Learning</h2>
+            <p>Welcome to EduArcade. A colorful and premium space for interactive educational games and modern teaching tools.</p>
+            <button class="cta-btn" onclick="window.switchTab('gamesPage')">
+                <i class="fa-solid fa-play"></i> Start Playing
+            </button>
         </div>
     </div>
 
     <!-- 🎮 GAMES PAGE -->
     <div id="gamesPage" class="tab-content">
         <div class="header-section">
-            <h1>Game Zone</h1>
-            <p class="subtitle">Select a game framework below to launch the ROM instance.</p>
+            <h1>Game Collection</h1>
+            <p class="subtitle">Scroll to browse. Click the center game to play.</p>
         </div>
-        <!-- Games Grid (JS မှ အလိုအလျောက် ဖြည့်ပေးမည်) -->
-        <div class="menu-container" id="arcadeGrid"></div>
+        <div class="carousel-scene" id="arcadeCarousel">
+            <!-- Cards injected via JS -->
+        </div>
     </div>
 
     <!-- 👩‍🏫 TEACHER PAGE -->
     <div id="teacherPage" class="tab-content">
         <div class="header-section">
             <h1>Teacher Console</h1>
-            <p class="subtitle">Access administrative utilities and analytics engines.</p>
+            <p class="subtitle">Management tools and analytics</p>
         </div>
-        <!-- Teacher Grid (JS မှ အလိုအလျောက် ဖြည့်ပေးမည်) -->
-        <div class="menu-container" id="teacherGrid"></div>
+        <div class="grid-container" id="teacherGrid"></div>
     </div>
 
-    <!-- 📌 Tab အသစ် ထည့်ချင်ရင် ဒီနေရာမှာ ထပ်တိုးပါ -->
-    <!--
-    <div id="newTab" class="tab-content">
+    <!-- ⭐ CUSTOM PAGE (NEW TAB FEATURE) -->
+    <div id="customPage" class="tab-content">
         <div class="header-section">
-            <h1>New Section</h1>
-            <p class="subtitle">Subtitle for new section.</p>
+            <h1>Custom Zone</h1>
+            <p class="subtitle">Your customized and added external educational links</p>
         </div>
-        <div class="menu-container" id="newGrid"></div>
+        <div class="grid-container" id="customGrid"></div>
     </div>
-    -->
+
+    
+    <!-- ➕ Admin Add Tool -->
+    <button class="fab-btn" onclick="document.getElementById('addLinkModal').classList.add('active')" title="Add New Link">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- 📝 Modal Form (All English UI) -->
+    <div class="modal-overlay" id="addLinkModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-link"></i> Add New Link</h3>
+                <button class="close-btn" onclick="document.getElementById('addLinkModal').classList.remove('active')">&times;</button>
+            </div>
+            <form id="addLinkForm" onsubmit="window.handleFormSubmit(event)">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select class="form-control" id="formCategory" required>
+                        <option value="game">Game Library</option>
+                        <option value="teacher">Teacher Console</option>
+                        <option value="custom">Custom Tab</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" class="form-control" id="formTitle" placeholder="e.g., Math Quiz" required>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" class="form-control" id="formImage" placeholder="https://..." required>
+                </div>
+                <div class="form-group">
+                    <label>Type / Engine</label>
+                    <input type="text" class="form-control" id="formType" placeholder="e.g., Quiz Engine" required>
+                </div>
+                <div class="form-group">
+                    <label>Website Link</label>
+                    <input type="text" class="form-control" id="formLink" placeholder="link.html or https://..." required>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">Save to Hub</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🍞 Toast Notification -->
+    <div class="toast" id="sysToast">
+        <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> 
+        <span id="toastMsg">Success</span>
+    </div>
 
     <script>
-        // --- 🧭 Navigation Routing Engine ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(section => {
-                section.classList.remove('active-section');
-            });
-            document.querySelectorAll('.nav-links .nav-item').forEach(btn => {
-                btn.classList.remove('active');
-            });
+        // 📦 ORIGINAL DATA (Preserved Exactly)
+        const originalGamesConfig = [
+            { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp", title: "Match Up Studio", type: "Memory Engine", link: "match_up.html" },
+            { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp", title: "Snake & Ladder", type: "Board Engine", link: "snake_game.html" },
+            { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp", title: "Behind the Card", type: "Reveal Engine", link: "behind_the_card.html" },
+            { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp", title: "Spin Wheel Factory", type: "Wheel Engine", link: "spin_wheel.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp?raw=true", title: "Flip Game Frenzy", type: "Flip Engine", link: "flash_card.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sentence%20Catcher.webp?raw=true", title: "Sentence catcher", type: "Flip Engine", link: "sentence_catcher.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-11_-2026_-09_40_10-AM.webp?raw=true", title: "Tug Of War", type: "Flip Engine", link: "tug_of_war.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Bingo.webp?raw=true", title: "Bingo", type: "Flip Engine", link: "bingo.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/six%20seven.webp?raw=true", title: "sixseven", type: "shake Engine", link: "sixseven.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Word_ar.webp?raw=true", title: "word_ar", type: " AR Engine", link: "word_ar.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sliding%20Puzzle.webp?raw=true", title: "puzzle", type: " AR Engine", link: "puzzle.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/tow_v2.webp?raw=true", title: "Tug of War V2", type: " AR Engine", link: "tow_v2.html" },
+            { image: "https://github.com/kayminn555-rgb/Gallery/blob/main/S__15237122.webp?raw=true", title: "Word Catcher", type: " AR Engine", link: "word_catcher.html" }
+        ];
 
+        const originalTeacherConfig = [
+            { image: "https://placehold.co/400x300/e2e8f0/333?text=Teacher+Kay+Minn", title: "Teacher Kay Minn", type: "GAS Web App", link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec" },
+            { image: "https://placehold.co/400x300/e2e8f0/333?text=Teacher+Han+Saw", title: "Teacher Han Saw", type: "GAS Web App", link: "https://script.google.com/macros/s/AKfycby8v6KAnO3ajKNunwukrv9wGCFZGzZGJRILa4CXTRTOmulP5J2tNswwOYds3-xXhwPIQQ/exec" },
+            { image: "https://placehold.co/400x300/dbeafe/3b82f6?text=Student+Points", title: "Student Points", type: "Listening Website", link: "https://script.google.com/macros/s/AKfycbzbG9u4b_YUZ_H4ANwRNOe-a0wgST1aeck1qXxzrgwE-FJqH5LUWl0LPAWAVyGVYYMk/exec" },
+            { image: "https://placehold.co/400x300/fce7f3/ec4899?text=Checking+System", title: "Teacher Minn's Checking", type: "System", link: "mscs.html" },
+            { image: "https://placehold.co/400x300/f3e8ff/8b5cf6?text=Checking+System", title: "Teacher Han Saw's Checking", type: "System", link: "hscs.html" },
+            { image: "https://placehold.co/400x300/d1fae5/10b981?text=Listening+Web", title: "Teacher Minn's Listening", type: "Website", link: "https://minn-listening.super.site/" }
+        ];
+
+        window.dbGames = [];
+        window.dbTeachers = [];
+        window.dbCustom = []; // Custom tab dynamic storage
+
+        // 🧭 Navigation Switcher
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active-section'));
+            document.querySelectorAll('.nav-links .nav-item').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active-section');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if(activeBtn) activeBtn.classList.add('active');
-        }
+            const btn = document.getElementById('btn-' + tabId);
+            if(btn) btn.classList.add('active');
+        };
 
-        // --- 🎮 Game Pack Array Configuration ---
-        const myArcadeGamesConfig = [
-            {
-                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp",
-                title: "Match Up Studio",
-                type: "Memory Engine",
-                link: "match_up.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp",
-                title: "Snake & Ladder",
-                type: "Board Engine",
-                link: "snake_game.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_27-AM.webp",
-                title: "Behind the Card",
-                type: "Reveal Engine",
-                link: "behind_the_card.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_34-AM.webp",
-                title: "Spin Wheel Factory",
-                type: "Wheel Engine",
-                link: "spin_wheel.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-2_-2026_-06_59_18-PM.webp?raw=true",
-                title: "Flip Game Frenzy",
-                type: "Flip Engine",
-                link: "flash_card.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sentence%20Catcher.webp?raw=true",
-                title: "Sentence catcher",
-                type: "Flip Engine",
-                link: "sentence_catcher.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/ChatGPT-Image-Jun-11_-2026_-09_40_10-AM.webp?raw=true",
-                title: "Tug Of War",
-                type: "Flip Engine",
-                link: "tug_of_war.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Bingo.webp?raw=true",
-                title: "Bingo",
-                type: "Flip Engine",
-                link: "bingo.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/six%20seven.webp?raw=true",
-                title: "sixseven",
-                type: "shake Engine",
-                link: "sixseven.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Word_ar.webp?raw=true",
-                title: "word_ar",
-                type: " AR Engine",
-                link: "word_ar.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/Sliding%20Puzzle.webp?raw=true",
-                title: "puzzle",
-                type: " AR Engine",
-                link: "puzzle.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/tow_v2.webp?raw=true",
-                title: "Tug of War V2",
-                type: " AR Engine",
-                link: "tow_v2.html",
-                isSystemTag: false
-            },
-            {
-                image: "https://github.com/kayminn555-rgb/Gallery/blob/main/S__15237122.webp?raw=true",
-                title: "Word Catcher",
-                type: " AR Engine",
-                link: "word_catcher.html",
-                isSystemTag: false
-            }
-        ];
+        // 💿 3D CAROUSEL LOGIC
+        let carouselCurrentIndex = 0;
+        let carouselTargetIndex = 0;
+        let allGamesCombined = [];
 
-        // --- 🏫 Teacher Section Array Configuration ---
-        // 💡 ဤနေရာတွင် Teacher Tab အတွက် ပုံများ (image url) ကို ထည့်သွင်းနိုင်ပါပြီ
-        const myTeacherUtilitiesConfig = [
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Teacher+Kay+Minn", 
-                title: "Teacher Kay Minn",
-                type: "GAS Web App",
-                link: "https://script.google.com/macros/s/AKfycbzTb0_G8v2OSfDOoHEQqP0kTb9jgjMblqNVCjyY-E0XKWmg2tHpKwaedUQNFi0dtDWd/exec",
-                isSystemTag: true // Teacher tag ကို အစိမ်းရောင်ဖြစ်စေရန်
-            },
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Teacher+Han+Saw", 
-                title: "Teacher Han Saw",
-                type: "GAS Web App",
-                link: "https://script.google.com/macros/s/AKfycby8v6KAnO3ajKNunwukrv9wGCFZGzZGJRILa4CXTRTOmulP5J2tNswwOYds3-xXhwPIQQ/exec",
-                isSystemTag: true
-            },
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Listening+Website", 
-                title: "Student Points",
-                type: "Listening Website",
-                link: "https://script.google.com/macros/s/AKfycbzbG9u4b_YUZ_H4ANwRNOe-a0wgST1aeck1qXxzrgwE-FJqH5LUWl0LPAWAVyGVYYMk/exec",
-                isSystemTag: true
-            },
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Listening+Website", 
-                title: "Teacher Minn's Student Checking System", 
-                type: "Listening Website",
-                link: "mscs.html",
-                isSystemTag: true
-            },
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Listening+Website", 
-                title: "Teacher Han Saw's Student Checking System", 
-                type: "Listening Website",
-                link: "hscs.html",
-                isSystemTag: true
-            },
-            {
-                // ပုံ Link အမှန်ကို ဒီနေရာမှာ အစားထိုးထည့်ပါ
-                image: "https://placehold.co/400x300?text=Listening+Website", 
-                title: "Teacher Minn's Listening Website", 
-                type: "Listening Website",
-                link: "https://minn-listening.super.site/",
-                isSystemTag: true
-            }
-        ];
+        window.renderGameBooks = function() {
+            const container = document.getElementById("arcadeCarousel");
+            container.innerHTML = "";
+            allGamesCombined = [...originalGamesConfig, ...window.dbGames];
 
-        // --- 📌 Tab အသစ်အတွက် Array သီးသန့်ဆောက်ချင်ပါက ---
-        /*
-        const myNewTabConfig = [
-            {
-                image: "...",
-                title: "New Game",
-                type: "Action",
-                link: "#",
-                isSystemTag: false
-            }
-        ];
-        */
-
-
-        // --- ⚙️ အလွယ်တကူ Card များတည်ဆောက်ပေးသော Engine (Reusable Function) ---
-        // ဒီ Function က Array, HTML ID နဲ့ Badge နာမည်ကို လက်ခံပြီး အလိုအလျောက် Card တွေရေးပေးသွားပါမယ်။
-        function renderCards(dataArray, containerId, badgeText) {
-            const gridContainer = document.getElementById(containerId);
-            if (!gridContainer) return; // Container မရှိရင် ရပ်မည်
-
-            gridContainer.innerHTML = ""; // အရင်ရှိတာတွေ ရှင်းလင်းမည်
-            
-            dataArray.forEach(item => {
-                const card = document.createElement("a");
-                card.href = item.link;
+            allGamesCombined.forEach((item, index) => {
+                const target = item.link.startsWith("http") ? "_blank" : "_self";
                 
-                // ပြင်ပ Link ဆိုလျှင် New Tab ဖြင့်ဖွင့်ရန်
-                if(item.link.startsWith("http")) card.target = "_blank"; 
-                
-                card.className = "game-card";
-                
-                // isSystemTag က true ဖြစ်ရင် 'system-tag' (အစိမ်းရောင်) ကို ထည့်ပေးမည်
-                const tagClass = item.isSystemTag ? "system-tag" : "";
+                const html = `
+                <div class="game-card" id="card-${index}" onclick="window.handleCardClick(${index}, '${item.link}', '${target}')">
+                    <img src="${item.image}" alt="${item.title}" loading="lazy">
+                    
+                    <div class="card-info">
+                        <h4>${item.title}</h4>
+                        <span>${item.type}</span>
+                    </div>
 
-                card.innerHTML = `
-                <div class="game-badge">${badgeText}</div>
-                <div class="image-container">
-                    <img class="game-cover-img" src="${item.image}" alt="${item.title}" loading="lazy">
-                </div>
-                <div class="game-details">
-                    <div class="game-title">${item.title}</div>
-                    <div class="game-type ${tagClass}">${item.type}</div>
+                    <div class="play-overlay">
+                        <div class="btn-play-now">
+                            <i class="fa-solid fa-play"></i> PLAY
+                        </div>
+                    </div>
                 </div>`;
-                
-                gridContainer.appendChild(card);
+                container.insertAdjacentHTML('beforeend', html);
             });
+            
+            updateCarouselPosition();
+        };
+
+        window.handleCardClick = function(index, link, target) {
+            const total = allGamesCombined.length;
+            let currentCentered = Math.round(carouselTargetIndex);
+            
+            let diff = ((index - currentCentered) % total + total) % total;
+            if (diff > total / 2) diff -= total;
+
+            if (diff === 0) {
+                window.open(link, target);
+            } else {
+                carouselTargetIndex += diff;
+            }
+        };
+
+        // Touchpad & Wheel Speed Guard
+        const scene = document.getElementById('arcadeCarousel');
+        let isWheelCooldown = false;
+
+        scene.addEventListener('wheel', (e) => {
+            if (document.getElementById('gamesPage').classList.contains('active-section')) {
+                e.preventDefault(); 
+                if (isWheelCooldown) return;
+                
+                if(e.deltaY > 0 || e.deltaX > 0) {
+                    carouselTargetIndex += 1;
+                } else {
+                    carouselTargetIndex -= 1;
+                }
+                
+                isWheelCooldown = true;
+                setTimeout(() => { isWheelCooldown = false; }, 200); 
+            }
+        }, { passive: false });
+
+        function updateCarouselPosition() {
+            const items = document.querySelectorAll('.game-card');
+            const total = items.length;
+            if(total === 0) return;
+
+            carouselCurrentIndex += (carouselTargetIndex - carouselCurrentIndex) * 0.1;
+
+            items.forEach((item, i) => {
+                let diff = ((i - carouselCurrentIndex) % total + total) % total;
+                if (diff > total / 2) diff -= total;
+
+                let absDiff = Math.abs(diff);
+                let translateX = diff * 160; 
+                let translateZ = -absDiff * 120;
+                let rotateY = diff * -15; 
+
+                if (absDiff < 0.5) {
+                    item.classList.add('active');
+                    translateZ += 40;
+                    rotateY = 0;
+                } else {
+                    item.classList.remove('active');
+                }
+
+                let opacity = 1 - (absDiff * 0.15);
+                if(opacity < 0) opacity = 0;
+                
+                let zIndex = 100 - Math.round(absDiff * 10);
+
+                item.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`;
+                item.style.zIndex = zIndex;
+                item.style.opacity = opacity;
+
+                if (absDiff > 4) {
+                    item.style.visibility = 'hidden';
+                } else {
+                    item.style.visibility = 'visible';
+                }
+            });
+
+            requestAnimationFrame(updateCarouselPosition);
         }
 
-        // --- 🚀 System Initialization ---
-        function initDashboardHub() {
-            // ၁။ Game Tab အတွက် Card များဖန်တီးခြင်း
-            renderCards(myArcadeGamesConfig, "arcadeGrid", "Play");
+        // 👩‍🏫 Render Teacher Cards
+        window.renderTeacherCards = function() {
+            const container = document.getElementById("teacherGrid");
+            container.innerHTML = "";
+            const allTeachers = [...originalTeacherConfig, ...window.dbTeachers];
 
-            // ၂။ Teacher Tab အတွက် Card များဖန်တီးခြင်း
-            renderCards(myTeacherUtilitiesConfig, "teacherGrid", "Launch");
+            allTeachers.forEach(item => {
+                const target = item.link.startsWith("http") ? "_blank" : "_self";
+                const html = `
+                <a href="${item.link}" target="${target}" class="premium-card">
+                    <img src="${item.image}" alt="${item.title}" class="card-img" loading="lazy">
+                    <div class="card-content">
+                        <h3 class="card-title">${item.title}</h3>
+                        <span class="card-tag"><i class="fa-solid fa-microchip"></i> ${item.type}</span>
+                    </div>
+                </a>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        };
 
-            // ၃။ (ရွေးချယ်ရန်) နောက်ထပ် Tab အသစ် ထပ်တိုးပါက အောက်ပါအတိုင်း ခေါ်သုံးနိုင်ပါသည်။
-            // renderCards(myNewTabConfig, "newGrid", "Open");
+        // ⭐ Render Custom Tab Cards
+        window.renderCustomCards = function() {
+            const container = document.getElementById("customGrid");
+            container.innerHTML = "";
+            
+            if(window.dbCustom.length === 0) {
+                container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray); font-weight: 600;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 10px; display: block; color: var(--primary);"></i>
+                    No custom links added yet. Click the "+" button below to add your first resource!
+                </div>`;
+                return;
+            }
+
+            window.dbCustom.forEach(item => {
+                const target = item.link.startsWith("http") ? "_blank" : "_self";
+                const html = `
+                <a href="${item.link}" target="${target}" class="premium-card">
+                    <img src="${item.image}" alt="${item.title}" class="card-img" loading="lazy">
+                    <div class="card-content">
+                        <h3 class="card-title">${item.title}</h3>
+                        <span class="card-tag"><i class="fa-solid fa-star"></i> ${item.type}</span>
+                    </div>
+                </a>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        };
+
+        window.showToast = function(msg, isError = false) {
+            const toast = document.getElementById('sysToast');
+            const icon = toast.querySelector('i');
+            document.getElementById('toastMsg').innerText = msg;
+            
+            icon.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+            icon.style.color = isError ? '#ef4444' : 'var(--success)';
+            toast.style.borderColor = isError ? '#ef4444' : '#e2e8f0';
+            
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        };
+
+        // Initialize Rendering
+        window.renderGameBooks();
+        window.renderTeacherCards();
+        window.renderCustomCards();
+    </script>
+
+    <!-- ==========================================
+         FIREBASE DATABASE LOGIC
+         ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { projectId: "demo-project" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'edu-arcade-hub';
+
+        let currentUser = null;
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) { console.error("Auth error", e); }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if(user) { currentUser = user; setupFirestoreListener(); }
+        });
+        
+        initAuth();
+
+        function setupFirestoreListener() {
+            if (!currentUser) return;
+            const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
+
+            onSnapshot(linksRef, (snapshot) => {
+                window.dbGames = []; 
+                window.dbTeachers = [];
+                window.dbCustom = [];
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(data.category === 'game') window.dbGames.push(data);
+                    if(data.category === 'teacher') window.dbTeachers.push(data);
+                    if(data.category === 'custom') window.dbCustom.push(data);
+                });
+                
+                window.renderGameBooks(); 
+                window.renderTeacherCards();
+                window.renderCustomCards();
+            }, (error) => { console.error("Firestore error", error); });
         }
 
-        window.addEventListener("DOMContentLoaded", initDashboardHub);
+        window.handleFormSubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Saving..."; btn.disabled = true;
+
+            const newData = {
+                category: document.getElementById('formCategory').value,
+                title: document.getElementById('formTitle').value,
+                image: document.getElementById('formImage').value,
+                type: document.getElementById('formType').value,
+                link: document.getElementById('formLink').value,
+                createdAt: Date.now()
+            };
+
+            try {
+                if(currentUser) {
+                    const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
+                    await addDoc(linksRef, newData);
+                } else {
+                    if(newData.category === 'game') window.dbGames.push(newData);
+                    else if(newData.category === 'teacher') window.dbTeachers.push(newData);
+                    else window.dbCustom.push(newData);
+                    
+                    window.renderGameBooks(); 
+                    window.renderTeacherCards();
+                    window.renderCustomCards();
+                }
+                
+                document.getElementById('addLinkModal').classList.remove('active');
+                document.getElementById('addLinkForm').reset();
+                window.showToast("Link added successfully!");
+            } catch(err) {
+                console.error(err); window.showToast("Failed to save link", true);
+            } finally {
+                btn.innerText = "Save to Hub"; btn.disabled = false;
+            }
+        };
     </script>
 </body>
 </html>
