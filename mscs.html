@@ -88,7 +88,7 @@
     }
     
     /* BACK camera ဖွင့်ချိန်တွင်သာ အရောင်ကို အမှန်အတိုင်း ပြန်လှည့်ပေးရန် */
-    .scanner-viewport:not(.mirror-active) video {
+    .scanner-viewport.back-cam-active video {
       filter: url(#swap-rgb) !important;
     }
     
@@ -1237,8 +1237,10 @@
         (errorMessage) => {}
       ).then(() => {
         var vp = document.getElementById('main-reader-viewport');
-        // Mirror active ကို အမြဲတမ်း ဖြုတ်ချထားပြီး ကင်မရာပုံရိပ်အတိုင်း တန်းဖတ်စေခြင်း
-        if(vp) { vp.classList.remove('mirror-active'); }
+        if(vp) { 
+          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
+          else { vp.classList.remove('back-cam-active'); }
+        }
       }).catch(err => {
         console.error("Main Camera Error: ", err);
       });
@@ -1336,7 +1338,10 @@
         (errorMessage) => {}
       ).then(() => {
         var vp = document.getElementById('fast-reader-viewport');
-        if(vp) { vp.classList.remove('mirror-active'); }
+        if(vp) { 
+          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
+          else { vp.classList.remove('back-cam-active'); }
+        }
       }).catch(err => {
         console.error("Fast Camera Error: ", err);
       });
@@ -1900,7 +1905,10 @@
         (errorMessage) => {}
       ).then(() => {
         var vp = document.getElementById('homework-reader-viewport');
-        if(vp) { vp.classList.remove('mirror-active'); }
+        if(vp) { 
+          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
+          else { vp.classList.remove('back-cam-active'); }
+        }
       }).catch(err => {
         console.error("Homework Camera Error: ", err);
       });
