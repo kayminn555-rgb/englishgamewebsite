@@ -85,9 +85,11 @@
     /* Mirror styling for FRONT camera only */
     .scanner-viewport.mirror-active video {
       transform: scaleX(-1) !important;
-    }/* စကင်နာကို Black & White Mode ပြောင်းရန် (အရောင်မှားသည့် Bug အား ဖြေရှင်းရန်) */
-    .scanner-viewport video {
-      filter: grayscale(100%) contrast(120%) !important;
+    }
+    
+    /* BACK camera ဖွင့်ချိန်တွင်သာ အရောင်ကို အမှန်အတိုင်း ပြန်လှည့်ပေးရန် */
+    .scanner-viewport:not(.mirror-active) video {
+      filter: url(#swap-rgb) !important;
     }
     
     /* ====== ONE PIECE THEME CONFIG ====== */
@@ -284,6 +286,16 @@
 </head>
 
 <body class="min-h-screen">
+  <!-- နောက်ကင်မရာအတွက် အရောင်ပြန်တည့်ပေးမည့် (Red-Blue Swap) SVG Filter -->
+  <svg style="display:none;">
+    <filter id="swap-rgb">
+      <feColorMatrix type="matrix" values="
+        0 0 1 0 0
+        0 1 0 0 0
+        1 0 0 0 0
+        0 0 0 1 0" />
+    </filter>
+  </svg>
   <div id="sidebar-overlay" class="hide-on-print" onclick="toggleSidebar(false)"></div>
   
   <div id="sidebar-menu" class="hide-on-print flex flex-col justify-between">
