@@ -85,6 +85,9 @@
     /* Mirror styling for FRONT camera only */
     .scanner-viewport.mirror-active video {
       transform: scaleX(-1) !important;
+    }/* စကင်နာကို Black & White Mode ပြောင်းရန် (အရောင်မှားသည့် Bug အား ဖြေရှင်းရန်) */
+    .scanner-viewport video {
+      filter: grayscale(100%) contrast(120%) !important;
     }
     
     /* ====== ONE PIECE THEME CONFIG ====== */
