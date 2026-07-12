@@ -15,236 +15,59 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
-    body { 
-      font-family: 'Sarabun', 'Inter', sans-serif; 
-      background-color: #f0fdf4; 
-      background-size: cover; 
-      background-position: center; 
-      background-repeat: no-repeat; 
-      transition: all 0.4s ease; 
-    }
+    body { font-family: 'Sarabun', 'Inter', sans-serif; background-color: #f0fdf4; background-size: cover; background-position: center; background-repeat: no-repeat; transition: all 0.4s ease; }
     .tab-content { display: none; }
     .tab-content.active { display: block !important; }
-    
-    .tab-btn { 
-      border-left: 4px solid transparent; 
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-      width: 100%; 
-      text-align: left; 
-      padding: 12px 16px; 
-      font-weight: 600; 
-      cursor: pointer; 
-    }
-    .tab-btn:hover { 
-      background-color: #f0fdf4; 
-      color: #16a34a; 
-      padding-left: 22px; 
-      border-left: 4px solid #bbf7d0; 
-    }
-    .tab-btn.active { 
-      border-left: 4px solid #16a34a !important; 
-      color: #166534 !important; 
-      font-weight: bold !important; 
-      background-color: #dcfce7; 
-      padding-left: 22px; 
-    }
-    
+    .tab-btn { border-left: 4px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: left; padding: 12px 16px; font-weight: 600; cursor: pointer; }
+    .tab-btn:hover { background-color: #f0fdf4; color: #16a34a; padding-left: 22px; border-left: 4px solid #bbf7d0; }
+    .tab-btn.active { border-left: 4px solid #16a34a !important; color: #166534 !important; font-weight: bold !important; background-color: #dcfce7; padding-left: 22px; }
     .action-btn-glow { transition: all 0.2s ease-in-out; }
-    .action-btn-glow:hover { 
-      transform: translateY(-1.5px); 
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); 
-      filter: brightness(1.06); 
-    }
+    .action-btn-glow:hover { transform: translateY(-1.5px); box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); filter: brightness(1.06); }
     .action-btn-orange:hover { box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); }
     .action-btn-gray:hover { box-shadow: 0 4px 12px rgba(55, 65, 81, 0.2); }
-    
-    #sidebar-menu { 
-      position: fixed; 
-      top: 0; 
-      left: -280px; 
-      width: 280px; 
-      height: 100%; 
-      background: white; 
-      box-shadow: 4px 0 15px rgba(0,0,0,0.08); 
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-      z-index: 100; 
-      overflow-y: auto; 
-    }
+    #sidebar-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: white; box-shadow: 4px 0 15px rgba(0,0,0,0.08); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; overflow-y: auto; }
     #sidebar-menu.open { left: 0; }
-    
-    #sidebar-overlay {
-      position: fixed; 
-      inset: 0; 
-      background: rgba(0,0,0,0.35); 
-      display: none; 
-      z-index: 90; 
-      backdrop-filter: blur(1.5px); 
-    }
+    #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; z-index: 90; backdrop-filter: blur(1.5px); }
     #sidebar-overlay.show { display: block; }
+    .scanner-viewport.mirror-active video { transform: scaleX(-1) !important; }
+    .scanner-viewport.back-cam-active video { filter: url(#swap-rgb) !important; }
     
-    /* Mirror styling for FRONT camera only */
-    .scanner-viewport.mirror-active video {
-      transform: scaleX(-1) !important;
-    }
-    
-    /* BACK camera ဖွင့်ချိန်တွင်သာ အရောင်ကို အမှန်အတိုင်း ပြန်လှည့်ပေးရန် */
-    .scanner-viewport.back-cam-active video {
-      filter: url(#swap-rgb) !important;
-    }
-    
-    /* ====== ONE PIECE THEME CONFIG ====== */
-    body.onepiece-mode {
-      background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true');
-      background-size: 100% calc(100vh - 60px) !important;
-      background-position: center 60px !important;
-      background-attachment: fixed !important;
-      background-repeat: no-repeat !important;
-    }
-    body.onepiece-mode .bg-white { 
-      background-color: rgba(255, 255, 255, 0.96); 
-      border-color: #e2e8f0; 
-      backdrop-filter: blur(4px); 
-    }
-    body.onepiece-mode #teacher-top-bar { 
-      background-color: #dfa119 !important; 
-      border-bottom: 3px solid #1e3a8a; 
-    }
-    body.onepiece-mode #current-active-tab-title { 
-      background-color: #1e3a8a !important; 
-      color: #ffffff !important; 
-      font-weight: 900; 
-    }
-    body.onepiece-mode .tab-btn:hover { 
-      background-color: #fef3c7; 
-      color: #b45309;
-      border-left-color: #fcd34d; 
-    }
-    body.onepiece-mode .tab-btn.active { 
-      border-left: 4px solid #dfa119 !important; 
-      color: #b45309 !important; 
-      background-color: #fef3c7; 
-    }
+    body.onepiece-mode { background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true'); background-size: 100% calc(100vh - 60px) !important; background-position: center 60px !important; background-attachment: fixed !important; background-repeat: no-repeat !important; }
+    body.onepiece-mode .bg-white { background-color: rgba(255, 255, 255, 0.96); border-color: #e2e8f0; backdrop-filter: blur(4px); }
+    body.onepiece-mode #teacher-top-bar { background-color: #dfa119 !important; border-bottom: 3px solid #1e3a8a; }
+    body.onepiece-mode #current-active-tab-title { background-color: #1e3a8a !important; color: #ffffff !important; font-weight: 900; }
+    body.onepiece-mode .tab-btn:hover { background-color: #fef3c7; color: #b45309; border-left-color: #fcd34d; }
+    body.onepiece-mode .tab-btn.active { border-left: 4px solid #dfa119 !important; color: #b45309 !important; background-color: #fef3c7; }
     body.onepiece-mode .text-green-900 { color: #b45309 !important; }
     body.onepiece-mode .bg-green-50 { background-color: #fffbeb !important; border-color: #fde68a !important; }
-    body.onepiece-mode .border-green-100 { border-color: #fde68a !important; }
-    body.onepiece-mode .border-green-300 { border-color: #fde68a !important; }
+    body.onepiece-mode .border-green-100, body.onepiece-mode .border-green-300 { border-color: #fde68a !important; }
     body.onepiece-mode .bg-green-600 { background-color: #dfa119 !important; }
     body.onepiece-mode .bg-green-600:hover { background-color: #b45309 !important; }
     body.onepiece-mode .action-btn-glow:hover { box-shadow: 0 4px 12px rgba(223, 161, 25, 0.4) !important; }
-    body.onepiece-mode .bg-green-50/20 { background-color: rgba(254, 251, 235, 0.6) !important; }
+    body.onepiece-mode .bg-green-50\/20 { background-color: rgba(254, 251, 235, 0.6) !important; }
 
-    /* ====== LIVERPOOL THEME CONFIG ====== */
-    body.liverpool-mode {
-      background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp');
-      background-size: cover !important;
-      background-position: center !important;
-      background-attachment: fixed !important;
-      background-repeat: no-repeat !important;
-    }
-    body.liverpool-mode .bg-white { 
-      background-color: rgba(255, 255, 255, 0.97); 
-      border-color: #f3f4f6; 
-      backdrop-filter: blur(5px); 
-    }
-    body.liverpool-mode #teacher-top-bar { 
-      background-color: #c8102e !important; 
-      border-bottom: 3px solid #f6eb61; 
-    }
-    body.liverpool-mode #current-active-tab-title { 
-      background-color: #f6eb61 !important; 
-      color: #c8102e !important; 
-      font-weight: 900; 
-    }
-    body.liverpool-mode .tab-btn:hover { 
-      background-color: #fde8e8; 
-      color: #c8102e;
-      border-left-color: #fecaca; 
-    }
-    body.liverpool-mode .tab-btn.active { 
-      border-left: 4px solid #c8102e !important; 
-      color: #c8102e !important; 
-      background-color: #fee2e2; 
-    }
+    body.liverpool-mode { background-image: url('https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-07_47_52-PM.webp'); background-size: cover !important; background-position: center !important; background-attachment: fixed !important; background-repeat: no-repeat !important; }
+    body.liverpool-mode .bg-white { background-color: rgba(255, 255, 255, 0.97); border-color: #f3f4f6; backdrop-filter: blur(5px); }
+    body.liverpool-mode #teacher-top-bar { background-color: #c8102e !important; border-bottom: 3px solid #f6eb61; }
+    body.liverpool-mode #current-active-tab-title { background-color: #f6eb61 !important; color: #c8102e !important; font-weight: 900; }
+    body.liverpool-mode .tab-btn:hover { background-color: #fde8e8; color: #c8102e; border-left-color: #fecaca; }
+    body.liverpool-mode .tab-btn.active { border-left: 4px solid #c8102e !important; color: #c8102e !important; background-color: #fee2e2; }
     body.liverpool-mode .text-green-900 { color: #c8102e !important; }
     body.liverpool-mode .bg-green-50 { background-color: #fef2f2 !important; border-color: #fca5a5 !important; }
-    body.liverpool-mode .border-green-100 { border-color: #fca5a5 !important; }
-    body.liverpool-mode .border-green-300 { border-color: #fca5a5 !important; }
+    body.liverpool-mode .border-green-100, body.liverpool-mode .border-green-300 { border-color: #fca5a5 !important; }
     body.liverpool-mode .bg-green-600 { background-color: #c8102e !important; }
     body.liverpool-mode .bg-green-600:hover { background-color: #a00d25 !important; }
     body.liverpool-mode .action-btn-glow:hover { box-shadow: 0 4px 12px rgba(200, 16, 46, 0.4) !important; }
-    body.liverpool-mode .bg-green-50/20 { background-color: rgba(254, 242, 242, 0.6) !important; }
+    body.liverpool-mode .bg-green-50\/20 { background-color: rgba(254, 242, 242, 0.6) !important; }
     
-    .theme-switch-container { 
-      display: flex; 
-      flex-direction: column;
-      padding: 12px 16px; 
-      margin: 8px; 
-      background: #f8fafc; 
-      border-radius: 12px; 
-      border: 1px solid #e2e8f0; 
-    }
+    .theme-switch-container { display: flex; flex-direction: column; padding: 12px 16px; margin: 8px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
     
-    /* ====== CARD DESIGN CONFIGURATION ====== */
-    .student-card {
-      width: 86mm !important;
-      height: 54mm !important;
-      min-width: 86mm !important;
-      min-height: 54mm !important;
-      position: relative;
-      background-color: #ffffff;
-      overflow: hidden;
-      box-sizing: border-box;
-      border-radius: 6mm;
-    }
-    
-    .card-content-wrapper { 
-      position: relative; 
-      z-index: 10; 
-      width: 100%; 
-      height: 100%; 
-      box-sizing: border-box; 
-    }
-    
-    .info-value-text { 
-      font-family: 'Sarabun', Arial, sans-serif; 
-      font-weight: 800; 
-      color: #000000 !important; 
-      white-space: nowrap; 
-      overflow: visible; 
-      text-overflow: ellipsis;
-      line-height: 0.3; 
-    }
-    
-    .qr-container-box {
-      position: absolute;
-      top: 19.5mm; 
-      right: 9.5mm; 
-      width: 14.5mm;
-      height: 14.5mm;
-      background: transparent; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 30;
-    }
+    .student-card { width: 86mm !important; height: 54mm !important; min-width: 86mm !important; min-height: 54mm !important; position: relative; background-color: #ffffff; overflow: hidden; box-sizing: border-box; border-radius: 6mm; }
+    .card-content-wrapper { position: relative; z-index: 10; width: 100%; height: 100%; box-sizing: border-box; }
+    .info-value-text { font-family: 'Sarabun', Arial, sans-serif; font-weight: 800; color: #000000 !important; white-space: nowrap; overflow: visible; text-overflow: ellipsis; line-height: 0.3; }
+    .qr-container-box { position: absolute; top: 19.5mm; right: 9.5mm; width: 14.5mm; height: 14.5mm; background: transparent; display: flex; align-items: center; justify-content: center; z-index: 30; }
     .qr-container-box img, .qr-container-box canvas { width: 100% !important; height: 100% !important; object-fit: contain; }
-    
-    .barcode-tray-wrapper {
-      position: absolute;
-      top: 35.5mm; 
-      right: 4.5mm;
-      width: 21.5mm;
-      height: 7.5mm;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      z-index: 40;
-      border-radius: 0.8mm;
-      padding: 0.4mm;
-    }
+    .barcode-tray-wrapper { position: absolute; top: 35.5mm; right: 4.5mm; width: 21.5mm; height: 7.5mm; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; z-index: 40; border-radius: 0.8mm; padding: 0.4mm; }
     .barcode-tray-wrapper svg { width: 100% !important; height: 100% !important; }
     .card-wrapper-spacer { margin: 10px; display: inline-block; }
     
@@ -252,49 +75,17 @@
       @page { size: A4 portrait; margin: 15mm 4mm 4mm 4mm !important; }
       body { background-color: #ffffff !important; margin: 0mm !important; padding: 0mm !important; }
       .hide-on-print { display: none !important; }
-      
-      #print-area { 
-        display: grid !important; 
-        grid-template-columns: 1fr 1fr !important;
-        grid-template-rows: repeat(4, auto) !important; 
-        row-gap: 8mm !important; 
-        column-gap: 6mm !important; 
-        width: 202mm !important; 
-        margin: 0mm auto !important; 
-        padding: 12mm 0mm !important; 
-        box-sizing: border-box !important; 
-        background: transparent !important;
-        page-break-after: always !important; 
-      }
-      .card-wrapper-spacer { 
-        margin: 0mm !important; 
-        padding: 0mm !important; 
-        display: flex !important; 
-        justify-content: center !important; 
-        page-break-inside: avoid !important; 
-        break-inside: avoid !important; 
-      }
-      .student-card { 
-        page-break-inside: avoid !important; 
-        break-inside: avoid !important;
-        -webkit-print-color-adjust: exact !important; 
-        print-color-adjust: exact !important; 
-      }
+      #print-area { display: grid !important; grid-template-columns: 1fr 1fr !important; grid-template-rows: repeat(4, auto) !important; row-gap: 8mm !important; column-gap: 6mm !important; width: 202mm !important; margin: 0mm auto !important; padding: 12mm 0mm !important; box-sizing: border-box !important; background: transparent !important; page-break-after: always !important; }
+      .card-wrapper-spacer { margin: 0mm !important; padding: 0mm !important; display: flex !important; justify-content: center !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+      .student-card { page-break-inside: avoid !important; break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .card-excluded, .card-action-bar { display: none !important; }
     }
   </style>
 </head>
 
 <body class="min-h-screen">
-  <!-- နောက်ကင်မရာအတွက် အရောင်ပြန်တည့်ပေးမည့် (Red-Blue Swap) SVG Filter -->
   <svg style="display:none;">
-    <filter id="swap-rgb">
-      <feColorMatrix type="matrix" values="
-        0 0 1 0 0
-        0 1 0 0 0
-        1 0 0 0 0
-        0 0 0 1 0" />
-    </filter>
+    <filter id="swap-rgb"><feColorMatrix type="matrix" values="0 0 1 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0" /></filter>
   </svg>
   <div id="sidebar-overlay" class="hide-on-print" onclick="toggleSidebar(false)"></div>
   
@@ -316,6 +107,24 @@
           <option value="liverpool">Liverpool FC Theme</option>
         </select>
       </div>
+
+      <!-- ======= အသစ်ထပ်ထည့်ထားသော GLOBAL YEAR / SEMESTER / SUBJECT SELECTORS ======= -->
+      <div class="theme-switch-container hide-on-print mt-1">
+        <label class="text-[11px] font-bold text-blue-700 mb-1">Academic Year</label>
+        <select id="global-year" class="w-full p-2 border rounded-xl text-xs font-semibold bg-white outline-none mb-2 border-blue-200">
+          <option value="2026-2027">2026-2027</option>
+          <option value="2027-2028">2027-2028</option>
+          <option value="2028-2029">2028-2029</option>
+        </select>
+
+        <label class="text-[11px] font-bold text-blue-700 mb-1">Semester</label>
+        <select id="global-sem" class="w-full p-2 border rounded-xl text-xs font-semibold bg-white outline-none mb-2 border-blue-200">
+          <option value="Semester 1">Semester 1</option>
+          <option value="Semester 2">Semester 2</option>
+        </select>
+
+      </div>
+      <!-- ========================================================================= -->
       
       <nav class="mt-1 space-y-1 px-2">
         <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn flex items-center space-x-2 text-gray-700 text-sm rounded-xl"><span>1. Main Scanner</span></button>
@@ -399,17 +208,18 @@
       <div id="tab1" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-900 pb-2 border-b">1. Attendance Main Entry</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div>
             <label class="block text-sm font-semibold text-gray-600 mb-1">Select Class</label>
             <select id="scanner-class" onchange="onClassChangeScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
               <option value="">-- Choose Class --</option>
-              <option value="1/1">1/1</option><option value="1/2">1/2</option>
-              <option value="2/1">2/1</option><option value="2/2">2/2</option>
-              <option value="3/1">3/1</option><option value="3/2">3/2</option>
-              <option value="4/1">4/1</option><option value="4/2">4/2</option>
-              <option value="5/1">5/1</option><option value="5/2">5/2</option>
-              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option><option value="2/1">2/1</option><option value="2/2">2/2</option><option value="3/1">3/1</option><option value="3/2">3/2</option><option value="4/1">4/1</option><option value="4/2">4/2</option><option value="5/1">5/1</option><option value="5/2">5/2</option><option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Select Subject</label>
+            <select id="scanner-subject" onchange="onSubjectChangeScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none font-bold text-blue-700">
+              <option value="">-- Choose Subject --</option>
             </select>
           </div>
           <div>
@@ -457,17 +267,18 @@
       <div id="tab1_fast" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-blue-900 pb-2 border-b">1.1 Fast Continuous Attendance Scanner (No Pop-ups)</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Select Class</label>
             <select id="fast-scanner-class" onchange="onClassChangeFastScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
               <option value="">-- Choose Class --</option>
-              <option value="1/1">1/1</option><option value="1/2">1/2</option>
-              <option value="2/1">2/1</option><option value="2/2">2/2</option>
-              <option value="3/1">3/1</option><option value="3/2">3/2</option>
-              <option value="4/1">4/1</option><option value="4/2">4/2</option>
-              <option value="5/1">5/1</option><option value="5/2">5/2</option>
-              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option><option value="2/1">2/1</option><option value="2/2">2/2</option><option value="3/1">3/1</option><option value="3/2">3/2</option><option value="4/1">4/1</option><option value="4/2">4/2</option><option value="5/1">5/1</option><option value="5/2">5/2</option><option value="6/1">6/1</option><option value="6/2">6/2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Subject</label>
+            <select id="fast-scanner-subject" onchange="onSubjectChangeFastScanner()" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none font-bold text-blue-700">
+              <option value="">-- Choose Subject --</option>
             </select>
           </div>
           <div>
@@ -570,11 +381,15 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Lesson Topic Title</label>
             <div class="mb-4">
-  <label class="block text-sm font-semibold text-gray-700 mb-1">Unit Name (ဥပမာ - Unit 1)</label>
-  <input type="text" id="add-unit-name" placeholder="Enter Unit Name..." class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
-</div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Subject Name</label>
+              <input type="text" id="lesson-subject" placeholder="e.g. English" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none font-bold text-blue-800">
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Unit Name (ဥပမာ - Unit 1)</label>
+              <input type="text" id="add-unit-name" placeholder="Enter Unit Name..." class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
+            </div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Lesson Topic Title</label>
             <input type="text" id="lesson-name" placeholder="e.g., Unit 1 Speaking" class="w-full p-2 border rounded-lg">
           </div>
           <button onclick="saveNewLesson()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-bold action-btn-glow">Save Topic</button>
@@ -632,32 +447,33 @@
       
       <div id="tab5" class="tab-content bg-white rounded-2xl border p-6 hide-on-print shadow-sm">
         <h2 class="text-xl font-bold mb-4 text-green-900 border-b pb-2">5. Lesson Submission Live Tracker</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 bg-gray-50 p-4 rounded-xl items-end">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Class</label>
-            <select id="tracker-class" onchange="onClassChangeTracker()" class="w-full p-2 border rounded-lg bg-white">
-              <option value="">-- Choose Class --</option>
-              <option value="1/1">1/1</option><option value="1/2">1/2</option>
-              <option value="2/1">2/1</option><option value="2/2">2/2</option>
-              <option value="3/1">3/1</option><option value="3/2">3/2</option>
-              <option value="4/1">4/1</option><option value="4/2">4/2</option>
-              <option value="5/1">5/1</option><option value="5/2">5/2</option>
-              <option value="6/1">6/1</option><option value="6/2">6/2</option>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Class</label>
+            <select id="tracker-class" onchange="onClassChangeTracker()" class="w-full p-2 border rounded-lg bg-white text-sm">
+              <option value="">-- Class --</option>
+              <option value="1/1">1/1</option><option value="1/2">1/2</option><option value="2/1">2/1</option><option value="2/2">2/2</option><option value="3/1">3/1</option><option value="3/2">3/2</option><option value="4/1">4/1</option><option value="4/2">4/2</option><option value="5/1">5/1</option><option value="5/2">5/2</option><option value="6/1">6/1</option><option value="6/2">6/2</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Unit</label>
-            <select id="tracker-unit" onchange="onUnitChangeTracker()" class="w-full p-2 border rounded-lg bg-white">
-              <option value="">-- Choose Unit --</option>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Subject</label>
+            <select id="tracker-subject" onchange="onSubjectChangeTracker()" class="w-full p-2 border rounded-lg bg-white text-sm">
+              <option value="">-- Subject --</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Lesson</label>
-            <select id="tracker-lesson" class="w-full p-2 border rounded-lg bg-white">
-              <option value="">-- Choose Lesson --</option>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Unit</label>
+            <select id="tracker-unit" onchange="onUnitChangeTracker()" class="w-full p-2 border rounded-lg bg-white text-sm">
+              <option value="">-- Unit --</option>
             </select>
           </div>
-          <button onclick="fetchTrackerStatus()" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 h-10 text-sm action-btn-glow">Check Tracker</button>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Lesson</label>
+            <select id="tracker-lesson" class="w-full p-2 border rounded-lg bg-white text-sm">
+              <option value="">-- Lesson --</option>
+            </select>
+          </div>
+          <button onclick="fetchTrackerStatus()" class="bg-green-600 text-white font-bold py-2 px-2 rounded-lg hover:bg-green-700 h-10 text-sm action-btn-glow w-full">Check</button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -847,21 +663,13 @@
       try {
         params.action = action;
         const response = await fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
+          method: "POST", mode: "cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(params)
         });
-        if (!response.ok) {
-          throw new Error("HTTP connection failed status: " + response.status);
-        }
+        if (!response.ok) { throw new Error("HTTP connection failed status: " + response.status); }
         const data = await response.json();
-        if (data && data.error) {
-          console.error("Backend Error Response: ", data.error);
-          return null;
-        }
+        if (data && data.error) { console.error("Backend Error Response: ", data.error); return null; }
         return data;
       } catch (err) {
         console.error("Network interface error calling GAS API: ", err);
@@ -877,18 +685,14 @@
     var html5QrScannerHomework = null;
     var scanThrottleLock = false;
 
-    // CAMERA FACING MANAGEMENT STATE VARIABLES
     var mainCamFacingMode = "user";
     var fastCamFacingMode = "user";
     var homeworkCamFacingMode = "user";
 
     function applySystemTheme(themeName) {
       document.body.classList.remove('onepiece-mode', 'liverpool-mode');
-      if (themeName === 'onepiece') {
-        document.body.classList.add('onepiece-mode');
-      } else if (themeName === 'liverpool') {
-        document.body.classList.add('liverpool-mode');
-      }
+      if (themeName === 'onepiece') { document.body.classList.add('onepiece-mode'); } 
+      else if (themeName === 'liverpool') { document.body.classList.add('liverpool-mode'); }
       localStorage.setItem('selectedSystemThemeActive', themeName);
       const ddn = document.getElementById('theme-selector-dropdown');
       if (ddn) ddn.value = themeName;
@@ -949,9 +753,7 @@
         alert("SYSTEM KEY FOUND! \nYour current password code is: " + MASTER_SECRET_KEY);
         document.getElementById('change-pass-tray').classList.remove('hidden');
         document.getElementById('new-password-input').focus();
-      } else { 
-        alert("X Phone number mismatch!"); 
-      }
+      } else { alert("X Phone number mismatch!"); }
     }
 
     function saveNewPasswordAdministrative() {
@@ -965,9 +767,7 @@
     }
 
     function logoutSessionBackToGateway() {
-      stopMainCameraEngine();
-      stopFastCameraEngine();
-      stopHomeworkCameraEngine();
+      stopMainCameraEngine(); stopFastCameraEngine(); stopHomeworkCameraEngine();
       document.getElementById('system-master-frame').classList.add('hidden');
       document.getElementById('student-isolated-frame').classList.add('hidden');
       document.getElementById('teacher-top-bar').classList.add('hidden');
@@ -978,167 +778,127 @@
 
     function switchTab(tabId) {
       var contents = document.getElementsByClassName('tab-content');
-      for (var i=0; i < contents.length; i++) { 
-        contents[i].style.setProperty('display', 'none', 'important');
-      }
+      for (var i=0; i < contents.length; i++) { contents[i].style.setProperty('display', 'none', 'important'); }
       var buttons = document.getElementsByClassName('tab-btn');
-      for (var i=0; i< buttons.length; i++) { 
-        buttons[i].classList.remove('active'); 
-      }
+      for (var i=0; i< buttons.length; i++) { buttons[i].classList.remove('active'); }
       var activeBtnNode = document.getElementById('btn-' + tabId);
-      if(activeBtnNode) { 
-        document.getElementById('current-active-tab-title').textContent = activeBtnNode.textContent.trim(); 
-      }
+      if(activeBtnNode) { document.getElementById('current-active-tab-title').textContent = activeBtnNode.textContent.trim(); }
       document.getElementById(tabId).style.setProperty('display', 'block', 'important');
-      if(document.getElementById('btn-' + tabId)) { 
-        document.getElementById('btn-' + tabId).classList.add('active'); 
-      }
+      if(document.getElementById('btn-' + tabId)) { document.getElementById('btn-' + tabId).classList.add('active'); }
       toggleSidebar(false);
       
-      if (tabId === 'tab1') {
-        document.getElementById('hardware-scanner-input').focus();
-      } else {
-        stopMainCameraEngine();
-      }
-      if (tabId === 'tab1_fast') {
-        document.getElementById('fast-hardware-input').focus();
-      } else {
-        stopFastCameraEngine();
-      }
-      if (tabId !== 'tab6') {
-        stopHomeworkCameraEngine();
-      }
+      if (tabId === 'tab1') { document.getElementById('hardware-scanner-input').focus(); } else { stopMainCameraEngine(); }
+      if (tabId === 'tab1_fast') { document.getElementById('fast-hardware-input').focus(); } else { stopFastCameraEngine(); }
+      if (tabId !== 'tab6') { stopHomeworkCameraEngine(); }
     }
 
     function beep() { 
       var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var osc = audioCtx.createOscillator(); 
-      osc.connect(audioCtx.destination); 
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.1); 
+      var osc = audioCtx.createOscillator(); osc.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1); 
     }
 
-    // --- (၁) Main Scanner ပိုင်း ---
+    function getGradeFromClass(cls) {
+      if(!cls) return 'Grade 3';
+      if (cls.indexOf('1') === 0) return 'Grade 1'; else if (cls.indexOf('2') === 0) return 'Grade 2';
+      else if (cls.indexOf('3') === 0) return 'Grade 3'; else if (cls.indexOf('4') === 0) return 'Grade 4';
+      else if (cls.indexOf('5') === 0) return 'Grade 5'; else if (cls.indexOf('6') === 0) return 'Grade 6';
+      return 'Grade 3';
+    }
+
+    // --- MAIN SCANNER ---
     async function onClassChangeScanner() {
       var cls = document.getElementById('scanner-class').value;
-      var unitSelect = document.getElementById('scanner-unit');
-      var lessonSelect = document.getElementById('scanner-lesson');
-      
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-      if (!cls) return;
-      
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      unitSelect.innerHTML = '<option value="">Loading Units...</option>';
-      const units = await runGAS("getUnitsByGrade", { grade: grade }); // ဤနေရာတွင် ပြင်ဆင်ထားပါသည်
-      
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      if (units && units.length > 0) {
-        units.forEach(u => unitSelect.innerHTML += '<option value="'+u+'">'+u+'</option>');
-      }
+      var sub = document.getElementById('scanner-subject'); var unit = document.getElementById('scanner-unit'); var les = document.getElementById('scanner-lesson');
+      sub.innerHTML = '<option value="">-- Choose Subject --</option>'; unit.innerHTML = '<option value="">-- Choose Unit --</option>'; les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (!cls) { loadEmergencyChecklist(); return; }
+      sub.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getSubjectsByGrade", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls) });
+      sub.innerHTML = '<option value="">-- Choose Subject --</option>';
+      if(data) data.forEach(d => sub.innerHTML += '<option value="'+d+'">'+d+'</option>');
       loadEmergencyChecklist();
     }
-
+    async function onSubjectChangeScanner() {
+      var cls = document.getElementById('scanner-class').value; var subVal = document.getElementById('scanner-subject').value;
+      var unit = document.getElementById('scanner-unit'); var les = document.getElementById('scanner-lesson');
+      unit.innerHTML = '<option value="">-- Choose Unit --</option>'; les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (!cls || !subVal) return;
+      unit.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getUnitsBySubject", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal });
+      unit.innerHTML = '<option value="">-- Choose Unit --</option>';
+      if(data) data.forEach(d => unit.innerHTML += '<option value="'+d+'">'+d+'</option>');
+    }
     async function onUnitChangeScanner() {
-      var cls = document.getElementById('scanner-class').value;
-      var unit = document.getElementById('scanner-unit').value;
-      var lessonSelect = document.getElementById('scanner-lesson');
-      
-      if (!cls || !unit) {
-        lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-        return;
-      }
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      lessonSelect.innerHTML = '<option value="">Loading Lessons...</option>';
-      const lessons = await runGAS("getLessonsByUnit", { grade: grade, unit: unit });
-      
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-      if (lessons && lessons.length > 0) {
-        lessons.forEach(l => lessonSelect.innerHTML += '<option value="'+l+'">'+l+'</option>');
-      }
+      var cls = document.getElementById('scanner-class').value; var subVal = document.getElementById('scanner-subject').value; var unitVal = document.getElementById('scanner-unit').value;
+      var les = document.getElementById('scanner-lesson'); les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (!cls || !subVal || !unitVal) return;
+      les.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getLessonsByUnit", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal, unit: unitVal });
+      les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if(data) data.forEach(d => les.innerHTML += '<option value="'+d+'">'+d+'</option>');
     }
 
-    // --- (၂) Fast Scanner ပိုင်း ---
+    // --- FAST SCANNER ---
     async function onClassChangeFastScanner() {
       var cls = document.getElementById('fast-scanner-class').value;
-      var unitSelect = document.getElementById('fast-scanner-unit');
-      var lessonSelect = document.getElementById('fast-scanner-lesson');
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      var sub = document.getElementById('fast-scanner-subject'); var unit = document.getElementById('fast-scanner-unit'); var les = document.getElementById('fast-scanner-lesson');
+      sub.innerHTML = '<option value="">-- Choose Subject --</option>'; unit.innerHTML = '<option value="">-- Choose Unit --</option>'; les.innerHTML = '<option value="">-- Choose Lesson --</option>';
       if (!cls) return;
-      
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      unitSelect.innerHTML = '<option value="">Loading Units...</option>';
-      const units = await runGAS("getUnitsByGrade", { grade: grade });
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      if (units && units.length > 0) {
-        units.forEach(u => unitSelect.innerHTML += '<option value="'+u+'">'+u+'</option>');
-      }
+      sub.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getSubjectsByGrade", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls) });
+      sub.innerHTML = '<option value="">-- Choose Subject --</option>';
+      if(data) data.forEach(d => sub.innerHTML += '<option value="'+d+'">'+d+'</option>');
     }
-
+    async function onSubjectChangeFastScanner() {
+      var cls = document.getElementById('fast-scanner-class').value; var subVal = document.getElementById('fast-scanner-subject').value;
+      var unit = document.getElementById('fast-scanner-unit'); var les = document.getElementById('fast-scanner-lesson');
+      unit.innerHTML = '<option value="">-- Choose Unit --</option>'; les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (!cls || !subVal) return;
+      unit.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getUnitsBySubject", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal });
+      unit.innerHTML = '<option value="">-- Choose Unit --</option>';
+      if(data) data.forEach(d => unit.innerHTML += '<option value="'+d+'">'+d+'</option>');
+    }
     async function onUnitChangeFastScanner() {
-      var cls = document.getElementById('fast-scanner-class').value;
-      var unit = document.getElementById('fast-scanner-unit').value;
-      var lessonSelect = document.getElementById('fast-scanner-lesson');
-      if (!cls || !unit) {
-        lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-        return;
-      }
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      lessonSelect.innerHTML = '<option value="">Loading Lessons...</option>';
-      const lessons = await runGAS("getLessonsByUnit", { grade: grade, unit: unit });
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-      if (lessons && lessons.length > 0) {
-        lessons.forEach(l => lessonSelect.innerHTML += '<option value="'+l+'">'+l+'</option>');
-      }
+      var cls = document.getElementById('fast-scanner-class').value; var subVal = document.getElementById('fast-scanner-subject').value; var unitVal = document.getElementById('fast-scanner-unit').value;
+      var les = document.getElementById('fast-scanner-lesson'); les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if (!cls || !subVal || !unitVal) return;
+      les.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getLessonsByUnit", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal, unit: unitVal });
+      les.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      if(data) data.forEach(d => les.innerHTML += '<option value="'+d+'">'+d+'</option>');
     }
 
-    // --- (၃) Tracker Status ပိုင်း ---
+    // --- TRACKER ---
     async function onClassChangeTracker() {
       var cls = document.getElementById('tracker-class').value;
-      var unitSelect = document.getElementById('tracker-unit');
-      var lessonSelect = document.getElementById('tracker-lesson');
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
+      var sub = document.getElementById('tracker-subject'); var unit = document.getElementById('tracker-unit'); var les = document.getElementById('tracker-lesson');
+      sub.innerHTML = '<option value="">-- Subject --</option>'; unit.innerHTML = '<option value="">-- Unit --</option>'; les.innerHTML = '<option value="">-- Lesson --</option>';
       if (!cls) return;
-      
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      unitSelect.innerHTML = '<option value="">Loading Units...</option>';
-      const units = await runGAS("getUnitsByGrade", { grade: grade });
-      unitSelect.innerHTML = '<option value="">-- Choose Unit --</option>';
-      if (units && units.length > 0) {
-        units.forEach(u => unitSelect.innerHTML += '<option value="'+u+'">'+u+'</option>');
-      }
+      sub.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getSubjectsByGrade", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls) });
+      sub.innerHTML = '<option value="">-- Subject --</option>';
+      if(data) data.forEach(d => sub.innerHTML += '<option value="'+d+'">'+d+'</option>');
+    }
+    async function onSubjectChangeTracker() {
+      var cls = document.getElementById('tracker-class').value; var subVal = document.getElementById('tracker-subject').value;
+      var unit = document.getElementById('tracker-unit'); var les = document.getElementById('tracker-lesson');
+      unit.innerHTML = '<option value="">-- Unit --</option>'; les.innerHTML = '<option value="">-- Lesson --</option>';
+      if (!cls || !subVal) return;
+      unit.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getUnitsBySubject", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal });
+      unit.innerHTML = '<option value="">-- Unit --</option>';
+      if(data) data.forEach(d => unit.innerHTML += '<option value="'+d+'">'+d+'</option>');
+    }
+    async function onUnitChangeTracker() {
+      var cls = document.getElementById('tracker-class').value; var subVal = document.getElementById('tracker-subject').value; var unitVal = document.getElementById('tracker-unit').value;
+      var les = document.getElementById('tracker-lesson'); les.innerHTML = '<option value="">-- Lesson --</option>';
+      if (!cls || !subVal || !unitVal) return;
+      les.innerHTML = '<option value="">Loading...</option>';
+      const data = await runGAS("getLessonsByUnit", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: getGradeFromClass(cls), subject: subVal, unit: unitVal });
+      les.innerHTML = '<option value="">-- Lesson --</option>';
+      if(data) data.forEach(d => les.innerHTML += '<option value="'+d+'">'+d+'</option>');
     }
 
-    async function onUnitChangeTracker() {
-      var cls = document.getElementById('tracker-class').value;
-      var unit = document.getElementById('tracker-unit').value;
-      var lessonSelect = document.getElementById('tracker-lesson');
-      if (!cls || !unit) {
-        lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-        return;
-      }
-      var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
-      lessonSelect.innerHTML = '<option value="">Loading Lessons...</option>';
-      const lessons = await runGAS("getLessonsByUnit", { grade: grade, unit: unit });
-      lessonSelect.innerHTML = '<option value="">-- Choose Lesson --</option>';
-      if (lessons && lessons.length > 0) {
-        lessons.forEach(l => lessonSelect.innerHTML += '<option value="'+l+'">'+l+'</option>');
-      }
-    }
 
     async function loadEmergencyChecklist() {
       var selectedClass = document.getElementById('scanner-class').value; 
@@ -1158,36 +918,26 @@
           label.innerHTML = '<input type="checkbox" onchange="submitManualCheck(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-5 w-5 text-green-600"><span class="select-none font-semibold text-sm">'+student.name+' ('+student.id+')</span>';
           container.appendChild(label);
         });
-      } else {
-        container.innerHTML = '<p class="text-red-500">No students found.</p>';
-      }
+      } else { container.innerHTML = '<p class="text-red-500">No students found.</p>'; }
     }
 
     async function submitManualCheck(cb, id, name, className) {
       if (!cb.checked) return; 
       var lesson = document.getElementById('scanner-lesson').value;
-      if (!lesson) { 
-        alert("Please select a Current Lesson first!"); 
-        cb.checked = false; 
-        return; 
-      }
+      if (!lesson) { alert("Please select a Current Lesson first!"); cb.checked = false; return; }
       beep(); 
       openTvModal(name, id, lesson, "ATTENDANCE RECEIVED"); 
       cb.disabled = true;
-      await runGAS("saveRecord", { studentId: id, name: name, className: className, lesson: lesson });
+      await runGAS("saveRecord", { studentId: id, name: name, className: className, lesson: lesson, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: document.getElementById('scanner-subject').value });
     }
 
     function triggerManualSubmit() {
       var inputEl = document.getElementById('hardware-scanner-input'); 
-      var value = inputEl.value.trim(); 
-      inputEl.value=''; 
+      var value = inputEl.value.trim(); inputEl.value=''; 
       if (!value) return;
       var selectedClass = document.getElementById('scanner-class').value; 
       var selectedLesson = document.getElementById('scanner-lesson').value; 
-      if (!selectedClass || !selectedLesson) { 
-        alert("Please select Class and Lesson Topic first!");
-        return; 
-      }
+      if (!selectedClass || !selectedLesson) { alert("Please select Class and Lesson Topic first!"); return; }
       processSubmittedId(value, selectedClass, selectedLesson);
     }
 
@@ -1200,34 +950,20 @@
       const students = await runGAS("getStudentsByClass", { className: cls });
       if (students) {
         var match = students.find(s => s.id.toString().toLowerCase() === id.toLowerCase());
-        if(!match) { 
-          status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; 
-          status.textContent = "ID Not Found in Class!"; 
-          return; 
-        }
-        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-green-100 text-green-800 block"; 
-        status.textContent = "Success!";
+        if(!match) { status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; status.textContent = "ID Not Found in Class!"; return; }
+        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-green-100 text-green-800 block"; status.textContent = "Success!";
         openTvModal(match.name, match.id, lesson, "ATTENDANCE RECEIVED");
-        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson });
+        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: document.getElementById('scanner-subject').value });
       } else {
-        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; 
-        status.textContent = "Error loading class database.";
+        status.className = "mt-4 p-3 rounded-xl text-center font-bold bg-red-100 text-red-800 block"; status.textContent = "Error loading class database.";
       }
     }
 
     function startMainCameraEngine() {
       let currentFacing = mainCamFacingMode;
       html5QrScannerMain = new Html5Qrcode("main-reader-viewport");
-      // fps တိုးမြှင့်ခြင်း၊ qrbox ဘောင်ဖြုတ်ခြင်းနှင့် Tablet အရောင်မှန်ရန် resolution constraint ထည့်သွင်းခြင်း
-      const config = { 
-        fps: 15, 
-        videoConstraints: {
-          facingMode: currentFacing
-        }
-      };
-      html5QrScannerMain.start(
-        { facingMode: currentFacing },
-        config,
+      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      html5QrScannerMain.start( { facingMode: currentFacing }, config,
         (decodedText, decodedResult) => {
           document.getElementById('hardware-scanner-input').value = decodedText;
           triggerManualSubmit();
@@ -1237,134 +973,71 @@
         (errorMessage) => {}
       ).then(() => {
         var vp = document.getElementById('main-reader-viewport');
-        if(vp) { 
-          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
-          else { vp.classList.remove('back-cam-active'); }
-        }
-      }).catch(err => {
-        console.error("Main Camera Error: ", err);
-      });
+        if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+      }).catch(err => { console.error("Main Camera Error: ", err); });
     }
     function switchMainCameraFacing() {
       mainCamFacingMode = (mainCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerMain && html5QrScannerMain.isScanning) {
-        html5QrScannerMain.stop().then(() => { startMainCameraEngine(); });
-      } else {
-        var vp = document.getElementById('main-reader-viewport');
-        if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-        else { vp.classList.remove('mirror-active'); }
-      }
+      if(html5QrScannerMain && html5QrScannerMain.isScanning) { html5QrScannerMain.stop().then(() => { startMainCameraEngine(); });
+      } else { var vp = document.getElementById('main-reader-viewport'); if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
     }
-
-    function stopMainCameraEngine() { 
-      if(html5QrScannerMain && html5QrScannerMain.isScanning) { 
-        html5QrScannerMain.stop().then(() => {
-          document.getElementById('main-reader-viewport').innerHTML = ''; 
-        }); 
-      } 
-    }
+    function stopMainCameraEngine() { if(html5QrScannerMain && html5QrScannerMain.isScanning) { html5QrScannerMain.stop().then(() => { document.getElementById('main-reader-viewport').innerHTML = ''; }); } }
 
     function triggerFastManualSubmit() {
       var inputEl = document.getElementById('fast-hardware-input'); 
-      var value = inputEl.value.trim();
-      inputEl.value = ''; 
+      var value = inputEl.value.trim(); inputEl.value = ''; 
       if (!value) return;
       var selectedClass = document.getElementById('fast-scanner-class').value; 
       var selectedLesson = document.getElementById('fast-scanner-lesson').value;
-      if (!selectedClass || !selectedLesson) { 
-        alert("Please select Class and Lesson Topic first!");
-        inputEl.focus(); 
-        return; 
-      }
+      if (!selectedClass || !selectedLesson) { alert("Please select Class and Lesson Topic first!"); inputEl.focus(); return; }
       processFastContinuousId(value, selectedClass, selectedLesson);
     }
 
     async function processFastContinuousId(id, cls, lesson) {
       beep(); 
       var toast = document.getElementById('fast-scan-status-toast'); 
-      toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block";
-      toast.textContent = "Checking ID: " + id + "...";
+      toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; toast.textContent = "Checking ID: " + id + "...";
       
       const students = await runGAS("getStudentsByClass", { className: cls });
       if (students) {
         var match = students.find(s => s.id.toString().toLowerCase() === id.toLowerCase());
-        if(!match) { 
-          toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
-          toast.textContent = "X ID " + id + " not found in Class " + cls;
-          document.getElementById('fast-hardware-input').focus(); 
-          return; 
-        }
-        toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
-        toast.textContent = match.name + " (" + match.id + ") Received Successfully!";
+        if(!match) { toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; toast.textContent = "X ID " + id + " not found in Class " + cls; document.getElementById('fast-hardware-input').focus(); return; }
+        toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; toast.textContent = match.name + " (" + match.id + ") Received Successfully!";
         
-        var emptyRow = document.getElementById('fast-queue-empty-row'); 
-        if (emptyRow) emptyRow.remove(); 
+        var emptyRow = document.getElementById('fast-queue-empty-row'); if (emptyRow) emptyRow.remove(); 
         fastScannerIndexCount++;
         
         var tbody = document.getElementById('fast-queue-table-body'); 
-        var tr = document.createElement('tr'); 
-        tr.className = "bg-green-50/50 hover:bg-green-50 transition";
-        var now = new Date(); 
-        var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+        var tr = document.createElement('tr'); tr.className = "bg-green-50/50 hover:bg-green-50 transition";
+        var now = new Date(); var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
         tr.innerHTML = '<td class="p-2 border-b text-gray-500">'+fastScannerIndexCount+'</td><td class="p-2 border-b font-mono text-gray-600">'+timeStr+'</td><td class="p-2 border-b font-bold text-blue-700">'+match.id+'</td><td class="p-2 border-b font-bold text-gray-900">'+match.name+'</td><td class="p-2 border-b">'+match.className+'</td><td class="p-2 border-b text-green-600 font-bold">Saved</td>';
         tbody.insertBefore(tr, tbody.firstChild); 
         
-        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson });
+        await runGAS("saveRecord", { studentId: match.id, name: match.name, className: match.className, lesson: lesson, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: document.getElementById('fast-scanner-subject').value });
         document.getElementById('fast-hardware-input').focus();
-      } else {
-        toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
-        toast.textContent = "Failed to load database records.";
-      }
+      } else { toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; toast.textContent = "Failed to load database records."; }
     }
 
     function startFastCameraEngine() {
       let currentFacing = fastCamFacingMode;
       html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
-      const config = { 
-        fps: 15, 
-        videoConstraints: {
-          facingMode: currentFacing
-        }
-      };
-      html5QrScannerFast.start(
-        { facingMode: currentFacing },
-        config,
+      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      html5QrScannerFast.start( { facingMode: currentFacing }, config,
         (decodedText, decodedResult) => {
           document.getElementById('fast-hardware-input').value = decodedText;
-          triggerFastManualSubmit();
-          html5QrScannerFast.pause(true);
+          triggerFastManualSubmit(); html5QrScannerFast.pause(true);
           setTimeout(() => { try { html5QrScannerFast.resume(); } catch(e){} }, 1200);
         },
         (errorMessage) => {}
-      ).then(() => {
-        var vp = document.getElementById('fast-reader-viewport');
-        if(vp) { 
-          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
-          else { vp.classList.remove('back-cam-active'); }
-        }
-      }).catch(err => {
-        console.error("Fast Camera Error: ", err);
-      });
+      ).then(() => { var vp = document.getElementById('fast-reader-viewport'); if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+      }).catch(err => { console.error("Fast Camera Error: ", err); });
     }
-
     function switchFastCameraFacing() {
       fastCamFacingMode = (fastCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerFast && html5QrScannerFast.isScanning) {
-        html5QrScannerFast.stop().then(() => { startFastCameraEngine(); });
-      } else {
-        var vp = document.getElementById('fast-reader-viewport');
-        if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-        else { vp.classList.remove('mirror-active'); }
-      }
+      if(html5QrScannerFast && html5QrScannerFast.isScanning) { html5QrScannerFast.stop().then(() => { startFastCameraEngine(); });
+      } else { var vp = document.getElementById('fast-reader-viewport'); if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
     }
-
-    function stopFastCameraEngine() { 
-      if(html5QrScannerFast && html5QrScannerFast.isScanning) { 
-        html5QrScannerFast.stop().then(() => {
-          document.getElementById('fast-reader-viewport').innerHTML = ''; 
-        }); 
-      } 
-    }
+    function stopFastCameraEngine() { if(html5QrScannerFast && html5QrScannerFast.isScanning) { html5QrScannerFast.stop().then(() => { document.getElementById('fast-reader-viewport').innerHTML = ''; }); } }
 
     function clearFastScannerQueue() {
       var tbody = document.getElementById('fast-queue-table-body');
@@ -1379,196 +1052,74 @@
       
       const students = await runGAS("getStudentsByClass", { className: cls });
       area.innerHTML = ""; 
-      if (!students || students.length === 0) { 
-        area.innerHTML = '<p class="text-red-600 font-bold">No students found!</p>'; 
-        return; 
-      }
+      if (!students || students.length === 0) { area.innerHTML = '<p class="text-red-600 font-bold">No students found!</p>'; return; }
 
       const currentActiveTheme = localStorage.getItem('selectedSystemThemeActive') || 'default';
       let templateImageSrc = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/One%20piece%20Card.webp"; 
-      
-      if (currentActiveTheme === 'liverpool') {
-        templateImageSrc = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-01_29_13-AM.webp";
-      }
+      if (currentActiveTheme === 'liverpool') { templateImageSrc = "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/refs/heads/main/ChatGPT-Image-Jun-8_-2026_-01_29_13-AM.webp"; }
 
       students.forEach(function(student, index) {
-        var masterWrapper = document.createElement('div'); 
-        masterWrapper.id = "card-wrapper" + index; 
-        masterWrapper.className = "card-wrapper-spacer flex flex-col space-y-2 p-1 bg-white rounded-2xl border border-gray-100";
-        
-        var actionBar = document.createElement('div'); 
-        actionBar.className = "card-action-bar border-b pb-1 text-xs hide-on-print flex justify-between items-center px-1";
+        var masterWrapper = document.createElement('div'); masterWrapper.id = "card-wrapper" + index; masterWrapper.className = "card-wrapper-spacer flex flex-col space-y-2 p-1 bg-white rounded-2xl border border-gray-100";
+        var actionBar = document.createElement('div'); actionBar.className = "card-action-bar border-b pb-1 text-xs hide-on-print flex justify-between items-center px-1";
         actionBar.innerHTML = '<label class="inline-flex items-center cursor-pointer select-none"><input type="checkbox" checked onchange="toggleCardSelection(this, '+index+')" class="form-checkbox text-green-600 rounded"><span class="ml-1 font-bold text-gray-700">Include</span></label><button onclick="downloadSingleCard('+index+', \''+student.name+'\')" class="bg-green-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">Download</button>';
         masterWrapper.appendChild(actionBar);
-        
-        var card = document.createElement('div'); 
-        card.id = "target-card-render-" + index; 
-        card.className = "student-card text-left";
-        
-        card.innerHTML = 
-          '<img src="' + templateImageSrc + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" />' +
-          '<div class="card-content-wrapper" style="position: relative; z-index: 10; width: 100%; height: 100%;">' +
-            '<div class="info-value-text" style="position: absolute; top: 20.8mm; left: 25.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div>' +
-            '<div class="info-value-text" style="position: absolute; top: 26.2mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.id + '</div>' +
-            '<div class="info-value-text" style="position: absolute; top: 31.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div>' +
-            '<div class="qr-container-box"><div id="code-'+index+'" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div></div>' +
-            '<div class="barcode-tray-wrapper"><svg id="bc-'+index+'"></svg></div>' +
-          '</div>';
-        
-        masterWrapper.appendChild(card); 
-        area.appendChild(masterWrapper);
-        
-        new QRCode(document.getElementById('code-'+index), { 
-          text: student.id, 
-          width: 120, 
-          height: 120,
-          colorDark : "#000000",
-          colorLight : "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        }); 
-        
-        JsBarcode("#bc-"+index, student.id, { 
-          format: "CODE128", 
-          width: 1.2, 
-          height: 20,
-          displayValue: true, 
-          fontSize: 8, 
-          fontOptions: "bold", 
-          margin: 0 
-        });
+        var card = document.createElement('div'); card.id = "target-card-render-" + index; card.className = "student-card text-left";
+        card.innerHTML = '<img src="' + templateImageSrc + '" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; border-radius: 6mm; object-fit: fill;" /><div class="card-content-wrapper" style="position: relative; z-index: 10; width: 100%; height: 100%;"><div class="info-value-text" style="position: absolute; top: 20.8mm; left: 25.5mm; width: 40mm; z-index: 20; font-size: '+(student.name.length > 20 ? '3.3mm' : '3.8mm')+';">' + student.name + '</div><div class="info-value-text" style="position: absolute; top: 26.2mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.id + '</div><div class="info-value-text" style="position: absolute; top: 31.5mm; left: 26.5mm; width: 40mm; z-index: 20;">' + student.className + '</div><div class="qr-container-box"><div id="code-'+index+'" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div></div><div class="barcode-tray-wrapper"><svg id="bc-'+index+'"></svg></div></div>';
+        masterWrapper.appendChild(card); area.appendChild(masterWrapper);
+        new QRCode(document.getElementById('code-'+index), { text: student.id, width: 120, height: 120, colorDark : "#000000", colorLight : "#ffffff", correctLevel: QRCode.CorrectLevel.H }); 
+        JsBarcode("#bc-"+index, student.id, { format: "CODE128", width: 1.2, height: 20, displayValue: true, fontSize: 8, fontOptions: "bold", margin: 0 });
       });
     }
 
     async function downloadSingleCard(index, studentName) { 
-      var targetElement = document.getElementById("target-card-render-" + index); 
-      window.scrollTo(0, 0);
-      await document.fonts.ready;
-      html2canvas(targetElement, {
-        useCORS: true, 
-        allowTaint: false, 
-        scale: 4, 
-        backgroundColor: "#ffffff", 
-        onclone: function(clonedDoc) {
-          var clonedCard = clonedDoc.getElementById("target-card-render-" + index);
-          if(clonedCard) clonedCard.style.transform = "none";
-        }
-      }).then(function(canvas) { 
-        var image = canvas.toDataURL("image/png", 1.0); 
-        var link = document.createElement('a'); 
-        link.download = studentName.replace(/\s+/g, '_') + "_Card.png"; 
-        link.href = image; 
-        link.click(); 
-      }); 
+      var targetElement = document.getElementById("target-card-render-" + index); window.scrollTo(0, 0); await document.fonts.ready;
+      html2canvas(targetElement, { useCORS: true, allowTaint: false, scale: 4, backgroundColor: "#ffffff", onclone: function(clonedDoc) { var clonedCard = clonedDoc.getElementById("target-card-render-" + index); if(clonedCard) clonedCard.style.transform = "none"; }
+      }).then(function(canvas) { var image = canvas.toDataURL("image/png", 1.0); var link = document.createElement('a'); link.download = studentName.replace(/\s+/g, '_') + "_Card.png"; link.href = image; link.click(); }); 
     }
+    function toggleCardSelection(cb, index) { var wrapper = document.getElementById("card-wrapper" + index); if(cb.checked) { wrapper.classList.remove("card-excluded", "opacity-20"); } else { wrapper.classList.add("card-excluded", "opacity-20"); } }
 
-    function toggleCardSelection(cb, index) { 
-      var wrapper = document.getElementById("card-wrapper" + index); 
-      if(cb.checked) {
-        wrapper.classList.remove("card-excluded", "opacity-20"); 
-      } else {
-        wrapper.classList.add("card-excluded", "opacity-20"); 
-      }
-    }
-
-    async function saveNewLesson() { 
+   async function saveNewLesson() { 
       var grade = document.getElementById('lesson-grade').value; 
+      var subject = document.getElementById('lesson-subject').value.trim();
       var unitName = document.getElementById('add-unit-name').value.trim(); 
       var name = document.getElementById('lesson-name').value.trim(); 
       var status = document.getElementById('lesson-status'); 
+      if(!subject || !unitName || !name) { alert("Subject, Unit နဲ့ Lesson အားလုံးဖြည့်ပေးပါဗျာ။"); return; }
+      status.className = "text-gray-500 text-sm block"; status.textContent = "Saving...";
       
-      if(!unitName || !name) {
-         alert("Unit Name ရော Lesson Title ကိုပါ ဖြည့်ပေးပါဗျာ။");
-         return; 
-      }
-      
-      status.className = "text-gray-500 text-sm block"; 
-      status.textContent = "Saving...";
-      
-      // Backend ကို grade, unitName နဲ့ lessonName ၃ ခုစလုံး လှမ်းပို့ပါမယ်
-      const msg = await runGAS("addLesson", { grade: grade, unitName: unitName, lessonName: name });
-      
-      if (msg) {
-        status.className = "text-green-600 text-sm block"; 
-        status.textContent = msg; 
-        document.getElementById('add-unit-name').value = '';
-        document.getElementById('lesson-name').value = '';
-      } else {
-        status.className = "text-red-600 text-sm block"; 
-        status.textContent = "Failed to add lesson.";
-      }
+      const msg = await runGAS("addLesson", { year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, grade: grade, subject: subject, unitName: unitName, lessonName: name });
+      if (msg) { status.className = "text-green-600 text-sm block"; status.textContent = msg; document.getElementById('add-unit-name').value = ''; document.getElementById('lesson-name').value = '';
+      } else { status.className = "text-red-600 text-sm block"; status.textContent = "Failed to add lesson."; }
     }
 
     async function loadStudentsForReview() { 
       var cls = document.getElementById('review-class').value; 
       var dropdown = document.getElementById('review-student');
       dropdown.innerHTML = '<option value="">-- Loading list... --</option>';
-      
       const students = await runGAS("getStudentsByClass", { className: cls });
       dropdown.innerHTML = '<option value="">-- Select Student --</option>'; 
-      if (students) {
-        students.forEach(function(s) { 
-          var opt = document.createElement('option'); 
-          opt.value = s.id; 
-          opt.textContent = s.name + " (" + s.id + ")";
-          dropdown.appendChild(opt); 
-        }); 
-      }
+      if (students) { students.forEach(function(s) { var opt = document.createElement('option'); opt.value = s.id; opt.textContent = s.name + " (" + s.id + ")"; dropdown.appendChild(opt); }); }
     }
-
-    function triggerReviewSearch() { 
-      var inputEl = document.getElementById('review-scanner-input'); 
-      var studentId = inputEl.value.trim();
-      if(!studentId) { alert("Please type a student ID first!"); return; } 
-      beep();
-      fetchStudentHistoryByIdDirect(studentId); 
-    }
-
-    function fetchStudentHistory() { 
-      var id = document.getElementById('review-student').value; 
-      if(!id) return; 
-      fetchStudentHistoryByIdDirect(id); 
-    }
+    function triggerReviewSearch() { var inputEl = document.getElementById('review-scanner-input'); var studentId = inputEl.value.trim(); if(!studentId) { alert("Please type a student ID first!"); return; } beep(); fetchStudentHistoryByIdDirect(studentId); }
+    function fetchStudentHistory() { var id = document.getElementById('review-student').value; if(!id) return; fetchStudentHistoryByIdDirect(id); }
 
     async function fetchStudentHistoryByIdDirect(id) {
-      var tbody = document.getElementById('history-table-body'); 
-      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 font-semibold">Loading...</td></tr>';
-      
+      var tbody = document.getElementById('history-table-body'); tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 font-semibold">Loading...</td></tr>';
       const records = await runGAS("getStudentRecords", { studentId: id });
       tbody.innerHTML = ''; 
-      if (!records || records.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500 font-bold">No records found!</td></tr>'; 
-        return; 
-      } 
-      records.forEach(function(r) { 
-        var tr = document.createElement('tr'); 
-        tr.className = "text-center hover:bg-gray-50"; 
-        tr.innerHTML = '<td class="p-3 border-b font-mono text-gray-600">'+r.timestamp+'</td><td class="p-3 border-b font-bold text-blue-700">'+r.id+'</td><td class="p-3 border-b text-left font-semibold">'+r.name+'</td><td class="p-3 border-b font-medium">'+r.className+'</td><td class="p-3 border-b text-left text-gray-800 font-semibold">'+r.lesson+'</td>';
-        tbody.appendChild(tr); 
-      }); 
+      if (!records || records.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500 font-bold">No records found!</td></tr>'; return; } 
+      records.forEach(function(r) { var tr = document.createElement('tr'); tr.className = "text-center hover:bg-gray-50"; tr.innerHTML = '<td class="p-3 border-b font-mono text-gray-600">'+r.timestamp+'</td><td class="p-3 border-b font-bold text-blue-700">'+r.id+'</td><td class="p-3 border-b text-left font-semibold">'+r.name+'</td><td class="p-3 border-b font-medium">'+r.className+'</td><td class="p-3 border-b text-left text-gray-800 font-semibold">'+r.lesson+'</td>'; tbody.appendChild(tr); }); 
     }
 
     async function loadLessonsForTracker() {
       var cls = document.getElementById('tracker-class').value; 
       var dropdown = document.getElementById('tracker-lesson'); 
       var grade = 'Grade 3';
-      if (cls.indexOf('1') === 0) grade = 'Grade 1'; 
-      else if (cls.indexOf('2') === 0) grade = 'Grade 2';
-      else if (cls.indexOf('3') === 0) grade = 'Grade 3'; 
-      else if (cls.indexOf('4') === 0) grade = 'Grade 4'; 
-      else if (cls.indexOf('5') === 0) grade = 'Grade 5'; 
-      else if (cls.indexOf('6') === 0) grade = 'Grade 6';
-      
+      if (cls.indexOf('1') === 0) grade = 'Grade 1'; else if (cls.indexOf('2') === 0) grade = 'Grade 2'; else if (cls.indexOf('3') === 0) grade = 'Grade 3'; else if (cls.indexOf('4') === 0) grade = 'Grade 4'; else if (cls.indexOf('5') === 0) grade = 'Grade 5'; else if (cls.indexOf('6') === 0) grade = 'Grade 6';
       dropdown.innerHTML = '<option value="">Loading lessons...</option>';
       const lessons = await runGAS("getLessonsByGrade", { grade: grade });
       dropdown.innerHTML = '<option value="">-- Choose Lesson --</option>'; 
-      if (lessons) {
-        lessons.forEach(function(l) { 
-          var opt = document.createElement('option'); 
-          opt.value = l; 
-          opt.textContent = l;
-          dropdown.appendChild(opt); 
-        }); 
-      }
+      if (lessons) { lessons.forEach(function(l) { var opt = document.createElement('option'); opt.value = l; opt.textContent = l; dropdown.appendChild(opt); }); }
     }
 
     async function fetchTrackerStatus() {
@@ -1576,380 +1127,157 @@
       var lesson = document.getElementById('tracker-lesson').value; 
       var subUl = document.getElementById('list-submitted'); 
       var misUl = document.getElementById('list-missing'); 
+      subUl.innerHTML = '<li>Loading...</li>'; misUl.innerHTML = '<li>Loading...</li>';
       
-      subUl.innerHTML = '<li>Loading...</li>'; 
-      misUl.innerHTML = '<li>Loading...</li>';
-      
-      const res = await runGAS("getSubmissionTracker", { className: cls, lessonName: lesson });
+      const res = await runGAS("getSubmissionTracker", { className: cls, lessonName: lesson, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: document.getElementById('tracker-subject').value });
       if (res) {
-        document.getElementById('count-submitted').textContent = res.submitted.length;
-        document.getElementById('count-missing').textContent = res.missing.length;
-        subUl.innerHTML=''; 
-        misUl.innerHTML='';
-        
-        if(res.submitted.length === 0) { 
-          subUl.innerHTML = '<li>No submissions.</li>'; 
-        } else {
-          res.submitted.forEach(function(s) { 
-            var li = document.createElement('li'); 
-            li.className = "p-2 bg-green-50 my-1 rounded flex justify-between"; 
-            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-gray-600">'+s.id+'</span>';
-            subUl.appendChild(li); 
-          }); 
-        }
-        if(res.missing.length === 0) { 
-          misUl.innerHTML = '<li>Perfect!</li>'; 
-        } else {
-          res.missing.forEach(function(s) { 
-            var li = document.createElement('li'); 
-            li.className = "p-2 bg-red-50 my-1 rounded flex justify-between"; 
-            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-red-500">'+s.id+'</span>'; 
-            misUl.appendChild(li); 
-          }); 
-        } 
-      } else {
-        subUl.innerHTML = '<li class="text-red-500">Error loading status.</li>';
-        misUl.innerHTML = '<li class="text-red-500">Error loading status.</li>';
-      }
+        document.getElementById('count-submitted').textContent = res.submitted.length; document.getElementById('count-missing').textContent = res.missing.length;
+        subUl.innerHTML=''; misUl.innerHTML='';
+        if(res.submitted.length === 0) { subUl.innerHTML = '<li>No submissions.</li>'; } else { res.submitted.forEach(function(s) { var li = document.createElement('li'); li.className = "p-2 bg-green-50 my-1 rounded flex justify-between"; li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-gray-600">'+s.id+'</span>'; subUl.appendChild(li); }); }
+        if(res.missing.length === 0) { misUl.innerHTML = '<li>Perfect!</li>'; } else { res.missing.forEach(function(s) { var li = document.createElement('li'); li.className = "p-2 bg-red-50 my-1 rounded flex justify-between"; li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-xs text-red-500">'+s.id+'</span>'; misUl.appendChild(li); }); } 
+      } else { subUl.innerHTML = '<li class="text-red-500">Error loading status.</li>'; misUl.innerHTML = '<li class="text-red-500">Error loading status.</li>'; }
     }
 
     async function triggerKidInquiryLookup() {
       var inputEl = document.getElementById('student-isolated-frame').querySelector('#kid-id-input');
-      var kidId = inputEl.value.trim(); 
-      if(!kidId) return; 
-      beep();
-      
-      var resZone = document.getElementById('kid-result-zone'); 
-      var doneUl = document.getElementById('kid-list-done'); 
-      var missUl = document.getElementById('kid-list-miss'); 
-      resZone.classList.remove('hidden');
-      
-      document.getElementById('kid-profile-name').textContent = "กำลังโหลดข้อมูล ...";
-      doneUl.innerHTML = '<li>กำลังโหลด...</li>'; 
-      missUl.innerHTML = '<li>กำลังโหลด...</li>';
+      var kidId = inputEl.value.trim(); if(!kidId) return; beep();
+      var resZone = document.getElementById('kid-result-zone'); var doneUl = document.getElementById('kid-list-done'); var missUl = document.getElementById('kid-list-miss'); 
+      resZone.classList.remove('hidden'); document.getElementById('kid-profile-name').textContent = "กำลังโหลดข้อมูล ...";
+      doneUl.innerHTML = '<li>กำลังโหลด...</li>'; missUl.innerHTML = '<li>กำลังโหลด...</li>';
       
       const res = await runGAS("getStudentSubmissionSummary", { studentId: kidId });
-      if (!res || res.error) { 
-        document.getElementById('kid-profile-name').textContent = "x ไม่พบรหัสประจำตัวนี้ในระบบ"; 
-        doneUl.innerHTML = '';
-        missUl.innerHTML = '';
-        return; 
-      }
+      if (!res || res.error) { document.getElementById('kid-profile-name').textContent = "x ไม่พบรหัสประจำตัวนี้ในระบบ"; doneUl.innerHTML = ''; missUl.innerHTML = ''; return; }
       
-      document.getElementById('kid-profile-name').textContent = res.student.name;
-      document.getElementById('kid-profile-id').textContent = res.student.id;
-      document.getElementById('kid-profile-class').textContent = res.student.className;
-      document.getElementById('kid-count-done').textContent = res.submitted.length;
-      document.getElementById('kid-count-miss').textContent = res.missing.length;
-      doneUl.innerHTML=''; 
-      missUl.innerHTML = '';
-      
-      if(res.submitted.length === 0) { 
-        doneUl.innerHTML = '<li class="p-2 text-gray-400 font-normal italic">ยังไม่มีประวัติการส่งงาน</li>'; 
-      } else { 
-        res.submitted.forEach(function(l) { 
-          var li = document.createElement('li'); 
-          li.className = "p-2 bg-green-50 rounded-lg border border-green-200 text-green-800 flex justify-between items-center"; 
-          li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-green-200 px-2 py-0.5 rounded-full text-green-900 font-black">ส่งแล้ว</span>'; 
-          doneUl.appendChild(li); 
-        }); 
-      }
-      
-      if(res.missing.length === 0) { 
-        missUl.innerHTML = '<li class="p-3 bg-green-100 text-green-800 rounded-xl text-center font-bold">ยินดีด้วย! คุณส่งงานครบทุกชิ้นเรียบร้อยแล้ว</li>'; 
-      } else { 
-        res.missing.forEach(function(l) { 
-          var li = document.createElement('li'); 
-          li.className = "p-2 bg-red-50 rounded-lg border border-red-200 text-red-700 flex justify-between items-center";
-          li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-red-200 px-2 py-0.5 rounded-full text-red-900 font-black">ยังไม่ส่ง</span>'; 
-          missUl.appendChild(li); 
-        }); 
-      }
+      document.getElementById('kid-profile-name').textContent = res.student.name; document.getElementById('kid-profile-id').textContent = res.student.id; document.getElementById('kid-profile-class').textContent = res.student.className;
+      document.getElementById('kid-count-done').textContent = res.submitted.length; document.getElementById('kid-count-miss').textContent = res.missing.length;
+      doneUl.innerHTML=''; missUl.innerHTML = '';
+      if(res.submitted.length === 0) { doneUl.innerHTML = '<li class="p-2 text-gray-400 font-normal italic">ยังไม่มีประวัติการส่งงาน</li>'; } else { res.submitted.forEach(function(l) { var li = document.createElement('li'); li.className = "p-2 bg-green-50 rounded-lg border border-green-200 text-green-800 flex justify-between items-center"; li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-green-200 px-2 py-0.5 rounded-full text-green-900 font-black">ส่งแล้ว</span>'; doneUl.appendChild(li); }); }
+      if(res.missing.length === 0) { missUl.innerHTML = '<li class="p-3 bg-green-100 text-green-800 rounded-xl text-center font-bold">ยินดีด้วย! คุณส่งงานครบทุกชิ้นเรียบร้อยแล้ว</li>'; } else { res.missing.forEach(function(l) { var li = document.createElement('li'); li.className = "p-2 bg-red-50 rounded-lg border border-red-200 text-red-700 flex justify-between items-center"; li.innerHTML = '<span>'+l+'</span><span class="text-[9px] bg-red-200 px-2 py-0.5 rounded-full text-red-900 font-black">ยังไม่ส่ง</span>'; missUl.appendChild(li); }); }
     }
 
     function openTvModal(name, id, topic, headerText) {
-      document.getElementById('tv-header-title').textContent = headerText;
-      document.getElementById('tv-student-name').textContent = name.toUpperCase();
-      document.getElementById('tv-student-id').textContent = "ID: " + id;
-      document.getElementById('tv-lesson-title').textContent = topic;
-      document.getElementById('tv-modal').classList.remove('hidden'); 
+      document.getElementById('tv-header-title').textContent = headerText; document.getElementById('tv-student-name').textContent = name.toUpperCase(); document.getElementById('tv-student-id').textContent = "ID: " + id; document.getElementById('tv-lesson-title').textContent = topic; document.getElementById('tv-modal').classList.remove('hidden'); 
     }
-
     function closeTvModal() { 
       document.getElementById('tv-modal').classList.add('hidden'); 
-      if (document.getElementById('system-master-frame').style.display !== 'none') { 
-        if (document.getElementById('btn-tab1').classList.contains('active')) {
-          document.getElementById('hardware-scanner-input').focus(); 
-        }
-        if (document.getElementById('btn-tab1_fast').classList.contains('active')) {
-          document.getElementById('fast-hardware-input').focus(); 
-        }
-      } 
+      if (document.getElementById('system-master-frame').style.display !== 'none') { if (document.getElementById('btn-tab1').classList.contains('active')) { document.getElementById('hardware-scanner-input').focus(); } if (document.getElementById('btn-tab1_fast').classList.contains('active')) { document.getElementById('fast-hardware-input').focus(); } } 
     }
 
     async function saveNewHomeworkTopicExplicit() {
       var cls = document.getElementById('homework-topic-class-select').value;
       var title = document.getElementById('homework-title-input').value.trim();
       if(!title) { alert("Please type Homework Title first!"); return; }
-      
       const msg = await runGAS("addHomeworkTopic", { cls: cls, title: title });
-      if (msg) {
-        alert(msg); 
-        document.getElementById('homework-title-input').value = '';
-        document.getElementById('homework-class').value = cls;
-        onHomeworkClassChange();
-      } else {
-        alert("Error adding homework topic.");
-      }
+      if (msg) { alert(msg); document.getElementById('homework-title-input').value = ''; document.getElementById('homework-class').value = cls; onHomeworkClassChange(); } else { alert("Error adding homework topic."); }
     }
 
-    function onHomeworkClassChange() {
-      loadHomeworkTopicsDropdown();
-      loadHomeworkChecklist();
-    }
+    function onHomeworkClassChange() { loadHomeworkTopicsDropdown(); loadHomeworkChecklist(); }
 
     async function loadHomeworkTopicsDropdown() {
       var cls = document.getElementById('homework-class').value;
       var dropdown = document.getElementById('homework-topic-dropdown');
       dropdown.innerHTML = '<option value="">-- Choose Topic --</option>';
       if(!cls) return;
-      
       const topics = await runGAS("getHomeworkTopicsByClass", { className: cls });
-      if (topics) {
-        topics.forEach(t => { 
-          dropdown.innerHTML += '<option value="'+t+'">'+t+'</option>'; 
-        });
-        fetchHomeworkTrackerStatus();
-      }
+      if (topics) { topics.forEach(t => { dropdown.innerHTML += '<option value="'+t+'">'+t+'</option>'; }); fetchHomeworkTrackerStatus(); }
     }
 
     async function loadHomeworkChecklist() {
       var selectedClass = document.getElementById('homework-class').value;
       var container = document.getElementById('homework-checklist-container');
-      if(!selectedClass) { 
-        container.innerHTML = '<p class="text-gray-400 italic">Please select class...</p>'; 
-        return; 
-      }
+      if(!selectedClass) { container.innerHTML = '<p class="text-gray-400 italic">Please select class...</p>'; return; }
       container.innerHTML = '<p class="text-gray-500">Loading...</p>';
-      
       const students = await runGAS("getStudentsByClass", { className: selectedClass });
       container.innerHTML = '';
-      if (students) {
-        students.forEach(function(student) {
-          var div = document.createElement('div'); 
-          div.className = "flex items-center space-x-2 bg-white p-2 rounded-lg border";
-          div.innerHTML = '<input type="checkbox" onchange="submitHomeworkAssignManual(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-4 w-4 text-orange-500"><span class="font-medium">'+student.name+' ('+student.id+')</span>';
-          container.appendChild(div);
-        });
-      }
+      if (students) { students.forEach(function(student) { var div = document.createElement('div'); div.className = "flex items-center space-x-2 bg-white p-2 rounded-lg border"; div.innerHTML = '<input type="checkbox" onchange="submitHomeworkAssignManual(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-4 w-4 text-orange-500"><span class="font-medium">'+student.name+' ('+student.id+')</span>'; container.appendChild(div); }); }
     }
 
     async function submitHomeworkAssignManual(cb, id, name, className) { 
       if(!cb.checked) return;
       var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwTitle) { 
-        alert("Please select Homework Topic Node from Dropdown list first!"); 
-        cb.checked = false; 
-        return; 
-      }
-      beep(); 
-      cb.disabled = true; 
-      cb.parentElement.classList.add('opacity-40');
-      
-      await runGAS("assignHomework", { studentId: id, name: name, className: className, homeworkTitle: hwTitle });
+      if(!hwTitle) { alert("Please select Homework Topic Node from Dropdown list first!"); cb.checked = false; return; }
+      beep(); cb.disabled = true; cb.parentElement.classList.add('opacity-40');
+      await runGAS("assignHomework", { studentId: id, name: name, className: className, homeworkTitle: hwTitle, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: "Homework" });
       fetchHomeworkTrackerStatus();
     }
 
     async function triggerHomeworkAssign() {
       var inputEl = document.getElementById('homework-assign-input');
-      var idValue = inputEl.value.trim(); 
-      inputEl.value=''; 
-      if(!idValue) return;
+      var idValue = inputEl.value.trim(); inputEl.value=''; if(!idValue) return;
       var hwClass = document.getElementById('homework-class').value;
       var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwClass || !hwTitle) { 
-        alert("Please select Class and choose Homework title node first."); 
-        return; 
-      }
-      
-      beep(); 
-      var status = document.getElementById('homework-status');
-      status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; 
-      status.textContent = "Assigning...";
+      if(!hwClass || !hwTitle) { alert("Please select Class and choose Homework title node first."); return; }
+      beep(); var status = document.getElementById('homework-status'); status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; status.textContent = "Assigning...";
       
       const students = await runGAS("getStudentsByClass", { className: hwClass });
       if (students) {
         var match = students.find(s => s.id.toString().toLowerCase() == idValue.toLowerCase());
-        if(!match) { 
-          status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
-          status.textContent = "ID Not Found!"; 
-          return; 
-        }
-        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
-        status.textContent = match.name + " assigned!";
-        
-        await runGAS("assignHomework", { studentId: match.id, name: match.name, className: match.className, homeworkTitle: hwTitle });
+        if(!match) { status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; status.textContent = "ID Not Found!"; return; }
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; status.textContent = match.name + " assigned!";
+        await runGAS("assignHomework", { studentId: match.id, name: match.name, className: match.className, homeworkTitle: hwTitle, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: "Homework" });
         fetchHomeworkTrackerStatus();
       }
     }
+
 
     async function triggerHomeworkSubmit() {
       var inputEl = document.getElementById('homework-submit-input');
-      var idValue = inputEl.value.trim(); 
-      inputEl.value=''; 
-      if(!idValue) return;
+      var idValue = inputEl.value.trim(); inputEl.value=''; if(!idValue) return;
       var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwTitle) { 
-        alert("Please select Homework title node dropdown context row to accept!"); 
-        return; 
-      }
-      
-      beep(); 
-      var status = document.getElementById('homework-status');
-      status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; 
-      status.textContent = "Verifying...";
+      if(!hwTitle) { alert("Please select Homework title node dropdown context row to accept!"); return; }
+      beep(); var status = document.getElementById('homework-status'); status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; status.textContent = "Verifying...";
       
       const responseString = await runGAS("submitHomework", { studentId: idValue, homeworkTitle: hwTitle });
       if (responseString) {
-        if (responseString.indexOf("Error") === 0) { 
-          status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
-          status.textContent = responseString;
-          return; 
-        }
+        if (responseString.indexOf("Error") === 0) { status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; status.textContent = responseString; return; }
         var studentNameParsed = responseString.split("|")[1] || "Student";
-        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
-        status.textContent = "Homework from " + studentNameParsed + " accepted!";
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; status.textContent = "Homework from " + studentNameParsed + " accepted!";
         openTvModal(studentNameParsed, idValue, hwTitle, "HOMEWORK RECEIVED *");
         fetchHomeworkTrackerStatus();
-      } else {
-        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
-        status.textContent = "Error submitting homework record.";
-      }
+      } else { status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; status.textContent = "Error submitting homework record."; }
     }
 
+    // Note: Homework Board တွင် Sidebar က Subject ကိုရှာနေလို့ Error တက်တာကို ပြင်ပေးထားပါသည်
     async function fetchHomeworkTrackerStatus() {
       var hwClass = document.getElementById('homework-class').value;
       var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      var subUl = document.getElementById('hw-list-submitted'); 
-      var misUl = document.getElementById('hw-list-missing');
+      var subUl = document.getElementById('hw-list-submitted'); var misUl = document.getElementById('hw-list-missing');
+      if(!hwClass || !hwTitle) { subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>'; misUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>'; document.getElementById('hw-count-submitted').textContent = '0'; document.getElementById('hw-count-missing').textContent = '0'; return; }
+      subUl.innerHTML = '<li>Loading...</li>'; misUl.innerHTML = '<li>Loading...</li>';
       
-      if(!hwClass || !hwTitle) {
-        subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>';
-        misUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>';
-        document.getElementById('hw-count-submitted').textContent = '0';
-        document.getElementById('hw-count-missing').textContent = '0';
-        return;
-      }
-      
-      subUl.innerHTML = '<li>Loading...</li>'; 
-      misUl.innerHTML = '<li>Loading...</li>';
-      
-      const res = await runGAS("getHomeworkTracker", { className: hwClass, homeworkTitle: hwTitle });
+      const res = await runGAS("getHomeworkTracker", { className: hwClass, homeworkTitle: hwTitle, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: "Homework" });
       if (res) {
-        document.getElementById('hw-count-submitted').textContent = res.submitted.length;
-        document.getElementById('hw-count-missing').textContent = res.missing.length;
-        subUl.innerHTML=''; 
-        misUl.innerHTML = '';
-        
-        if(res.submitted.length === 0) { 
-          subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>'; 
-        } else {
-          res.submitted.forEach(function(s) {
-            var li = document.createElement('li'); 
-            li.className = "p-1.5 bg-green-50 rounded border border-green-200 flex justify-between items-center";
-            li.innerHTML = '<span>'+s.name+' <b class="text-gray-400">('+s.id+')</b></span><button onclick="executeUndoHomeworkSubmission(\''+s.id+'\', \''+hwTitle+'\')" class="bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded transition">X Remove</button>';
-            subUl.appendChild(li);
-          });
-        }
-        
-        if(res.missing.length === 0) { 
-          misUl.innerHTML = '<li class="p-1 text-green-600 font-bold font-normal">All submitted!</li>'; 
-        } else { 
-          res.missing.forEach(function(s) {
-            var li = document.createElement('li'); 
-            li.className = "p-1.5 bg-red-50 rounded border border-red-200 flex justify-between";
-            li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-red-400 text-[10px]">'+s.id+'</span>'; 
-            misUl.appendChild(li);
-          });
-        }
+        document.getElementById('hw-count-submitted').textContent = res.submitted.length; document.getElementById('hw-count-missing').textContent = res.missing.length; subUl.innerHTML=''; misUl.innerHTML = '';
+        if(res.submitted.length === 0) { subUl.innerHTML = '<li class="p-1 text-gray-400 italic font-normal">No entries.</li>'; } else { res.submitted.forEach(function(s) { var li = document.createElement('li'); li.className = "p-1.5 bg-green-50 rounded border border-green-200 flex justify-between items-center"; li.innerHTML = '<span>'+s.name+' <b class="text-gray-400">('+s.id+')</b></span><button onclick="executeUndoHomeworkSubmission(\''+s.id+'\', \''+hwTitle+'\')" class="bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded transition">X Remove</button>'; subUl.appendChild(li); }); }
+        if(res.missing.length === 0) { misUl.innerHTML = '<li class="p-1 text-green-600 font-bold font-normal">All submitted!</li>'; } else { res.missing.forEach(function(s) { var li = document.createElement('li'); li.className = "p-1.5 bg-red-50 rounded border border-red-200 flex justify-between"; li.innerHTML = '<span>'+s.name+'</span><span class="font-mono text-red-400 text-[10px]">'+s.id+'</span>'; misUl.appendChild(li); }); }
       }
     }
 
-    async function executeUndoHomeworkSubmission(studentId, title) { 
-      if(!confirm("Are you sure?")) return; 
-      beep(); 
-      const res = await runGAS("revertHomeworkSubmission", { studentId: studentId, homeworkTitle: title });
-      if (res === "Reverted") {
-        fetchHomeworkTrackerStatus(); 
-      } 
-    }
+    async function executeUndoHomeworkSubmission(studentId, title) { if(!confirm("Are you sure?")) return; beep(); const res = await runGAS("revertHomeworkSubmission", { studentId: studentId, homeworkTitle: title }); if (res === "Reverted") { fetchHomeworkTrackerStatus(); } }
 
     function startHomeworkCameraEngine() {
       let currentFacing = homeworkCamFacingMode;
       html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
-      const config = { 
-        fps: 15, 
-        videoConstraints: {
-          facingMode: currentFacing
-        }
-      };
-      html5QrScannerHomework.start(
-        { facingMode: currentFacing },
-        config,
-        (decodedText, decodedResult) => {
-          document.getElementById('homework-submit-input').value = decodedText;
-          triggerHomeworkSubmit();
-          html5QrScannerHomework.pause(true);
-          setTimeout(() => { try { html5QrScannerHomework.resume(); } catch(e){} }, 1500);
-        },
+      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      html5QrScannerHomework.start( { facingMode: currentFacing }, config,
+        (decodedText, decodedResult) => { document.getElementById('homework-submit-input').value = decodedText; triggerHomeworkSubmit(); html5QrScannerHomework.pause(true); setTimeout(() => { try { html5QrScannerHomework.resume(); } catch(e){} }, 1500); },
         (errorMessage) => {}
-      ).then(() => {
-        var vp = document.getElementById('homework-reader-viewport');
-        if(vp) { 
-          if(currentFacing === "environment") { vp.classList.add('back-cam-active'); }
-          else { vp.classList.remove('back-cam-active'); }
-        }
-      }).catch(err => {
-        console.error("Homework Camera Error: ", err);
-      });
+      ).then(() => { var vp = document.getElementById('homework-reader-viewport'); if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+      }).catch(err => { console.error("Homework Camera Error: ", err); });
     }
     function switchHomeworkCameraFacing() {
       homeworkCamFacingMode = (homeworkCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) {
-        html5QrScannerHomework.stop().then(() => { startHomeworkCameraEngine(); });
-      } else {
-        var vp = document.getElementById('homework-reader-viewport');
-        if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } 
-        else { vp.classList.remove('mirror-active'); }
-      }
+      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { html5QrScannerHomework.stop().then(() => { startHomeworkCameraEngine(); });
+      } else { var vp = document.getElementById('homework-reader-viewport'); if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
     }
+    function stopHomeworkCameraEngine() { if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { html5QrScannerHomework.stop().then(() => { document.getElementById('homework-reader-viewport').innerHTML = ''; }); } }
 
-    function stopHomeworkCameraEngine() {
-      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { 
-        html5QrScannerHomework.stop().then(() => {
-          document.getElementById('homework-reader-viewport').innerHTML = ''; 
-        }); 
-      }
-    }
-
-    document.getElementById('hardware-scanner-input').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') triggerManualSubmit(); 
-    });
-    document.getElementById('fast-hardware-input').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') triggerFastManualSubmit(); 
-    });
-    document.getElementById('teacher-pass-input').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') verifyTeacherCode(); 
-    });
-    document.getElementById('kid-id-input').addEventListener('keypress', function(e) { 
-      if(e.key === 'Enter') triggerKidInquiryLookup(); 
-    });
-    document.getElementById('homework-assign-input').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') triggerHomeworkAssign(); 
-    });
-    document.getElementById('homework-submit-input').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') triggerHomeworkSubmit(); 
-    });
+    document.getElementById('hardware-scanner-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerManualSubmit(); });
+    document.getElementById('fast-hardware-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerFastManualSubmit(); });
+    document.getElementById('teacher-pass-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') verifyTeacherCode(); });
+    document.getElementById('kid-id-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerKidInquiryLookup(); });
+    document.getElementById('homework-assign-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerHomeworkAssign(); });
+    document.getElementById('homework-submit-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerHomeworkSubmit(); });
   </script>
 </body>
 </html>
