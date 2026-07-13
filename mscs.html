@@ -30,8 +30,9 @@
     #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; z-index: 90; backdrop-filter: blur(1.5px); }
     #sidebar-overlay.show { display: block; }
     .scanner-viewport.mirror-active video { transform: scaleX(-1) !important; }
-    .scanner-viewport.back-cam-active video { filter: url(#swap-rgb) !important; }
-    
+    /* Back Camera အရောင်ပြောင်းပြန်ဖြစ်ခြင်းကို ပိတ်ထားသည် */
+    .scanner-viewport.back-cam-active video {  }
+
     body.onepiece-mode { background-image: url('https://github.com/kayminn555-rgb/Gallery/blob/main/One-piece.webp?raw=true'); background-size: 100% calc(100vh - 60px) !important; background-position: center 60px !important; background-attachment: fixed !important; background-repeat: no-repeat !important; }
     body.onepiece-mode .bg-white { background-color: rgba(255, 255, 255, 0.96); border-color: #e2e8f0; backdrop-filter: blur(4px); }
     body.onepiece-mode #teacher-top-bar { background-color: #dfa119 !important; border-bottom: 3px solid #1e3a8a; }
@@ -84,9 +85,10 @@
 </head>
 
 <body class="min-h-screen">
-  <svg style="display:none;">
+    <svg style="display:none;">
     <filter id="swap-rgb"><feColorMatrix type="matrix" values="0 0 1 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0" /></filter>
   </svg>
+
   <div id="sidebar-overlay" class="hide-on-print" onclick="toggleSidebar(false)"></div>
   
   <div id="sidebar-menu" class="hide-on-print flex flex-col justify-between">
@@ -386,7 +388,7 @@
               <input type="text" id="lesson-subject" placeholder="e.g. English" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none font-bold text-blue-800">
             </div>
             <div class="mb-4">
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Unit Name (ဥပမာ - Unit 1)</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Unit Name (example - Unit 1)</label>
               <input type="text" id="add-unit-name" placeholder="Enter Unit Name..." class="w-full p-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none">
             </div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Lesson Topic Title</label>
@@ -959,10 +961,21 @@
       }
     }
 
+// ==========================================
+    // 1. MAIN SCANNER CAMERA FUNCTIONS
+    // ==========================================
     function startMainCameraEngine() {
       let currentFacing = mainCamFacingMode;
       html5QrScannerMain = new Html5Qrcode("main-reader-viewport");
-      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      
+      // Resolution အမြင့်တောင်းပြီး Box လေးဖန်တီးထားသည်
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 }, 
+        disableFlip: false,
+        videoConstraints: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: currentFacing }
+      };
+      
       html5QrScannerMain.start( { facingMode: currentFacing }, config,
         (decodedText, decodedResult) => {
           document.getElementById('hardware-scanner-input').value = decodedText;
@@ -973,16 +986,25 @@
         (errorMessage) => {}
       ).then(() => {
         var vp = document.getElementById('main-reader-viewport');
-        if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+        if(vp) { 
+           if(currentFacing === "environment") { vp.classList.add('back-cam-active'); vp.classList.remove('mirror-active'); } 
+           else { vp.classList.remove('back-cam-active'); vp.classList.add('mirror-active'); } 
+        }
       }).catch(err => { console.error("Main Camera Error: ", err); });
     }
+    
     function switchMainCameraFacing() {
       mainCamFacingMode = (mainCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerMain && html5QrScannerMain.isScanning) { html5QrScannerMain.stop().then(() => { startMainCameraEngine(); });
-      } else { var vp = document.getElementById('main-reader-viewport'); if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
+      if(html5QrScannerMain && html5QrScannerMain.isScanning) { 
+         html5QrScannerMain.stop().then(() => { startMainCameraEngine(); });
+      } else { 
+         var vp = document.getElementById('main-reader-viewport'); 
+         if(mainCamFacingMode === "user") { vp.classList.add('mirror-active'); vp.classList.remove('back-cam-active'); } 
+         else { vp.classList.remove('mirror-active'); vp.classList.add('back-cam-active'); } 
+      }
     }
     function stopMainCameraEngine() { if(html5QrScannerMain && html5QrScannerMain.isScanning) { html5QrScannerMain.stop().then(() => { document.getElementById('main-reader-viewport').innerHTML = ''; }); } }
-
+   
     function triggerFastManualSubmit() {
       var inputEl = document.getElementById('fast-hardware-input'); 
       var value = inputEl.value.trim(); inputEl.value = ''; 
@@ -1018,27 +1040,49 @@
       } else { toast.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; toast.textContent = "Failed to load database records."; }
     }
 
+ // ==========================================
+    // 2. FAST SCANNER CAMERA FUNCTIONS
+    // ==========================================
     function startFastCameraEngine() {
       let currentFacing = fastCamFacingMode;
       html5QrScannerFast = new Html5Qrcode("fast-reader-viewport");
-      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 }, 
+        disableFlip: false,
+        videoConstraints: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: currentFacing }
+      };
+      
       html5QrScannerFast.start( { facingMode: currentFacing }, config,
         (decodedText, decodedResult) => {
           document.getElementById('fast-hardware-input').value = decodedText;
-          triggerFastManualSubmit(); html5QrScannerFast.pause(true);
+          triggerFastManualSubmit(); 
+          html5QrScannerFast.pause(true);
           setTimeout(() => { try { html5QrScannerFast.resume(); } catch(e){} }, 1200);
         },
         (errorMessage) => {}
-      ).then(() => { var vp = document.getElementById('fast-reader-viewport'); if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+      ).then(() => { 
+        var vp = document.getElementById('fast-reader-viewport'); 
+        if(vp) { 
+           if(currentFacing === "environment") { vp.classList.add('back-cam-active'); vp.classList.remove('mirror-active'); } 
+           else { vp.classList.remove('back-cam-active'); vp.classList.add('mirror-active'); } 
+        }
       }).catch(err => { console.error("Fast Camera Error: ", err); });
     }
+    
     function switchFastCameraFacing() {
       fastCamFacingMode = (fastCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerFast && html5QrScannerFast.isScanning) { html5QrScannerFast.stop().then(() => { startFastCameraEngine(); });
-      } else { var vp = document.getElementById('fast-reader-viewport'); if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
+      if(html5QrScannerFast && html5QrScannerFast.isScanning) { 
+         html5QrScannerFast.stop().then(() => { startFastCameraEngine(); });
+      } else { 
+         var vp = document.getElementById('fast-reader-viewport'); 
+         if(fastCamFacingMode === "user") { vp.classList.add('mirror-active'); vp.classList.remove('back-cam-active'); } 
+         else { vp.classList.remove('mirror-active'); vp.classList.add('back-cam-active'); } 
+      }
     }
     function stopFastCameraEngine() { if(html5QrScannerFast && html5QrScannerFast.isScanning) { html5QrScannerFast.stop().then(() => { document.getElementById('fast-reader-viewport').innerHTML = ''; }); } }
-
+    
     function clearFastScannerQueue() {
       var tbody = document.getElementById('fast-queue-table-body');
       tbody.innerHTML = '<tr id="fast-queue-empty-row"><td colspan="6" class="p-4 text-gray-400 italic text-center">No students scanned yet in this fast window stream session.</td></tr>';
@@ -1164,12 +1208,26 @@
     }
 
     async function saveNewHomeworkTopicExplicit() {
-      var cls = document.getElementById('homework-topic-class-select').value;
-      var title = document.getElementById('homework-title-input').value.trim();
-      if(!title) { alert("Please type Homework Title first!"); return; }
-      const msg = await runGAS("addHomeworkTopic", { cls: cls, title: title });
-      if (msg) { alert(msg); document.getElementById('homework-title-input').value = ''; document.getElementById('homework-class').value = cls; onHomeworkClassChange(); } else { alert("Error adding homework topic."); }
-    }
+  var cls = document.getElementById('homework-topic-class-select').value;
+  var title = document.getElementById('homework-title-input').value.trim();
+  if(!title) { alert("Please type Homework Title first!"); return; }
+  
+  var status = document.getElementById('homework-status');
+  status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block";
+  status.textContent = "Adding topic...";
+  
+  const msg = await runGAS("addHomeworkTopic", { cls: cls, title: title });
+  if (msg && !msg.includes("Error")) { 
+    status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
+    status.textContent = msg; // Successfully ဆိုပြပေးမည် (Pop-up မတက်တော့ပါ)
+    document.getElementById('homework-title-input').value = ''; 
+    document.getElementById('homework-class').value = cls; 
+    onHomeworkClassChange(); // Dropdown တွင် ချက်ချင်းပေါ်လာစေမည်
+  } else { 
+    status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+    status.textContent = "Error adding homework topic."; 
+  }
+}
 
     function onHomeworkClassChange() { loadHomeworkTopicsDropdown(); loadHomeworkChecklist(); }
 
@@ -1183,23 +1241,61 @@
     }
 
     async function loadHomeworkChecklist() {
-      var selectedClass = document.getElementById('homework-class').value;
-      var container = document.getElementById('homework-checklist-container');
-      if(!selectedClass) { container.innerHTML = '<p class="text-gray-400 italic">Please select class...</p>'; return; }
-      container.innerHTML = '<p class="text-gray-500">Loading...</p>';
-      const students = await runGAS("getStudentsByClass", { className: selectedClass });
-      container.innerHTML = '';
-      if (students) { students.forEach(function(student) { var div = document.createElement('div'); div.className = "flex items-center space-x-2 bg-white p-2 rounded-lg border"; div.innerHTML = '<input type="checkbox" onchange="submitHomeworkAssignManual(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="form-checkbox h-4 w-4 text-orange-500"><span class="font-medium">'+student.name+' ('+student.id+')</span>'; container.appendChild(div); }); }
-    }
+  var selectedClass = document.getElementById('homework-class').value;
+  var container = document.getElementById('homework-checklist-container');
+  if(!selectedClass) { container.innerHTML = '<p class="text-gray-400 italic">Please select class...</p>'; return; }
+  container.innerHTML = '<p class="text-gray-500">Loading...</p>';
+  const students = await runGAS("getStudentsByClass", { className: selectedClass });
+  
+  // Select All ခလုတ် အသစ်ထည့်ထားသည်
+  container.innerHTML = '<button onclick="selectAllStudentsForHomework()" class="mb-3 w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-2 rounded-lg text-xs transition shadow-sm">Select All Students (Assign All)</button><div id="hw-check-list" class="space-y-2"></div>';
+  
+  var listDiv = document.getElementById('hw-check-list');
+  if (students) { 
+    students.forEach(function(student) { 
+      var div = document.createElement('div'); 
+      div.className = "flex items-center space-x-2 bg-white p-2 rounded-lg border"; 
+      // Checkbox တွင် data attributes များ သိမ်းပေးထားသည်
+      div.innerHTML = '<input type="checkbox" data-id="'+student.id+'" data-name="'+student.name+'" data-class="'+student.className+'" onchange="submitHomeworkAssignManual(this, \''+student.id+'\', \''+student.name+'\', \''+student.className+'\')" class="hw-student-checkbox form-checkbox h-4 w-4 text-orange-500"><span class="font-medium">'+student.name+' ('+student.id+')</span>'; 
+      listDiv.appendChild(div); 
+    }); 
+  }
+}
 
-    async function submitHomeworkAssignManual(cb, id, name, className) { 
-      if(!cb.checked) return;
-      var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwTitle) { alert("Please select Homework Topic Node from Dropdown list first!"); cb.checked = false; return; }
-      beep(); cb.disabled = true; cb.parentElement.classList.add('opacity-40');
-      await runGAS("assignHomework", { studentId: id, name: name, className: className, homeworkTitle: hwTitle, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: "Homework" });
-      fetchHomeworkTrackerStatus();
-    }
+// Select All နှိပ်လျှင် အလုပ်လုပ်မည့် Function အသစ် (ဒီ Code ကို အသစ် ထပ်ထည့်ပေးပါ)
+async function selectAllStudentsForHomework() {
+  var hwTitle = document.getElementById('homework-topic-dropdown').value;
+  if(!hwTitle) { alert("Please select Homework Topic Node from Dropdown list first!"); return; }
+  
+  var checkboxes = document.querySelectorAll('.hw-student-checkbox:not(:checked):not(:disabled)');
+  if(checkboxes.length === 0) { alert("All students are already assigned!"); return; }
+  
+  var status = document.getElementById('homework-status');
+  status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-blue-100 text-blue-800 block";
+  status.textContent = "Assigning all students... Please wait.";
+  
+  for(var i = 0; i < checkboxes.length; i++) {
+     var cb = checkboxes[i];
+     cb.checked = true;
+     // ကလေးအားလုံးကို Missing List သို့ တစ်ဆက်တည်း ပို့ပေးမည်
+     await submitHomeworkAssignManual(cb, cb.getAttribute('data-id'), cb.getAttribute('data-name'), cb.getAttribute('data-class'), true);
+  }
+  status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block";
+  status.textContent = "All students successfully assigned to Missing List!";
+  fetchHomeworkTrackerStatus();
+}
+
+// ကလေးတစ်ယောက်ချင်းစီအတွက် သို့မဟုတ် Bulk အတွက် 
+async function submitHomeworkAssignManual(cb, id, name, className, isBulk = false) { 
+  if(!cb.checked) return;
+  var hwTitle = document.getElementById('homework-topic-dropdown').value;
+  if(!hwTitle) { alert("Please select Homework Topic Node from Dropdown list first!"); cb.checked = false; return; }
+  if(!isBulk) beep(); 
+  cb.disabled = true; cb.parentElement.classList.add('opacity-40');
+  await runGAS("assignHomework", { studentId: id, name: name, className: className, homeworkTitle: hwTitle, year: document.getElementById('global-year').value, sem: document.getElementById('global-sem').value, subject: "Homework" });
+  if(!isBulk) fetchHomeworkTrackerStatus();
+}
+
 
     async function triggerHomeworkAssign() {
       var inputEl = document.getElementById('homework-assign-input');
@@ -1221,21 +1317,33 @@
 
 
     async function triggerHomeworkSubmit() {
-      var inputEl = document.getElementById('homework-submit-input');
-      var idValue = inputEl.value.trim(); inputEl.value=''; if(!idValue) return;
-      var hwTitle = document.getElementById('homework-topic-dropdown').value;
-      if(!hwTitle) { alert("Please select Homework title node dropdown context row to accept!"); return; }
-      beep(); var status = document.getElementById('homework-status'); status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; status.textContent = "Verifying...";
-      
-      const responseString = await runGAS("submitHomework", { studentId: idValue, homeworkTitle: hwTitle });
-      if (responseString) {
-        if (responseString.indexOf("Error") === 0) { status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; status.textContent = responseString; return; }
-        var studentNameParsed = responseString.split("|")[1] || "Student";
-        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; status.textContent = "Homework from " + studentNameParsed + " accepted!";
-        openTvModal(studentNameParsed, idValue, hwTitle, "HOMEWORK RECEIVED *");
-        fetchHomeworkTrackerStatus();
-      } else { status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; status.textContent = "Error submitting homework record."; }
+  var inputEl = document.getElementById('homework-submit-input');
+  var idValue = inputEl.value.trim(); inputEl.value=''; if(!idValue) return;
+  var hwTitle = document.getElementById('homework-topic-dropdown').value;
+  if(!hwTitle) { alert("Please select Homework title node dropdown context row to accept!"); return; }
+  beep(); 
+  var status = document.getElementById('homework-status'); 
+  status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-yellow-100 text-yellow-800 block"; 
+  status.textContent = "Verifying...";
+  
+  const responseString = await runGAS("submitHomework", { studentId: idValue, homeworkTitle: hwTitle });
+  if (responseString) {
+    if (responseString.indexOf("Error") === 0) { 
+        status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+        status.textContent = responseString; 
+        return; 
     }
+    var studentNameParsed = responseString.split("|")[1] || "Student";
+    status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-green-100 text-green-800 block"; 
+    status.textContent = "Homework from " + studentNameParsed + " accepted!";
+    
+    // မှတ်ချက် - ဆက်တိုက် Scan ဖတ်နိုင်ရန် openTvModal() ကို ဖြုတ်ပစ်လိုက်ပါပြီ။
+    fetchHomeworkTrackerStatus();
+  } else { 
+    status.className = "mt-2 p-3 text-center font-bold rounded-xl bg-red-100 text-red-800 block"; 
+    status.textContent = "Error submitting homework record."; 
+  }
+}
 
     // Note: Homework Board တွင် Sidebar က Subject ကိုရှာနေလို့ Error တက်တာကို ပြင်ပေးထားပါသည်
     async function fetchHomeworkTrackerStatus() {
@@ -1255,24 +1363,49 @@
 
     async function executeUndoHomeworkSubmission(studentId, title) { if(!confirm("Are you sure?")) return; beep(); const res = await runGAS("revertHomeworkSubmission", { studentId: studentId, homeworkTitle: title }); if (res === "Reverted") { fetchHomeworkTrackerStatus(); } }
 
+     // ==========================================
+    // 3. HOMEWORK SCANNER CAMERA FUNCTIONS
+    // ==========================================
     function startHomeworkCameraEngine() {
       let currentFacing = homeworkCamFacingMode;
       html5QrScannerHomework = new Html5Qrcode("homework-reader-viewport");
-      const config = { fps: 15, videoConstraints: { facingMode: currentFacing } };
+      
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 }, 
+        disableFlip: false,
+        videoConstraints: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: currentFacing }
+      };
+      
       html5QrScannerHomework.start( { facingMode: currentFacing }, config,
-        (decodedText, decodedResult) => { document.getElementById('homework-submit-input').value = decodedText; triggerHomeworkSubmit(); html5QrScannerHomework.pause(true); setTimeout(() => { try { html5QrScannerHomework.resume(); } catch(e){} }, 1500); },
+        (decodedText, decodedResult) => { 
+           document.getElementById('homework-submit-input').value = decodedText; 
+           triggerHomeworkSubmit(); 
+           html5QrScannerHomework.pause(true); 
+           setTimeout(() => { try { html5QrScannerHomework.resume(); } catch(e){} }, 1500); 
+        },
         (errorMessage) => {}
-      ).then(() => { var vp = document.getElementById('homework-reader-viewport'); if(vp) { if(currentFacing === "environment") { vp.classList.add('back-cam-active'); } else { vp.classList.remove('back-cam-active'); } }
+      ).then(() => { 
+        var vp = document.getElementById('homework-reader-viewport'); 
+        if(vp) { 
+           if(currentFacing === "environment") { vp.classList.add('back-cam-active'); vp.classList.remove('mirror-active'); } 
+           else { vp.classList.remove('back-cam-active'); vp.classList.add('mirror-active'); } 
+        }
       }).catch(err => { console.error("Homework Camera Error: ", err); });
     }
+    
     function switchHomeworkCameraFacing() {
       homeworkCamFacingMode = (homeworkCamFacingMode === "user") ? "environment" : "user";
-      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { html5QrScannerHomework.stop().then(() => { startHomeworkCameraEngine(); });
-      } else { var vp = document.getElementById('homework-reader-viewport'); if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); } else { vp.classList.remove('mirror-active'); } }
+      if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { 
+         html5QrScannerHomework.stop().then(() => { startHomeworkCameraEngine(); });
+      } else { 
+         var vp = document.getElementById('homework-reader-viewport'); 
+         if(homeworkCamFacingMode === "user") { vp.classList.add('mirror-active'); vp.classList.remove('back-cam-active'); } 
+         else { vp.classList.remove('mirror-active'); vp.classList.add('back-cam-active'); } 
+      }
     }
     function stopHomeworkCameraEngine() { if(html5QrScannerHomework && html5QrScannerHomework.isScanning) { html5QrScannerHomework.stop().then(() => { document.getElementById('homework-reader-viewport').innerHTML = ''; }); } }
-
-    document.getElementById('hardware-scanner-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerManualSubmit(); });
+   
     document.getElementById('fast-hardware-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerFastManualSubmit(); });
     document.getElementById('teacher-pass-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') verifyTeacherCode(); });
     document.getElementById('kid-id-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') triggerKidInquiryLookup(); });
