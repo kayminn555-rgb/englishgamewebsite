@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fun Pronunciation Game Pro</title>
+    <style>
+        /* ================= ကလေးများအတွက် ဆွဲဆောင်မှုရှိသော ဒီဇိုင်း (Kids-Friendly & Responsive UI) ================= */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap');
+
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --success: #2ED573;
+            --danger: #FF4757;
+            --dark: #2F3542;
+            --light: #F1F2F6;
+            --white: #FFFFFF;
+            --bg-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--dark);
+            text-align: center;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.7);
+        }
+
+        /* မျက်နှာပြင် အပြောင်းအလဲ (Screen Toggling) */
+        .screen {
+            display: none;
+            flex-grow: 1;
+            padding: 15px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* အဓိက Container (Main Container) */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+            border: 3px solid rgba(255,255,255,0.5);
+            margin: 10px auto;
+        }
+
+        /* 3D ခလုတ် ဒီဇိုင်းများ (3D Buttons) */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Fredoka One', cursive;
+            cursor: pointer;
+            color: var(--white);
+            transition: all 0.1s ease;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.15);
+            text-align: center;
+            display: inline-block;
+        }
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.15);
+        }
+        .btn-primary { background-color: var(--primary); }
+        .btn-secondary { background-color: var(--secondary); }
+        .btn-success { background-color: var(--success); font-size: 22px; padding: 15px 40px; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-accent { background-color: var(--accent); color: var(--dark); }
+
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .file-upload-wrapper input[type=file] {
+            font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
+        }
+
+        /* Dashboard အတွင်းရှိ အကွက်များ (Dashboard Elements) */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .timer-settings {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        select, input[type="number"] {
+            padding: 10px;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+        }
+
+        .list-container {
+            max-height: 40vh;
+            overflow-y: auto;
+            padding: 15px;
+            border-radius: 16px;
+            background: #F8F9FA;
+            margin-bottom: 20px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .word-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+            background: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+
+        .word-row input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 2px solid #EFEFEF;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        /* ဂိမ်းကစားသည့် မျက်နှာပြင် (Game Screen Elements) */
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .badge {
+            background: var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+            color: var(--dark);
+        }
+        .timer-badge { background: var(--secondary); color: white; }
+
+        .game-nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 10px auto;
+        }
+
+        .game-card {
+            background: #fff;
+            border: 4px solid var(--secondary);
+            border-radius: 30px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+            min-height: 300px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+
+        /* Animations အတွက် Class များ */
+        .card-out { transform: scale(0.5); opacity: 0; }
+        .card-in { transform: scale(1); opacity: 1; }
+
+        .game-image {
+            max-width: 90%;
+            max-height: 180px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: none;
+        }
+
+        .game-word {
+            font-size: 48px;
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        /* မိုက်ခရိုဖုန်း ခလုတ် (Mic Button) */
+        .mic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mic-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 40px;
+            border: 6px solid #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4), inset 0 -5px 0px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .mic-btn:active { transform: scale(0.9); }
+        .mic-btn.listening-wake { background: var(--secondary); animation: pulse-wake 1.5s infinite; }
+        .mic-btn.listening-word { background: var(--success); animation: pulse-word 0.8s infinite; }
+        .mic-btn.disabled { background: #ccc; cursor: not-allowed; box-shadow: none; animation: none;}
+
+        @keyframes pulse-wake {
+            0% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(78, 205, 196, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0); }
+        }
+        @keyframes pulse-word {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(46, 213, 115, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+        }
+
+        .feedback-text {
+            font-size: 24px;
+            font-family: 'Fredoka One', cursive;
+            text-align: center;
+            min-height: 35px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+        }
+        
+        .mic-hint {
+            font-size: 16px;
+            color: #666;
+            font-weight: bold;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px dashed #ccc;
+        }
+
+        /* ================= POPUP MODAL ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 5px solid var(--accent);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-overlay.show .modal-box { transform: scale(1); }
+        .modal-title { font-size: 32px; color: var(--primary); margin-bottom: 10px; font-family: 'Fredoka One', cursive;}
+        .modal-score { font-size: 50px; color: var(--success); font-family: 'Fredoka One', cursive; margin-bottom: 25px; }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+        /* ================= Mobile & Tablet Responsive ================= */
+        @media (max-width: 768px) {
+            h1 { font-size: 28px; }
+            .container { padding: 15px; margin: 5px; border-radius: 16px; }
+            .game-word { font-size: 36px; }
+            .game-card { min-height: 250px; padding: 20px 10px; margin-bottom: 20px; }
+            .mic-btn { width: 80px; height: 80px; font-size: 32px; }
+            .btn { font-size: 14px; padding: 10px 15px; }
+            .btn-success { font-size: 18px; }
+            .feedback-text { font-size: 20px; }
+            .controls-row { flex-direction: column; align-items: stretch; }
+            .controls-row > div, .controls-row > button { width: 100%; text-align: center; justify-content: center;}
+            .word-row { flex-direction: column; }
+            .word-row button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= TEACHER DASHBOARD ================= -->
+    <div id="dashboard-screen" class="screen active">
+        <div class="container">
+            <h1>🌟 Teacher Dashboard 🌟</h1>
+            
+            <div class="controls-row">
+                <!-- အချိန်သတ်မှတ်ချက် (Timer Settings) -->
+                <div class="timer-settings">
+                    <label style="font-weight: bold; color: var(--dark);">Game Timer:</label>
+                    <select id="timer-mode" onchange="toggleTimerInput()">
+                        <option value="none">No Timer (Free Play)</option>
+                        <option value="stopwatch">Stopwatch (Count Up)</option>
+                        <option value="countdown">Countdown Timer</option>
+                    </select>
+                    <input type="number" id="timer-seconds" value="60" style="display:none; width: 80px;" placeholder="Sec">
+                </div>
+            </div>
+
+            <!-- စာလုံးများ အစုလိုက်ထည့်ရန် အကွက် (Bulk Add Area) -->
+            <div class="controls-row" style="flex-direction: column; align-items: stretch; text-align: center; gap: 10px;">
+                <h3 style="color: var(--primary); font-size: 18px;">Bulk Add Words</h3>
+                <textarea id="bulk-input" placeholder="Paste multiple words here (e.g. Apple Banana)" style="width: 100%; height: 80px; border-radius: 8px; padding: 10px; border: 2px solid #ddd;"></textarea>
+                <button class="btn btn-secondary" onclick="addBulkWords()">+ Add Words Automatically</button>
+            </div>
+
+            <div class="controls-row" style="background: transparent; box-shadow: none; padding: 0;">
+                <button class="btn btn-primary" onclick="addWordRow()">+ Add Single Row</button>
+                
+                <!-- TXT Upload & Download -->
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn btn-accent" onclick="downloadTxt()">📥 Download .txt</button>
+                    <div class="file-upload-wrapper">
+                        <button class="btn btn-accent">📤 Upload .txt</button>
+                        <input type="file" id="file-upload" accept=".txt" onchange="uploadTxt(event)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-container" id="word-list-container">
+                <!-- စာလုံးအကွက်များ (Word rows) ဤနေရာတွင် ပေါ်လာမည် -->
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn btn-success" onclick="startGame()">▶ PLAY GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= GAME SCREEN ================= -->
+    <div id="game-screen" class="screen">
+        <div class="container" style="background: transparent; border: none; box-shadow: none;">
+            
+            <div class="game-header">
+                <button class="btn btn-danger" onclick="showGameOverModal()">🚪 Quit</button>
+                <div class="badge timer-badge" id="timer-display-container" style="display: none;">
+                    ⏱ <span id="timer-display">0</span>s
+                </div>
+                <div class="badge">⭐ Score: <span id="score-display">0</span></div>
+            </div>
+
+            <div class="game-nav-buttons">
+                <button class="btn btn-secondary" onclick="previousWord()">⏮ Back</button>
+                <button class="btn btn-secondary" onclick="skipWord()">Skip ⏭</button>
+            </div>
+
+            <div class="game-card card-in" id="game-card">
+                <img id="display-image" class="game-image" src="" alt="Image">
+                <div id="display-word" class="game-word">Word</div>
+            </div>
+
+            <div class="mic-container">
+                <div class="feedback-text" id="feedback-display">Say "Teacher" to start!</div>
+                <button id="mic-btn" class="mic-btn" onclick="manualMicTrigger()">🎤</button>
+                <div class="mic-hint" id="mic-hint">Waiting for "Teacher"...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= GAME OVER POPUP (MODAL) ================= -->
+    <div class="modal-overlay" id="game-over-modal">
+        <div class="modal-box">
+            <div class="modal-title">Game Over!</div>
+            <p style="font-size: 18px; font-weight: bold; color: #666;">Your Final Score</p>
+            <div class="modal-score" id="final-score">0</div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="restartGame()">🔄 Play Again</button>
+                <button class="btn btn-primary" onclick="goToDashboard()">🏠 Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================= ကိန်းရှင်များ (State Variables) ================= */
+        let gameData = [];
+        let currentIndex = 0;
+        let score = 0;
+        
+        // Timer Variables
+        let timerMode = 'none'; // 'none', 'stopwatch', 'countdown'
+        let timeValue = 0;
+        let timerInterval = null;
+
+        // Speech Variables
+        let isWaitingForWord = false; // "Teacher" လို့ပြောပြီး စာလုံးနားထောင်နေချိန်
+        let speechAudioRunning = false; // TTS အသံထွက်နေချိန်
+        let isFirstWord = true; // ပထမဆုံး စာလုံး ဟုတ်/မဟုတ်
+        let autoMicTimeout = null; // Auto ပွင့်မယ့် Timeout
+        
+        /* ================= Web Audio API (Sound Effects ဖန်တီးရန်) ================= */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playCorrectSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playWrongSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playWakeSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        }
+
+        /* ================= Web Speech API (မိုက်ခရိုဖုန်းဖြင့် နားထောင်ခြင်း) ================= */
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isGameActive = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; 
+            recognition.continuous = true; 
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                updateMicUI();
+            };
+
+            recognition.onresult = function(event) {
+                if (speechAudioRunning) return; 
+                
+                const lastIndex = event.results.length - 1;
+                const transcript = event.results[lastIndex][0].transcript.toLowerCase().trim();
+                
+                if (!isWaitingForWord) {
+                    if (transcript.includes("teacher")) {
+                        activateMicForWord();
+                    }
+                } else {
+                    const cleanTranscript = transcript.replace(/[^a-z]/g, ''); 
+                    if(cleanTranscript) {
+                        checkPronunciation(cleanTranscript);
+                    }
+                }
+            };
+
+            recognition.onerror = function(event) {
+                if (event.error !== 'no-speech') {
+                    console.log("Mic Error:", event.error);
+                }
+            };
+
+            recognition.onend = function() {
+                if (isGameActive && !speechAudioRunning) {
+                    try { recognition.start(); } catch(e){}
+                } else {
+                    updateMicUI();
+                }
+            };
+        } else {
+            alert("Speech Recognition not supported. Please use Chrome browser.");
+        }
+
+        // စာလုံးနားထောင်ဖို့ မိုက်ဖွင့်ခြင်း (Activate Mic to listen for the answer)
+        function activateMicForWord() {
+            playWakeSound();
+            isWaitingForWord = true;
+            updateMicUI();
+            showFeedback("I'm listening! Say the word.", "var(--primary)");
+        }
+
+        function updateMicUI() {
+            const btn = document.getElementById('mic-btn');
+            const hint = document.getElementById('mic-hint');
+            
+            btn.classList.remove('listening-wake', 'listening-word', 'disabled');
+            
+            if (!isGameActive) {
+                btn.classList.add('disabled');
+                hint.innerText = "Game Over";
+            } else if (speechAudioRunning) {
+                btn.style.background = '#ccc';
+                hint.innerText = "Please listen...";
+            } else if (isWaitingForWord) {
+                btn.classList.add('listening-word');
+                hint.innerText = "Listening for Answer...";
+            } else {
+                btn.classList.add('listening-wake');
+                hint.innerText = "Say 'Teacher' to activate!";
+            }
+        }
+
+        function manualMicTrigger() {
+            if (speechAudioRunning || !isGameActive) return;
+            initAudio();
+            activateMicForWord();
+            try { recognition.start(); } catch(e){}
+        }
+
+        /* ================= DASHBOARD လုပ်ဆောင်ချက်များ ================= */
+
+        function toggleTimerInput() {
+            const mode = document.getElementById('timer-mode').value;
+            const input = document.getElementById('timer-seconds');
+            input.style.display = (mode === 'countdown') ? 'inline-block' : 'none';
+        }
+
+        function addBulkWords() {
+            const textarea = document.getElementById('bulk-input');
+            const words = textarea.value.split(/[\s,]+/); 
+            words.forEach(word => {
+                if(word.trim() !== '') addWordRow(word.trim(), '');
+            });
+            textarea.value = '';
+        }
+
+        function addWordRow(word = '', imageUrl = '') {
+            const container = document.getElementById('word-list-container');
+            const row = document.createElement('div');
+            row.className = 'word-row';
+            row.innerHTML = `
+                <input type="text" class="input-word" placeholder="Word (Required)" value="${word}">
+                <input type="text" class="input-image" placeholder="Image URL (Optional)" value="${imageUrl}">
+                <button class="btn btn-danger" style="padding: 10px 15px;" onclick="this.parentElement.remove()">X</button>
+            `;
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.onload = () => { addWordRow(); };
+
+        // TXT ဖိုင် အဖြစ် ဒေါင်းလုဒ်လုပ်ရန် (Export to TXT)
+        function downloadTxt() {
+            let content = '';
+            document.querySelectorAll('.word-row').forEach(row => {
+                const word = row.querySelector('.input-word').value.trim();
+                const image = row.querySelector('.input-image').value.trim();
+                if (word || image) content += `${word}|${image}\n`;
+            });
+            if (!content) return alert("No data to download!");
+            const blob = new Blob([content], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "Words.txt";
+            link.click();
+        }
+
+        // TXT ဖိုင်ကို ဖတ်ရန် (Import from TXT)
+        function uploadTxt(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('word-list-container').innerHTML = ''; 
+                e.target.result.split('\n').forEach(line => {
+                    if (line.trim() !== '') {
+                        const parts = line.split('|');
+                        addWordRow(parts[0]?.trim() || '', parts[1]?.trim() || '');
+                    }
+                });
+                if(document.getElementById('word-list-container').children.length === 0) addWordRow();
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        }
+
+        /* ================= ဂိမ်းကစားခြင်း လုပ်ဆောင်ချက်များ ================= */
+
+        function startGame() {
+            initAudio(); 
+            
+            gameData = [];
+            document.querySelectorAll('.word-row').forEach(row => {
+                const word = row.querySelector('.input-word').value.trim();
+                const image = row.querySelector('.input-image').value.trim();
+                if (word) gameData.push({ word, image });
+            });
+
+            if (gameData.length === 0) {
+                alert("Please add some words first!");
+                return;
+            }
+
+            score = 0;
+            currentIndex = 0;
+            isGameActive = true;
+            isWaitingForWord = false;
+            speechAudioRunning = false;
+            isFirstWord = true;
+            updateScoreDisplay();
+            
+            // Setup Timer
+            timerMode = document.getElementById('timer-mode').value;
+            clearInterval(timerInterval);
+            const timerContainer = document.getElementById('timer-display-container');
+            const timerDisplay = document.getElementById('timer-display');
+            
+            if (timerMode === 'none') {
+                timerContainer.style.display = 'none';
+            } else {
+                timerContainer.style.display = 'inline-block';
+                if (timerMode === 'countdown') {
+                    timeValue = parseInt(document.getElementById('timer-seconds').value) || 60;
+                } else if (timerMode === 'stopwatch') {
+                    timeValue = 0;
+                }
+                timerDisplay.innerText = timeValue;
+                
+                timerInterval = setInterval(() => {
+                    if (timerMode === 'countdown') {
+                        timeValue--;
+                        if (timeValue <= 0) {
+                            clearInterval(timerInterval);
+                            showGameOverModal();
+                        }
+                    } else {
+                        timeValue++;
+                    }
+                    timerDisplay.innerText = timeValue;
+                }, 1000);
+            }
+
+            document.getElementById('dashboard-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            document.getElementById('game-over-modal').classList.remove('show');
+
+            try { recognition.start(); } catch(e){}
+
+            loadCurrentWord();
+        }
+
+        function loadCurrentWord() {
+            if (currentIndex >= gameData.length) {
+                showGameOverModal();
+                return;
+            }
+
+            const current = gameData[currentIndex];
+            const card = document.getElementById('game-card');
+            
+            clearTimeout(autoMicTimeout); // အရင္ Auto Timeout တွေရှိရင် ဖျက်မည်
+
+            card.classList.remove('card-in');
+            card.classList.add('card-out');
+            
+            setTimeout(() => {
+                document.getElementById('display-word').innerText = current.word;
+                const imageElement = document.getElementById('display-image');
+                if (current.image) {
+                    imageElement.src = current.image;
+                    imageElement.style.display = 'block';
+                } else {
+                    imageElement.style.display = 'none';
+                }
+                
+                card.classList.remove('card-out');
+                card.classList.add('card-in');
+                
+                if (isFirstWord) {
+                    // ပထမဆုံး စာလုံးဆိုရင် ကိုယ်တိုင် မိုက်နှိပ်တာ သို့မဟုတ် "Teacher" ခေါ်တာကို စောင့်မည်
+                    isWaitingForWord = false; 
+                    showFeedback("Tap Mic or Say 'Teacher' to start!", "var(--dark)");
+                    isFirstWord = false;
+                } else {
+                    // နောက်စာလုံးတွေဆိုရင် Teacher လို့ခေါ်စရာမလိုဘဲ ၂ စက္ကန့်အကြာမှာ Auto ပွင့်မည်
+                    isWaitingForWord = false;
+                    showFeedback("Get ready...", "var(--dark)");
+                    autoMicTimeout = setTimeout(() => {
+                        if (isGameActive && !speechAudioRunning) {
+                            activateMicForWord();
+                        }
+                    }, 2000);
+                }
+                
+                updateMicUI();
+            }, 300);
+        }
+
+        // ⏭ Skip ခလုတ် လုပ်ဆောင်ချက်
+        function skipWord() {
+            if (!isGameActive || speechAudioRunning) return;
+            initAudio();
+            isWaitingForWord = false;
+            currentIndex++;
+            loadCurrentWord();
+        }
+
+        // ⏮ Back ခလုတ် လုပ်ဆောင်ချက်
+        function previousWord() {
+            if (!isGameActive || speechAudioRunning) return;
+            initAudio();
+            if (currentIndex > 0) {
+                isWaitingForWord = false;
+                currentIndex--;
+                loadCurrentWord();
+            }
+        }
+
+        /* ================= အသံစစ်ဆေးခြင်း နှင့် တုံ့ပြန်ခြင်း (Check & Audio Feedback) ================= */
+
+        function checkPronunciation(spokenCleanText) {
+            const targetWord = gameData[currentIndex].word;
+            const cleanTarget = targetWord.toLowerCase().replace(/[^a-z]/g, '');
+            
+            speechAudioRunning = true; 
+            if(recognition) recognition.stop();
+            updateMicUI();
+            clearTimeout(autoMicTimeout);
+
+            if (spokenCleanText === cleanTarget) {
+                // ----- မှန်ကန်ပါက (Correct) -----
+                score++;
+                updateScoreDisplay();
+                showFeedback("Correct! 🎉", "var(--success)");
+                playCorrectSound();
+                
+                setTimeout(() => {
+                    speakText("Correct", 'en-US', 1.0, 1.0, 1.0, () => {
+                        setTimeout(() => {
+                            speechAudioRunning = false;
+                            currentIndex++;
+                            loadCurrentWord();
+                            try { recognition.start(); } catch(e){}
+                        }, 300);
+                    });
+                }, 400); 
+
+            } else {
+                // ----- မှားယွင်းပါက (Incorrect) -----
+                showFeedback("Wrong! ❌", "var(--danger)");
+                playWrongSound();
+                
+                setTimeout(() => {
+                    speakText("Wrong", 'en-US', 1.0, 1.0, 1.0, () => {
+                        setTimeout(() => {
+                            speakText(targetWord, 'en-GB', 0.6, 1.0, 1.2, () => {
+                                setTimeout(() => {
+                                    speechAudioRunning = false;
+                                    currentIndex++;
+                                    loadCurrentWord();
+                                    try { recognition.start(); } catch(e){}
+                                }, 500);
+                            });
+                        }, 300); 
+                    });
+                }, 400);
+            }
+        }
+
+        // Text-to-Speech Engine
+        function speakText(text, langCode, rate, volume, pitch, callback) {
+            const synth = window.speechSynthesis;
+            synth.cancel(); 
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            const voices = synth.getVoices();
+            let selectedVoice;
+            if (langCode === 'en-GB') {
+                selectedVoice = voices.find(v => v.lang === 'en-GB' || v.name.includes('UK') || v.name.includes('British'));
+            } else {
+                selectedVoice = voices.find(v => v.lang === 'en-US' || v.name.includes('US'));
+            }
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            } else {
+                utterance.lang = langCode; 
+            }
+
+            utterance.rate = rate;     
+            utterance.volume = volume; 
+            utterance.pitch = pitch;   
+
+            utterance.onend = function() {
+                if (callback) callback();
+            };
+
+            synth.speak(utterance);
+        }
+
+        window.speechSynthesis.onvoiceschanged = function() {
+            window.speechSynthesis.getVoices();
+        };
+
+        /* ================= UI Updates & Navigation ================= */
+
+        function updateScoreDisplay() {
+            document.getElementById('score-display').innerText = score;
+        }
+
+        function showFeedback(text, color) {
+            const fb = document.getElementById('feedback-display');
+            fb.innerText = text;
+            fb.style.color = color;
+        }
+
+        function showGameOverModal() {
+            isGameActive = false;
+            clearInterval(timerInterval);
+            clearTimeout(autoMicTimeout);
+            window.speechSynthesis.cancel();
+            if(recognition) recognition.stop();
+            updateMicUI();
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('game-over-modal').classList.add('show');
+        }
+
+        function restartGame() {
+            document.getElementById('game-over-modal').classList.remove('show');
+            startGame();
+        }
+
+        function goToDashboard() {
+            isGameActive = false;
+            clearInterval(timerInterval);
+            clearTimeout(autoMicTimeout);
+            if(recognition) recognition.stop();
+            
+            document.getElementById('game-over-modal').classList.remove('show');
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('dashboard-screen').classList.add('active');
+        }
+
+    </script>
+</body>
+</html>
