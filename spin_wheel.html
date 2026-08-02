@@ -898,6 +898,71 @@
         let lastWinnerIndex = -1;
         let animationFrameId = null;
         let globalRequestStop = false;
+        let speechRecognition = null; // New Voice Control Variable
+
+        function setupVoiceControl() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!window.SpeechRecognition) {
+                console.warn("Speech Recognition API is not supported in this browser.");
+                return;
+            }
+            
+            speechRecognition = new window.SpeechRecognition();
+            speechRecognition.continuous = true;
+            speechRecognition.interimResults = true; 
+            speechRecognition.lang = 'en-US';
+
+            let commandCooldown = false;
+
+            speechRecognition.onresult = function(event) {
+                if (commandCooldown) return;
+
+                // Combine all available transcripts to catch even very soft or partial words
+                let fullTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    fullTranscript += event.results[i][0].transcript.toLowerCase();
+                }
+
+                const popupBox = document.getElementById("spinResultBox");
+                const isPopupVisible = popupBox && popupBox.style.display === "block";
+                let commandTriggered = false;
+
+                // Command Logic Based on Game State
+                if (isPopupVisible) {
+                    if (fullTranscript.includes("remove")) {
+                        removeWinnerNamePermanently();
+                        commandTriggered = true;
+                    } else if (fullTranscript.includes("keep")) {
+                        closeConsoleSpinPopup();
+                        commandTriggered = true;
+                    }
+                } else {
+                    if (fullTranscript.includes("spin") && !isSpinning) {
+                        toggleWheelSpinEngine();
+                        commandTriggered = true;
+                    } else if (fullTranscript.includes("stop") && isSpinning) {
+                        toggleWheelSpinEngine(); 
+                        commandTriggered = true;
+                    }
+                }
+
+                // If a command works, flush the mic buffer instantly for the next round
+                if (commandTriggered) {
+                    commandCooldown = true;
+                    try { speechRecognition.abort(); } catch(e) {}
+                    
+                    // Release cooldown after 1 second
+                    setTimeout(() => { commandCooldown = false; }, 1000);
+                }
+            };
+
+            speechRecognition.onend = function() {
+                // Restart immediately with a clean slate
+                if (document.getElementById("gameRuntimeView").style.display === "flex") {
+                    try { speechRecognition.start(); } catch(e) {}
+                }
+            };
+        }
 
         const segmentColors = [
             "#3498db", "#5dade2", "#2ecc71", "#58d68d", "#e67e22", 
@@ -1155,6 +1220,12 @@
             document.getElementById("gameRuntimeView").style.display = "flex";
             document.getElementById("liveSecondsInput").value = durationSeconds;
 
+            // Start Voice Control Engine
+            if (!speechRecognition) setupVoiceControl();
+            if (speechRecognition) {
+                try { speechRecognition.start(); } catch(e) { console.log(e); }
+            }
+
             currentRotationAngle = 0;
             lastWinnerIndex = -1;
             isSpinning = false;
@@ -1221,81 +1292,88 @@
         function drawConsoleWheelGraphic(currentRotationRad) {
             const canvas = document.getElementById("wheelCanvas");
             if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, 600, 600);
-
+            
             const numSegs = matrixStoreData.length;
             if (numSegs === 0) return 0;
 
             const arcSize = (2 * Math.PI) / numSegs;
 
-            ctx.save();
-            ctx.translate(300, 300);
-            ctx.rotate(currentRotationRad);
-
-            for (let i = 0; i < numSegs; i++) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, 290, i * arcSize, (i + 1) * arcSize);
-
-                let colorIdx = i;
-                if (numSegs % 2 !== 0 && i === numSegs - 1) {
-                    colorIdx = 3; 
-                }
-
-                ctx.fillStyle = segmentColors[colorIdx % segmentColors.length];
-                ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "#ffffff";
-                ctx.stroke();
+            // PERFORMANCE FIX: Only redraw the heavy Canvas graphics if it is NOT spinning.
+            // During the spin, we skip the heavy rendering and rely purely on GPU CSS rotation!
+            if (!isSpinning || currentRotationRad === 0) {
+                const ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, 600, 600);
 
                 ctx.save();
-                ctx.rotate((i + 0.5) * arcSize);
+                ctx.translate(300, 300);
                 
-                let seg = matrixStoreData[i];
-
-                if (seg.imgObj && seg.imgObj.complete && seg.imgObj.naturalWidth !== 0) {
-                    ctx.save();
-                    let translateRadius = (seg.text === "") ? 185 : 165;
-                    ctx.translate(translateRadius, 0);
-                    ctx.rotate(Math.PI / 2);
+                for (let i = 0; i < numSegs; i++) {
                     ctx.beginPath();
-                    let imageRadius = (seg.text === "") ? 35 : 26;
-                    ctx.arc(0, 0, imageRadius, 0, Math.PI * 2);
-                    ctx.clip();
-                    ctx.drawImage(seg.imgObj, -imageRadius, -imageRadius, imageRadius*2, imageRadius*2);
-                    ctx.restore();
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, 290, i * arcSize, (i + 1) * arcSize);
 
-                    if (seg.text !== "") {
+                    let colorIdx = i;
+                    if (numSegs % 2 !== 0 && i === numSegs - 1) {
+                        colorIdx = 3; 
+                    }
+
+                    ctx.fillStyle = segmentColors[colorIdx % segmentColors.length];
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.stroke();
+
+                    ctx.save();
+                    ctx.rotate((i + 0.5) * arcSize);
+                    
+                    let seg = matrixStoreData[i];
+
+                    if (seg.imgObj && seg.imgObj.complete && seg.imgObj.naturalWidth !== 0) {
+                        ctx.save();
+                        let translateRadius = (seg.text === "") ? 185 : 165;
+                        ctx.translate(translateRadius, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.beginPath();
+                        let imageRadius = (seg.text === "") ? 35 : 26;
+                        ctx.arc(0, 0, imageRadius, 0, Math.PI * 2);
+                        ctx.clip();
+                        ctx.drawImage(seg.imgObj, -imageRadius, -imageRadius, imageRadius*2, imageRadius*2);
+                        ctx.restore();
+
+                        if (seg.text !== "") {
+                            ctx.fillStyle = "white";
+                            let fontSize = seg.text.length > 12 ? 11 : 14;
+                            ctx.font = `bold ${fontSize}px sans-serif`;
+                            ctx.textAlign = "right";
+                            ctx.textBaseline = "middle";
+                            ctx.fillText(seg.text, 120, 0);
+                        }
+                    } else if (seg.text !== "") {
                         ctx.fillStyle = "white";
-                        let fontSize = seg.text.length > 12 ? 11 : 14;
+                        let fontSize = 16;
+                        if (seg.text.length > 12) fontSize = 13;
+                        if (seg.text.length > 20) fontSize = 10;
+
                         ctx.font = `bold ${fontSize}px sans-serif`;
                         ctx.textAlign = "right";
                         ctx.textBaseline = "middle";
-                        ctx.fillText(seg.text, 120, 0);
+                        ctx.fillText(seg.text, 255, 0);
                     }
-                } else if (seg.text !== "") {
-                    ctx.fillStyle = "white";
-                    let fontSize = 16;
-                    if (seg.text.length > 12) fontSize = 13;
-                    if (seg.text.length > 20) fontSize = 10;
-
-                    ctx.font = `bold ${fontSize}px sans-serif`;
-                    ctx.textAlign = "right";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(seg.text, 255, 0);
+                    ctx.restore();
                 }
                 ctx.restore();
-            }
-            ctx.restore();
 
-            const grad = ctx.createRadialGradient(300, 300, 20, 300, 300, 290);
-            grad.addColorStop(0, 'rgba(255,255,255,0.05)');
-            grad.addColorStop(1, 'rgba(0,0,0,0.15)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(300, 300, 290, 0, Math.PI * 2);
-            ctx.fill();
+                const grad = ctx.createRadialGradient(300, 300, 20, 300, 300, 290);
+                grad.addColorStop(0, 'rgba(255,255,255,0.05)');
+                grad.addColorStop(1, 'rgba(0,0,0,0.15)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(300, 300, 290, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // GPU Hardware Acceleration for smooth rotation
+            canvas.style.transform = `rotate(${currentRotationRad}rad)`;
 
             let normalizedAngle = (2 * Math.PI - (currentRotationRad % (2 * Math.PI))) % (2 * Math.PI);
             let targetIdx = Math.floor(normalizedAngle / arcSize);
@@ -1412,6 +1490,13 @@
         }
 
         function quitActiveGameEngine() {
+            // Stop Voice Control Engine
+            if (speechRecognition) {
+                speechRecognition.onend = null; // Prevent auto-restart loop
+                try { speechRecognition.stop(); } catch(e) { console.log(e); }
+                speechRecognition = null;
+            }
+
             if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (document.exitFullscreen) document.exitFullscreen();
             }

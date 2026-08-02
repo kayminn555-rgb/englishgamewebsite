@@ -25,8 +25,6 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         body {
@@ -101,6 +99,7 @@
 
         .hidden {
             opacity: 0;
+            visibility: hidden;
             pointer-events: none !important;
         }
 
@@ -136,6 +135,8 @@
             color: var(--holo-light); padding: 12px; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem;
             outline: none; transition: all 0.3s; border-radius: 5px;
             pointer-events: auto;
+            user-select: auto;
+            -webkit-user-select: auto;
         }
         input:focus, textarea:focus { border-color: var(--holo-blue); box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); background: rgba(0, 30, 60, 0.8); }
         textarea { height: 100px; resize: none; }
@@ -313,10 +314,12 @@
                     </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 10px;">
+                <div style="text-align: center; margin-top: 10px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                     <button id="btn-start" class="holo-btn" onclick="startGame()">INITIALIZE</button>
-                    <!-- Fullscreen button on dashboard -->
-                    <button id="btn-fs-dash" class="holo-btn purple" onclick="toggleFullscreen()" style="margin-left: 15px;">FULLSCREEN</button>
+                    <button id="btn-save-txt" class="holo-btn purple" onclick="downloadTXT()">EXPORT TXT</button>
+                    <button id="btn-load-txt" class="holo-btn pink" onclick="document.getElementById('txt-file-input').click()">IMPORT TXT</button>
+                    <input type="file" id="txt-file-input" accept=".txt" style="display: none;" onchange="uploadTXT(event)">
+                    <button id="btn-fs-dash" class="holo-btn" onclick="toggleFullscreen()">FULLSCREEN</button>
                 </div>
             </div>
         </div>
@@ -662,9 +665,75 @@
             setTimeout(() => basket.classList.remove(cls), 500);
         }
 
+        // --- TXT File Export & Import Logic ---
+        function downloadTXT() {
+            const lName = document.getElementById('left-name').value;
+            const lWords = document.getElementById('left-words').value;
+            const rName = document.getElementById('right-name').value;
+            const rWords = document.getElementById('right-words').value;
 
+            const content = `LEFT_CATEGORY: ${lName}\nLEFT_WORDS: ${lWords}\nRIGHT_CATEGORY: ${rName}\nRIGHT_WORDS: ${rWords}`;
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `vocab_preset_${lName}_vs_${rName}.txt`.toLowerCase();
+            link.click();
+            URL.revokeObjectURL(link.href);
+            playSound('click');
+        }
+
+        function uploadTXT(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result;
+                const lines = text.split('\n');
+
+                let lName = "", lWords = "", rName = "", rWords = "";
+
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith("LEFT_CATEGORY:")) {
+                        lName = trimmed.replace("LEFT_CATEGORY:", "").trim();
+                    } else if (trimmed.startsWith("LEFT_WORDS:")) {
+                        lWords = trimmed.replace("LEFT_WORDS:", "").trim();
+                    } else if (trimmed.startsWith("RIGHT_CATEGORY:")) {
+                        rName = trimmed.replace("RIGHT_CATEGORY:", "").trim();
+                    } else if (trimmed.startsWith("RIGHT_WORDS:")) {
+                        rWords = trimmed.replace("RIGHT_WORDS:", "").trim();
+                    }
+                });
+
+                // Labeled format မဟုတ်ဘဲ ၄ ကြောင်း တိုက်ရိုက် ရေးထားလျှင်လည်း ဖတ်ပေးနိုင်အောင် ပြုလုပ်ထားခြင်း
+                if (!lName && !rName && lines.length >= 4) {
+                    lName = lines[0].trim();
+                    lWords = lines[1].trim();
+                    rName = lines[2].trim();
+                    rWords = lines[3].trim();
+                }
+
+                if (lName) document.getElementById('left-name').value = lName;
+                if (lWords) document.getElementById('left-words').value = lWords;
+                if (rName) document.getElementById('right-name').value = rName;
+                if (rWords) document.getElementById('right-words').value = rWords;
+
+                alert("TXT File မှ စာလုံး Presets များကို အောင်မြင်စွာ တင်ယူပြီးပါပြီ။");
+                playSound('click');
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+        
         function getActiveButtons() {
-            if (currentScreen === 'dashboard') return [document.getElementById('btn-start'), document.getElementById('btn-fs-dash')];
+            if (currentScreen === 'dashboard') return [
+                document.getElementById('btn-start'),
+                document.getElementById('btn-save-txt'),
+                document.getElementById('btn-load-txt'),
+                document.getElementById('btn-fs-dash')
+            ];
             if (currentScreen === 'game') return [document.getElementById('btn-dash'), document.getElementById('btn-restart'), document.getElementById('btn-fullscreen')];
             if (currentScreen === 'gameover') return [document.getElementById('btn-playagain'), document.getElementById('btn-todash')];
             return [];

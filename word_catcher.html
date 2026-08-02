@@ -70,6 +70,13 @@
                 <label class="block text-base font-black mb-1 text-emerald-700 uppercase">🔤 Vocabulary Words</label>
                 <p class="text-xs text-emerald-600/70 font-bold mb-3">Enter words separated by commas. The AI will automatically generate 3 misspelled options for each word.</p>
                 <textarea id="words-textarea" rows="4" class="w-full bg-white border-2 border-emerald-200 rounded-xl p-4 text-slate-700 font-bold focus:outline-none focus:border-emerald-400 text-base shadow-inner mb-4" placeholder="apple, banana, teacher, student, school">apple, banana, teacher, student, computer</textarea>
+                
+                <!-- ဂိမ်းဆော့မည့် အချိန်ကို မိနစ်ဖြင့် သတ်မှတ်ရန် Input -->
+                <div class="mb-4">
+                    <label class="block text-xs font-black text-emerald-700 uppercase mb-1">⏱️ Time Limit (Minutes)</label>
+                    <input type="number" id="time-input" min="1" value="3" class="w-full bg-white border-2 border-emerald-200 rounded-xl p-3 text-slate-700 font-bold focus:outline-none focus:border-emerald-400 text-base shadow-inner">
+                </div>
+
                 <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white font-black py-4 px-4 rounded-xl shadow-lg text-xl cursor-pointer transition uppercase tracking-wider transform hover:scale-[1.02]">
                     Start Game 🚀
                 </button>
@@ -158,8 +165,9 @@
         let timerInterval = null;
 
         let activeHandIndexTip = null; 
+        let activeHandLandmarks = null; // ဒီနေရာတွင် Global အနေဖြင့် ကြေညာမှ Error မတက်မည်ဖြစ်သည်
         let handTrails = []; 
-        let mouseTrail = []; 
+        let mouseTrail = [];
         let isMouseDown = false;
 
         let cameraEngine = null;
@@ -217,14 +225,24 @@
             reader.readAsText(file);
         });
 
-        // Timer Logic
+        // အချိန်မှတ်စနစ် (Count Down) နှင့် ဂိမ်းပြီးဆုံးခြင်း Logic
         function startTimer() {
             stopTimer();
-            totalSeconds = 0;
+            // Input မှ မိနစ်ကို ရယူပြီး စက္ကန့်ပြောင်းပါသည်
+            let inputMins = document.getElementById('time-input').value;
+            totalSeconds = parseInt(inputMins) * 60;
+            if(isNaN(totalSeconds) || totalSeconds <= 0) totalSeconds = 180; // Default အနေဖြင့် ၃ မိနစ် သတ်မှတ်ထားသည်
+            
             updateTimerDisplay();
             timerInterval = setInterval(() => {
-                totalSeconds++;
-                updateTimerDisplay();
+                totalSeconds--;
+                if (totalSeconds <= 0) {
+                    totalSeconds = 0;
+                    updateTimerDisplay();
+                    triggerGameOver(); // အချိန်ကုန်သွားပါက ဂိမ်းရပ်ပါမည်
+                } else {
+                    updateTimerDisplay();
+                }
             }, 1000);
         }
 
@@ -239,6 +257,21 @@
             let mins = Math.floor(totalSeconds / 60);
             let secs = totalSeconds % 60;
             timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // စကားလုံးကုန်သွားချိန် (သို့) အချိန်ကုန်သွားချိန်တွင် ဂိမ်းရပ်ရန် Function
+        function triggerGameOver() {
+            isGameRunning = false;
+            stopTimer();
+            finalScoreText.innerText = `${kidScore} / ${gameDataPool.length}`;
+            
+            let mins = Math.floor(totalSeconds / 60);
+            let secs = totalSeconds % 60;
+            finalTimeText.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            // ရလဒ်ပြသည့်ဘုတ်တွင် Time Taken အစား Time Left ဟု ပြောင်းပြရန်
+            document.querySelector('#final-time-text').previousElementSibling.innerText = "TIME LEFT"; 
+            
+            resultDialog.classList.remove('hidden');
         }
 
         // Auto Typo Generator Logic
@@ -369,15 +402,7 @@
 
         function loadNextRound() {
             if (currentWordIndex >= gameDataPool.length) {
-                isGameRunning = false;
-                stopTimer(); // Stop timer on game over
-                finalScoreText.innerText = `${kidScore} / ${gameDataPool.length}`;
-                
-                let mins = Math.floor(totalSeconds / 60);
-                let secs = totalSeconds % 60;
-                finalTimeText.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                
-                resultDialog.classList.remove('hidden');
+                triggerGameOver(); // ဂိမ်းပြီးဆုံးကြောင်း function ကို လှမ်းခေါ်ပါသည်
                 return;
             }
 
@@ -400,11 +425,12 @@
             ctx.font = "900 34px sans-serif";
             
             // Standardize responsive positions (Left Top, Left Bottom, Right Top, Right Bottom)
+            // စာလုံး ၄ လုံးကို ဖန်သားပြင်၏ ထောင့် ၄ ထောင့်သို့ ပိုကပ်သွားစေရန် အကွာအဝေးကို ချဲ့ထားပါသည်
             let positions = [
-                { cx: canvas.width * 0.25, cy: canvas.height * 0.40 },
-                { cx: canvas.width * 0.25, cy: canvas.height * 0.70 },
-                { cx: canvas.width * 0.75, cy: canvas.height * 0.40 },
-                { cx: canvas.width * 0.75, cy: canvas.height * 0.70 }
+                { cx: canvas.width * 0.18, cy: canvas.height * 0.25 },
+                { cx: canvas.width * 0.18, cy: canvas.height * 0.80 },
+                { cx: canvas.width * 0.82, cy: canvas.height * 0.25 },
+                { cx: canvas.width * 0.82, cy: canvas.height * 0.80 }
             ];
 
             for (let i = 0; i < 4; i++) {
@@ -472,22 +498,33 @@
                 minTrackingConfidence: 0.5
             });
 
+            // လက်ဆစ် ၂၁ ခုလုံး၏ နေရာများကို သိမ်းထားမည့် Variable
             handsEngine.onResults((results) => {
-                if (!isGameRunning || isTransitioning) { 
+                // isTransitioning ဖြစ်နေချိန်တွင် အောက်က Code များကို ကျော်မသွားစေရန် ဖြုတ်လိုက်ပါသည်
+                if (!isGameRunning) { 
                     activeHandIndexTip = null;
+                    activeHandLandmarks = null;
                     return; 
                 }
                 
                 if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                    let indexTip = results.multiHandLandmarks[0][8]; 
+                    activeHandLandmarks = results.multiHandLandmarks[0];
+
+                    let indexTip = activeHandLandmarks[8]; 
                     
                     let hx = (1 - indexTip.x) * canvas.width;
                     let hy = indexTip.y * canvas.height;
 
                     activeHandIndexTip = { x: hx, y: hy };
-                    handTrails.push({ x: hx, y: hy, time: Date.now() });
+                    
+                    // စာလုံးပြောင်းနေချိန်တွင် လက်ပုံစံကိုသာ ဆက်ပြထားပြီး ခုတ်သည့်လမ်းကြောင်း (Trail) ကို မမှတ်တော့ပါ
+                    // သို့မှသာ နောက်စာလုံးကို အလိုအလျောက် သွားခုတ်မိခြင်းမှ ကာကွယ်နိုင်မည်ဖြစ်သည်
+                    if (!isTransitioning) {
+                        handTrails.push({ x: hx, y: hy, time: Date.now() });
+                    }
                 } else {
                     activeHandIndexTip = null;
+                    activeHandLandmarks = null;
                 }
             });
 
@@ -497,10 +534,10 @@
                     video.srcObject = stream;
                     
                     cameraEngine = new Camera(video, {
-                        onFrame: async () => {
-                            if (isGameRunning && !isTransitioning && handsEngine && !isAiProcessing) {
+                       onFrame: async () => {
+                            // စာလုံးပြောင်းနေချိန် (Transition) တွင် Camera AI ရပ်မသွားစေရန် !isTransitioning ကို ဖြုတ်လိုက်ပါသည်
+                            if (isGameRunning && handsEngine && !isAiProcessing) {
                                 isAiProcessing = true;
-                                // Pass the raw video feed for improved quality and tracking accuracy
                                 try {
                                     await handsEngine.send({ image: video });
                                 } catch (e) {}
@@ -632,7 +669,14 @@
                     }
 
                     for (let slash of slicePoints) {
-                        if (checkIntersection(slash.prev, slash.curr, item)) {
+                        // Pointer ရွေ့လျားမှု အကွာအဝေး (Velocity/Speed) ကို တွက်ချက်ပါသည်
+                        let dx = slash.curr.x - slash.prev.x;
+                        let dy = slash.curr.y - slash.prev.y;
+                        let swipeDistance = Math.sqrt(dx * dx + dy * dy);
+
+                        // အကွာအဝေး 15 pixels ထက်ကြီးမှ (Fruit Ninja ကဲ့သို့ အမြန်ခုတ်ချမှ) ရွေးချယ်မှု အောင်မြင်ပါမည်
+                        // ထိရုံ (သို့) ဖြည်းဖြည်းလေး ရွှေ့ရုံဖြင့် မရွေးမိတော့ပါ
+                        if (swipeDistance > 15 && checkIntersection(slash.prev, slash.curr, item)) {
                             isTargetHit = true;
                             break;
                         }
@@ -758,20 +802,64 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Pointer
+        // Pointer နှင့် လက်ပုံစံ (Hand Skeleton) ဆွဲရန်
         function drawBladePointer() {
-            if (!activeHandIndexTip) return;
+            if (!activeHandLandmarks) return;
+
             ctx.save();
-            ctx.shadowColor = '#f472b6';
-            ctx.shadowBlur = 15;
-            ctx.fillStyle = '#ec4899'; // Bright Pink pointer
-            ctx.beginPath();
-            ctx.arc(activeHandIndexTip.x, activeHandIndexTip.y, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(activeHandIndexTip.x, activeHandIndexTip.y, 4, 0, Math.PI * 2);
-            ctx.fill();
+            
+            // လက်ဆစ်များ ဆက်ဆွဲရမည့် အမှတ်စဉ်များ (MediaPipe Hand Connections)
+            const connections = [
+                [0,1], [1,2], [2,3], [3,4],       // လက်မ (Thumb)
+                [0,5], [5,6], [6,7], [7,8],       // လက်ညိုး (Index finger)
+                [5,9], [9,10], [10,11], [11,12],  // လက်ခလယ် (Middle finger)
+                [9,13], [13,14], [14,15], [15,16],// လက်သူကြွယ် (Ring finger)
+                [13,17], [17,18], [18,19], [19,20],// လက်သန်း (Pinky)
+                [0,17]                            // လက်ဖဝါး အောက်ခြေ (Palm base)
+            ];
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#60a5fa'; // လက်ပုံစံ လိုင်းများကို အပြာနုရောင် ပြထားပါသည်
+            ctx.shadowColor = '#3b82f6';
+            ctx.shadowBlur = 10;
+
+            // လိုင်းများ (Skeleton Lines) ဆွဲခြင်း
+            connections.forEach(pair => {
+                const startPoint = activeHandLandmarks[pair[0]];
+                const endPoint = activeHandLandmarks[pair[1]];
+
+                let sx = (1 - startPoint.x) * canvas.width;
+                let sy = startPoint.y * canvas.height;
+                let ex = (1 - endPoint.x) * canvas.width;
+                let ey = endPoint.y * canvas.height;
+
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(ex, ey);
+                ctx.stroke();
+            });
+
+            // အဆစ်နေရာများကို အစက်လေးတွေနဲ့ ပြရန်
+            activeHandLandmarks.forEach((point, index) => {
+                let px = (1 - point.x) * canvas.width;
+                let py = point.y * canvas.height;
+
+                ctx.beginPath();
+                // လက်ညိုးထိပ် (Index 8) ကို ခုတ်ချမည့် နေရာဖြစ်ကြောင်း သိသာစေရန် အနည်းငယ် ကြီးထားပြီး အဖြူရောင်လင်းနေစေပါသည်
+                if(index === 8) {
+                    ctx.arc(px, py, 7, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 15;
+                } else {
+                    // ကျန်တဲ့အဆစ်များကို အပြာနုရောင် အစက်သေးသေးလေးများ ပြထားပါသည်
+                    ctx.arc(px, py, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#93c5fd'; 
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+            });
+
             ctx.restore();
         }
 

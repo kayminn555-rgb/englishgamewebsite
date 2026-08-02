@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Phone နှင့် Tablet များတွင် Screen Size အတိအကျဖြစ်စေရန် -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Educational Arcade Game Hub</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,15 +13,13 @@
 
     <style>
         /* ==========================================
-           LIGHT PREMIUM & COLORFUL THEME
+           LIGHT PREMIUM & COLORFUL THEME (Base / Hub)
            ========================================== */
         :root {
             --bg-main: #f8fafc;
             --text-dark: #0f172a;
             --text-gray: #475569;
             --glass-bg: rgba(255, 255, 255, 0.7);
-            
-            /* Vibrant Accents */
             --primary: #3b82f6;
             --secondary: #ec4899;
             --tertiary: #8b5cf6;
@@ -37,10 +36,11 @@
             user-select: none;
         }
 
-        /* Ambient Background Blobs */
+        /* Ambient Background Blobs (Hub အတွက်သာ) */
         .bg-blobs {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; overflow: hidden; pointer-events: none;
+            transition: opacity 0.3s;
         }
         .blob {
             position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5;
@@ -55,19 +55,14 @@
             100% { transform: translate(40px, -40px) scale(1.1); }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        body {
-            display: flex; flex-direction: column; align-items: center;
-            padding-bottom: 80px;
-        }
+        body { display: flex; flex-direction: column; align-items: center; padding-bottom: 80px; }
 
         /* ==========================================
-           MODERN NAVIGATION
+           MODERN NAVIGATION (Hub)
            ========================================== */
         .navbar {
             width: 100%;
@@ -76,6 +71,7 @@
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
             border-bottom: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: opacity 0.3s, transform 0.3s;
         }
 
         .nav-logo {
@@ -112,13 +108,10 @@
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header-section { margin: 30px 0 10px 0; text-align: center; }
+        .header-section { margin: 30px 0 10px 0; text-align: center; position: relative; z-index: 5; }
         h1 { font-family: 'Fredoka', sans-serif; font-size: 3rem; margin: 0 0 8px 0; color: var(--text-dark); }
         .subtitle { font-size: 1.1rem; font-weight: 600; color: var(--text-gray); margin: 0; }
 
-        /* ==========================================
-           HOME PAGE
-           ========================================== */
         .hero-card {
             background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px);
             border: 1px solid white; border-radius: 30px;
@@ -138,83 +131,135 @@
             border-radius: 30px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
             box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3); transition: all 0.3s;
         }
-        .cta-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 15px 25px rgba(236, 72, 153, 0.4); }
 
         /* ==========================================
-           🎮 3D INFINITE CAROUSEL (SLEEK CARDS)
+           🎮 EXACT PS4 UI (Games Page)
            ========================================== */
-        .carousel-scene {
-            width: 100%; height: 500px;
-            display: flex; justify-content: center; align-items: center;
-            perspective: 1200px; overflow: hidden; position: relative;
-            margin-top: 10px;
-            touch-action: pan-y; /* Allows normal vertical scrolling while catching horizontal swipes */
+        
+        #gamesPage.active-section {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 9999; padding: 0; margin: 0; max-width: none;
+            background-color: #001235; /* PS4 Dark Blue Base */
+            display: flex; flex-direction: column; overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
         }
 
+        /* PS4 Dynamic Wavy Background & Color */
+        .ps4-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 20%, #0a46b5 0%, #001235 70%);
+            z-index: 1;
+        }
+        .ps4-wave {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 80% -20%, transparent 60%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.03) 62%, transparent 62%),
+                radial-gradient(circle at 10% 120%, transparent 60%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.03) 62%, transparent 62%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* PS4 Top Navigation Bar */
+        .ps4-top-bar {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 25px 40px;
+            box-sizing: border-box; display: flex; justify-content: space-between;
+            color: white; z-index: 10; align-items: center;
+        }
+        
+        /* ပြန်ထွက်ရန် ခလုတ် (Back to Hub) */
+        .ps4-back-btn {
+            background: transparent; border: none; color: white;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-family: inherit;
+            transition: 0.2s;
+        }
+        .ps4-back-btn:hover { color: #cbd5e1; transform: translateX(-5px); }
+
+        /* PS4 System Icons (Profile, Time etc.) */
+        .ps4-sys-icons {
+            display: flex; align-items: center; gap: 20px;
+            font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .ps4-sys-icons span { font-weight: 600; font-size: 1rem; margin-left: 5px; }
+
+        /* Carousel Area */
+        .carousel-scene {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            z-index: 5; touch-action: pan-y;
+        }
+
+        /* Game Card Styling (PS4 နှင့် ချွတ်စွတ်တူစေရန်)
+           ရွေးထားသည့် Card မှာ အဖြူရောင် Border နှင့် Shadow ပေါ်မည် 
+        */
         .game-card {
             position: absolute;
-            width: 250px; height: 350px;
-            transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s;
+            top: 45%; /* Screen ရဲ့ အပေါ်နည်းနည်းရောက်နေမည် */
+            width: 130px; height: 130px; 
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid transparent; 
+            border-radius: 3px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             cursor: pointer;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
             display: flex; flex-direction: column;
-            border: 2px solid transparent;
+            transition: opacity 0.3s ease; /* Transform ကို JS ဘက်မှ ထိန်းမည် */
         }
-
+        .game-card img { width: 100%; height: 100%; object-fit: cover; }
+        
         .game-card.active {
-            border: 2px solid white;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), 0 20px 40px rgba(0,0,0,0.2);
+            border: 3px solid #ffffff; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.2);
         }
 
-        .game-card img {
-            width: 100%; height: 100%; 
-            object-fit: contain;
-            background-color: #f1f5f9;
-            padding: 5px; box-sizing: border-box;
+        /* PS4 Game Information Box 
+           (ရွေးချယ်ထားသော Game ၏ အောက်တည့်တည့်တွင် ပေါ်မည်)
+        */
+        .ps4-info-box {
+            position: absolute;
+            top: 65%; /* Card များ၏ အောက်တွင် */
+            left: 20vw; /* Desktop အတွက် Left Edge နေရာ */
+            transform: translateX(-50%); /* Center Align ချိန်ရန် */
+            width: 400px; text-align: center;
+            color: white; z-index: 10;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
         }
+        .ps4-info-box.visible { opacity: 1; pointer-events: all; }
 
-        .card-info {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(15,23,42, 0.95) 0%, rgba(15,23,42, 0.8) 60%, transparent 100%);
-            padding: 30px 15px 15px 15px; color: white;
-            text-align: center;
-            transform: translateY(100%); transition: transform 0.3s ease;
+        .ps4-info-box h1 { 
+            font-family: 'Quicksand', sans-serif; font-size: 2.2rem; 
+            margin: 0 0 10px 0; font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        .ps4-info-box p {
+            margin: 0; font-size: 1rem; color: #cbd5e1; font-weight: 600;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
         
-        .game-card.active .card-info {
-            transform: translateY(0);
+        /* Start Game Button (Pointer မသုံးဘဲ Mouse ဖြင့် နှိပ်လိုလျှင်) */
+        .ps4-start-btn {
+            margin-top: 15px; padding: 10px 25px; border-radius: 20px;
+            background: rgba(255,255,255,0.15); color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            font-family: inherit; font-size: 1rem; font-weight: bold;
+            cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px);
         }
+        .ps4-start-btn:hover { background: white; color: #001235; }
 
-        .card-info h4 { font-family: 'Fredoka', sans-serif; font-size: 1.2rem; margin: 0 0 5px 0; }
-        .card-info span { font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
-
-        .play-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease; z-index: 10;
+        /* Responsive Layout အတွက် ချိန်ညှိမှုများ */
+        @media (max-width: 768px) {
+            .ps4-top-bar { padding: 15px 20px; }
+            .ps4-sys-icons { gap: 10px; font-size: 1rem; }
+            .game-card { width: 100px; height: 100px; top: 40%; } 
+            .ps4-info-box { top: 60%; width: 90vw; }
+            .ps4-info-box h1 { font-size: 1.8rem; }
         }
-        .game-card.active:hover .play-overlay { opacity: 1; }
-        
-        .play-overlay .btn-play-now {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; padding: 14px 28px; border-radius: 30px; font-weight: 800;
-            font-size: 1.1rem; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: scale(0.9); transition: all 0.3s;
-        }
-        .game-card.active:hover .play-overlay .btn-play-now { transform: scale(1); }
-        .play-overlay .btn-play-now:hover { transform: scale(1.05); }
 
         /* ==========================================
-           GRID LAYOUT (DYNAMIC TABS)
+           GRID LAYOUT & ADMIN TOOLS
            ========================================== */
         .grid-container {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px; padding: 20px 0;
+            gap: 25px; padding: 20px 0; position: relative; z-index: 2;
         }
 
         .premium-card {
@@ -236,9 +281,7 @@
             background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; text-transform: uppercase;
         }
 
-        /* ==========================================
-           ADMIN TOOL: FAB, MODALS & TAB CONTROLS
-           ========================================== */
+        /* Admin Tools */
         .fab-btn {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%;
             background: white; color: var(--primary); font-size: 1.5rem;
@@ -247,85 +290,49 @@
             cursor: pointer; z-index: 1000; transition: all 0.3s ease;
         }
         .fab-btn:hover { background: var(--primary); color: white; transform: scale(1.1) rotate(90deg); }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-
-        .modal-box {
-            background: white; width: 90%; max-width: 480px; border-radius: 24px; padding: 30px;
-            transform: translateY(30px) scale(0.9); transition: 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
-
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { font-family: 'Fredoka'; margin: 0; font-size: 1.5rem; color: var(--text-dark); }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-gray); }
-
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem;}
-        .form-control {
-            width: 100%; padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #cbd5e1;
-            color: var(--text-dark); font-family: inherit; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s;
-        }
-        .form-control:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
-        .tab-creation-box {
-            background: #f1f5f9; padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px dashed #cbd5e1;
-        }
-        .tab-creation-box h4 { margin: 0 0 10px 0; font-family: 'Fredoka'; font-size: 1.05rem; color: var(--primary); }
-
-        .submit-btn {
-            width: 100%; padding: 14px; border-radius: 12px; border: none;
-            background: var(--primary); color: white; font-weight: bold;
-            font-size: 1.1rem; cursor: pointer; margin-top: 15px; transition: 0.2s;
-        }
-        .submit-btn:hover { background: #2563eb; }
-
-        .secondary-btn {
-            background: var(--text-gray); color: white; border: none; padding: 10px 15px; border-radius: 10px;
-            font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 5px;
-        }
-        .secondary-btn:hover { background: var(--text-dark); }
-
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: white; border: 1px solid #e2e8f0; color: var(--text-dark); padding: 12px 24px;
             border-radius: 30px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3000; display: flex; align-items: center; gap: 10px;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000; display: flex; align-items: center; gap: 10px;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        @media (max-width: 768px) {
-            .navbar { padding: 15px; flex-direction: column; gap: 15px; }
-            .hero-card h2 { font-size: 2.5rem; }
-            h1 { font-size: 2.2rem; }
-            .carousel-scene { height: 400px; }
-            .game-card { width: 200px; height: 280px; }
-        }
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 20000; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-box { background: white; width: 90%; max-width: 480px; border-radius: 24px; padding: 30px; transform: translateY(30px) scale(0.9); transition: 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-family: 'Fredoka'; margin: 0; font-size: 1.5rem; color: var(--text-dark); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-gray); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem;}
+        .form-control { width: 100%; padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #cbd5e1; color: var(--text-dark); font-family: inherit; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s; }
+        .form-control:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .tab-creation-box { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px dashed #cbd5e1; }
+        .tab-creation-box h4 { margin: 0 0 10px 0; font-family: 'Fredoka'; font-size: 1.05rem; color: var(--primary); }
+        .submit-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .submit-btn:hover { background: #2563eb; }
+        .secondary-btn { background: var(--text-gray); color: white; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- 🎨 Ambient Background Orbs -->
-    <div class="bg-blobs">
+    <!-- Default Ambient Blobs (Hidden when in PS4 Mode) -->
+    <div class="bg-blobs" id="bgBlobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- 🌟 Glassmorphism Top Navigation -->
-    <nav class="navbar">
+    <!-- Main Hub Navigation -->
+    <nav class="navbar" id="mainNav">
         <a href="#" class="nav-logo" onclick="window.switchTab('homePage')">
             <i class="fa-solid fa-gamepad"></i> <span>EduArcade</span>
         </a>
         <div class="nav-links" id="dynamicNavLinks">
-            <!-- Default Static Tabs -->
             <button class="nav-item active" id="btn-homePage" onclick="window.switchTab('homePage')">
                 <i class="fa-solid fa-house"></i> Home
             </button>
@@ -335,11 +342,10 @@
             <button class="nav-item" id="btn-teacherPage" onclick="window.switchTab('teacherPage')">
                 <i class="fa-solid fa-chalkboard-user"></i> Teacher
             </button>
-            <!-- Custom Tabs will be injected here dynamically -->
         </div>
     </nav>
 
-    <!-- 🏠 HOME PAGE -->
+    <!-- Home Page -->
     <div id="homePage" class="tab-content active-section">
         <div class="hero-card">
             <h2>Level Up Your Learning</h2>
@@ -350,18 +356,42 @@
         </div>
     </div>
 
-    <!-- 🎮 GAMES PAGE -->
+    <!-- 🎮 GAMES PAGE (EXACT PS4 FULL SCREEN MODE) -->
     <div id="gamesPage" class="tab-content">
-        <div class="header-section">
-            <h1>Game Collection</h1>
-            <p class="subtitle">Scroll or swipe left/right to browse. Click the center game to play.</p>
+        <!-- PS4 Ambient Background -->
+        <div class="ps4-bg"></div>
+        <div class="ps4-wave"></div>
+        
+        <!-- PS4 Top Bar -->
+        <div class="ps4-top-bar">
+            <button class="ps4-back-btn" onclick="window.switchTab('homePage')">
+                <i class="fa-solid fa-chevron-left"></i> Back to Hub
+            </button>
+            <div class="ps4-sys-icons">
+                <i class="fa-solid fa-plus" title="PlayStation Plus"></i>
+                <i class="fa-solid fa-trophy" title="Trophies"></i>
+                <i class="fa-solid fa-user-circle" title="Profile"></i>
+                <span id="ps4-clock">12:00 PM</span>
+            </div>
         </div>
+
+        <!-- Carousel Area -->
         <div class="carousel-scene" id="arcadeCarousel">
             <!-- Cards injected via JS -->
         </div>
+
+        <!-- PS4 Active Game Info Box -->
+        <div class="ps4-info-box" id="ps4InfoBox">
+            <h1 id="ps4-game-title">Loading...</h1>
+            <p><i class="fa-solid fa-circle-info"></i> <span id="ps4-game-type">Engine</span></p>
+            <!-- Start button if user prefers mouse click -->
+            <button class="ps4-start-btn" onclick="window.startActiveGame()">
+                <i class="fa-solid fa-play"></i> Start
+            </button>
+        </div>
     </div>
 
-    <!-- 👩‍🏫 TEACHER PAGE -->
+    <!-- Teacher Page -->
     <div id="teacherPage" class="tab-content">
         <div class="header-section">
             <h1>Teacher Console</h1>
@@ -370,25 +400,21 @@
         <div class="grid-container" id="teacherGrid"></div>
     </div>
 
-    <!-- 📁 DYNAMIC TABS ROOT CONTAINER -->
-    <div id="dynamicTabsContainer">
-        <!-- Containers matching custom tabs will be generated dynamically -->
-    </div>
+    <div id="dynamicTabsContainer"></div>
 
-    <!-- ➕ Admin Resource Creator & Tab Manager -->
     <button class="fab-btn" onclick="window.openModal()" title="Add Custom Links or Custom Tabs">
         <i class="fa-solid fa-plus"></i>
     </button>
 
-    <!-- 📝 Dynamic Hub Modal -->
+    <!-- Modal Form -->
     <div class="modal-overlay" id="addLinkModal">
         <div class="modal-box">
+            <!-- Modal Content (Retained as previous) -->
             <div class="modal-header">
                 <h3><i class="fa-solid fa-gears"></i> Hub Console</h3>
                 <button class="close-btn" onclick="window.closeModal()">&times;</button>
             </div>
             
-            <!-- 📁 Part A: Dynamic Tab Creator -->
             <div class="tab-creation-box">
                 <h4>Create Custom Category Tab</h4>
                 <div class="form-group" style="margin-bottom: 8px;">
@@ -399,7 +425,6 @@
                 </button>
             </div>
 
-            <!-- 🔗 Part B: Add Resource Form -->
             <form id="addLinkForm" onsubmit="window.handleFormSubmit(event)">
                 <h4 style="margin: 0 0 10px 0; font-family: 'Fredoka'; color: var(--primary);">Add Link to Selected Tab</h4>
                 <div class="form-group">
@@ -407,7 +432,6 @@
                     <select class="form-control" id="formCategory" required>
                         <option value="game">Games Collection</option>
                         <option value="teacher">Teacher Console</option>
-                        <!-- Dynamic Custom Tabs options will be appended here -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -431,45 +455,45 @@
         </div>
     </div>
 
-    <!-- 🍞 Sounding / System Feedback -->
     <div class="toast" id="sysToast">
         <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> 
         <span id="toastMsg">Success</span>
     </div>
 
     <script>
-        // 🔊 HTML5 WEB AUDIO API SYNTHESIZER (For instant retro game sounds)
+        // Sound System
         let audioCtx = null;
         function playBlipSound() {
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                // Classic synth pulse blip sound
+                osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(450, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.08);
-                
                 gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.08);
-            } catch (e) {
-                console.log("Audio not allowed yet or not supported", e);
-            }
+                osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) { console.log(e); }
         }
 
-        // 📦 ORIGINAL DATA (Preserved and unaltered)
+        // Live Clock (PS4 Style)
+        function updatePS4Clock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            const clockEl = document.getElementById('ps4-clock');
+            if(clockEl) clockEl.innerText = hours + ':' + minutes + ' ' + ampm;
+        }
+        setInterval(updatePS4Clock, 1000);
+        updatePS4Clock();
+
         const originalGamesConfig = [
             { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_09-AM.webp", title: "Match Up Studio", type: "Memory Engine", link: "match_up.html" },
             { image: "https://raw.githubusercontent.com/kayminn555-rgb/Gallery/main/ChatGPT-Image-Jun-2_-2026_-10_20_16-AM.webp", title: "Snake & Ladder", type: "Board Engine", link: "snake_game.html" },
@@ -495,13 +519,9 @@
             { image: "https://placehold.co/400x300/d1fae5/10b981?text=Listening+Web", title: "Teacher Minn's Listening", type: "Website", link: "https://minn-listening.super.site/" }
         ];
 
-        // Global lists for Firestore updates
-        window.dbGames = [];
-        window.dbTeachers = [];
-        window.dbCustomTabs = []; // Holds dynamically created navigation tabs
-        window.dbCustomLinks = []; // Holds items categorized inside dynamic custom tabs
+        window.dbGames = []; window.dbTeachers = []; window.dbCustomTabs = []; window.dbCustomLinks = []; 
 
-        // 🧭 Dynamic Navigation & Routing Module
+        // 🧭 Tab Switch Logic (Games Page အတွက် Navbar ဖျောက်ခြင်း)
         window.switchTab = function(tabId) {
             playBlipSound();
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active-section'));
@@ -512,20 +532,28 @@
             
             const btn = document.getElementById('btn-' + tabId);
             if(btn) btn.classList.add('active');
+
+            if(tabId === 'gamesPage') {
+                document.getElementById('mainNav').style.display = 'none';
+                document.getElementById('bgBlobs').style.opacity = '0';
+                
+                // Set Info Box Position based on screen size on load
+                const isMobile = window.innerWidth < 768;
+                document.getElementById('ps4InfoBox').style.left = isMobile ? '30vw' : '25vw';
+            } else {
+                document.getElementById('mainNav').style.display = 'flex';
+                document.getElementById('bgBlobs').style.opacity = '1';
+            }
         };
 
-        // Modal Operations
-        window.openModal = function() {
-            document.getElementById('addLinkModal').classList.add('active');
-        };
-        window.closeModal = function() {
-            document.getElementById('addLinkModal').classList.remove('active');
-        };
+        window.openModal = function() { document.getElementById('addLinkModal').classList.add('active'); };
+        window.closeModal = function() { document.getElementById('addLinkModal').classList.remove('active'); };
 
-        // 💿 3D CAROUSEL GRAPHICS MODULE
+        // 💿 EXACT PS4 CAROUSEL MATH & RENDERING
         let carouselCurrentIndex = 0;
         let carouselTargetIndex = 0;
         let allGamesCombined = [];
+        let lastActiveIdx = -1;
 
         window.renderGameBooks = function() {
             const container = document.getElementById("arcadeCarousel");
@@ -535,132 +563,137 @@
             allGamesCombined.forEach((item, index) => {
                 const target = item.link.startsWith("http") ? "_blank" : "_self";
                 
+                // 🖱️ Mouse ဖြင့် Card ကို တစ်ချက်နှိပ်ရုံဖြင့် ဂိမ်းထဲ တန်းဝင်မည် (1-Click Enter)
                 const html = `
-                <div class="game-card" id="card-${index}" onclick="window.handleCardClick(${index}, '${item.link}', '${target}')">
+                <div class="game-card" id="card-${index}" onclick="window.handleCardClick('${item.link}', '${target}')">
                     <img src="${item.image}" alt="${item.title}" loading="lazy">
-                    
-                    <div class="card-info">
-                        <h4>${item.title}</h4>
-                        <span>${item.type}</span>
-                    </div>
-
-                    <div class="play-overlay">
-                        <div class="btn-play-now">
-                            <i class="fa-solid fa-play"></i> PLAY
-                        </div>
-                    </div>
                 </div>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
-            
             updateCarouselPosition();
         };
 
-        window.handleCardClick = function(index, link, target) {
-            const total = allGamesCombined.length;
-            let currentCentered = Math.round(carouselTargetIndex);
-            
-            let diff = ((index - currentCentered) % total + total) % total;
-            if (diff > total / 2) diff -= total;
-
-            if (diff === 0) {
-                // If it is already centered, launch the link
-                window.open(link, target);
-            } else {
-                // Bring to center and play blip sound
-                carouselTargetIndex += diff;
-                playBlipSound();
-            }
+        // 🖱️ 1-Click Game Entry Function
+        window.handleCardClick = function(link, target) {
+            playBlipSound();
+            window.open(link, target); 
         };
 
-        // 🖱️ Mouse Wheel and Trackpad speed controller
+        // 🖱️ Mouse Wheel Handler 
         const scene = document.getElementById('arcadeCarousel');
         let isWheelCooldown = false;
-
         scene.addEventListener('wheel', (e) => {
             if (document.getElementById('gamesPage').classList.contains('active-section')) {
                 e.preventDefault(); 
                 if (isWheelCooldown) return;
-                
-                if(e.deltaY > 0 || e.deltaX > 0) {
-                    carouselTargetIndex += 1;
-                } else {
-                    carouselTargetIndex -= 1;
-                }
-                
+                if(e.deltaY > 0 || e.deltaX > 0) carouselTargetIndex += 1;
+                else carouselTargetIndex -= 1;
                 playBlipSound();
-                isWheelCooldown = true;
-                setTimeout(() => { isWheelCooldown = false; }, 220); 
+                isWheelCooldown = true; setTimeout(() => { isWheelCooldown = false; }, 220); 
             }
         }, { passive: false });
 
-        // 📱 Touch and Drag/Swipe Handler for Mobile/Tablets
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        scene.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
+        // 📱 Touch and Swipe Handler
+        let touchStartX = 0; let touchEndX = 0;
+        scene.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
         scene.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
-            handleTouchSwipe();
+            const threshold = 50; 
+            if (touchStartX - touchEndX > threshold) { carouselTargetIndex += 1; playBlipSound(); } 
+            else if (touchEndX - touchStartX > threshold) { carouselTargetIndex -= 1; playBlipSound(); }
         }, { passive: true });
+        
+        // ⌨️ Keyboard & PowerPoint Pointer Control
+        window.addEventListener('keydown', (e) => {
+            if (!document.getElementById('gamesPage').classList.contains('active-section')) return;
+            
+            // Arrow Keys ဖြင့် ရွေးချယ်ခြင်း (Pointer Next/Prev)
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                carouselTargetIndex += 1; playBlipSound();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                carouselTargetIndex -= 1; playBlipSound();
+            } 
+            // Enter/Space နှိပ်လျှင် ဂိမ်းထဲဝင်ခြင်း (Pointer Click)
+            else if (e.key === 'Enter' || e.key === ' ') {
+                window.startActiveGame();
+            }
+        });
 
-        function handleTouchSwipe() {
-            const threshold = 50; // minimum touch gesture pixel travel to slide
-            if (touchStartX - touchEndX > threshold) {
-                // Swiped Left -> show next game card
-                carouselTargetIndex += 1;
+        // 🎮 Enter Button နှိပ်လျှင် လက်ရှိရွေးထားသောဂိမ်းကို ဝင်ရန် Function
+        window.startActiveGame = function() {
+            const total = allGamesCombined.length;
+            if(total === 0) return;
+            let activeIdx = ((Math.round(carouselTargetIndex) % total) + total) % total;
+            let activeGame = allGamesCombined[activeIdx];
+            if(activeGame) {
                 playBlipSound();
-            } else if (touchEndX - touchStartX > threshold) {
-                // Swiped Right -> show previous game card
-                carouselTargetIndex -= 1;
-                playBlipSound();
+                const target = activeGame.link.startsWith("http") ? "_blank" : "_self";
+                window.open(activeGame.link, target);
             }
         }
 
-        // Realtime 3D Matrix Loop
+        // 🎮 Exact PS4 Layout Math Engine
         function updateCarouselPosition() {
             const items = document.querySelectorAll('.game-card');
             const total = items.length;
             if(total === 0) return;
 
-            carouselCurrentIndex += (carouselTargetIndex - carouselCurrentIndex) * 0.1;
+            carouselCurrentIndex += (carouselTargetIndex - carouselCurrentIndex) * 0.15;
+            
+            // PS4 အတိအကျ Layout အတွက် နေရာချထားခြင်း (ဘယ်ဘက်သို့ ကပ်ထားပြီး ကျန်သည်များ ညာဘက်သို့ စီသွားမည်)
+            let isMobile = window.innerWidth < 768;
+            let startX = isMobile ? window.innerWidth * 0.3 : window.innerWidth * 0.25; // Screen ရဲ့ 25% နေရာ
+            let normalSpacing = isMobile ? 80 : 120; // Inactive Card များကြား အကွာအဝေး (ကပ်နေစေရန်)
+            let activeExtraSpacing = isMobile ? 60 : 100; // Active Card ကြီးလာသည့်အတွက် လိုအပ်သော နေရာလွတ်
+
+            let currentActiveIdx = ((Math.round(carouselTargetIndex) % total) + total) % total;
+
+            // Update Info Box below the active card
+            if (currentActiveIdx !== lastActiveIdx && allGamesCombined[currentActiveIdx]) {
+                const infoBox = document.getElementById('ps4InfoBox');
+                infoBox.classList.remove('visible'); // Fade out old
+                setTimeout(() => {
+                    document.getElementById('ps4-game-title').innerText = allGamesCombined[currentActiveIdx].title;
+                    document.getElementById('ps4-game-type').innerText = allGamesCombined[currentActiveIdx].type;
+                    infoBox.classList.add('visible'); // Fade in new
+                }, 150);
+                lastActiveIdx = currentActiveIdx;
+            }
 
             items.forEach((item, i) => {
                 let diff = ((i - carouselCurrentIndex) % total + total) % total;
-                if (diff > total / 2) diff -= total;
+                if (diff > total / 2) diff -= total; // Shortest path wrapping
 
                 let absDiff = Math.abs(diff);
-                let translateX = diff * 160; 
-                let translateZ = -absDiff * 120;
-                let rotateY = diff * -15; 
-
-                if (absDiff < 0.5) {
-                    item.classList.add('active');
-                    translateZ += 40;
-                    rotateY = 0;
-                } else {
-                    item.classList.remove('active');
-                }
-
-                let opacity = 1 - (absDiff * 0.15);
-                if(opacity < 0) opacity = 0;
+                let exactDiff = diff;
                 
-                let zIndex = 100 - Math.round(absDiff * 10);
+                // Horizontal Position (X) တွက်ချက်ခြင်း
+                let xPos = startX + (exactDiff * normalSpacing);
+                
+                // ရွေးထားသော Card (Index 0 နား) ကို နေရာချပေးရန် ညာဘက် Card များကို ဆက်တွန်းမည်
+                if (exactDiff > 0) xPos += Math.min(exactDiff, 1) * activeExtraSpacing;
+                else if (exactDiff < 0) xPos += Math.max(exactDiff, -1) * (activeExtraSpacing * 0.2); // ဘယ်ဘက်ထွက်သွားသော Card များ
 
-                item.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`;
-                item.style.zIndex = zIndex;
+                // Center Card ကို Class တပ်ပေးမည်
+                if (absDiff < 0.1) item.classList.add('active'); 
+                else item.classList.remove('active');
+
+                // Center Card ၏ အရွယ်အစားကို အနည်းငယ်ပိုကြီးစေမည်
+                let scale = 1;
+                if (absDiff < 1) scale = 1 + (0.4 * (1 - absDiff)); // 1.4x scale
+
+                // ဘယ်ဘက်/ညာဘက် အစွန်းရောက်လျှင် ပျောက်သွားစေရန် (Opacity တွက်ချက်ခြင်း)
+                let opacity = 1;
+                if (exactDiff < -1) opacity = Math.max(0, 1 - (Math.abs(exactDiff) - 1) * 0.8); // ဘယ်ဘက်ကို အမြန်ဖျောက်မည်
+                else if (exactDiff > 5) opacity = Math.max(0, 1 - (exactDiff - 5)); // ညာဘက်အစွန်းများ ဖျောက်မည်
+
+                item.style.transform = `translate(-50%, -50%) translateX(${xPos}px) scale(${scale})`;
                 item.style.opacity = opacity;
-
-                if (absDiff > 4) {
-                    item.style.visibility = 'hidden';
-                } else {
-                    item.style.visibility = 'visible';
-                }
+                item.style.visibility = opacity === 0 ? 'hidden' : 'visible';
+                
+                // ရွေးထားသော ကတ်ကို အပေါ်ဆုံးရောက်နေစေမည်
+                item.style.zIndex = 100 - Math.round(absDiff * 10); 
             });
-
             requestAnimationFrame(updateCarouselPosition);
         }
 
@@ -669,7 +702,6 @@
             const container = document.getElementById("teacherGrid");
             container.innerHTML = "";
             const allTeachers = [...originalTeacherConfig, ...window.dbTeachers];
-
             allTeachers.forEach(item => {
                 const target = item.link.startsWith("http") ? "_blank" : "_self";
                 const html = `
@@ -690,18 +722,15 @@
             const dynamicTabsRoot = document.getElementById("dynamicTabsContainer");
             const categorySelect = document.getElementById("formCategory");
 
-            // Reset dynamically generated sections
             document.querySelectorAll('.dynamic-nav-item').forEach(el => el.remove());
             dynamicTabsRoot.innerHTML = "";
 
-            // Reset dynamic dropdown list options but retain 'game' & 'teacher' defaults
             categorySelect.innerHTML = `
                 <option value="game">Games Collection</option>
                 <option value="teacher">Teacher Console</option>
             `;
 
             window.dbCustomTabs.forEach(tab => {
-                // 1. Append navigation option button
                 const navBtn = document.createElement("button");
                 navBtn.className = "nav-item dynamic-nav-item";
                 navBtn.id = `btn-${tab.id}`;
@@ -709,24 +738,18 @@
                 navBtn.innerHTML = `<i class="fa-solid fa-star"></i> ${tab.name}`;
                 navContainer.appendChild(navBtn);
 
-                // 2. Add resource dropdown selector in creator panel
                 const dropOption = document.createElement("option");
-                dropOption.value = tab.id;
-                dropOption.textContent = tab.name;
+                dropOption.value = tab.id; dropOption.textContent = tab.name;
                 categorySelect.appendChild(dropOption);
 
-                // 3. Create grid section frame in document structure
                 const sectionDiv = document.createElement("div");
-                sectionDiv.id = tab.id;
-                sectionDiv.className = "tab-content";
+                sectionDiv.id = tab.id; sectionDiv.className = "tab-content";
                 
-                // Filter matching links for this dynamic tab
                 const filteredLinks = window.dbCustomLinks.filter(link => link.category === tab.id);
                 let linksHtml = "";
 
                 if(filteredLinks.length === 0) {
-                    linksHtml = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray); font-weight: 600;">
+                    linksHtml = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray); font-weight: 600;">
                         <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 10px; display: block; color: var(--primary);"></i>
                         Empty Category folder. Click "+" in the bottom right corner to upload resources into ${tab.name}!
                     </div>`;
@@ -743,41 +766,28 @@
                         </a>`;
                     });
                 }
-
-                sectionDiv.innerHTML = `
-                    <div class="header-section">
-                        <h1>${tab.name}</h1>
-                        <p class="subtitle">Custom dynamic tab zone</p>
-                    </div>
-                    <div class="grid-container">${linksHtml}</div>
-                `;
+                sectionDiv.innerHTML = `<div class="header-section"><h1>${tab.name}</h1><p class="subtitle">Custom dynamic tab zone</p></div><div class="grid-container">${linksHtml}</div>`;
                 dynamicTabsRoot.appendChild(sectionDiv);
             });
         };
 
-        // Custom Toast Dialog UI
         window.showToast = function(msg, isError = false) {
             const toast = document.getElementById('sysToast');
             const icon = toast.querySelector('i');
             document.getElementById('toastMsg').innerText = msg;
-            
             icon.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
             icon.style.color = isError ? '#ef4444' : 'var(--success)';
             toast.style.borderColor = isError ? '#ef4444' : '#e2e8f0';
-            
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
-        // Render Base Setup
         window.renderGameBooks();
         window.renderTeacherCards();
         window.buildDynamicTabs();
     </script>
 
-    <!-- ==========================================
-         FIREBASE REALTIME COLLABORATIVE DB LOGIC
-         ========================================== -->
+    <!-- FIREBASE SYSTEM -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -791,7 +801,6 @@
 
         let currentUser = null;
 
-        // Auto Anonymous Auth Engine
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -799,124 +808,62 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (e) { console.error("Firebase Security Handshake failed:", e); }
+            } catch (e) { console.error("Auth failed:", e); }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if(user) { currentUser = user; setupRealtimeListeners(); }
-        });
-        
+        onAuthStateChanged(auth, (user) => { if(user) { currentUser = user; setupRealtimeListeners(); } });
         initAuth();
 
-        // Dual Realtime Observers (Custom Tabs + Custom Links)
         function setupRealtimeListeners() {
             if (!currentUser) return;
-            
-            // Collection Reference paths obeying strict rule constraints
             const tabsRef = collection(db, 'artifacts', appId, 'public', 'data', 'customTabs');
             const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
 
-            // Listen for changes in dynamic custom tab configurations
             onSnapshot(tabsRef, (snapshot) => {
                 window.dbCustomTabs = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    window.dbCustomTabs.push({ id: doc.id, name: data.name });
-                });
+                snapshot.forEach(doc => { window.dbCustomTabs.push({ id: doc.id, name: doc.data().name }); });
                 window.buildDynamicTabs();
-            }, (err) => console.error("Tabs Sync Error: ", err));
+            }, (err) => console.error(err));
 
-            // Listen for changes in dynamic links
             onSnapshot(linksRef, (snapshot) => {
-                window.dbGames = []; 
-                window.dbTeachers = [];
-                window.dbCustomLinks = [];
-                
+                window.dbGames = []; window.dbTeachers = []; window.dbCustomLinks = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if(data.category === 'game') {
-                        window.dbGames.push(data);
-                    } else if(data.category === 'teacher') {
-                        window.dbTeachers.push(data);
-                    } else {
-                        window.dbCustomLinks.push(data);
-                    }
+                    if(data.category === 'game') window.dbGames.push(data);
+                    else if(data.category === 'teacher') window.dbTeachers.push(data);
+                    else window.dbCustomLinks.push(data);
                 });
-                
-                window.renderGameBooks(); 
-                window.renderTeacherCards();
-                window.buildDynamicTabs();
-            }, (error) => { console.error("Links Sync Error: ", error); });
+                window.renderGameBooks(); window.renderTeacherCards(); window.buildDynamicTabs();
+            }, (error) => { console.error(error); });
         }
 
-        // Create a Dynamic Category Tab
         window.handleCreateCustomTab = async function() {
             const tabInput = document.getElementById("formNewTabName");
             const rawName = tabInput.value.trim();
-            if(!rawName) {
-                window.showToast("Tab name cannot be empty", true);
-                return;
-            }
-
-            // Simple Tab Sanitization for HTML ID values
+            if(!rawName) { window.showToast("Tab name cannot be empty", true); return; }
             const tabId = "tab_" + rawName.toLowerCase().replace(/[^a-z0-9]/g, "_");
-
             try {
-                if(currentUser) {
-                    // Save to customTabs database path matching strict rules
-                    const tabsRef = collection(db, 'artifacts', appId, 'public', 'data', 'customTabs');
-                    await addDoc(tabsRef, { name: rawName, tabId: tabId, createdAt: Date.now() });
-                } else {
-                    // Offline fallback simulator
-                    window.dbCustomTabs.push({ id: tabId, name: rawName });
-                    window.buildDynamicTabs();
-                }
-                tabInput.value = "";
-                window.showToast(`Category tab "${rawName}" created!`);
-            } catch(e) {
-                console.error(e);
-                window.showToast("Failed to create tab", true);
-            }
+                if(currentUser) { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'customTabs'), { name: rawName, tabId: tabId, createdAt: Date.now() }); } 
+                else { window.dbCustomTabs.push({ id: tabId, name: rawName }); window.buildDynamicTabs(); }
+                tabInput.value = ""; window.showToast(`Category tab "${rawName}" created!`);
+            } catch(e) { window.showToast("Failed to create tab", true); }
         };
 
-        // Submit and Save Custom Resources to Tabs
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "Saving..."; btn.disabled = true;
-
-            const newData = {
-                category: document.getElementById('formCategory').value,
-                title: document.getElementById('formTitle').value,
-                image: document.getElementById('formImage').value,
-                type: document.getElementById('formType').value,
-                link: document.getElementById('formLink').value,
-                createdAt: Date.now()
-            };
-
+            const btn = document.getElementById('submitBtn'); btn.innerText = "Saving..."; btn.disabled = true;
+            const newData = { category: document.getElementById('formCategory').value, title: document.getElementById('formTitle').value, image: document.getElementById('formImage').value, type: document.getElementById('formType').value, link: document.getElementById('formLink').value, createdAt: Date.now() };
             try {
-                if(currentUser) {
-                    const linksRef = collection(db, 'artifacts', appId, 'public', 'data', 'customLinks');
-                    await addDoc(linksRef, newData);
-                } else {
-                    // Local emulation update
+                if(currentUser) { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'customLinks'), newData); } 
+                else {
                     if(newData.category === 'game') window.dbGames.push(newData);
                     else if(newData.category === 'teacher') window.dbTeachers.push(newData);
                     else window.dbCustomLinks.push(newData);
-                    
-                    window.renderGameBooks(); 
-                    window.renderTeacherCards();
-                    window.buildDynamicTabs();
+                    window.renderGameBooks(); window.renderTeacherCards(); window.buildDynamicTabs();
                 }
-                
-                window.closeModal();
-                document.getElementById('addLinkForm').reset();
-                window.showToast("Resource saved successfully!");
-            } catch(err) {
-                console.error(err); window.showToast("Failed to save link", true);
-            } finally {
-                btn.innerText = "Save Resource"; btn.disabled = false;
-            }
+                window.closeModal(); document.getElementById('addLinkForm').reset(); window.showToast("Resource saved successfully!");
+            } catch(err) { window.showToast("Failed to save link", true); } 
+            finally { btn.innerText = "Save Resource"; btn.disabled = false; }
         };
     </script>
 </body>
