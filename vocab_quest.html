@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Quest</title>
+<style>
+/* ဒီအပိုင်းမှာ Game ရဲ့ အခြေခံ Design နဲ့ Responsive Layout ကို သတ်မှတ်ထားပါတယ် */
+:root{
+  --primary:#5b5ce2; --secondary:#7c3aed; --accent:#f59e0b;
+  --success:#16a34a; --danger:#dc2626; --bg:#f5f7fb;
+  --card:#fff; --text:#172033; --muted:#687386; --border:#e5e7eb;
+  --shadow:0 10px 30px rgba(30,40,80,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.app{min-height:100vh;display:flex}
+.sidebar{width:245px;background:#171b35;color:#fff;padding:20px 14px;position:fixed;left:0;top:0;bottom:0;z-index:20}
+.brand{font-size:23px;font-weight:900;padding:10px 12px 25px}
+.brand span{color:#fbbf24}
+.nav-btn{width:100%;text-align:left;padding:12px 14px;margin:3px 0;border-radius:11px;background:transparent;color:#cbd2e5;font-weight:700}
+.nav-btn:hover,.nav-btn.active{background:#30366a;color:#fff}
+.main{margin-left:245px;width:calc(100% - 245px);min-height:100vh}
+.topbar{height:70px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+.page{padding:28px;max-width:1500px;margin:auto}
+h1,h2,h3{margin-top:0}
+.grid{display:grid;gap:18px}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.stat{font-size:30px;font-weight:900;margin-top:7px}
+.muted{color:var(--muted)}
+.btn{padding:10px 15px;border-radius:10px;font-weight:800}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:#eef0ff;color:#4b4fc4}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warning{background:var(--accent);color:#111827}
+.btn-light{background:#eef1f5;color:#273043}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d9dee8;border-radius:10px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px #5b5ce21a}
+label{display:block;font-weight:800;margin-bottom:6px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.form-group.full{grid-column:1/-1}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.vocab-card{overflow:hidden;padding:0}
+.vocab-img{height:145px;background:#edf0f7;display:flex;align-items:center;justify-content:center;font-size:55px}
+.vocab-img img{width:100%;height:100%;object-fit:cover}
+.vocab-body{padding:16px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef0ff;color:#4b4fc4;font-size:12px;font-weight:800}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+.modal{position:fixed;inset:0;background:rgba(10,15,35,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:18px;width:min(760px,100%);max-height:92vh;overflow:auto;padding:24px}
+.close{float:right;background:#eef1f5;border-radius:50%;width:34px;height:34px}
+.hidden{display:none!important}
+.empty{text-align:center;padding:45px;color:var(--muted)}
+.team-card{display:flex;gap:14px;align-items:center}
+.avatar{width:58px;height:58px;border-radius:16px;background:#eef0ff;display:flex;align-items:center;justify-content:center;font-size:32px}
+.team-score{margin-left:auto;font-size:22px;font-weight:900}
+.game-shell{min-height:calc(100vh - 70px);padding:24px;background:linear-gradient(135deg,#eef2ff,#fdf7ff)}
+.game-header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.score-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:18px 0}
+.score-mini{background:#fff;border-radius:14px;padding:10px;border:2px solid transparent;text-align:center}
+.score-mini.active{border-color:var(--primary);box-shadow:var(--shadow)}
+.score-mini .mini-avatar{font-size:28px}
+.game-card{max-width:1050px;margin:25px auto;background:#fff;border-radius:25px;padding:28px;box-shadow:0 20px 50px rgba(50,40,100,.14)}
+.round{font-weight:900;color:var(--primary)}
+.question{font-size:30px;font-weight:900;text-align:center;margin:15px 0}
+.question-image{height:220px;border-radius:20px;background:#f0f2f8;display:flex;justify-content:center;align-items:center;font-size:100px;overflow:hidden;margin:15px auto;max-width:430px}
+.question-image img{width:100%;height:100%;object-fit:contain}
+.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.answer{padding:18px;border-radius:14px;background:#f3f5f9;border:3px solid transparent;font-weight:900;font-size:18px}
+.answer:hover{background:#e9ebff}
+.answer.correct{background:#dcfce7;border-color:#16a34a}
+.answer.wrong{background:#fee2e2;border-color:#dc2626}
+.timer{font-size:31px;font-weight:900;min-width:80px;text-align:center}
+.timer.warning{color:#dc2626}
+.feedback{text-align:center;font-size:25px;font-weight:900;min-height:38px;margin-top:15px}
+.map{background:linear-gradient(#dff4ff,#fff7df);border-radius:20px;padding:20px;margin-top:20px;overflow:hidden}
+.map-track{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.map-stop{width:90px;text-align:center;font-size:12px;font-weight:800}
+.map-icon{width:55px;height:55px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:auto;border:3px solid #d5d9e5}
+.map-character{font-size:38px;transition:transform .5s}
+.result-rank{display:flex;align-items:center;gap:15px;padding:15px;border-bottom:1px solid var(--border)}
+.rank{font-size:25px;font-weight:900;width:45px}
+.mobile-menu{display:none}
+.preview{width:150px;height:110px;border-radius:12px;background:#eef1f5;object-fit:cover;display:block}
+.checkbox-row{display:flex;gap:15px;flex-wrap:wrap}
+.checkbox-row label{display:flex;gap:6px;align-items:center;font-weight:700}
+.checkbox-row input{width:auto}
+.toast{position:fixed;right:20px;bottom:20px;background:#171b35;color:#fff;padding:13px 17px;border-radius:12px;display:none;z-index:100}
+.toast.show{display:block}
+@media(max-width:1000px){
+  .sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px)}
+  .grid-4{grid-template-columns:repeat(2,1fr)}.score-strip{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:720px){
+  .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;width:100%}.mobile-menu{display:block}
+  .topbar{padding:0 15px}.page{padding:16px}.grid-3,.grid-2,.grid-4{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}
+  .answers{grid-template-columns:1fr}.score-strip{grid-template-columns:repeat(2,1fr)}
+  .game-card{padding:18px}.question{font-size:23px}.question-image{height:170px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal" class="modal"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ဒီအပိုင်းမှာ Game ရဲ့ အခြေခံ Setting တွေကို စုစည်းထားပါတယ် */
+const GAME_CONFIG = {
+  defaultTimer: 20,
+  pointsPerCorrectAnswer: 10,
+  fastAnswerPoints: 15,
+  streakBonus: 20,
+  speakingBonus: 5,
+  maxTeams: 6,
+  storageKey: "vocabQuestData"
+};
+
+/* ဒီအပိုင်းမှာ Default Data တွေကို ဖန်တီးထားပါတယ် */
+const DEFAULT_DATA = {
+  vocabulary: [
+    ["Dog","Animals","A common pet animal.","The dog is very friendly.","DOG",1,"🐶"],
+    ["Cat","Animals","A small pet animal.","The cat is sleeping.","CAT",1,"🐱"],
+    ["Elephant","Animals","A large animal with a trunk.","The elephant is very big.","ELEPHANT",2,"🐘"],
+    ["Tiger","Animals","A large wild cat with stripes.","The tiger is strong.","TIGER",2,"🐯"],
+    ["Lion","Animals","A large wild cat with a mane.","The lion is brave.","LION",2,"🦁"],
+    ["Monkey","Animals","An animal that can climb trees.","The monkey can climb.","MONKEY",2,"🐵"],
+    ["Rabbit","Animals","A small animal with long ears.","The rabbit can jump.","RABBIT",1,"🐰"],
+    ["Giraffe","Animals","A tall animal with a long neck.","The giraffe is tall.","GIRAFFE",2,"🦒"],
+    ["Zebra","Animals","A wild animal with black and white stripes.","The zebra runs fast.","ZEBRA",2,"🦓"],
+    ["Bear","Animals","A large strong wild animal.","The bear is big.","BEAR",2,"🐻"],
+    ["Apple","Food","A round fruit.","I eat an apple.","APPLE",1,"🍎"],
+    ["Banana","Food","A long yellow fruit.","I like bananas.","BANANA",1,"🍌"],
+    ["Bread","Food","A baked food made from flour.","I eat bread for breakfast.","BREAD",1,"🍞"],
+    ["Rice","Food","Small grains used as food.","We eat rice every day.","RICE",1,"🍚"],
+    ["Pizza","Food","A round baked food with toppings.","I like pizza.","PIZZA",1,"🍕"],
+    ["Burger","Food","A sandwich with a cooked patty.","He eats a burger.","BURGER",1,"🍔"],
+    ["Egg","Food","An oval food from a bird.","I have an egg for breakfast.","EGG",1,"🥚"],
+    ["Chicken","Food","A type of bird and a common food.","We eat chicken for dinner.","CHICKEN",1,"🍗"],
+    ["Noodles","Food","Long thin strips of food.","I like noodles.","NOODLES",1,"🍜"],
+    ["Cheese","Food","A food made from milk.","The cheese is delicious.","CHEESE",1,"🧀"],
+    ["Wake up","Daily Activities","To stop sleeping.","I wake up at seven.","WAKE UP",1,"🌅"],
+    ["Brush my teeth","Daily Activities","To clean your teeth.","I brush my teeth every morning.","BRUSH MY TEETH",1,"🪥"],
+    ["Take a shower","Daily Activities","To wash your body.","I take a shower before school.","TAKE A SHOWER",1,"🚿"],
+    ["Have breakfast","Daily Activities","To eat your first meal.","I have breakfast at seven.","HAVE BREAKFAST",1,"🥣"],
+    ["Go to school","Daily Activities","To travel to school.","I go to school by bus.","GO TO SCHOOL",1,"🏫"],
+    ["Read a book","Daily Activities","To look at and understand a book.","I read a book at night.","READ A BOOK",1,"📖"],
+    ["Play football","Daily Activities","To play the sport of football.","We play football after school.","PLAY FOOTBALL",1,"⚽"],
+    ["Do homework","Daily Activities","To complete school work at home.","I do my homework after dinner.","DO HOMEWORK",1,"✏️"],
+    ["Have dinner","Daily Activities","To eat the evening meal.","We have dinner at seven.","HAVE DINNER",1,"🍽️"],
+    ["Go to bed","Daily Activities","To go to sleep.","I go to bed at ten.","GO TO BED",1,"🛏️"]
+  ].map((v,i)=>({id:crypto.randomUUID(),word:v[0],category:v[1],meaning:v[2],exampleSentence:v[3],pronunciation:v[4],difficulty:v[5],image:v[6],questions:[]})),
+  categories: [
+    {id:crypto.randomUUID(),name:"Animals",icon:"🐾",image:""},
+    {id:crypto.randomUUID(),name:"Food",icon:"🍎",image:""},
+    {id:crypto.randomUUID(),name:"Daily Activities",icon:"⏰",image:""}
+  ],
+  teams: [
+    {id:crypto.randomUUID(),name:"Tigers",avatar:"🐯",icon:"🐯",score:0,stars:0,coins:0,correct:0,wrong:0,position:0,streak:0},
+    {id:crypto.randomUUID(),name:"Lions",avatar:"🦁",icon:"🦁",score:0,stars:0,coins:0,correct:0,wrong:0,position:0,streak:0},
+    {id:crypto.randomUUID(),name:"Eagles",avatar:"🦅",icon:"🦅",score:0,stars:0,coins:0,correct:0,wrong:0,position:0,streak:0},
+    {id:crypto.randomUUID(),name:"Sharks",avatar:"🦈",icon:"🦈",score:0,stars:0,coins:0,correct:0,wrong:0,position:0,streak:0}
+  ],
+  settings:{
+    numberOfTeams:4, questionsPerGame:12, timer:20, points:10, bonus:20,
+    category:"All", difficulty:"All",
+    questionTypes:["picture-word","word-picture","meaning","missing-letter","spelling","sentence"],
+    sound:true, animations:true, music:false
+  },
+  scores:[]
+};
+
+/* ဒီအပိုင်းမှာ Browser Storage ကနေ Data ကို သိမ်း/ဖတ်ပါတယ် */
+let data = loadData();
+let state = {
+  page:"home",
+  editingId:null,
+  game:null
+};
+
+function clone(obj){return JSON.parse(JSON.stringify(obj));}
+
+function loadData(){
+  try{
+    const saved=localStorage.getItem(GAME_CONFIG.storageKey);
+    if(saved){
+      const d=JSON.parse(saved);
+      return {...clone(DEFAULT_DATA),...d,
+        settings:{...clone(DEFAULT_DATA.settings),...(d.settings||{})}};
+    }
+  }catch(e){console.warn(e)}
+  return clone(DEFAULT_DATA);
+}
+
+function saveData(){
+  localStorage.setItem(GAME_CONFIG.storageKey,JSON.stringify(data));
+}
+
+/* ဒီအပိုင်းမှာ UI ကို ပြသဖို့ Helper Functions တွေ ရေးထားပါတယ် */
+function esc(value=""){
+  return String(value).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function toast(message){
+  const el=document.getElementById("toast"); el.textContent=message; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2200);
+}
+function nav(page){state.page=page;state.editingId=null;render();}
+function getCategory(name){return data.categories.find(c=>c.name===name)}
+function getVocab(id){return data.vocabulary.find(v=>v.id===id)}
+function imageHTML(item,cls=""){
+  if(item.image && item.image.startsWith("data:")) return `<img class="${cls}" src="${item.image}" alt="${esc(item.word)}">`;
+  if(item.image && item.image.startsWith("http")) return `<img class="${cls}" src="${esc(item.image)}" alt="${esc(item.word)}" onerror="this.style.display='none';this.parentElement.innerHTML='📚'">`;
+  return `<span>${item.image||"📚"}</span>`;
+}
+
+/* ဒီအပိုင်းမှာ Main Application Layout ကို Render လုပ်ပါတယ် */
+function render(){
+  const app=document.getElementById("app");
+  if(state.page==="game"){
+    app.innerHTML=gameLayout();
+  }else{
+    app.innerHTML=dashboardLayout();
+  }
+  bindEvents();
+}
+
+function dashboardLayout(){
+  const titles={home:"Dashboard Home",vocabulary:"Vocabulary",categories:"Categories",questions:"Questions",teams:"Teams",settings:"Game Settings",results:"Results"};
+  return `<div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">🎯 Vocab <span>Quest</span></div>
+      ${navButton("home","Dashboard Home","🏠")}
+      ${navButton("vocabulary","Vocabulary","📚")}
+      ${navButton("categories","Categories","🗂️")}
+      ${navButton("questions","Questions","❓")}
+      ${navButton("teams","Teams","👥")}
+      ${navButton("settings","Game Settings","⚙️")}
+      ${navButton("game","Game","🎮")}
+      ${navButton("results","Results","🏆")}
+      <div style="margin-top:20px;padding:10px 12px;color:#8e96b3;font-size:12px">Vocab Quest • Classroom Edition</div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button class="btn btn-light mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <strong>${titles[state.page]||"Vocab Quest"}</strong>
+        <div class="actions">
+          <button class="btn btn-light" onclick="exportData()">Export Data</button>
+          <label class="btn btn-light" style="margin:0;cursor:pointer">Import Data
+            <input id="importFile" type="file" accept=".json" hidden>
+          </label>
+        </div>
+      </header>
+      ${dashboardPage()}
+    </main>
+  </div>`;
+}
+function navButton(page,label,icon){
+  return `<button class="nav-btn ${state.page===page?'active':''}" onclick="nav('${page}')">${icon} &nbsp; ${label}</button>`;
+}
+function dashboardPage(){
+  switch(state.page){
+    case "vocabulary":return vocabularyPage();
+    case "categories":return categoriesPage();
+    case "questions":return questionsPage();
+    case "teams":return teamsPage();
+    case "settings":return settingsPage();
+    case "results":return resultsPage();
+    default:return homePage();
+  }
+}
+
+/* ဒီအပိုင်းမှာ Dashboard Home ကို ပြသပါတယ် */
+function homePage(){
+  const correct=data.teams.reduce((a,t)=>a+t.correct,0);
+  const wrong=data.teams.reduce((a,t)=>a+t.wrong,0);
+  return `<section class="page">
+    <div class="toolbar"><div><h1>Welcome to Vocab Quest</h1><p class="muted">Manage vocabulary and start a classroom game.</p></div>
+      <button class="btn btn-primary" onclick="nav('game')">🎮 Start Game</button></div>
+    <div class="grid grid-4">
+      ${statCard("📚","Vocabulary",data.vocabulary.length)}
+      ${statCard("🗂️","Categories",data.categories.length)}
+      ${statCard("👥","Teams",data.teams.length)}
+      ${statCard("⭐","Correct Answers",correct)}
+    </div>
+    <div class="grid grid-2" style="margin-top:18px">
+      <div class="card"><h2>Quick Start</h2><p>1. Add vocabulary and pictures.</p><p>2. Create your teams.</p><p>3. Choose game settings.</p><p>4. Start the classroom game.</p><button class="btn btn-primary" onclick="nav('vocabulary')">Manage Vocabulary</button></div>
+      <div class="card"><h2>Game Status</h2><p class="muted">Current question set: <strong>${data.settings.questionsPerGame}</strong></p><p class="muted">Timer: <strong>${data.settings.timer===0?"No timer":data.settings.timer+" seconds"}</strong></p><p class="muted">Category: <strong>${esc(data.settings.category)}</strong></p><p class="muted">Wrong answers recorded: <strong>${wrong}</strong></p></div>
+    </div>
+  </section>`;
+}
+function statCard(icon,title,value){return `<div class="card"><div style="font-size:27px">${icon}</div><div class="muted">${title}</div><div class="stat">${value}</div></div>`}
+
+/* ဒီအပိုင်းမှာ Vocabulary CRUD စနစ်ကို ပြုလုပ်ထားပါတယ် */
+function vocabularyPage(){
+  return `<section class="page">
+    <div class="toolbar"><div><h1>Vocabulary</h1><p class="muted">Add, edit, delete and preview vocabulary.</p></div>
+      <button class="btn btn-primary" onclick="openVocabModal()">+ Add New Vocabulary</button></div>
+    <div class="card" style="margin-bottom:18px"><div class="grid grid-3">
+      <input id="vocabSearch" placeholder="Search vocabulary..." oninput="filterVocab()">
+      <select id="vocabCategoryFilter" onchange="filterVocab()"><option>All</option>${data.categories.map(c=>`<option>${esc(c.name)}</option>`).join("")}</select>
+      <select id="vocabDifficultyFilter" onchange="filterVocab()"><option>All</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option></select>
+    </div></div>
+    <div id="vocabList" class="vocab-grid">${vocabCards()}</div>
+  </section>`;
+}
+function vocabCards(){
+  if(!data.vocabulary.length)return `<div class="card empty">No vocabulary yet.</div>`;
+  return data.vocabulary.map(v=>`<article class="card vocab-card vocab-item" data-word="${esc(v.word.toLowerCase())}" data-category="${esc(v.category)}" data-difficulty="${v.difficulty}">
+    <div class="vocab-img">${imageHTML(v)}</div>
+    <div class="vocab-body"><span class="badge">${esc(v.category)}</span><h3 style="margin:10px 0 5px">${esc(v.word)}</h3>
+    <p class="muted">${esc(v.meaning)}</p><p><strong>Example:</strong> ${esc(v.exampleSentence)}</p>
+    <div class="actions"><button class="btn btn-secondary" onclick="openVocabModal('${v.id}')">Edit</button><button class="btn btn-danger" onclick="deleteVocab('${v.id}')">Delete</button></div></div>
+  </article>`).join("");
+}
+function filterVocab(){
+  const q=(document.getElementById("vocabSearch")?.value||"").toLowerCase();
+  const cat=document.getElementById("vocabCategoryFilter")?.value||"All";
+  const dif=document.getElementById("vocabDifficultyFilter")?.value||"All";
+  document.querySelectorAll(".vocab-item").forEach(el=>{
+    el.style.display=(!q||el.dataset.word.includes(q))&&(cat==="All"||el.dataset.category===cat)&&(dif==="All"||el.dataset.difficulty===dif)?"":"none";
+  });
+}
+
+/* ဒီအပိုင်းမှာ Vocabulary Form နဲ့ Image Upload ကို ထိန်းချုပ်ပါတယ် */
+function openVocabModal(id=null){
+  state.editingId=id;
+  const v=id?getVocab(id):{word:"",category:data.categories[0]?.name||"Animals",meaning:"",exampleSentence:"",pronunciation:"",difficulty:1,image:"📚"};
+  document.getElementById("modal").innerHTML=`<div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button><h2>${id?"Edit Vocabulary":"Add New Vocabulary"}</h2>
+    <div class="form-grid">
+      <div class="form-group"><label>Word</label><input id="fWord" value="${esc(v.word)}"></div>
+      <div class="form-group"><label>Category</label><select id="fCategory">${data.categories.map(c=>`<option ${v.category===c.name?"selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+      <div class="form-group full"><label>Meaning</label><textarea id="fMeaning" rows="2">${esc(v.meaning)}</textarea></div>
+      <div class="form-group full"><label>Example Sentence</label><textarea id="fExample" rows="2">${esc(v.exampleSentence)}</textarea></div>
+      <div class="form-group"><label>Pronunciation</label><input id="fPronunciation" value="${esc(v.pronunciation)}"></div>
+      <div class="form-group"><label>Difficulty</label><select id="fDifficulty"><option value="1" ${v.difficulty==1?"selected":""}>Easy</option><option value="2" ${v.difficulty==2?"selected":""}>Medium</option><option value="3" ${v.difficulty==3?"selected":""}>Hard</option></select></div>
+      <div class="form-group full"><label>Image URL</label><input id="fImageUrl" placeholder="https://example.com/image.jpg" value="${v.image?.startsWith("http")?esc(v.image):""}"></div>
+      <div class="form-group full"><label>Upload Image</label><input id="fImageFile" type="file" accept="image/*"><p class="muted">Upload an image or use an image URL.</p></div>
+      <div class="form-group full"><label>Preview</label><div id="imagePreview" class="vocab-img" style="height:150px;border-radius:12px">${imageHTML(v)}</div></div>
+    </div>
+    <div class="actions" style="margin-top:18px"><button class="btn btn-primary" onclick="saveVocab('${id||""}')">Save</button><button class="btn btn-light" onclick="closeModal()">Cancel</button>${id?`<button class="btn btn-danger" onclick="deleteVocab('${id}');closeModal()">Delete</button>`:""}</div>
+  </div>`;
+  document.getElementById("modal").classList.add("show");
+  document.getElementById("fImageFile").onchange=e=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>document.getElementById("imagePreview").innerHTML=`<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:contain">`;
+    reader.readAsDataURL(file);
+  };
+  document.getElementById("fImageUrl").oninput=e=>{
+    if(e.target.value)document.getElementById("imagePreview").innerHTML=`<img src="${esc(e.target.value)}" style="width:100%;height:100%;object-fit:contain" onerror="this.style.display='none'">`;
+  };
+}
+function closeModal(){document.getElementById("modal").classList.remove("show");document.getElementById("modal").innerHTML=""}
+function saveVocab(id){
+  const word=document.getElementById("fWord").value.trim();
+  if(!word){toast("Please enter a word.");return}
+  const file=document.getElementById("fImageFile").files[0];
+  const url=document.getElementById("fImageUrl").value.trim();
+  const old=id?getVocab(id):null;
+  const finish=image=>{
+    const obj={id:id||crypto.randomUUID(),word,category:document.getElementById("fCategory").value,
+      meaning:document.getElementById("fMeaning").value.trim(),
+      exampleSentence:document.getElementById("fExample").value.trim(),
+      pronunciation:document.getElementById("fPronunciation").value.trim(),
+      difficulty:Number(document.getElementById("fDifficulty").value),
+      image:image||old?.image||"📚",questions:old?.questions||[]};
+    if(id)data.vocabulary=data.vocabulary.map(v=>v.id===id?obj:v);else data.vocabulary.push(obj);
+    saveData();closeModal();render();toast("Vocabulary saved.");
+  };
+  if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file)}
+  else finish(url||old?.image||"📚");
+}
+function deleteVocab(id){
+  if(!confirm("Delete this vocabulary item?"))return;
+  data.vocabulary=data.vocabulary.filter(v=>v.id!==id);saveData();render();toast("Vocabulary deleted.");
+}
+
+/* ဒီအပိုင်းမှာ Category Management ကို ပြုလုပ်ထားပါတယ် */
+function categoriesPage(){
+  return `<section class="page"><div class="toolbar"><div><h1>Categories</h1><p class="muted">Create and manage vocabulary categories.</p></div><button class="btn btn-primary" onclick="openCategoryModal()">+ Add Category</button></div>
+  <div class="grid grid-3">${data.categories.map(c=>`<div class="card"><div style="font-size:45px">${c.icon||"📁"}</div><h3>${esc(c.name)}</h3><p class="muted">${data.vocabulary.filter(v=>v.category===c.name).length} vocabulary items</p><div class="actions"><button class="btn btn-secondary" onclick="openCategoryModal('${c.id}')">Edit</button><button class="btn btn-danger" onclick="deleteCategory('${c.id}')">Delete</button></div></div>`).join("")}</div></section>`;
+}
+function openCategoryModal(id=null){
+  const c=id?data.categories.find(x=>x.id===id):{name:"",icon:"📁"};
+  document.getElementById("modal").innerHTML=`<div class="modal-box"><button class="close" onclick="closeModal()">×</button><h2>${id?"Edit Category":"Add Category"}</h2>
+  <label>Category Name</label><input id="catName" value="${esc(c.name)}"><br><br><label>Category Icon</label><input id="catIcon" value="${esc(c.icon)}"><br><br>
+  <div class="actions"><button class="btn btn-primary" onclick="saveCategory('${id||""}')">Save</button><button class="btn btn-light" onclick="closeModal()">Cancel</button></div></div>`;
+  document.getElementById("modal").classList.add("show");
+}
+function saveCategory(id){
+  const name=document.getElementById("catName").value.trim(),icon=document.getElementById("catIcon").value.trim()||"📁";
+  if(!name)return toast("Enter a category name.");
+  if(id){
+    const old=data.categories.find(c=>c.id===id),oldName=old.name;old.name=name;old.icon=icon;
+    data.vocabulary.forEach(v=>{if(v.category===oldName)v.category=name});
+  }else data.categories.push({id:crypto.randomUUID(),name,icon,image:""});
+  saveData();closeModal();render();toast("Category saved.");
+}
+function deleteCategory(id){
+  const c=data.categories.find(x=>x.id===id);
+  if(!c)return;
+  if(data.vocabulary.some(v=>v.category===c.name))return toast("Move or delete its vocabulary first.");
+  if(data.categories.length<=1)return toast("Keep at least one category.");
+  data.categories=data.categories.filter(x=>x.id!==id);saveData();render();
+}
+
+/* ဒီအပိုင်းမှာ Question Management နဲ့ Question Preview ကို ပြသပါတယ် */
+function questionsPage(){
+  const types=[["picture-word","Picture → Word"],["word-picture","Word → Picture"],["meaning","Word → Meaning"],["missing-letter","Missing Letter"],["spelling","Correct Spelling"],["sentence","Sentence Completion"]];
+  return `<section class="page"><div class="toolbar"><div><h1>Questions</h1><p class="muted">The game automatically generates questions from vocabulary.</p></div></div>
+  <div class="grid grid-3">${types.map(t=>`<div class="card"><h3>${t[1]}</h3><p class="muted">${questionDescription(t[0])}</p><span class="badge">Automatic</span></div>`).join("")}</div>
+  <div class="card" style="margin-top:18px"><h2>Question Settings</h2><p>Enabled types: ${data.settings.questionTypes.length}</p><div class="actions">${data.settings.questionTypes.map(x=>`<span class="badge">${types.find(t=>t[0]===x)?.[1]||x}</span>`).join(" ")}</div></div></section>`;
+}
+function questionDescription(type){
+  return { "picture-word":"Show a picture and choose the correct word.","word-picture":"Show a word and choose the correct picture.","meaning":"Choose the correct meaning.","missing-letter":"Choose the missing letter.","spelling":"Choose the correctly spelled word.","sentence":"Complete the example sentence."}[type];
+}
+
+/* ဒီအပိုင်းမှာ Team Management ကို ပြုလုပ်ထားပါတယ် */
+function teamsPage(){
+  return `<section class="page"><div class="toolbar"><div><h1>Teams</h1><p class="muted">Create up to ${GAME_CONFIG.maxTeams} classroom teams.</p></div><button class="btn btn-primary" onclick="openTeamModal()">+ Add Team</button></div>
+  <div class="grid grid-2">${data.teams.map(t=>`<div class="card team-card"><div class="avatar">${t.avatar}</div><div><h3 style="margin:0">${esc(t.name)}</h3><p class="muted">${t.correct} correct • ${t.wrong} wrong</p></div><div class="team-score">${t.score} ⭐</div><div class="actions"><button class="btn btn-secondary" onclick="openTeamModal('${t.id}')">Edit</button><button class="btn btn-danger" onclick="deleteTeam('${t.id}')">Delete</button></div></div>`).join("")}</div></section>`;
+}
+function openTeamModal(id=null){
+  const t=id?data.teams.find(x=>x.id===id):{name:"Team",avatar:"🐯"};
+  document.getElementById("modal").innerHTML=`<div class="modal-box"><button class="close" onclick="closeModal()">×</button><h2>${id?"Edit Team":"Add Team"}</h2>
+  <label>Team Name</label><input id="teamName" value="${esc(t.name)}"><br><br><label>Team Avatar</label><input id="teamAvatar" value="${esc(t.avatar)}" maxlength="4"><br><br>
+  <div class="actions"><button class="btn btn-primary" onclick="saveTeam('${id||""}')">Save</button><button class="btn btn-light" onclick="closeModal()">Cancel</button></div></div>`;
+  document.getElementById("modal").classList.add("show");
+}
+function saveTeam(id){
+  const name=document.getElementById("teamName").value.trim(),avatar=document.getElementById("teamAvatar").value.trim()||"⭐";
+  if(!name)return toast("Enter a team name.");
+  if(id){const t=data.teams.find(x=>x.id===id);t.name=name;t.avatar=avatar;t.icon=avatar}
+  else{if(data.teams.length>=GAME_CONFIG.maxTeams)return toast("Maximum 6 teams.");data.teams.push({id:crypto.randomUUID(),name,avatar,icon:avatar,score:0,stars:0,coins:0,correct:0,wrong:0,position:0,streak:0})}
+  saveData();closeModal();render();
+}
+function deleteTeam(id){if(data.teams.length<=2)return toast("Keep at least 2 teams.");data.teams=data.teams.filter(t=>t.id!==id);saveData();render()}
+
+/* ဒီအပိုင်းမှာ Game Settings ကို စီမံပါတယ် */
+function settingsPage(){
+  const types=[["picture-word","Picture → Word"],["word-picture","Word → Picture"],["meaning","Meaning"],["missing-letter","Missing Letter"],["spelling","Spelling"],["sentence","Sentence Completion"]];
+  return `<section class="page"><h1>Game Settings</h1><div class="card">
+  <div class="form-grid">
+    <div><label>Number of Teams</label><select id="setTeams">${[2,3,4,5,6].map(n=>`<option ${data.settings.numberOfTeams==n?"selected":""}>${n}</option>`).join("")}</select></div>
+    <div><label>Questions per Game</label><input id="setQuestions" type="number" min="1" max="50" value="${data.settings.questionsPerGame}"></div>
+    <div><label>Timer</label><select id="setTimer">${[0,10,15,20,30].map(n=>`<option value="${n}" ${data.settings.timer==n?"selected":""}>${n===0?"No timer":n+" seconds"}</option>`).join("")}</select></div>
+    <div><label>Points per Question</label><input id="setPoints" type="number" value="${data.settings.points}"></div>
+    <div><label>Bonus Points</label><input id="setBonus" type="number" value="${data.settings.bonus}"></div>
+    <div><label>Category</label><select id="setCategory"><option>All</option>${data.categories.map(c=>`<option ${data.settings.category===c.name?"selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+    <div><label>Difficulty</label><select id="setDifficulty"><option ${data.settings.difficulty==="All"?"selected":""}>All</option><option ${data.settings.difficulty==="1"?"selected":""} value="1">Easy</option><option ${data.settings.difficulty==="2"?"selected":""} value="2">Medium</option><option ${data.settings.difficulty==="3"?"selected":""} value="3">Hard</option></select></div>
+  </div>
+  <h3 style="margin-top:22px">Question Types</h3><div class="checkbox-row">${types.map(t=>`<label><input class="qtype" type="checkbox" value="${t[0]}" ${data.settings.questionTypes.includes(t[0])?"checked":""}> ${t[1]}</label>`).join("")}</div>
+  <h3 style="margin-top:22px">Effects</h3><div class="checkbox-row">
+    <label><input id="setSound" type="checkbox" ${data.settings.sound?"checked":""}> Sound</label>
+    <label><input id="setAnimations" type="checkbox" ${data.settings.animations?"checked":""}> Animations</label>
+    <label><input id="setMusic" type="checkbox" ${data.settings.music?"checked":""}> Music</label>
+  </div><br><button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+  </div></section>`;
+}
+function saveSettings(){
+  data.settings.numberOfTeams=Number(document.getElementById("setTeams").value);
+  data.settings.questionsPerGame=Math.max(1,Number(document.getElementById("setQuestions").value));
+  data.settings.timer=Number(document.getElementById("setTimer").value);
+  data.settings.points=Number(document.getElementById("setPoints").value);
+  data.settings.bonus=Number(document.getElementById("setBonus").value);
+  data.settings.category=document.getElementById("setCategory").value;
+  data.settings.difficulty=document.getElementById("setDifficulty").value;
+  data.settings.questionTypes=[...document.querySelectorAll(".qtype:checked")].map(x=>x.value);
+  data.settings.sound=document.getElementById("setSound").checked;
+  data.settings.animations=document.getElementById("setAnimations").checked;
+  data.settings.music=document.getElementById("setMusic").checked;
+  saveData();toast("Game settings saved.");render();
+}
+
+/* ဒီအပိုင်းမှာ Results Page ကို ပြသပါတယ် */
+function resultsPage(){
+  const teams=[...data.teams].sort((a,b)=>b.score-a.score);
+  if(!data.scores.length && teams.every(t=>!t.score))return `<section class="page"><h1>Results</h1><div class="card empty">No completed games yet.</div></section>`;
+  return `<section class="page"><h1>Results</h1><div class="card">${teams.map((t,i)=>`<div class="result-rank"><div class="rank">${i+1}</div><div class="avatar">${t.avatar}</div><div><h3 style="margin:0">${esc(t.name)}</h3><p class="muted">${t.correct} correct • ${t.wrong} wrong • ${t.stars} stars • ${t.coins} coins</p></div><strong style="margin-left:auto;font-size:25px">${t.score}</strong></div>`).join("")}</div><br><button class="btn btn-danger" onclick="resetScores()">Reset Scores</button></section>`;
+}
+function resetScores(){
+  data.teams.forEach(t=>{t.score=0;t.stars=0;t.coins=0;t.correct=0;t.wrong=0;t.position=0;t.streak=0});
+  data.scores=[];saveData();render();
+}
+
+/* ဒီအပိုင်းမှာ Question Generator ကို ရေးထားပါတယ် */
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function eligibleVocabulary(){
+  return data.vocabulary.filter(v=>(data.settings.category==="All"||v.category===data.settings.category)&&(data.settings.difficulty==="All"||String(v.difficulty)===String(data.settings.difficulty)));
+}
+function weightedVocabulary(){
+  const pool=eligibleVocabulary();
+  if(!pool.length)return [];
+  const result=[];
+  const count=data.settings.questionsPerGame;
+  for(let i=0;i<count;i++){
+    let candidates=pool.map(v=>{
+      const miss=(state.game?.mistakes?.[v.id]||0);
+      return {v,weight:1+miss*3};
+    });
+    const total=candidates.reduce((a,x)=>a+x.weight,0);
+    let r=Math.random()*total,picked=candidates[0].v;
+    for(const x of candidates){r-=x.weight;if(r<=0){picked=x.v;break}}
+    result.push(picked);
+  }
+  return result;
+}
+function makeQuestion(v){
+  const types=data.settings.questionTypes.length?data.settings.questionTypes:["picture-word"];
+  const type=types[Math.floor(Math.random()*types.length)];
+  const others=shuffle(eligibleVocabulary().filter(x=>x.id!==v.id)).slice(0,3);
+  if(type==="picture-word")return {type,v,question:"What is it?",choices:shuffle([v.word,...others.map(x=>x.word)]),answer:v.word};
+  if(type==="word-picture")return {type,v,question:`Which picture is "${v.word}"?`,choices:shuffle([v,...others]),answer:v.id};
+  if(type==="meaning")return {type,v,question:`What does "${v.word}" mean?`,choices:shuffle([v.meaning,...others.map(x=>x.meaning)]),answer:v.meaning};
+  if(type==="missing-letter"){
+    const letters=v.word.replace(/\s/g,"").split("");
+    const idx=Math.floor(Math.random()*letters.length);
+    const shown=letters.map((l,i)=>i===idx?"_":l).join(" ");
+    return {type,v,question:`Choose the missing letter: ${shown}`,choices:shuffle([letters[idx],..."ABCDE".split("").filter(x=>x!==letters[idx]).slice(0,3)]),answer:letters[idx]};
+  }
+  if(type==="spelling"){
+    const wrong=[
+      v.word.replace(/[aeiou]/i,"e"),
+      v.word.replace(/[aeiou]/i,"a"),
+      v.word.slice(0,-1)+"e"
+    ];
+    return {type,v,question:"Choose the correctly spelled word.",choices:shuffle([v.word,...wrong]),answer:v.word};
+  }
+  return {type:"sentence",v,question:v.exampleSentence.replace(new RegExp(v.word,"ig"),"________"),choices:shuffle([v.word,...others.map(x=>x.word)]),answer:v.word};
+}
+
+/* ဒီအပိုင်းမှာ Classroom Game Mode ကို Render လုပ်ပါတယ် */
+function gameLayout(){
+  if(!state.game)return `<div class="game-shell"><div class="game-header"><div><h1>🎯 Vocab Quest</h1><p class="muted">Classroom Game Mode</p></div><div class="actions"><button class="btn btn-light" onclick="nav('home')">Dashboard</button><button class="btn btn-primary" onclick="startGame()">Start Game</button></div></div><div class="card empty" style="max-width:700px;margin:100px auto"><div style="font-size:70px">🎮</div><h2>Ready for a Vocabulary Adventure?</h2><p>Set up your teams and game settings, then start the game.</p><button class="btn btn-primary" onclick="startGame()">Start Game</button></div></div>`;
+  const g=state.game;
+  if(g.finished)return resultsGameScreen();
+  const q=g.currentQuestion;
+  return `<div class="game-shell">
+    <div class="game-header"><div><h1>🎯 Vocab Quest</h1><span class="round">ROUND ${g.index+1} / ${g.questions.length}</span></div>
+      <div class="actions"><div class="timer ${g.time<=5?'warning':''}" id="gameTimer">${data.settings.timer?g.time:"∞"}</div><button class="btn btn-light" onclick="confirmExitGame()">Exit</button></div></div>
+    <div class="score-strip">${g.teams.map((t,i)=>`<div class="score-mini ${i===g.activeTeam?'active':''}"><div class="mini-avatar">${t.avatar}</div><strong>${esc(t.name)}</strong><div>${t.score} ⭐</div></div>`).join("")}</div>
+    <div class="game-card">
+      <div class="question">${esc(q.question)}</div>
+      ${q.type==="word-picture"?`<div class="answers">${q.choices.map(c=>`<button class="answer" onclick="answerQuestion('${c.id}')">${imageHTML(c)}</button>`).join("")}</div>`:
+      q.type==="picture-word"||q.type==="spelling"?`<div class="question-image">${imageHTML(q.v)}</div><div class="answers">${q.choices.map(c=>`<button class="answer" onclick="answerQuestion('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("")}</div>`:
+      `<div class="answers">${q.choices.map(c=>`<button class="answer" onclick="answerQuestion('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("")}</div>`}
+      <div class="feedback" id="feedback">${g.feedback||""}</div>
+      <div class="actions" style="justify-content:center;margin-top:12px">
+        ${g.awaitingNext?`<button class="btn btn-primary" onclick="nextQuestion()">Next Question →</button>`:""}
+        ${g.awaitingNext?`<button class="btn btn-warning" onclick="speakingBonus()">+5 Speaking Challenge</button>`:""}
+      </div>
+    </div>
+    ${treasureMap(g)}
+  </div>`;
+}
+function treasureMap(g){
+  const stops=["START","FOREST","RIVER","MOUNTAIN","CASTLE","TREASURE"];
+  return `<div class="map"><h3>🗺️ Treasure Map</h3><div class="map-track">${stops.map((s,i)=>`<div class="map-stop"><div class="map-icon">${i===5?"🏆":i===0?"🚩":"📍"}</div><div>${s}</div>${g.teams.map(t=>t.position===i?`<div class="map-character">${t.avatar}</div>`:"").join("")}</div>`).join("")}</div></div>`;
+}
+function resultsGameScreen(){
+  const sorted=[...state.game.teams].sort((a,b)=>b.score-a.score);
+  return `<div class="game-shell"><div class="game-card" style="text-align:center"><div style="font-size:80px">🏆</div><h1>Game Complete!</h1><h2>${esc(sorted[0].name)} Wins!</h2><div class="grid grid-2" style="text-align:left;margin-top:25px">${sorted.map((t,i)=>`<div class="card result-rank"><div class="rank">${i+1}</div><div class="avatar">${t.avatar}</div><div><h3>${esc(t.name)}</h3><div>${t.score} points</div><div class="muted">${t.correct} correct • ${t.wrong} wrong</div></div></div>`).join("")}</div><div class="actions" style="justify-content:center;margin-top:25px"><button class="btn btn-primary" onclick="startGame()">Play Again</button><button class="btn btn-light" onclick="state.game=null;nav('results')">View Results</button></div></div></div>`;
+}
+
+/* ဒီအပိုင်းမှာ Game Engine နဲ့ Team Answering ကို ထိန်းချုပ်ပါတယ် */
+function startGame(){
+  const selected=data.teams.slice(0,data.settings.numberOfTeams).map(t=>clone(t));
+  if(selected.length<2)return toast("Create at least 2 teams.");
+  const vocab=weightedVocabulary();
+  if(!vocab.length)return toast("Add vocabulary first.");
+  state.game={teams:selected,questions:vocab.map(makeQuestion),index:0,currentQuestion:null,
+    activeTeam:0,time:data.settings.timer,mistakes:{},feedback:"",awaitingNext:false,finished:false};
+  state.game.currentQuestion=state.game.questions[0];
+  if(data.settings.timer)startTimer();
+  render();
+}
+let timerInterval=null;
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(!state.game||state.game.finished||state.game.awaitingNext){clearInterval(timerInterval);return}
+    state.game.time--;
+    const el=document.getElementById("gameTimer");if(el)el.textContent=state.game.time;
+    if(state.game.time<=5&&data.settings.sound)beep(180,.08);
+    if(state.game.time<=0){clearInterval(timerInterval);timeUp()}
+  },1000);
+}
+function timeUp(){
+  if(!state.game||state.game.awaitingNext)return;
+  const q=state.game.currentQuestion;
+  const team=state.game.teams[state.game.activeTeam];
+  team.wrong++;team.streak=0;state.game.mistakes[q.v.id]=(state.game.mistakes[q.v.id]||0)+1;
+  state.game.feedback="TIME'S UP!";
+  state.game.awaitingNext=true;
+  if(data.settings.sound)beep(100,.25);
+  render();
+}
+function answerQuestion(encoded){
+  if(!state.game||state.game.awaitingNext)return;
+  const answer=decodeURIComponent(encoded);
+  const q=state.game.currentQuestion,team=state.game.teams[state.game.activeTeam];
+  const correct=answer===q.answer;
+  if(correct){
+    const fast=state.game.time>Math.max(5,Math.floor(data.settings.timer/2));
+    const points=fast?GAME_CONFIG.fastAnswerPoints:data.settings.points;
+    team.score+=points;team.correct++;team.streak++;team.stars++;
+    team.coins+=fast?2:1;
+    if(team.streak>0&&team.streak%3===0){team.score+=data.settings.bonus;team.stars++}
+    team.position=Math.min(5,Math.floor(team.score/50));
+    state.game.feedback=fast?`Correct! +${points} points!`:`Correct! +${points} points!`;
+    if(data.settings.sound)beep(700,.12);
+  }else{
+    team.wrong++;team.streak=0;state.game.mistakes[q.v.id]=(state.game.mistakes[q.v.id]||0)+1;
+    state.game.feedback="Try again!";
+    if(data.settings.sound)beep(160,.18);
+  }
+  state.game.awaitingNext=true;clearInterval(timerInterval);render();
+}
+function speakingBonus(){
+  if(!state.game||!state.game.awaitingNext)return;
+  state.game.teams[state.game.activeTeam].score+=GAME_CONFIG.speakingBonus;
+  state.game.teams[state.game.activeTeam].coins++;
+  state.game.feedback="+5 Speaking Challenge!";
+  render();
+}
+function nextQuestion(){
+  const g=state.game;
+  g.index++;
+  if(g.index>=g.questions.length){finishGame();return}
+  g.activeTeam=(g.activeTeam+1)%g.teams.length;
+  g.currentQuestion=g.questions[g.index];
+  g.time=data.settings.timer;g.feedback="";g.awaitingNext=false;
+  render();if(data.settings.timer)startTimer();
+}
+function finishGame(){
+  clearInterval(timerInterval);state.game.finished=true;
+  data.teams=data.teams.map(t=>{
+    const result=state.game.teams.find(x=>x.id===t.id);
+    return result?result:t;
+  });
+  data.scores.unshift({date:new Date().toISOString(),teams:clone(state.game.teams)});
+  saveData();render();
+}
+function confirmExitGame(){
+  if(confirm("Exit the current game?")){clearInterval(timerInterval);state.game=null;nav("home")}
+}
+
+/* ဒီအပိုင်းမှာ Web Audio API နဲ့ Simple Sound Effects ပြုလုပ်ပါတယ် */
+function beep(freq=600,duration=.1){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.frequency.value=freq;osc.type="sine";gain.gain.value=.05;
+    osc.connect(gain);gain.connect(ctx.destination);osc.start();
+    setTimeout(()=>{osc.stop();ctx.close()},duration*1000);
+  }catch(e){}
+}
+
+/* ဒီအပိုင်းမှာ Data Import / Export ကို ပြုလုပ်ပါတယ် */
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vocab-quest-data.json";a.click();URL.revokeObjectURL(a.href);
+  toast("Data exported.");
+}
+function importData(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imported=JSON.parse(e.target.result);
+      if(!imported.vocabulary||!imported.categories||!imported.teams)throw new Error("Invalid");
+      data=imported;saveData();render();toast("Data imported successfully.");
+    }catch(err){toast("Invalid Vocab Quest JSON file.")}
+  };reader.readAsText(file);
+}
+
+/* ဒီအပိုင်းမှာ Click Event တွေကို ချိတ်ဆက်ထားပါတယ် */
+function bindEvents(){
+  const file=document.getElementById("importFile");
+  if(file)file.onchange=e=>{if(e.target.files[0])importData(e.target.files[0])};
+}
+render();
+</script>
+</body>
+</html>

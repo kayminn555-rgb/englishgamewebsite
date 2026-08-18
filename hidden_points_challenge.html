@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hidden Points Challenge</title>
+<style>
+:root{
+  --bg:#f5f7ff;--panel:#fff;--text:#172033;--muted:#6b7280;
+  --primary:#5b5ce2;--primary2:#7c3aed;--green:#16a34a;--red:#dc2626;
+  --yellow:#f59e0b;--border:#e5e7eb;--shadow:0 12px 35px rgba(30,41,59,.12);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.app{min-height:100vh}
+.topbar{height:68px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:20px}
+.brand-badge{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;color:#fff;font-size:21px;box-shadow:0 7px 18px #6366f155}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{padding:10px 14px;border-radius:12px;background:#eef0ff;color:#3730a3;font-weight:800;transition:.18s}
+.btn:hover{transform:translateY(-1px);filter:brightness(.98)}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.btn.dark{background:#172033;color:#fff}
+.btn.green{background:#dcfce7;color:#166534}
+.btn.red{background:#fee2e2;color:#991b1b}
+.btn.yellow{background:#fef3c7;color:#92400e}
+.btn.small{padding:7px 10px;font-size:13px}
+.btn.icon{width:40px;height:40px;padding:0;display:grid;place-items:center}
+.layout{display:grid;grid-template-columns:245px 1fr;min-height:calc(100vh - 68px)}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:18px 12px}
+.nav-title{font-size:11px;font-weight:900;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;padding:12px}
+.nav-btn{width:100%;text-align:left;padding:12px 13px;border-radius:12px;background:transparent;color:#4b5563;font-weight:750;margin-bottom:4px}
+.nav-btn:hover,.nav-btn.active{background:#eef0ff;color:#3730a3}
+.nav-btn span{display:inline-block;width:25px}
+.main{padding:25px;min-width:0}
+.page{display:none}.page.active{display:block}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:20px}
+.page-head h1{margin:0 0 5px;font-size:28px}.page-head p{margin:0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 5px 20px #1e293b08}
+.stat .label{color:var(--muted);font-size:13px;font-weight:700}.stat .value{font-size:28px;font-weight:950;margin-top:6px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}.table th{font-size:12px;text-transform:uppercase;color:#6b7280}
+.empty{padding:35px;text-align:center;color:var(--muted)}
+.thumb{width:62px;height:50px;border-radius:12px;object-fit:cover;background:#eef0ff;display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-weight:800;font-size:13px}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid #d7dbe5;border-radius:11px;outline:none;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px #6366f11c}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.modal-backdrop{position:fixed;inset:0;background:#0f172a99;display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.modal-backdrop.show{display:flex}.modal{width:min(680px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 30px 80px #0005;padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0}.close{background:#f3f4f6;border-radius:10px;width:38px;height:38px;font-size:20px}
+.lesson-list{display:grid;gap:10px}.lesson-item{display:flex;align-items:center;justify-content:space-between;padding:14px;border:1px solid var(--border);border-radius:14px}.lesson-item.selected{border-color:#6366f1;background:#eef0ff}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.team-card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:16px}.team-card.active{border-color:#6366f1;box-shadow:0 0 0 4px #6366f11a}.team-icon{font-size:34px}.team-score{font-size:34px;font-weight:950;margin:5px 0}.mini-actions{display:flex;gap:5px;flex-wrap:wrap}
+.check{display:flex;align-items:center;gap:8px}.check input{width:18px;height:18px}
+.notice{padding:12px 14px;border-radius:12px;background:#eef0ff;color:#3730a3;font-weight:700;margin-bottom:14px}.notice.success{background:#dcfce7;color:#166534}.notice.error{background:#fee2e2;color:#991b1b}
+#gamePage{padding:0}.game-shell{min-height:calc(100vh - 68px);background:linear-gradient(135deg,#eef2ff,#fdf4ff);padding:18px}
+.game-top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
+.current-team{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:14px;font-weight:900;box-shadow:0 5px 15px #0000000a}
+.score-strip{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.score-pill{min-width:140px;background:#fff;border:2px solid transparent;border-radius:15px;padding:9px 12px}.score-pill.active{border-color:#6366f1;box-shadow:0 6px 18px #6366f126}.score-pill .name{font-size:12px;font-weight:800;color:#6b7280}.score-pill .score{font-size:22px;font-weight:950}
+.question{background:#fff;border-radius:18px;padding:12px 18px;text-align:center;font-size:clamp(18px,2.5vw,28px);font-weight:950;box-shadow:var(--shadow);margin-bottom:16px}
+.board{display:grid;gap:18px;max-width:1400px;margin:auto}
+.board.cols4{grid-template-columns:repeat(4,1fr)}.board.cols5{grid-template-columns:repeat(5,1fr)}.board.cols6{grid-template-columns:repeat(6,1fr)}
+.game-card{min-height:260px;border-radius:24px;background:#fff;border:3px solid #fff;box-shadow:0 15px 35px #312e8140;overflow:hidden;position:relative;transition:.22s;user-select:none}
+.game-card:not(.revealed):not(.locked):hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 42px #312e814c}
+.game-card.selected{border-color:#6366f1;box-shadow:0 0 0 5px #6366f133,0 20px 42px #312e8144}
+.game-card.locked{cursor:not-allowed;opacity:.72}.game-card.revealed{animation:revealCard .65s ease forwards}
+.card-img{width:100%;height:190px;object-fit:cover;background:linear-gradient(135deg,#dbeafe,#ede9fe);display:block}
+.card-word{font-size:clamp(18px,2vw,27px);font-weight:950;text-align:center;padding:12px 8px}
+.card-placeholder{height:190px;display:grid;place-items:center;font-size:70px}
+.points-reveal{height:100%;min-height:260px;display:grid;place-items:center;text-align:center;background:linear-gradient(135deg,#ecfdf5,#eef2ff);font-weight:950}
+.points-number{font-size:clamp(48px,7vw,90px);line-height:1}.points-label{font-size:20px;margin-top:8px}.negative{background:linear-gradient(135deg,#fff1f2,#fff7ed)}
+@keyframes revealCard{0%{transform:scale(1)}35%{transform:scale(1.05)}100%{transform:scale(.96);opacity:.8}}
+@keyframes scorePop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.score-pop{animation:scorePop .5s ease}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}.particle{position:absolute;font-size:24px;animation:floatUp 1.2s ease-out forwards}@keyframes floatUp{from{transform:translate(0,0) scale(.6);opacity:0}20%{opacity:1}to{transform:translate(var(--x),var(--y)) scale(1.2);opacity:0}}
+.big-points{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.2);font-size:clamp(50px,10vw,130px);font-weight:1000;z-index:210;opacity:0;pointer-events:none;text-shadow:0 8px 25px #0003}.big-points.show{animation:bigPoint .95s cubic-bezier(.2,.8,.2,1) forwards}@keyframes bigPoint{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-58%) scale(.95)}}
+.winner{position:fixed;inset:0;background:#0f172ae8;z-index:180;display:none;align-items:center;justify-content:center;padding:20px}.winner.show{display:flex}.winner-box{width:min(700px,100%);background:#fff;border-radius:28px;padding:30px;text-align:center;box-shadow:0 35px 100px #0008}.trophy{font-size:70px}.winner h2{font-size:clamp(30px,6vw,56px);margin:8px 0}.winner-score{font-size:40px;font-weight:1000}.rank-row{display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);font-weight:800}
+.toast{position:fixed;right:20px;bottom:20px;z-index:300;background:#172033;color:#fff;padding:13px 16px;border-radius:13px;box-shadow:var(--shadow);transform:translateY(30px);opacity:0;transition:.25s;max-width:360px}.toast.show{transform:none;opacity:1}
+.preview{max-width:180px;max-height:130px;border-radius:14px;display:none;margin-top:8px}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.muted{color:var(--muted)}.right{margin-left:auto}
+.kpi{font-size:13px;color:var(--muted)}.danger{color:#b91c1c}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:205px 1fr}.board.cols6{grid-template-columns:repeat(3,1fr)}.board.cols5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.sidebar{position:sticky;top:68px;z-index:40;border-right:0;border-bottom:1px solid var(--border);display:flex;overflow:auto;padding:8px}.nav-title{display:none}.nav-btn{min-width:max-content;width:auto;margin:0}.main{padding:15px}.grid2,.form-grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.board.cols4,.board.cols5,.board.cols6{grid-template-columns:repeat(2,1fr)}.game-card{min-height:190px}.card-img,.card-placeholder{height:130px}.points-reveal{min-height:190px}.topbar{padding:0 10px}.brand span:last-child{display:none}}
+@media(max-width:480px){.board.cols4,.board.cols5,.board.cols6{grid-template-columns:1fr}.game-card{min-height:250px}.card-img,.card-placeholder{height:185px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-badge">🏆</div><span>Hidden Points Challenge</span></div>
+  <div class="top-actions">
+    <button class="btn small" onclick="showPage('game')">🎮 Game Board</button>
+    <button class="btn primary small" onclick="startGame()">▶ Start Game</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="nav-title">Teacher Dashboard</div>
+  <button class="nav-btn active" data-page="home" onclick="showPage('home')"><span>⌂</span>Home</button>
+  <button class="nav-btn" data-page="lessons" onclick="showPage('lessons')"><span>📚</span>Lessons</button>
+  <button class="nav-btn" data-page="cards" onclick="showPage('cards')"><span>🃏</span>Vocabulary Cards</button>
+  <button class="nav-btn" data-page="teams" onclick="showPage('teams')"><span>👥</span>Teams</button>
+  <button class="nav-btn" data-page="settings" onclick="showPage('settings')"><span>⚙</span>Game Settings</button>
+  <button class="nav-btn" data-page="game" onclick="showPage('game')"><span>🎮</span>Game Board</button>
+  <button class="nav-btn" data-page="results" onclick="showPage('results')"><span>🏆</span>Results</button>
+  <button class="nav-btn" data-page="import" onclick="showPage('import')"><span>⇅</span>Import / Export</button>
+</aside>
+
+<main class="main">
+<section id="homePage" class="page active">
+  <div class="page-head"><div><h1>Teacher Dashboard</h1><p>Prepare your lesson, choose teams, and start the classroom game.</p></div><button class="btn primary" onclick="startGame()">▶ Start Game</button></div>
+  <div class="cards">
+    <div class="stat"><div class="label">Lessons</div><div class="value" id="statLessons">0</div></div>
+    <div class="stat"><div class="label">Vocabulary Cards</div><div class="value" id="statCards">0</div></div>
+    <div class="stat"><div class="label">Teams</div><div class="value" id="statTeams">0</div></div>
+    <div class="stat"><div class="label">Current Lesson</div><div class="value" id="statCurrent" style="font-size:18px">—</div></div>
+  </div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="panel">
+      <h2>Quick Start</h2>
+      <p class="muted">The sample Animals lesson is ready to play. You can edit everything from the dashboard.</p>
+      <div class="actions"><button class="btn primary" onclick="startGame()">Start Animals Game</button><button class="btn" onclick="showPage('lessons')">Manage Lessons</button></div>
+    </div>
+    <div class="panel">
+      <h2>Current Setup</h2>
+      <div id="homeSetup"></div>
+    </div>
+  </div>
+</section>
+
+<section id="lessonsPage" class="page">
+  <div class="page-head"><div><h1>Lessons</h1><p>Create and organise vocabulary lessons.</p></div><button class="btn primary" onclick="openLessonModal()">＋ Add Lesson</button></div>
+  <div class="panel"><div id="lessonList" class="lesson-list"></div></div>
+</section>
+
+<section id="cardsPage" class="page">
+  <div class="page-head"><div><h1>Vocabulary Cards</h1><p>Edit pictures, words, points, categories, and example sentences.</p></div><button class="btn primary" onclick="openCardModal()">＋ Add Card</button></div>
+  <div class="panel">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:15px;flex-wrap:wrap">
+      <label><strong>Lesson:</strong> <select id="cardLessonSelect" onchange="renderCards()"></select></label>
+      <span class="muted" id="cardCountLabel"></span>
+    </div>
+    <div style="overflow:auto"><table class="table"><thead><tr><th>Order</th><th>Picture</th><th>Word</th><th>Category</th><th>Points</th><th>Actions</th></tr></thead><tbody id="cardsTable"></tbody></table></div>
+  </div>
+</section>
+
+<section id="teamsPage" class="page">
+  <div class="page-head"><div><h1>Teams</h1><p>Create 2–6 teams and choose the active team during play.</p></div><button class="btn primary" onclick="openTeamModal()">＋ Add Team</button></div>
+  <div id="teamEditorGrid" class="team-grid"></div>
+</section>
+
+<section id="settingsPage" class="page">
+  <div class="page-head"><div><h1>Game Settings</h1><p>Control the classroom game experience.</p></div></div>
+  <div class="panel">
+    <div class="form-grid">
+      <div class="field"><label>Number of Cards</label><select id="setCardCount"><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option><option>12</option></select></div>
+      <div class="field"><label>Card Layout</label><select id="setLayout"><option value="4">4 cards</option><option value="5">5 cards</option><option value="6">6 cards</option></select></div>
+      <div class="field"><label>Question Prompt</label><select id="setQuestion"><option>What is this?</option><option>Name the animal.</option><option>Can you say the word?</option><option>What animal is this?</option><option>Custom prompt</option></select></div>
+      <div class="field" id="customQuestionField" style="display:none"><label>Custom Question</label><input id="setCustomQuestion" placeholder="Type your question"></div>
+      <div class="field"><label>Animation</label><label class="check"><input type="checkbox" id="setAnimation"> ON</label></div>
+      <div class="field"><label>Sound Effects</label><label class="check"><input type="checkbox" id="setSound"> ON</label></div>
+      <div class="field"><label>Auto Score</label><label class="check"><input type="checkbox" id="setAutoScore"> ON</label></div>
+      <div class="field"><label>Randomize Cards</label><label class="check"><input type="checkbox" id="setRandomize"> ON</label></div>
+      <div class="field"><label>Show Vocabulary Word</label><label class="check"><input type="checkbox" id="setShowWord"> ON</label></div>
+    </div>
+    <div class="divider"></div><button class="btn primary" onclick="saveSettings()">Save Settings</button>
+  </div>
+</section>
+
+<section id="resultsPage" class="page">
+  <div class="page-head"><div><h1>Results</h1><p>Review the latest completed game.</p></div><button class="btn" onclick="startGame()">▶ Play Again</button></div>
+  <div class="panel" id="resultsPanel"></div>
+</section>
+
+<section id="importPage" class="page">
+  <div class="page-head"><div><h1>Import / Export</h1><p>Back up your lessons and game configuration as JSON.</p></div></div>
+  <div class="grid2">
+    <div class="panel"><h2>Export Data</h2><p class="muted">Export lessons, cards, teams, settings, and the latest results.</p><button class="btn primary" onclick="exportData()">⇩ Export JSON</button></div>
+    <div class="panel"><h2>Import Data</h2><p class="muted">Choose a valid Hidden Points Challenge JSON file.</p><input type="file" id="importFile" accept=".json,application/json" onchange="importData(event)"></div>
+  </div>
+</section>
+
+<section id="gamePage" class="page">
+  <div class="game-shell">
+    <div class="game-top">
+      <div class="actions">
+        <button class="btn dark small" onclick="showPage('home')">← Dashboard</button>
+        <button class="btn small" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button class="btn small" onclick="undoLast()">↶ Undo</button>
+        <button class="btn red small" onclick="confirmReset()">Reset Game</button>
+      </div>
+      <div class="current-team">CURRENT TEAM: <span id="currentTeamName">None</span></div>
+    </div>
+    <div id="scoreStrip" class="score-strip"></div>
+    <div id="questionBox" class="question">What is this?</div>
+    <div id="gameBoard" class="board cols5"></div>
+  </div>
+</section>
+</main>
+</div>
+</div>
+
+<div id="lessonModal" class="modal-backdrop"><div class="modal">
+  <div class="modal-head"><h2 id="lessonModalTitle">Add Lesson</h2><button class="close" onclick="closeModal('lessonModal')">×</button></div>
+  <div class="form-grid"><div class="field full"><label>Lesson Name</label><input id="lessonName" placeholder="e.g. Animals"></div></div>
+  <div class="actions" style="margin-top:18px"><button class="btn" onclick="closeModal('lessonModal')">Cancel</button><button class="btn primary" onclick="saveLesson()">Save</button></div>
+</div></div>
+
+<div id="cardModal" class="modal-backdrop"><div class="modal">
+  <div class="modal-head"><h2 id="cardModalTitle">Add Vocabulary Card</h2><button class="close" onclick="closeModal('cardModal')">×</button></div>
+  <div class="form-grid">
+    <div class="field"><label>Word *</label><input id="cardWord" placeholder="Tiger"></div>
+    <div class="field"><label>Category</label><input id="cardCategory" placeholder="Animals"></div>
+    <div class="field"><label>Hidden Points *</label><input id="cardPoints" type="number" step="1" placeholder="20"></div>
+    <div class="field"><label>Image</label><input id="cardImage" type="file" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)"></div>
+    <div class="field full"><label>Example Sentence</label><input id="cardSentence" placeholder="It is a tiger."></div>
+    <div class="field full"><img id="imagePreview" class="preview" alt="Preview"></div>
+  </div>
+  <div class="actions" style="margin-top:18px"><button class="btn" onclick="closeModal('cardModal')">Cancel</button><button class="btn primary" onclick="saveCard()">Save Card</button></div>
+</div></div>
+
+<div id="teamModal" class="modal-backdrop"><div class="modal">
+  <div class="modal-head"><h2 id="teamModalTitle">Add Team</h2><button class="close" onclick="closeModal('teamModal')">×</button></div>
+  <div class="form-grid"><div class="field"><label>Team Name *</label><input id="teamName" placeholder="Tigers"></div><div class="field"><label>Icon / Avatar</label><input id="teamIcon" maxlength="4" placeholder="🐯"></div></div>
+  <div class="actions" style="margin-top:18px"><button class="btn" onclick="closeModal('teamModal')">Cancel</button><button class="btn primary" onclick="saveTeam()">Save Team</button></div>
+</div></div>
+
+<div id="confirmModal" class="modal-backdrop"><div class="modal">
+  <div class="modal-head"><h2>Confirm Reset</h2><button class="close" onclick="closeModal('confirmModal')">×</button></div>
+  <p>Are you sure you want to reset the current game?</p><div class="actions"><button class="btn" onclick="closeModal('confirmModal')">Cancel</button><button class="btn red" onclick="resetGame()">Reset Game</button></div>
+</div></div>
+
+<div id="scoreModal" class="modal-backdrop"><div class="modal">
+  <div class="modal-head"><h2>Edit Score</h2><button class="close" onclick="closeModal('scoreModal')">×</button></div>
+  <div class="field"><label>New Score</label><input id="editScoreInput" type="number" step="1"></div>
+  <div class="actions" style="margin-top:18px"><button class="btn" onclick="closeModal('scoreModal')">Cancel</button><button class="btn primary" onclick="saveEditedScore()">Save</button></div>
+</div></div>
+
+<div id="fx"></div><div id="bigPoints" class="big-points"></div>
+<div id="winner" class="winner"><div class="winner-box"><div class="trophy">🏆</div><h2>GAME COMPLETE!</h2><div id="winnerName"></div><div class="winner-score" id="winnerScore"></div><div id="ranking" style="margin:18px 0;text-align:left"></div><div class="actions" style="justify-content:center"><button class="btn primary" onclick="closeWinner();showPage('results')">Results</button><button class="btn" onclick="closeWinner();startGame()">Play Again</button><button class="btn" onclick="closeWinner();showPage('home')">Dashboard</button></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ဒီအပိုင်းမှာ Game ရဲ့ အခြေခံ Setting တွေကို တစ်နေရာတည်းမှာ ပြင်နိုင်အောင် စုထားပါတယ် */
+const GAME_CONFIG = {
+  defaultCardCount: 5,
+  maxTeams: 6,
+  minTeams: 2,
+  randomizeCards: false,
+  animations: true,
+  sound: true
+};
+
+/* ဒီအပိုင်းမှာ Browser ထဲက Data ကို သိမ်းမယ့် Key ကို သတ်မှတ်ထားပါတယ် */
+const STORAGE_KEY = "hiddenPointsGameData";
+
+/* ဒီအပိုင်းမှာ Game ရဲ့ အခြေခံ Data ကို စတင်ဖန်တီးပါတယ် */
+const defaultData = {
+  lessons: [{
+    id: uid(), name: "Animals",
+    cards: [
+      {id:uid(),word:"Dog",category:"Animals",points:10,sentence:"It is a dog.",image:"https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=700&q=80"},
+      {id:uid(),word:"Cat",category:"Animals",points:20,sentence:"It is a cat.",image:"https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=700&q=80"},
+      {id:uid(),word:"Tiger",category:"Animals",points:-10,sentence:"It is a tiger.",image:"https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=700&q=80"},
+      {id:uid(),word:"Lion",category:"Animals",points:30,sentence:"It is a lion.",image:"https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=700&q=80"},
+      {id:uid(),word:"Rabbit",category:"Animals",points:5,sentence:"It is a rabbit.",image:"https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=700&q=80"}
+    ]
+  }],
+  teams: [
+    {id:uid(),name:"Tigers",icon:"🐯"},
+    {id:uid(),name:"Lions",icon:"🦁"},
+    {id:uid(),name:"Eagles",icon:"🦅"},
+    {id:uid(),name:"Sharks",icon:"🦈"}
+  ],
+  settings:{
+    cardCount:5,layout:5,question:"What is this?",customQuestion:"",
+    animation:true,sound:true,autoScore:true,randomize:false,showWord:true
+  },
+  latestResults:null
+};
+
+/* ဒီအပိုင်းမှာ Local Storage ကနေ Data ကို ဖတ်ပြီး မရှိရင် Default Data ကို သုံးပါတယ် */
+let data = loadData();
+let game = {activeTeam:null,cards:[],revealed:new Set(),selectedCard:null,history:[],scores:{},pointsGained:{},pointsLost:{},selectedCounts:{},started:false};
+let editingLessonId=null, editingCardId=null, editingTeamId=null, editingScoreTeamId=null, pendingImage=null;
+
+/* ဒီ Function က Data ID အသစ်တစ်ခု ထုတ်ပေးပါတယ် */
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+
+/* ဒီ Function က Local Storage မှာ Game Data ကို သိမ်းပေးပါတယ် */
+function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}
+
+/* ဒီ Function က Local Storage ထဲက Data ကို ဖတ်ပါတယ် */
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw){localStorage.setItem(STORAGE_KEY,JSON.stringify(defaultData));return structuredClone(defaultData)}
+    const parsed=JSON.parse(raw);
+    return normalizeData(parsed);
+  }catch(e){return structuredClone(defaultData)}
+}
+
+/* ဒီ Function က Import လုပ်လာတဲ့ Data မှာ လိုအပ်တဲ့ Structure တွေ ရှိအောင် ပြင်ပေးပါတယ် */
+function normalizeData(d){
+  if(!d || !Array.isArray(d.lessons) || !Array.isArray(d.teams) || !d.settings) throw new Error("Invalid game data file.");
+  d.lessons=d.lessons.map(l=>({...l,id:l.id||uid(),cards:Array.isArray(l.cards)?l.cards.map(c=>({...c,id:c.id||uid()})):[]}));
+  d.teams=d.teams.map(t=>({...t,id:t.id||uid()}));
+  return d;
+}
+
+/* ဒီ Function က Page တစ်ခုကို ပြောင်းပေးပြီး Navigation ကို Highlight လုပ်ပါတယ် */
+function showPage(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(page+"Page").classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  if(page==="home")renderHome();
+  if(page==="lessons")renderLessons();
+  if(page==="cards")renderCards();
+  if(page==="teams")renderTeams();
+  if(page==="settings")renderSettings();
+  if(page==="results")renderResults();
+  if(page==="game")renderGame();
+}
+
+/* ဒီ Function က Dashboard Home ကို ပြသပါတယ် */
+function renderHome(){
+  const lesson=currentLesson();
+  document.getElementById("statLessons").textContent=data.lessons.length;
+  document.getElementById("statCards").textContent=data.lessons.reduce((n,l)=>n+l.cards.length,0);
+  document.getElementById("statTeams").textContent=data.teams.length;
+  document.getElementById("statCurrent").textContent=lesson?lesson.name:"—";
+  document.getElementById("homeSetup").innerHTML=`
+    <p><strong>Lesson:</strong> ${esc(lesson?.name||"None")}</p>
+    <p><strong>Teams:</strong> ${data.teams.map(t=>esc(t.name)).join(", ")||"None"}</p>
+    <p><strong>Cards:</strong> ${lesson?.cards.length||0}</p>
+    <p><strong>Card count:</strong> ${data.settings.cardCount}</p>`;
+}
+
+/* ဒီ Function က လက်ရှိ Lesson ကို ပြန်ပေးပါတယ် */
+function currentLesson(){return data.lessons[0]}
+
+/* ဒီ Function က Lesson List ကို Render လုပ်ပါတယ် */
+function renderLessons(){
+  const el=document.getElementById("lessonList");
+  if(!data.lessons.length){el.innerHTML='<div class="empty">No lessons yet.</div>';return}
+  el.innerHTML=data.lessons.map(l=>`
+    <div class="lesson-item ${currentLesson()?.id===l.id?"selected":""}">
+      <div><strong>${esc(l.name)}</strong><div class="kpi">${l.cards.length} vocabulary card(s)</div></div>
+      <div class="actions">
+        <button class="btn small" onclick="selectLesson('${l.id}')">Select</button>
+        <button class="btn small" onclick="duplicateLesson('${l.id}')">Duplicate</button>
+        <button class="btn small" onclick="openLessonModal('${l.id}')">Edit</button>
+        <button class="btn red small" onclick="deleteLesson('${l.id}')">Delete</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ဒီ Function က Lesson အသစ်ထည့်တဲ့ Modal ကို ဖွင့်ပါတယ် */
+function openLessonModal(id=null){
+  editingLessonId=id;
+  document.getElementById("lessonModalTitle").textContent=id?"Edit Lesson":"Add Lesson";
+  document.getElementById("lessonName").value=id?(data.lessons.find(l=>l.id===id)?.name||""):"";
+  openModal("lessonModal");
+}
+
+/* ဒီ Function က Lesson ကို Save လုပ်ပါတယ် */
+function saveLesson(){
+  const name=document.getElementById("lessonName").value.trim();
+  if(!name){toast("Please enter a lesson name.","error");return}
+  if(editingLessonId){
+    const l=data.lessons.find(x=>x.id===editingLessonId); if(l)l.name=name;
+  }else data.lessons.push({id:uid(),name,cards:[]});
+  persist();closeModal("lessonModal");renderLessons();renderHome();toast("Lesson saved.","success");
+}
+
+/* ဒီ Function က Lesson ကို ရွေးချယ်ပါတယ် */
+function selectLesson(id){
+  const idx=data.lessons.findIndex(l=>l.id===id);
+  if(idx>0){const [l]=data.lessons.splice(idx,1);data.lessons.unshift(l);persist()}
+  renderLessons();renderHome();renderCards();toast("Lesson selected.","success");
+}
+
+/* ဒီ Function က Lesson ကို Duplicate လုပ်ပါတယ် */
+function duplicateLesson(id){
+  const l=data.lessons.find(x=>x.id===id);if(!l)return;
+  data.lessons.push({id:uid(),name:l.name+" Copy",cards:l.cards.map(c=>({...c,id:uid()}))});
+  persist();renderLessons();renderHome();toast("Lesson duplicated.","success");
+}
+
+/* ဒီ Function က Lesson ကို ဖျက်ပါတယ် */
+function deleteLesson(id){
+  if(data.lessons.length<=1){toast("At least one lesson must remain.","error");return}
+  if(!confirm("Delete this lesson?"))return;
+  data.lessons=data.lessons.filter(l=>l.id!==id);persist();renderLessons();renderHome();renderCards();toast("Lesson deleted.","success");
+}
+
+/* ဒီ Function က Card Lesson Selector ကို ပြင်ဆင်ပါတယ် */
+function populateLessonSelect(){
+  const s=document.getElementById("cardLessonSelect");
+  s.innerHTML=data.lessons.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");
+}
+
+/* ဒီ Function က Vocabulary Cards Table ကို Render လုပ်ပါတယ် */
+function renderCards(){
+  populateLessonSelect();
+  const lesson=currentLesson();
+  const el=document.getElementById("cardsTable");
+  document.getElementById("cardCountLabel").textContent=lesson?`${lesson.cards.length} card(s)`:"";
+  if(!lesson||!lesson.cards.length){el.innerHTML='<tr><td colspan="6" class="empty">No vocabulary cards yet.</td></tr>';return}
+  el.innerHTML=lesson.cards.map((c,i)=>`
+    <tr>
+      <td><div class="actions"><button class="btn icon small" onclick="moveCard('${c.id}',-1)">←</button><strong>${i+1}</strong><button class="btn icon small" onclick="moveCard('${c.id}',1)">→</button></div></td>
+      <td>${c.image?`<img class="thumb" src="${escAttr(c.image)}" alt="">`:"🖼️"}</td>
+      <td><strong>${esc(c.word)}</strong></td><td>${esc(c.category||"—")}</td>
+      <td><strong class="${Number(c.points)<0?"danger":""}">${Number(c.points)>0?"+":""}${Number(c.points)}</strong></td>
+      <td><div class="actions"><button class="btn small" onclick="openCardModal('${c.id}')">Edit</button><button class="btn red small" onclick="deleteCard('${c.id}')">Delete</button></div></td>
+    </tr>`).join("");
+}
+
+/* ဒီ Function က Card Modal ကို ဖွင့်ပြီး လက်ရှိ Card Data ကို ဖြည့်ပေးပါတယ် */
+function openCardModal(id=null){
+  editingCardId=id;pendingImage=null;
+  const c=id?currentLesson()?.cards.find(x=>x.id===id):null;
+  document.getElementById("cardModalTitle").textContent=id?"Edit Vocabulary Card":"Add Vocabulary Card";
+  document.getElementById("cardWord").value=c?.word||"";
+  document.getElementById("cardCategory").value=c?.category||"";
+  document.getElementById("cardPoints").value=c?.points??20;
+  document.getElementById("cardSentence").value=c?.sentence||"";
+  document.getElementById("cardImage").value="";
+  const p=document.getElementById("imagePreview");p.src=c?.image||"";p.style.display=c?.image?"block":"none";
+  openModal("cardModal");
+}
+
+/* ဒီ Function က Upload လုပ်ထားတဲ့ Image ကို Preview ပြပါတယ် */
+function previewImage(e){
+  const file=e.target.files[0];if(!file)return;
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){toast("Please use JPG, JPEG, PNG, or WEBP.","error");e.target.value="";return}
+  const reader=new FileReader();
+  reader.onload=()=>{pendingImage=reader.result;const p=document.getElementById("imagePreview");p.src=pendingImage;p.style.display="block"};
+  reader.readAsDataURL(file);
+}
+
+/* ဒီ Function က Card အသစ် သို့မဟုတ် ပြင်ထားတဲ့ Card ကို Save လုပ်ပါတယ် */
+function saveCard(){
+  const word=document.getElementById("cardWord").value.trim();
+  const points=Number(document.getElementById("cardPoints").value);
+  if(!word){toast("Please enter a vocabulary word.","error");return}
+  if(!Number.isInteger(points)){toast("Please enter a valid number.","error");return}
+  const l=currentLesson();if(!l){toast("Please create a lesson first.","error");return}
+  if(editingCardId){
+    const c=l.cards.find(x=>x.id===editingCardId);if(c){
+      c.word=word;c.category=document.getElementById("cardCategory").value.trim();c.points=points;c.sentence=document.getElementById("cardSentence").value.trim();if(pendingImage)c.image=pendingImage;
+    }
+  }else l.cards.push({id:uid(),word,category:document.getElementById("cardCategory").value.trim(),points,sentence:document.getElementById("cardSentence").value.trim(),image:pendingImage||""});
+  persist();closeModal("cardModal");renderCards();renderHome();toast("Vocabulary card saved.","success");
+}
+
+/* ဒီ Function က Card ကို ဖျက်ပါတယ် */
+function deleteCard(id){
+  if(!confirm("Delete this vocabulary card?"))return;
+  const l=currentLesson();l.cards=l.cards.filter(c=>c.id!==id);persist();renderCards();renderHome();toast("Card deleted.","success");
+}
+
+/* ဒီ Function က Card Order ကို ဘယ်/ညာ ရွှေ့ပါတယ် */
+function moveCard(id,dir){
+  const cards=currentLesson().cards;const i=cards.findIndex(c=>c.id===id);const j=i+dir;
+  if(j<0||j>=cards.length)return;[cards[i],cards[j]]=[cards[j],cards[i]];persist();renderCards();
+}
+
+/* ဒီ Function က Team Editor ကို Render လုပ်ပါတယ် */
+function renderTeams(){
+  document.getElementById("teamEditorGrid").innerHTML=data.teams.map(t=>`
+    <div class="team-card">
+      <div class="team-icon">${esc(t.icon||"⭐")}</div><h2 style="margin:5px 0">${esc(t.name)}</h2>
+      <div class="actions">
+        <button class="btn small" onclick="openTeamModal('${t.id}')">Edit</button>
+        <button class="btn red small" onclick="deleteTeam('${t.id}')">Delete</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ဒီ Function က Team Modal ကို ဖွင့်ပါတယ် */
+function openTeamModal(id=null){
+  editingTeamId=id;const t=id?data.teams.find(x=>x.id===id):null;
+  document.getElementById("teamModalTitle").textContent=id?"Edit Team":"Add Team";
+  document.getElementById("teamName").value=t?.name||"";
+  document.getElementById("teamIcon").value=t?.icon||"⭐";
+  openModal("teamModal");
+}
+
+/* ဒီ Function က Team Data ကို Save လုပ်ပါတယ် */
+function saveTeam(){
+  const name=document.getElementById("teamName").value.trim();
+  if(!name){toast("Please enter a team name.","error");return}
+  if(editingTeamId){const t=data.teams.find(x=>x.id===editingTeamId);if(t){t.name=name;t.icon=document.getElementById("teamIcon").value.trim()||"⭐"}}
+  else{
+    if(data.teams.length>=GAME_CONFIG.maxTeams){toast("Maximum 6 teams allowed.","error");return}
+    data.teams.push({id:uid(),name,icon:document.getElementById("teamIcon").value.trim()||"⭐"});
+  }
+  persist();closeModal("teamModal");renderTeams();renderHome();toast("Team saved.","success");
+}
+
+/* ဒီ Function က Team ကို ဖျက်ပါတယ် */
+function deleteTeam(id){
+  if(data.teams.length<=GAME_CONFIG.minTeams){toast("Please keep at least 2 teams.","error");return}
+  if(!confirm("Delete this team?"))return;
+  data.teams=data.teams.filter(t=>t.id!==id);persist();renderTeams();renderHome();toast("Team deleted.","success");
+}
+
+/* ဒီ Function က Settings Page မှာ သိမ်းထားတဲ့ Setting တွေကို ပြပါတယ် */
+function renderSettings(){
+  const s=data.settings;
+  document.getElementById("setCardCount").value=s.cardCount;
+  document.getElementById("setLayout").value=s.layout;
+  document.getElementById("setQuestion").value=["What is this?","Name the animal.","Can you say the word?","What animal is this?"].includes(s.question)?s.question:"Custom prompt";
+  document.getElementById("setCustomQuestion").value=s.customQuestion||"";
+  document.getElementById("customQuestionField").style.display=document.getElementById("setQuestion").value==="Custom prompt"?"flex":"none";
+  document.getElementById("setAnimation").checked=s.animation;
+  document.getElementById("setSound").checked=s.sound;
+  document.getElementById("setAutoScore").checked=s.autoScore;
+  document.getElementById("setRandomize").checked=s.randomize;
+  document.getElementById("setShowWord").checked=s.showWord;
+}
+
+/* ဒီ Event က Custom Question ကို ရွေးရင် Input Box ကို ပြပါတယ် */
+document.getElementById("setQuestion").addEventListener("change",e=>document.getElementById("customQuestionField").style.display=e.target.value==="Custom prompt"?"flex":"none");
+
+/* ဒီ Function က Game Settings ကို သိမ်းပါတယ် */
+function saveSettings(){
+  const q=document.getElementById("setQuestion").value;
+  data.settings={cardCount:Number(document.getElementById("setCardCount").value),layout:Number(document.getElementById("setLayout").value),question:q==="Custom prompt"?document.getElementById("setCustomQuestion").value.trim():q,customQuestion:document.getElementById("setCustomQuestion").value.trim(),animation:document.getElementById("setAnimation").checked,sound:document.getElementById("setSound").checked,autoScore:document.getElementById("setAutoScore").checked,randomize:document.getElementById("setRandomize").checked,showWord:document.getElementById("setShowWord").checked};
+  persist();toast("Settings saved.","success");renderGame();
+}
+
+/* ဒီ Function က Game စတင်ဖို့ လိုအပ်ချက်တွေကို စစ်ပြီး Game State ကို ဖန်တီးပါတယ် */
+function startGame(){
+  if(data.teams.length<2){toast("Please create at least 2 teams.","error");showPage("teams");return}
+  const l=currentLesson();if(!l||!l.cards.length){toast("Please add at least one vocabulary card.","error");showPage("cards");return}
+  const cards=[...l.cards];if(data.settings.randomize)shuffle(cards);
+  game={activeTeam:null,cards:cards.slice(0,Math.min(data.settings.cardCount,cards.length)),revealed:new Set(),selectedCard:null,history:[],scores:{},pointsGained:{},pointsLost:{},selectedCounts:{},started:true};
+  data.teams.forEach(t=>{game.scores[t.id]=0;game.pointsGained[t.id]=0;game.pointsLost[t.id]=0;game.selectedCounts[t.id]=0});
+  showPage("game");renderGame();toast("Game ready. Select a team to begin.","success");
+}
+
+/* ဒီ Function က Game Board နဲ့ Scoreboard ကို Render လုပ်ပါတယ် */
+function renderGame(){
+  if(!game.started){document.getElementById("gameBoard").innerHTML='<div class="empty" style="grid-column:1/-1;background:#fff;border-radius:20px">Click <strong>Start Game</strong> to begin.</div>';return}
+  const layout=Math.min(6,Math.max(4,Number(data.settings.layout)||5));
+  const board=document.getElementById("gameBoard");board.className="board cols"+layout;
+  document.getElementById("questionBox").textContent=data.settings.question||"What is this?";
+  document.getElementById("currentTeamName").textContent=game.activeTeam?teamById(game.activeTeam)?.name||"None":"None";
+  document.getElementById("scoreStrip").innerHTML=data.teams.map(t=>`
+    <button class="score-pill ${game.activeTeam===t.id?"active":""}" onclick="selectTeam('${t.id}')">
+      <div class="name">${esc(t.icon||"⭐")} ${esc(t.name)}</div><div class="score">${game.scores[t.id]||0}</div>
+    </button>`).join("");
+  board.innerHTML=game.cards.map((c,i)=>{
+    const rev=game.revealed.has(c.id);
+    return `<div class="game-card ${rev?"revealed locked":""} ${game.selectedCard===c.id&&!rev?"selected":""}" onclick="selectCard('${c.id}')">
+      ${rev?`<div class="points-reveal ${Number(c.points)<0?"negative":""}"><div><div class="points-number">${Number(c.points)>0?"+":""}${Number(c.points)}</div><div class="points-label">POINTS</div></div></div>`:
+      `${c.image?`<img class="card-img" src="${escAttr(c.image)}" alt="${escAttr(c.word)}">`:`<div class="card-placeholder">🖼️</div>`}
+      ${data.settings.showWord?`<div class="card-word">${esc(c.word.toUpperCase())}</div>`:""}`}</div>`
+  }).join("");
+}
+
+/* ဒီ Function က လက်ရှိ Team ကို ရွေးပါတယ် */
+function selectTeam(id){
+  if(!game.started)return;
+  pushHistory();game.activeTeam=id;game.selectedCard=null;renderGame();
+}
+
+/* ဒီ Function က Card ကို ရွေးပြီး Reveal လုပ်ဖို့ လုပ်ဆောင်ပါတယ် */
+function selectCard(id){
+  if(!game.started)return;
+  if(!game.activeTeam){toast("Please select an active team first.","error");return}
+  if(game.revealed.has(id))return;
+  game.selectedCard=id;renderGame();
+  setTimeout(()=>revealCard(id),80);
+}
+
+/* ဒီ Function က Hidden Point Reveal Animation နဲ့ Score Update ကို လုပ်ပါတယ် */
+function revealCard(id){
+  if(game.revealed.has(id)||!game.activeTeam)return;
+  const card=game.cards.find(c=>c.id===id);if(!card)return;
+  pushHistory();
+  const teamId=game.activeTeam;
+  game.revealed.add(id);
+  game.selectedCard=null;
+  game.selectedCounts[teamId]=(game.selectedCounts[teamId]||0)+1;
+  const pts=Number(card.points)||0;
+  if(data.settings.autoScore) changeScore(teamId,pts,false);
+  renderGame();
+  if(data.settings.animation)showBigPoints(pts);
+  if(data.settings.sound)playSound(pts>=0?"positive":"negative");
+  if(pts>=0)particles(["⭐","✨","🪙","🎉"]);else particles(["⚠️","💨","☁️"]);
+  setTimeout(()=>{if(game.revealed.size===game.cards.length)finishGame()},800);
+}
+
+/* ဒီ Function က Score ကို ပြောင်းပြီး Gain/Loss ကို မှတ်တမ်းတင်ပါတယ် */
+function changeScore(teamId,delta,record=true){
+  if(record)pushHistory();
+  game.scores[teamId]=(game.scores[teamId]||0)+Number(delta);
+  if(delta>=0)game.pointsGained[teamId]=(game.pointsGained[teamId]||0)+Number(delta);
+  else game.pointsLost[teamId]=(game.pointsLost[teamId]||0)+Math.abs(Number(delta));
+  renderGame();
+}
+
+/* ဒီ Function က Team Score ကို ပြင်ဆင်ရန် Modal ဖွင့်ပါတယ် */
+function editScore(id){
+  editingScoreTeamId=id;document.getElementById("editScoreInput").value=game.scores[id]||0;openModal("scoreModal");
+}
+
+/* ဒီ Function က Edit Score ကို Save လုပ်ပါတယ် */
+function saveEditedScore(){
+  const n=Number(document.getElementById("editScoreInput").value);
+  if(!Number.isInteger(n)){toast("Please enter a valid number.","error");return}
+  pushHistory();game.scores[editingScoreTeamId]=n;closeModal("scoreModal");renderGame();toast("Score updated.","success");
+}
+
+/* ဒီ Function က Game History ကို သိမ်းပြီး Undo လုပ်နိုင်အောင် ပြင်ဆင်ပါတယ် */
+function pushHistory(){
+  if(!game.started)return;
+  game.history.push(JSON.parse(JSON.stringify({activeTeam:game.activeTeam,scores:game.scores,pointsGained:game.pointsGained,pointsLost:game.pointsLost,selectedCounts:game.selectedCounts,revealed:[...game.revealed],selectedCard:game.selectedCard})));
+  if(game.history.length>30)game.history.shift();
+}
+
+/* ဒီ Function က နောက်ဆုံး Action ကို ပြန်ဖျက်ပါတယ် */
+function undoLast(){
+  if(!game.history.length){toast("Nothing to undo.","error");return}
+  const h=game.history.pop();
+  game.activeTeam=h.activeTeam;game.scores=h.scores;game.pointsGained=h.pointsGained;game.pointsLost=h.pointsLost;game.selectedCounts=h.selectedCounts;game.revealed=new Set(h.revealed);game.selectedCard=h.selectedCard;renderGame();toast("Last action undone.","success");
+}
+
+/* ဒီ Function က Reset Confirmation Modal ကို ပြပါတယ် */
+function confirmReset(){openModal("confirmModal")}
+
+/* ဒီ Function က Current Game ကို အစကနေ ပြန်စပါတယ် */
+function resetGame(){
+  closeModal("confirmModal");game.started=false;game.activeTeam=null;game.cards=[];game.revealed=new Set();game.selectedCard=null;game.history=[];renderGame();toast("Game reset.","success");
+}
+
+/* ဒီ Function က Game ပြီးဆုံးရင် Winner Screen ပြပါတယ် */
+function finishGame(){
+  const ranking=data.teams.map(t=>({team:t,score:game.scores[t.id]||0})).sort((a,b)=>b.score-a.score);
+  const winner=ranking[0];if(!winner)return;
+  data.latestResults={date:new Date().toISOString(),lesson:currentLesson()?.name||"",ranking:ranking.map(r=>({name:r.team.name,icon:r.team.icon,score:r.score,gained:game.pointsGained[r.team.id]||0,lost:game.pointsLost[r.team.id]||0,cards:game.selectedCounts[r.team.id]||0}))};
+  persist();
+  document.getElementById("winnerName").textContent=winner.team.icon+" "+winner.team.name+" WINS!";
+  document.getElementById("winnerScore").textContent=winner.score+" POINTS";
+  document.getElementById("ranking").innerHTML=ranking.map((r,i)=>`<div class="rank-row"><span>${i+1}${i===0?"st":i===1?"nd":i===2?"rd":"th"} — ${esc(r.team.name)}</span><span>${r.score}</span></div>`).join("");
+  document.getElementById("winner").classList.add("show");
+  if(data.settings.sound)playSound("victory");particles(["🏆","⭐","🎉","✨"]);
+}
+
+/* ဒီ Function က Winner Screen ကို ပိတ်ပါတယ် */
+function closeWinner(){document.getElementById("winner").classList.remove("show")}
+
+/* ဒီ Function က Latest Results ကို ပြပါတယ် */
+function renderResults(){
+  const p=document.getElementById("resultsPanel"),r=data.latestResults;
+  if(!r){p.innerHTML='<div class="empty">No completed game results yet.</div>';return}
+  p.innerHTML=`<h2>${esc(r.lesson)}</h2><p class="muted">${new Date(r.date).toLocaleString()}</p>
+  <table class="table"><thead><tr><th>Team</th><th>Final Score</th><th>Points Gained</th><th>Points Lost</th><th>Cards Selected</th></tr></thead><tbody>
+  ${r.ranking.map(x=>`<tr><td>${esc(x.icon||"⭐")} ${esc(x.name)}</td><td><strong>${x.score}</strong></td><td>${x.gained}</td><td>${x.lost}</td><td>${x.cards}</td></tr>`).join("")}</tbody></table>`;
+}
+
+/* ဒီ Function က JSON Data ကို File အဖြစ် Download လုပ်ပေးပါတယ် */
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="hidden-points-game-data.json";a.click();URL.revokeObjectURL(a.href);toast("Game data exported.","success");
+}
+
+/* ဒီ Function က JSON Import Data ကို စစ်ပြီး သိမ်းပါတယ် */
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=normalizeData(JSON.parse(reader.result));data=parsed;persist();renderHome();renderLessons();renderCards();renderTeams();renderSettings();toast("Game data imported successfully.","success");
+    }catch(err){toast("Invalid game data file.","error")}
+    e.target.value="";
+  };
+  reader.readAsText(file);
+}
+
+/* ဒီ Function က Browser Fullscreen ကို ဖွင့်/ပိတ်ပါတယ် */
+function toggleFullscreen(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();
+}
+
+/* ဒီ Function က Keyboard Shortcut တွေကို စီမံပါတယ် */
+document.addEventListener("keydown",e=>{
+  if(["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName))return;
+  if(e.key==="Escape"&&document.fullscreenElement)document.exitFullscreen?.();
+  if(e.key.toLowerCase()==="f")toggleFullscreen();
+  if(e.key.toLowerCase()==="r")confirmReset();
+  if(e.key.toLowerCase()==="u")undoLast();
+  if(e.code==="Space"){e.preventDefault();if(game.selectedCard&&!game.revealed.has(game.selectedCard))revealCard(game.selectedCard)}
+});
+
+/* ဒီ Function က Modal ကို ဖွင့်ပါတယ် */
+function openModal(id){document.getElementById(id).classList.add("show")}
+
+/* ဒီ Function က Modal ကို ပိတ်ပါတယ် */
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+
+/* ဒီ Function က Team ID နဲ့ Team Data ကို ရှာပေးပါတယ် */
+function teamById(id){return data.teams.find(t=>t.id===id)}
+
+/* ဒီ Function က User မြင်ရမယ့် Text ထဲက HTML Character တွေကို Escape လုပ်ပါတယ် */
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function escAttr(s){return esc(s)}
+
+/* ဒီ Function က Array ကို Random Order ပြောင်းပေးပါတယ် */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* ဒီ Function က Toast Message ကို ခဏပြပါတယ် */
+let toastTimer;
+function toast(message,type=""){
+  const t=document.getElementById("toast");t.textContent=message;t.className="toast show";
+  if(type==="error")t.style.background="#991b1b";else if(type==="success")t.style.background="#166534";else t.style.background="#172033";
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+
+/* ဒီ Function က Positive/Negative Point Animation ကို ပြပါတယ် */
+function showBigPoints(points){
+  const el=document.getElementById("bigPoints");el.textContent=(points>=0?"+":"")+points+" POINTS";el.style.color=points>=0?"#16a34a":"#dc2626";el.classList.remove("show");void el.offsetWidth;el.classList.add("show");
+}
+
+/* ဒီ Function က Lightweight Particle Effect ကို ပြပါတယ် */
+function particles(chars){
+  const fx=document.getElementById("fx");
+  for(let i=0;i<16;i++){
+    const p=document.createElement("div");p.className="particle";p.textContent=chars[Math.floor(Math.random()*chars.length)];
+    p.style.left=(35+Math.random()*30)+"%";p.style.top=(42+Math.random()*18)+"%";p.style.setProperty("--x",(Math.random()*360-180)+"px");p.style.setProperty("--y",(-80-Math.random()*280)+"px");p.style.animationDelay=(Math.random()*.18)+"s";fx.appendChild(p);setTimeout(()=>p.remove(),1500);
+  }
+}
+
+/* ဒီ Function က Copyright Music မသုံးဘဲ Web Audio API နဲ့ Simple Sound ထုတ်ပါတယ် */
+function playSound(type){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);o.type="sine";
+    const now=ctx.currentTime;
+    if(type==="positive"){o.frequency.setValueAtTime(520,now);o.frequency.exponentialRampToValueAtTime(900,now+.16)}
+    else if(type==="negative"){o.frequency.setValueAtTime(240,now);o.frequency.exponentialRampToValueAtTime(150,now+.22)}
+    else if(type==="victory"){o.frequency.setValueAtTime(440,now);o.frequency.setValueAtTime(660,now+.12);o.frequency.setValueAtTime(880,now+.24)}
+    else{o.frequency.setValueAtTime(380,now)}
+    g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.08,now+.02);g.gain.exponentialRampToValueAtTime(.0001,now+.32);
+    o.start(now);o.stop(now+.34);
+  }catch(e){}
+}
+
+/* ဒီ Function က Page အားလုံးရဲ့ Initial Render ကို လုပ်ပါတယ် */
+function init(){
+  renderHome();renderLessons();renderCards();renderTeams();renderSettings();renderResults();renderGame();
+}
+init();
+</script>
+</body>
+</html>
