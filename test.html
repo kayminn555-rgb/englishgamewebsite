@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#6657e8">
+<title>WORD QUEST — Final Edition</title>
+<style>
+:root{
+  --primary:#6657e8;--primary2:#8b6df2;--green:#32c875;--red:#ff5d78;
+  --blue:#42a5f5;--yellow:#ffd447;--orange:#ff9f43;--dark:#273142;
+  --muted:#707b91;--bg1:#dff6ff;--bg2:#f3eaff;--white:#fff;
+  --border:#e2e6f2;--shadow:0 14px 35px rgba(40,50,90,.15);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif;color:var(--dark)}
+body{background:linear-gradient(135deg,var(--bg1),var(--bg2));overflow-x:hidden}
+button,input,select{font:inherit}
+button{border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:4px solid #42a5f566;outline-offset:2px}
+.screen{display:none;min-height:100vh;padding:18px;align-items:center;justify-content:center}
+.screen.active{display:flex}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.cloud{position:absolute;width:150px;height:55px;background:#ffffff80;border-radius:50px;animation:cloud 28s linear infinite}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud:before{width:75px;height:75px;left:20px;bottom:12px}.cloud:after{width:82px;height:82px;right:15px;bottom:8px}
+.cloud.c1{top:10%;left:-200px}.cloud.c2{top:45%;left:-260px;animation-delay:9s}.cloud.c3{top:75%;left:-220px;animation-delay:18s}
+@keyframes cloud{to{transform:translateX(135vw)}}
+.start{width:min(100%,920px);text-align:center}
+.mascot{width:155px;height:155px;margin:auto;border-radius:50%;display:grid;place-items:center;font-size:82px;background:linear-gradient(145deg,#ffe56a,#ffb42f);box-shadow:var(--shadow);animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-9px) rotate(2deg)}}
+.mascot.jump{animation:jump .65s ease}
+@keyframes jump{0%{transform:scale(1)}40%{transform:scale(1.2) rotate(-7deg)}70%{transform:scale(.9) rotate(7deg)}100%{transform:scale(1)}}
+.logo{font-size:clamp(48px,9vw,96px);font-weight:1000;color:var(--primary);letter-spacing:-4px;text-shadow:0 6px 0 #4d41bf,0 12px 25px #0002;margin:12px 0}
+.subtitle{font-size:clamp(20px,4vw,30px);font-weight:900;color:#58627b}
+.message{min-height:28px;color:var(--muted);font-weight:900}
+.main-buttons{display:grid;gap:12px;width:min(100%,390px);margin:25px auto}
+.btn{min-height:50px;padding:12px 18px;border-radius:15px;color:#fff;font-weight:1000;box-shadow:0 5px #0002;transition:.15s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(3px);box-shadow:0 2px #0002}
+.primary{background:linear-gradient(135deg,var(--primary),var(--primary2))}.green{background:var(--green)}
+.red{background:var(--red)}.blue{background:var(--blue)}.orange{background:var(--orange)}.gray{background:#7d8799}
+.panel{width:min(100%,1160px);background:#fffffff5;border-radius:28px;padding:28px;box-shadow:var(--shadow)}
+.title{text-align:center;color:var(--primary);font-size:clamp(29px,5vw,42px);margin:0 0 8px}.sub{text-align:center;color:var(--muted);margin:0 0 22px}
+.input,.select{width:100%;height:52px;border:2px solid var(--border);border-radius:13px;padding:0 13px;background:#fff;color:var(--dark)}
+.input:focus,.select:focus{border-color:var(--primary)}
+.actions{display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:18px}
+.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:15px}
+.set-card{background:#fff;border:2px solid var(--border);border-radius:20px;padding:20px;box-shadow:0 6px 20px #0000000b;transition:.2s}
+.set-card:hover{transform:translateY(-4px);border-color:var(--primary)}
+.set-icon{font-size:52px}.set-card h3{font-size:23px;margin:8px 0 5px}.set-card p{color:var(--muted)}
+.dashboard{width:min(100%,1320px);min-height:760px;background:#fff;border-radius:28px;overflow:hidden;display:grid;grid-template-columns:225px 1fr;box-shadow:var(--shadow)}
+.sidebar{background:linear-gradient(180deg,#594ee0,#806cf0);padding:18px;color:#fff}
+.sidebar-logo{text-align:center;font-size:25px;font-weight:1000;margin-bottom:22px}
+.nav{display:block;width:100%;text-align:left;background:transparent;color:#fff;padding:13px;border-radius:12px;font-weight:900;margin:3px 0}
+.nav:hover,.nav.active{background:#ffffff24}
+.dashboard-main{padding:26px;overflow:auto}
+.header{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+.header h1{margin:0}.muted{color:var(--muted)}
+.set-row{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;border:2px solid var(--border);border-radius:18px;padding:16px;margin:11px 0}
+.set-row h3{margin:0 0 4px}.set-row p{margin:0;color:var(--muted)}
+.small-actions{display:flex;gap:6px;flex-wrap:wrap}.small-btn{padding:9px 12px;border-radius:10px;color:#fff;font-weight:900}
+.editor{display:none}.editor.active{display:block}
+.fields{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:#f7f8ff;padding:15px;border-radius:17px;margin:18px 0}
+.field label{display:block;font-weight:900;color:#5c667e;margin-bottom:6px}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.vocab-card{border:2px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}
+.vocab-img{height:145px;background:#f6f7ff;display:grid;place-items:center;font-size:65px}
+.vocab-img img{width:100%;height:100%;object-fit:contain}
+.vocab-body{padding:13px}.vocab-body h3{margin:0;font-size:22px}.vocab-body p{margin:5px 0 10px;color:var(--muted)}
+.empty{text-align:center;padding:45px 20px;border:2px dashed var(--border);border-radius:18px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#151a2a99;z-index:100;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}.modal-box{width:min(100%,650px);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:24px;box-shadow:0 20px 70px #0004}
+.modal-box h2{margin-top:0;color:var(--primary)}
+.group{margin:13px 0}.group label{display:block;font-weight:900;margin-bottom:6px}
+.preview{height:175px;border:2px dashed var(--border);border-radius:14px;display:grid;place-items:center;background:#f8f9ff;overflow:hidden;color:var(--muted)}
+.preview img{max-width:100%;max-height:100%;object-fit:contain}
+.check-row{display:flex;gap:14px;flex-wrap:wrap}.check{display:flex;gap:8px;align-items:center;font-weight:900}
+.check input{width:20px;height:20px}
+.game{width:min(100%,1280px)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;background:#fffffff4;padding:13px;border-radius:19px;box-shadow:var(--shadow)}
+.stat{text-align:center}.stat b{display:block;font-size:11px;color:var(--muted)}.stat strong{font-size:22px;color:var(--primary)}
+.progress{height:17px;background:#ffffffaa;border-radius:20px;overflow:hidden;margin:15px 0}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--yellow),var(--orange));transition:.4s}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}.column{background:#fffffff2;border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.column h2{text-align:center;color:#59627a}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}
+.card{position:relative;min-height:112px;border:3px solid var(--border);border-radius:18px;background:#fff;display:grid;place-items:center;padding:10px;user-select:none;touch-action:none;transition:.15s}
+.card:hover{transform:translateY(-3px)}.card.selected,.card.focus{border-color:var(--primary);box-shadow:0 0 0 4px #6657e822}
+.card.correct{border-color:var(--green);background:#edfff4}.card.wrong{border-color:var(--red);animation:shake .35s}
+.card.locked{opacity:.35;pointer-events:none}.card.drag-target{outline:4px dashed var(--blue);outline-offset:3px}
+.word{font-size:19px;font-weight:1000;text-transform:uppercase;text-align:center}
+.picture{width:82px;height:82px;object-fit:contain}.speaker{position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;background:#ff9f43;color:#fff}
+.game-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:13px}
+.feedback{position:fixed;left:50%;top:19%;transform:translate(-50%,-20px) scale(.7);opacity:0;z-index:120;font-size:clamp(30px,6vw,65px);font-weight:1000;color:var(--primary);text-shadow:0 4px #fff;pointer-events:none}
+.feedback.show{animation:pop .85s ease}@keyframes pop{0%{opacity:0;transform:translate(-50%,0) scale(.6)}35%{opacity:1;transform:translate(-50%,-8px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-80px) scale(1)}}
+.confetti{position:fixed;inset:0;z-index:110;pointer-events:none;overflow:hidden}.piece{position:absolute;width:9px;height:16px;animation:fall 2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.controller{display:none;position:fixed;right:12px;bottom:12px;background:#202737;color:#fff;padding:10px 14px;border-radius:12px;z-index:130}.controller.show{display:block}
+.result{text-align:center}.stars{font-size:58px;margin:12px}.result h2{font-size:28px}.result p{color:var(--muted);font-weight:800}
+@media(max-width:900px){.dashboard{grid-template-columns:1fr}.sidebar{display:flex;overflow:auto;gap:4px}.sidebar-logo{display:none}.nav{min-width:max-content;width:auto}.fields{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:650px){.screen{padding:10px}.panel{padding:18px}.fields{grid-template-columns:1fr}.columns{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.logo{letter-spacing:-2px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
+
+<section id="startScreen" class="screen active">
+  <div class="start">
+    <div id="mascot" class="mascot">🦊</div>
+    <div id="startMessage" class="message">Ready for a vocabulary adventure?</div>
+    <h1 class="logo">WORD QUEST</h1>
+    <div class="subtitle">Match the Words!</div>
+    <div class="main-buttons">
+      <button class="btn primary" id="playBtn">▶ PLAY</button>
+      <button class="btn red" id="teacherBtn">👩‍🏫 TEACHER DASHBOARD</button>
+      <button class="btn blue" id="loadBtn">📥 LOAD GAME</button>
+      <button class="btn green" id="settingsBtn">⚙ SETTINGS</button>
+    </div>
+    <input id="importFileStart" type="file" accept=".json" hidden>
+  </div>
+</section>
+
+<section id="nameScreen" class="screen">
+  <div class="panel">
+    <h1 class="title">What's your name?</h1>
+    <p class="sub">Enter your name before starting.</p>
+    <input id="playerName" class="input" maxlength="24" placeholder="Enter your name">
+    <div class="actions"><button class="btn primary" id="nameStartBtn">START</button><button class="btn gray" data-home>BACK</button></div>
+  </div>
+</section>
+
+<section id="setScreen" class="screen">
+  <div class="panel">
+    <h1 class="title">Choose Your Game</h1>
+    <p class="sub">Pick a vocabulary adventure.</p>
+    <div id="gameSetGrid" class="set-grid"></div>
+    <div class="actions"><button class="btn gray" data-home>BACK</button></div>
+  </div>
+</section>
+
+<section id="dashboardScreen" class="screen">
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-logo">WORD QUEST</div>
+      <button class="nav active" id="navDashboard">🏠 Dashboard</button>
+      <button class="nav" id="navGameSets">📚 Game Sets</button>
+      <button class="nav" id="navThemes">🎨 Themes</button>
+      <button class="nav" id="navSettings">⚙ Settings</button>
+      <button class="nav" id="navData">📦 Import / Export</button>
+      <button class="nav" id="navHelp">❓ Help</button>
+      <button class="nav" data-home>← Back to Game</button>
+    </aside>
+    <main class="dashboard-main">
+      <div id="dashboardHome">
+        <div class="header">
+          <div><h1>Teacher Dashboard</h1><p class="muted">Create and manage vocabulary games without editing code.</p></div>
+          <button class="btn green" id="createSetBtn">+ Create Game Set</button>
+        </div>
+        <div id="dashboardSetList"></div>
+      </div>
+      <div id="editor" class="editor">
+        <div class="header">
+          <div><h1 id="editorTitle">Vocabulary Editor</h1><p id="editorSub" class="muted"></p></div>
+          <div class="small-actions">
+            <button class="btn green" id="addWordBtn">+ Add Word</button>
+            <button class="btn primary" id="previewBtn">▶ Preview Game</button>
+            <button class="btn gray" id="closeEditorBtn">← Back</button>
+          </div>
+        </div>
+        <div class="fields">
+          <div class="field"><label>Game Set Name</label><input id="editSetName" class="input"></div>
+          <div class="field"><label>Difficulty</label><select id="editDifficulty" class="select"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option></select></div>
+          <div class="field"><label>Theme</label><select id="editTheme" class="select"><option value="jungle">🌴 Jungle</option><option value="space">🚀 Space</option><option value="pirate">🏴‍☠️ Pirate</option><option value="fantasy">🏰 Fantasy</option><option value="ocean">🌊 Ocean</option><option value="dinosaur">🦖 Dinosaur</option><option value="robot">🤖 Robot</option><option value="candy">🍭 Candy</option></select></div>
+          <div class="field"><label>Questions</label><select id="editQuestions" class="select"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="custom">All available</option></select></div>
+        </div>
+        <div id="vocabularyGrid" class="vocab-grid"></div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div class="game">
+    <div class="stats">
+      <div class="stat"><b>PLAYER</b><strong id="gPlayer">Player</strong></div>
+      <div class="stat"><b>SCORE</b><strong id="scoreValue">0</strong></div>
+      <div class="stat"><b>COMBO</b><strong id="comboValue">0</strong></div>
+      <div class="stat"><b>TIME</b><strong id="timeValue">∞</strong></div>
+      <div class="stat"><b>LEVEL</b><strong id="levelValue">1</strong></div>
+      <div class="stat"><b>PROGRESS</b><strong id="progressValue">0/0</strong></div>
+    </div>
+    <div class="progress"><div id="progressFill" class="progress-fill"></div></div>
+    <div class="columns">
+      <div class="column"><h2>English Words</h2><div id="wordCards" class="cards"></div></div>
+      <div class="column"><h2>Pictures</h2><div id="pictureCards" class="cards"></div></div>
+    </div>
+    <div class="game-controls">
+      <button class="btn orange" id="hintBtn">💡 HINT (<span id="hintValue">3</span>)</button>
+      <button class="btn orange" id="repeatBtn">🔊 REPEAT</button>
+      <button class="btn gray" id="pauseBtn">⏸ PAUSE</button>
+      <button class="btn red" id="quitBtn">✕ QUIT</button>
+    </div>
+  </div>
+</section>
+
+<section id="resultScreen" class="screen">
+  <div class="panel result">
+    <div class="mascot">🏆</div>
+    <h1 class="title" id="resultTitle">Fantastic!</h1>
+    <div id="resultStars" class="stars">⭐⭐⭐</div>
+    <h2 id="resultScore">Score: 0</h2>
+    <p id="resultProgress"></p>
+    <p id="resultMessage"></p>
+    <div class="actions">
+      <button class="btn primary" id="againBtn">PLAY AGAIN</button>
+      <button class="btn green" id="nextLevelBtn">NEXT LEVEL</button>
+      <button class="btn gray" id="resultHomeBtn">HOME</button>
+    </div>
+  </div>
+</section>
+
+<div id="wordModal" class="modal">
+  <div class="modal-box">
+    <h2 id="wordModalTitle">Add Vocabulary</h2>
+    <div class="group"><label>English Word</label><input id="wordInput" class="input" placeholder="Example: Apple"></div>
+    <div class="group"><label>Category</label><input id="categoryInput" class="input" placeholder="Example: Food"></div>
+    <div class="group"><label>Image</label><input id="imageInput" class="input" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"><div id="imagePreview" class="preview">Choose an image.</div></div>
+    <div class="group"><label>Pronunciation Audio (Optional)</label><input id="audioInput" class="input" type="file" accept="audio/*"></div>
+    <div class="actions"><button class="btn green" id="saveWordBtn">SAVE WORD</button><button class="btn gray" id="cancelWordBtn">CANCEL</button></div>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal">
+  <div class="modal-box">
+    <h2>Game Settings</h2>
+    <div class="check-row">
+      <label class="check"><input id="soundSetting" type="checkbox"> Sound Effects</label>
+      <label class="check"><input id="timerSetting" type="checkbox"> Timer</label>
+      <label class="check"><input id="hintsSetting" type="checkbox"> Hints</label>
+      <label class="check"><input id="reducedSetting" type="checkbox"> Reduced Motion</label>
+    </div>
+    <div class="group"><label>Time Limit</label><select id="timeSetting" class="select"><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="90">90 seconds</option><option value="120">120 seconds</option></select></div>
+    <div class="actions"><button class="btn green" id="saveSettingsBtn">SAVE</button><button class="btn gray" id="cancelSettingsBtn">CANCEL</button></div>
+  </div>
+</div>
+
+<div id="feedback" class="feedback"></div>
+<div id="confetti" class="confetti"></div>
+<div id="controllerIndicator" class="controller">🎮 Controller Connected</div>
+
+<script>
+/* =========================================================
+   WORD QUEST FINAL EDITION
+   Single-file offline vocabulary game.
+   ========================================================= */
+
+const DB_NAME="WordQuestDB",DB_VERSION=2,STORE="gameSets";
+let db=null;
+
+const defaultSets=[
+  {id:"animals",name:"Animals",theme:"jungle",difficulty:"easy",questions:5,items:[
+    {id:"lion",word:"Lion",category:"Animals",emoji:"🦁",image:null,audio:null},
+    {id:"elephant",word:"Elephant",category:"Animals",emoji:"🐘",image:null,audio:null},
+    {id:"monkey",word:"Monkey",category:"Animals",emoji:"🐒",image:null,audio:null},
+    {id:"tiger",word:"Tiger",category:"Animals",emoji:"🐯",image:null,audio:null},
+    {id:"panda",word:"Panda",category:"Animals",emoji:"🐼",image:null,audio:null}
+  ]},
+  {id:"food",name:"Food",theme:"candy",difficulty:"easy",questions:5,items:[
+    {id:"apple",word:"Apple",category:"Food",emoji:"🍎",image:null,audio:null},
+    {id:"banana",word:"Banana",category:"Food",emoji:"🍌",image:null,audio:null},
+    {id:"pizza",word:"Pizza",category:"Food",emoji:"🍕",image:null,audio:null},
+    {id:"cake",word:"Cake",category:"Food",emoji:"🍰",image:null,audio:null},
+    {id:"burger",word:"Burger",category:"Food",emoji:"🍔",image:null,audio:null}
+  ]}
+];
+
+let gameSets=[];
+let editingSet=null,editingWord=null,imageData=null,audioData=null;
+
+const state={
+  player:"",
+  currentSet:null,
+  items:[],
+  level:1,
+  selectedWord:null,
+  score:0,
+  combo:0,
+  matched:0,
+  hints:3,
+  seconds:60,
+  timer:null,
+  paused:false,
+  focusSide:"word",
+  focusIndex:0,
+  dragWord:null,
+  settings:{sound:true,timer:false,hints:true,reducedMotion:false,time:60}
+};
+
+const $=id=>document.getElementById(id);
+
+function escapeHTML(v){
+  return String(v??"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+function themeIcon(theme){
+  return {jungle:"🌴",space:"🚀",pirate:"🏴‍☠️",fantasy:"🏰",ocean:"🌊",dinosaur:"🦖",robot:"🤖",candy:"🍭"}[theme]||"🎮";
+}
+
+function toast(message){
+  $("startMessage").textContent=message;
+  if($("startScreen").classList.contains("active")){
+    setTimeout(()=>{$("startMessage").textContent="Ready for a vocabulary adventure?"},2200);
+  }
+}
+
+function feedback(message){
+  const f=$("feedback");
+  f.textContent=message;
+  f.classList.remove("show");
+  void f.offsetWidth;
+  f.classList.add("show");
+}
+
+function celebrate(){
+  if(state.settings.reducedMotion)return;
+  const c=$("confetti");
+  c.innerHTML="";
+  for(let i=0;i<85;i++){
+    const p=document.createElement("i");
+    p.className="piece";
+    p.style.left=Math.random()*100+"%";
+    p.style.top="-20px";
+    p.style.background=["#6657e8","#32c875","#ffd447","#ff5d78","#42a5f5","#ff9f43"][i%6];
+    p.style.animationDelay=(Math.random()*.7)+"s";
+    c.appendChild(p);
+  }
+  setTimeout(()=>c.innerHTML="",2500);
+}
+
+function sound(kind){
+  if(!state.settings.sound)return;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    const ctx=new AC(),osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type="sine";
+    osc.frequency.value=kind==="correct"?720:kind==="wrong"?180:520;
+    gain.gain.value=.055;
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+.12);
+  }catch(e){}
+}
+
+function savePrefs(){
+  localStorage.setItem("WordQuestSettings",JSON.stringify(state.settings));
+}
+
+function loadPrefs(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("WordQuestSettings")||"null");
+    if(saved)state.settings={...state.settings,...saved};
+  }catch(e){}
+}
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const request=indexedDB.open(DB_NAME,DB_VERSION);
+    request.onupgradeneeded=e=>{
+      const database=e.target.result;
+      if(!database.objectStoreNames.contains(STORE)){
+        database.createObjectStore(STORE,{keyPath:"id"});
+      }
+    };
+    request.onsuccess=e=>{db=e.target.result;resolve(db)};
+    request.onerror=()=>reject(request.error);
+  });
+}
+
+function getAllSets(){
+  return new Promise((resolve,reject)=>{
+    const request=db.transaction(STORE,"readonly").objectStore(STORE).getAll();
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
+  });
+}
+
+function putSet(set){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).put(set);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+function deleteSet(id){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+async function initialise(){
+  loadPrefs();
+  try{
+    await openDB();
+    const saved=await getAllSets();
+    if(saved.length){
+      gameSets=saved;
+    }else{
+      gameSets=JSON.parse(JSON.stringify(defaultSets));
+      for(const set of gameSets)await putSet(set);
+    }
+  }catch(error){
+    gameSets=JSON.parse(JSON.stringify(defaultSets));
+    console.warn("IndexedDB unavailable; temporary data mode.",error);
+  }
+  renderGameSetSelection();
+  renderDashboard();
+}
+
+function renderGameSetSelection(){
+  const grid=$("gameSetGrid");
+  grid.innerHTML="";
+  gameSets.forEach(set=>{
+    const card=document.createElement("div");
+    card.className="set-card";
+    card.innerHTML=`
+      <div class="set-icon">${themeIcon(set.theme)}</div>
+      <h3>${escapeHTML(set.name)}</h3>
+      <p>${set.items.length} words • ${escapeHTML(set.difficulty)}</p>
+      <button class="btn green" data-play-set="${set.id}">PLAY →</button>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll("[data-play-set]").forEach(btn=>{
+    btn.onclick=()=>startGame(gameSets.find(s=>s.id===btn.dataset.playSet),1);
+  });
+}
+
+function renderDashboard(){
+  closeEditor();
+  const list=$("dashboardSetList");
+  list.innerHTML="";
+  if(!gameSets.length){
+    list.innerHTML=`<div class="empty"><div style="font-size:60px">📚</div><h2>No Game Sets Yet</h2><p>Create your first vocabulary game.</p></div>`;
+    return;
+  }
+  gameSets.forEach(set=>{
+    const row=document.createElement("div");
+    row.className="set-row";
+    row.innerHTML=`
+      <div>
+        <h3>${themeIcon(set.theme)} ${escapeHTML(set.name)}</h3>
+        <p>${set.items.length} words • ${escapeHTML(set.difficulty)} • ${set.questions||set.items.length} questions</p>
+      </div>
+      <div class="small-actions">
+        <button class="small-btn green" data-action="play" data-id="${set.id}">PLAY</button>
+        <button class="small-btn blue" data-action="edit" data-id="${set.id}">EDIT</button>
+        <button class="small-btn" style="background:#8b6df2" data-action="copy" data-id="${set.id}">DUPLICATE</button>
+        <button class="small-btn red" data-action="delete" data-id="${set.id}">DELETE</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-action]").forEach(btn=>{
+    btn.onclick=()=>dashboardAction(btn.dataset.action,btn.dataset.id);
+  });
+}
+
+async function dashboardAction(action,id){
+  const set=gameSets.find(s=>s.id===id);
+  if(!set)return;
+  if(action==="play"){
+    state.player=state.player||"Teacher";
+    startGame(set,1);
+    return;
+  }
+  if(action==="edit"){
+    openEditor(set);
+    return;
+  }
+  if(action==="copy"){
+    const copy=JSON.parse(JSON.stringify(set));
+    copy.id="set-"+Date.now();
+    copy.name+=" Copy";
+    copy.items.forEach(item=>item.id="word-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+    gameSets.push(copy);
+    await putSet(copy);
+    renderDashboard();
+    return;
+  }
+  if(action==="delete"){
+    if(!confirm(`Delete "${set.name}"?`))return;
+    gameSets=gameSets.filter(s=>s.id!==id);
+    await deleteSet(id);
+    renderDashboard();
+  }
+}
+
+$("createSetBtn").onclick=async()=>{
+  const name=prompt("Enter the game set name:");
+  if(!name||!name.trim())return;
+  const set={id:"set-"+Date.now(),name:name.trim(),theme:"jungle",difficulty:"easy",questions:5,items:[]};
+  gameSets.push(set);
+  await putSet(set);
+  openEditor(set);
+};
+
+function openEditor(set){
+  editingSet=set;
+  $("dashboardHome").style.display="none";
+  $("editor").classList.add("active");
+  $("editorTitle").textContent=set.name+" — Vocabulary";
+  $("editorSub").textContent=set.items.length+" vocabulary items";
+  $("editSetName").value=set.name;
+  $("editDifficulty").value=set.difficulty;
+  $("editTheme").value=set.theme;
+  $("editQuestions").value=set.questions||set.items.length||5;
+  renderVocabulary();
+}
+
+function closeEditor(){
+  editingSet=null;
+  $("editor").classList.remove("active");
+  $("dashboardHome").style.display="block";
+}
+
+$("closeEditorBtn").onclick=()=>renderDashboard();
+
+async function saveEditorSettings(){
+  if(!editingSet)return;
+  editingSet.name=$("editSetName").value.trim()||editingSet.name;
+  editingSet.difficulty=$("editDifficulty").value;
+  editingSet.theme=$("editTheme").value;
+  const q=$("editQuestions").value;
+  editingSet.questions=q==="custom"?editingSet.items.length:Number(q);
+  await putSet(editingSet);
+  $("editorTitle").textContent=editingSet.name+" — Vocabulary";
+  $("editorSub").textContent=editingSet.items.length+" vocabulary items";
+  renderVocabulary();
+  renderGameSetSelection();
+}
+
+["editSetName","editDifficulty","editTheme","editQuestions"].forEach(id=>{
+  $(id).addEventListener("change",saveEditorSettings);
+});
+
+function renderVocabulary(){
+  if(!editingSet)return;
+  const grid=$("vocabularyGrid");
+  if(!editingSet.items.length){
+    grid.innerHTML=`<div class="empty"><div style="font-size:60px">🔤</div><h2>No Vocabulary Yet</h2><p>Click “Add Word” to create your first word.</p></div>`;
+    return;
+  }
+  grid.innerHTML=editingSet.items.map(item=>`
+    <div class="vocab-card">
+      <div class="vocab-img">${item.image?`<img src="${item.image}" alt="${escapeHTML(item.word)}">`:(item.emoji||"🖼️")}</div>
+      <div class="vocab-body">
+        <h3>${escapeHTML(item.word)}</h3>
+        <p>${escapeHTML(item.category||"General")}</p>
+        <div class="small-actions">
+          ${item.audio?`<button class="small-btn orange" data-vocab-action="audio" data-id="${item.id}">🔊</button>`:""}
+          <button class="small-btn blue" data-vocab-action="edit" data-id="${item.id}">EDIT</button>
+          <button class="small-btn red" data-vocab-action="delete" data-id="${item.id}">DELETE</button>
+        </div>
+      </div>
+    </div>`).join("");
+  grid.querySelectorAll("[data-vocab-action]").forEach(btn=>{
+    btn.onclick=()=>vocabularyAction(btn.dataset.vocabAction,btn.dataset.id);
+  });
+}
+
+$("addWordBtn").onclick=()=>openWordModal();
+
+function openWordModal(word=null){
+  editingWord=word;
+  imageData=word?.image||null;
+  audioData=word?.audio||null;
+  $("wordModalTitle").textContent=word?"Edit Vocabulary":"Add Vocabulary";
+  $("wordInput").value=word?.word||"";
+  $("categoryInput").value=word?.category||"";
+  $("imageInput").value="";
+  $("audioInput").value="";
+  $("imagePreview").innerHTML=imageData?`<img src="${imageData}" alt="Preview">`:"Choose an image.";
+  $("wordModal").classList.add("show");
+}
+
+function closeWordModal(){
+  $("wordModal").classList.remove("show");
+  editingWord=null;imageData=null;audioData=null;
+}
+
+$("cancelWordBtn").onclick=closeWordModal;
+
+$("imageInput").onchange=e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  if(!["image/png","image/jpeg","image/webp"].includes(file.type)){
+    alert("Please use PNG, JPG, JPEG or WEBP.");
+    e.target.value="";return;
+  }
+  if(file.size>5*1024*1024){
+    alert("Image must be smaller than 5 MB.");
+    e.target.value="";return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    imageData=reader.result;
+    $("imagePreview").innerHTML=`<img src="${imageData}" alt="Image preview">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+$("audioInput").onchange=e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("audio/")){
+    alert("Please choose an audio file.");
+    e.target.value="";return;
+  }
+  if(file.size>10*1024*1024){
+    alert("Audio must be smaller than 10 MB.");
+    e.target.value="";return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>audioData=reader.result;
+  reader.readAsDataURL(file);
+};
+
+$("saveWordBtn").onclick=async()=>{
+  const word=$("wordInput").value.trim();
+  if(!word){alert("Please enter an English word.");return;}
+  if(!imageData){alert("Please add an image before saving this word.");return;}
+  if(editingWord){
+    editingWord.word=word;
+    editingWord.category=$("categoryInput").value.trim()||"General";
+    editingWord.image=imageData;
+    editingWord.audio=audioData;
+  }else{
+    editingSet.items.push({
+      id:"word-"+Date.now()+"-"+Math.random().toString(36).slice(2),
+      word,category:$("categoryInput").value.trim()||"General",
+      image:imageData,audio:audioData,emoji:"📚"
+    });
+  }
+  await putSet(editingSet);
+  closeWordModal();
+  renderVocabulary();
+  $("editorSub").textContent=editingSet.items.length+" vocabulary items";
+  renderGameSetSelection();
+};
+
+async function vocabularyAction(action,id){
+  const item=editingSet.items.find(x=>x.id===id);
+  if(!item)return;
+  if(action==="edit"){openWordModal(item);return;}
+  if(action==="audio"){
+    try{await new Audio(item.audio).play()}catch(e){alert("Unable to play audio.");}
+    return;
+  }
+  if(action==="delete"){
+    if(!confirm(`Delete "${item.word}"?`))return;
+    editingSet.items=editingSet.items.filter(x=>x.id!==id);
+    await putSet(editingSet);
+    renderVocabulary();
+    renderGameSetSelection();
+  }
+}
+
+$("previewBtn").onclick=()=>{
+  if(!editingSet)return;
+  if(editingSet.items.length<2){alert("Add at least 2 vocabulary items first.");return;}
+  state.player="Teacher Preview";
+  startGame(editingSet,1);
+};
+
+/* =========================================================
+   GAME SETUP AND LEVELS
+   ========================================================= */
+
+function levelCount(level,total){
+  const counts={1:5,2:8,3:10,4:15,5:20};
+  return Math.min(counts[level]||5,total);
+}
+
+function startGame(set,level=1){
+  if(!set||set.items.length<2){
+    alert("Please add at least 2 vocabulary items first.");
+    return;
+  }
+  state.currentSet=set;
+  state.level=level;
+  const count=Math.min(levelCount(level,set.items.length),set.items.length);
+  state.items=shuffle([...set.items]).slice(0,count);
+  state.selectedWord=null;
+  state.score=0;
+  state.combo=0;
+  state.matched=0;
+  state.hints=state.settings.hints?3:0;
+  state.paused=false;
+  state.seconds=state.settings.time;
+  $("gPlayer").textContent=state.player||"Player";
+  $("levelValue").textContent=String(level);
+  applyTheme(set.theme);
+  showScreen("gameScreen");
+  renderGameCards();
+  updateStats();
+  startTimer();
+}
+
+function applyTheme(theme){
+  const colors={
+    jungle:["#dff8e9","#e4f6ff"],space:["#171b42","#4b2e73"],
+    pirate:["#fff0d5","#d8efff"],fantasy:["#f0e6ff","#ffe4f1"],
+    ocean:["#dff8ff","#d7ebff"],dinosaur:["#efffdc","#fff0c7"],
+    robot:["#e9edf5","#d9e2ff"],candy:["#ffe5f1","#fff0c7"]
+  }[theme]||["#dff6ff","#f3eaff"];
+  document.documentElement.style.setProperty("--bg1",colors[0]);
+  document.documentElement.style.setProperty("--bg2",colors[1]);
+}
+
+function renderGameCards(){
+  const words=$("wordCards"),pics=$("pictureCards");
+  words.innerHTML="";pics.innerHTML="";
+  shuffle([...state.items]).forEach(item=>words.appendChild(createWordCard(item)));
+  shuffle([...state.items]).forEach(item=>pics.appendChild(createPictureCard(item)));
+  state.focusSide="word";state.focusIndex=0;updateFocus();
+}
+
+function createWordCard(item){
+  const card=document.createElement("button");
+  card.className="card";
+  card.dataset.id=item.id;
+  card.dataset.side="word";
+  card.innerHTML=`<span class="word">${escapeHTML(item.word)}</span>`;
+  card.addEventListener("click",()=>selectWord(item,card));
+  card.addEventListener("pointerdown",e=>beginPointerDrag(e,item,card));
+  return card;
+}
+
+function createPictureCard(item){
+  const card=document.createElement("button");
+  card.className="card";
+  card.dataset.id=item.id;
+  card.dataset.side="picture";
+  card.innerHTML=item.image
+    ?`<img class="picture" src="${item.image}" alt="${escapeHTML(item.word)}">`
+    :`<span style="font-size:65px">${item.emoji||"🖼️"}</span>`;
+  card.addEventListener("click",()=>selectPicture(item,card));
+  return card;
+}
+
+function selectWord(item,card){
+  if(state.paused)return;
+  document.querySelectorAll("#wordCards .card").forEach(c=>c.classList.remove("selected"));
+  card.classList.add("selected");
+  state.selectedWord=item;
+  if(item.audio)playAudio(item.audio);
+  state.focusSide="word";
+  state.focusIndex=[...document.querySelectorAll("#wordCards .card")].indexOf(card);
+}
+
+function selectPicture(item,card){
+  if(state.paused)return;
+  if(!state.selectedWord){toast("Choose a word first.");return;}
+  checkMatch(state.selectedWord,item,card);
+}
+
+function checkMatch(word,picture,pictureCard){
+  if(word.id===picture.id)correctMatch(word,pictureCard);
+  else wrongMatch(pictureCard);
+}
+
+function correctMatch(item,pictureCard){
+  const wordCard=document.querySelector(`#wordCards .card[data-id="${CSS.escape(item.id)}"]`);
+  pictureCard.classList.add("correct","locked");
+  if(wordCard)wordCard.classList.add("correct","locked");
+  state.score+=100+(Math.min(state.combo,5)*25)+(state.level-1)*10;
+  state.combo++;
+  state.matched++;
+  state.selectedWord=null;
+  sound("correct");
+  feedback(state.combo>=5?"WORD MASTER!":state.combo>=4?"AMAZING!":state.combo>=3?"AWESOME!":state.combo>=2?"GREAT!":"GOOD!");
+  updateStats();
+  if(state.matched===state.items.length){
+    setTimeout(()=>finishGame(false),650);
+  }
+}
+
+function wrongMatch(card){
+  card.classList.add("wrong");
+  state.score=Math.max(0,state.score-10);
+  state.combo=0;
+  sound("wrong");
+  feedback("TRY AGAIN!");
+  updateStats();
+  setTimeout(()=>card.classList.remove("wrong"),450);
+}
+
+function updateStats(){
+  $("scoreValue").textContent=state.score;
+  $("comboValue").textContent=state.combo;
+  $("levelValue").textContent=state.level;
+  $("progressValue").textContent=`${state.matched}/${state.items.length}`;
+  $("hintValue").textContent=state.hints;
+  $("timeValue").textContent=state.settings.timer?formatTime(state.seconds):"∞";
+  $("progressFill").style.width=(state.matched/state.items.length*100)+"%";
+}
+
+function formatTime(sec){
+  return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+}
+
+function startTimer(){
+  clearInterval(state.timer);
+  state.timer=setInterval(()=>{
+    if(state.paused||!state.settings.timer){updateStats();return;}
+    if(state.seconds<=0){
+      clearInterval(state.timer);
+      finishGame(true);
+      return;
+    }
+    state.seconds--;
+    updateStats();
+  },1000);
+}
+
+function finishGame(timeout){
+  clearInterval(state.timer);
+  const pct=state.matched/state.items.length*100;
+  const stars=pct>=90?"⭐⭐⭐":pct>=70?"⭐⭐":"⭐";
+  $("resultStars").textContent=stars;
+  $("resultScore").textContent="Score: "+state.score;
+  $("resultProgress").textContent=`${state.matched} / ${state.items.length} Matches`;
+  $("resultTitle").textContent=timeout?"Time's Up!":`Fantastic, ${state.player||"Player"}!`;
+  $("resultMessage").textContent=pct>=90?"Perfect Match!":pct>=70?"Great job!":"Keep practising!";
+  $("nextLevelBtn").style.display=state.level<5&&state.levelCountAllowed!==false?"inline-block":"none";
+  celebrate();
+  showScreen("resultScreen");
+}
+
+function playAudio(data){
+  if(!data)return;
+  try{const a=new Audio(data);a.play()}catch(e){}
+}
+
+$("hintBtn").onclick=()=>{
+  if(!state.settings.hints||state.hints<=0){toast("No hints left.");return;}
+  if(!state.selectedWord){toast("Choose a word first.");return;}
+  const target=document.querySelector(`#pictureCards .card[data-id="${CSS.escape(state.selectedWord.id)}"]`);
+  if(target){
+    state.hints--;
+    target.classList.add("focus");
+    setTimeout(()=>target.classList.remove("focus"),1000);
+    updateStats();
+  }
+};
+
+$("repeatBtn").onclick=()=>{
+  if(state.selectedWord?.audio)playAudio(state.selectedWord.audio);
+  else toast("Select a word with pronunciation audio.");
+};
+
+$("pauseBtn").onclick=()=>{
+  state.paused=!state.paused;
+  $("pauseBtn").textContent=state.paused?"▶ RESUME":"⏸ PAUSE";
+  toast(state.paused?"Game paused":"Game resumed");
+};
+
+$("quitBtn").onclick=()=>{
+  if(confirm("Quit this game?")){
+    clearInterval(state.timer);
+    showScreen("startScreen");
+  }
+};
+
+/* =========================================================
+   POINTER DRAG AND DROP
+   ========================================================= */
+
+function beginPointerDrag(event,item,card){
+  if(event.pointerType==="mouse"&&event.button!==0)return;
+  state.dragWord=item;
+  card.classList.add("dragging");
+  try{card.setPointerCapture(event.pointerId)}catch(e){}
+}
+
+document.addEventListener("pointermove",event=>{
+  if(!state.dragWord)return;
+  const target=document.elementFromPoint(event.clientX,event.clientY)?.closest("#pictureCards .card");
+  document.querySelectorAll("#pictureCards .card").forEach(c=>c.classList.remove("drag-target"));
+  if(target)target.classList.add("drag-target");
+},{passive:true});
+
+document.addEventListener("pointerup",event=>{
+  if(!state.dragWord)return;
+  const source=state.dragWord;
+  const target=document.elementFromPoint(event.clientX,event.clientY)?.closest("#pictureCards .card");
+  document.querySelectorAll(".card").forEach(c=>c.classList.remove("dragging","drag-target"));
+  state.dragWord=null;
+  if(target&&!state.paused){
+    const item=state.items.find(x=>x.id===target.dataset.id);
+    if(item)checkMatch(source,item,target);
+  }
+});
+
+/* =========================================================
+   KEYBOARD ACCESSIBILITY
+   ========================================================= */
+
+function updateFocus(){
+  document.querySelectorAll(".card").forEach(c=>c.classList.remove("focus"));
+  const selector=state.focusSide==="word"?"#wordCards .card":"#pictureCards .card";
+  const cards=[...document.querySelectorAll(selector)];
+  if(!cards.length)return;
+  state.focusIndex=Math.max(0,Math.min(state.focusIndex,cards.length-1));
+  cards[state.focusIndex].classList.add("focus");
+}
+
+document.addEventListener("keydown",event=>{
+  if(!$("gameScreen").classList.contains("active"))return;
+  if(event.key==="ArrowDown"){state.focusIndex++;updateFocus();event.preventDefault()}
+  if(event.key==="ArrowUp"){state.focusIndex--;updateFocus();event.preventDefault()}
+  if(event.key==="ArrowLeft"||event.key==="ArrowRight"){
+    state.focusSide=state.focusSide==="word"?"picture":"word";
+    state.focusIndex=0;updateFocus();event.preventDefault();
+  }
+  if(event.key==="Enter"||event.key===" "){
+    const selector=state.focusSide==="word"?"#wordCards .card":"#pictureCards .card";
+    const card=[...document.querySelectorAll(selector)][state.focusIndex];
+    if(card)card.click();
+    event.preventDefault();
+  }
+  if(event.key.toLowerCase()==="h")$("hintBtn").click();
+  if(event.key.toLowerCase()==="r")$("repeatBtn").click();
+  if(event.key.toLowerCase()==="p")$("pauseBtn").click();
+});
+
+/* =========================================================
+   GAMEPAD SUPPORT
+   ========================================================= */
+
+let previousButtons=[];
+function gamepadLoop(){
+  const pads=navigator.getGamepads?navigator.getGamepads():[];
+  const pad=[...pads].find(Boolean);
+  if(pad){
+    $("controllerIndicator").classList.add("show");
+    const current=pad.buttons.map(b=>b.pressed);
+    const pressed=i=>current[i]&&!previousButtons[i];
+    if($("gameScreen").classList.contains("active")){
+      if(pressed(0)){
+        const selector=state.focusSide==="word"?"#wordCards .card":"#pictureCards .card";
+        const card=[...document.querySelectorAll(selector)][state.focusIndex];
+        if(card)card.click();
+      }
+      if(pressed(1))$("quitBtn").click();
+      if(pressed(2))$("hintBtn").click();
+      if(pressed(3))$("repeatBtn").click();
+      if(pressed(9))$("pauseBtn").click();
+      if(pressed(12)){state.focusIndex--;updateFocus()}
+      if(pressed(13)){state.focusIndex++;updateFocus()}
+      if(pressed(14)){state.focusSide="word";state.focusIndex=0;updateFocus()}
+      if(pressed(15)){state.focusSide="picture";state.focusIndex=0;updateFocus()}
+    }
+    previousButtons=current;
+  }
+  requestAnimationFrame(gamepadLoop);
+}
+window.addEventListener("gamepadconnected",()=>$("controllerIndicator").classList.add("show"));
+window.addEventListener("gamepaddisconnected",()=>$("controllerIndicator").classList.remove("show"));
+gamepadLoop();
+
+/* =========================================================
+   IMPORT / EXPORT
+   ========================================================= */
+
+function exportGame(){
+  const payload={
+    format:"WORD_QUEST_GAME",
+    version:1,
+    exportedAt:new Date().toISOString(),
+    settings:state.settings,
+    gameSets:gameSets
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="WordQuest_Game.json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function importGame(file){
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(data.format!=="WORD_QUEST_GAME"||!Array.isArray(data.gameSets))throw new Error();
+      for(const set of data.gameSets){
+        if(!set.id||!set.name||!Array.isArray(set.items))throw new Error();
+        for(const item of set.items){
+          if(!item.id||!item.word)throw new Error();
+        }
+      }
+      gameSets=data.gameSets;
+      for(const set of gameSets)await putSet(set);
+      if(data.settings){
+        state.settings={...state.settings,...data.settings};
+        savePrefs();
+      }
+      renderGameSetSelection();
+      renderDashboard();
+      alert("Game imported successfully.");
+    }catch(error){
+      alert("Invalid Word Quest game file.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+function openSettings(){
+  $("soundSetting").checked=state.settings.sound;
+  $("timerSetting").checked=state.settings.timer;
+  $("hintsSetting").checked=state.settings.hints;
+  $("reducedSetting").checked=state.settings.reducedMotion;
+  $("timeSetting").value=String(state.settings.time);
+  $("settingsModal").classList.add("show");
+}
+
+$("settingsBtn").onclick=openSettings;
+$("navSettings").onclick=openSettings;
+
+$("saveSettingsBtn").onclick=()=>{
+  state.settings.sound=$("soundSetting").checked;
+  state.settings.timer=$("timerSetting").checked;
+  state.settings.hints=$("hintsSetting").checked;
+  state.settings.reducedMotion=$("reducedSetting").checked;
+  state.settings.time=Number($("timeSetting").value);
+  savePrefs();
+  $("settingsModal").classList.remove("show");
+  alert("Settings saved.");
+};
+
+$("cancelSettingsBtn").onclick=()=>$("settingsModal").classList.remove("show");
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+$("playBtn").onclick=()=>{
+  $("mascot").classList.add("jump");
+  setTimeout(()=>showScreen("nameScreen"),250);
+};
+
+$("teacherBtn").onclick=()=>{
+  showScreen("dashboardScreen");
+  renderDashboard();
+};
+
+$("loadBtn").onclick=()=>$("importFileStart").click();
+$("importFileStart").onchange=e=>{
+  if(e.target.files[0])importGame(e.target.files[0]);
+};
+
+$("nameStartBtn").onclick=()=>{
+  const name=$("playerName").value.trim();
+  if(!name){alert("Please enter your name.");return}
+  state.player=name;
+  renderGameSetSelection();
+  showScreen("setScreen");
+};
+
+$("playerName").onkeydown=e=>{
+  if(e.key==="Enter")$("nameStartBtn").click();
+};
+
+document.querySelectorAll("[data-home]").forEach(btn=>{
+  btn.onclick=()=>{
+    clearInterval(state.timer);
+    showScreen("startScreen");
+  };
+});
+
+$("navDashboard").onclick=()=>{renderDashboard()};
+$("navGameSets").onclick=()=>{renderDashboard()};
+$("navThemes").onclick=()=>alert("Choose a theme in a Game Set editor.");
+$("navData").onclick=()=>{
+  const exportNow=confirm("Press OK to export game data. Press Cancel to import a game file.");
+  if(exportNow)exportGame();
+  else $("importFileStart").click();
+};
+$("navHelp").onclick=()=>alert(
+"Teacher workflow:\n\n1. Create a Game Set.\n2. Add vocabulary, images and optional audio.\n3. Choose difficulty, theme and question count.\n4. Preview the game.\n5. Students can click, tap, drag, use keyboard or a compatible gamepad.\n\nImport and Export move the game data between computers."
+);
+
+$("againBtn").onclick=()=>startGame(state.currentSet,state.level);
+$("nextLevelBtn").onclick=()=>{
+  if(state.level>=5){startGame(state.currentSet,1);return}
+  startGame(state.currentSet,state.level+1);
+};
+$("resultHomeBtn").onclick=()=>{
+  clearInterval(state.timer);
+  showScreen("startScreen");
+};
+
+window.addEventListener("beforeunload",savePrefs);
+
+initialise();
+</script>
+</body>
+</html>
