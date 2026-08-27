@@ -596,7 +596,7 @@
 
         function addBulkWords() {
             const textarea = document.getElementById('bulk-input');
-            const words = textarea.value.split(/[\s,]+/); 
+            const words = textarea.value.split(/\r?\n|,/); 
             words.forEach(word => {
                 if(word.trim() !== '') addWordRow(word.trim(), '');
             });
@@ -804,7 +804,7 @@
                 playCorrectSound();
                 
                 setTimeout(() => {
-                    speakText("Correct", 'en-US', 1.0, 1.0, 1.0, () => {
+                    speakText("Correct", 'en-GB', 0.95, 1.0, 1.0, () => {
                         setTimeout(() => {
                             speechAudioRunning = false;
                             currentIndex++;
@@ -820,9 +820,9 @@
                 playWrongSound();
                 
                 setTimeout(() => {
-                    speakText("Wrong", 'en-US', 1.0, 1.0, 1.0, () => {
+                    speakText("Wrong", 'en-GB', 0.95, 1.0, 1.0, () => {
                         setTimeout(() => {
-                            speakText(targetWord, 'en-GB', 0.6, 1.0, 1.2, () => {
+                            speakText(targetWord, 'en-GB', 0.85, 1.0, 1.0, () => {
                                 setTimeout(() => {
                                     speechAudioRunning = false;
                                     currentIndex++;
@@ -843,18 +843,45 @@
 
             const utterance = new SpeechSynthesisUtterance(text);
             
-            const voices = synth.getVoices();
+             const voices = synth.getVoices();
             let selectedVoice;
+
             if (langCode === 'en-GB') {
-                selectedVoice = voices.find(v => v.lang === 'en-GB' || v.name.includes('UK') || v.name.includes('British'));
+                // Prefer a British English voice available on the device.
+                const britishVoices = voices.filter(v =>
+                    /^en-GB/i.test(v.lang) ||
+                    /British|UK English|English \(United Kingdom\)/i.test(v.name)
+                );
+
+                const preferredBritish = [
+                    'Daniel',
+                    'Arthur',
+                    'Microsoft Libby',
+                    'Microsoft Sonia',
+                    'Google UK English Female',
+                    'Google UK English Male',
+                    'Sonia',
+                    'Ryan',
+                    'Brian'
+                ];
+
+                selectedVoice =
+                    preferredBritish
+                        .map(name => britishVoices.find(v => v.name.includes(name)))
+                        .find(Boolean) ||
+                    britishVoices.find(v => /^en-GB/i.test(v.lang)) ||
+                    britishVoices[0];
             } else {
-                selectedVoice = voices.find(v => v.lang === 'en-US' || v.name.includes('US'));
+                selectedVoice = voices.find(v =>
+                    /^en-US/i.test(v.lang) || /US English|English \(United States\)/i.test(v.name)
+                );
             }
-            
+
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
+                utterance.lang = selectedVoice.lang;
             } else {
-                utterance.lang = langCode; 
+                utterance.lang = langCode;
             }
 
             utterance.rate = rate;     

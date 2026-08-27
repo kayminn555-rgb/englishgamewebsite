@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Listen & Choose — Teacher Game</title>
+<style>
+:root{--bg:#f5f8fb;--card:#fff;--ink:#172033;--muted:#667085;--primary:#16b7a5;--accent:#ffd447;--danger:#ef5b67;--ok:#1fa774;--line:#dbe3ec}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+.container{width:min(1100px,100%);margin:auto;padding:18px}
+h1{margin:0 0 14px;font-size:30px}
+h2{margin:0 0 8px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 18px #1620330a}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.btn{padding:12px 16px;border-radius:12px;font-weight:800}
+.primary{background:#5865f2;color:white}.secondary{background:var(--primary);color:white}.accent{background:var(--accent);color:#332a00}.gray{background:#e9eef4;color:#253047}.success{background:var(--ok);color:white}.danger{background:var(--danger);color:white}
+.note{font-size:14px;color:var(--muted);line-height:1.45}
+.bulk{width:100%;min-height:230px;resize:vertical;border:2px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;font-size:17px;line-height:1.6}
+.example{background:#f8fafc;border:1px dashed #c9d4df;border-radius:12px;padding:12px;font-family:ui-monospace,monospace;white-space:pre-wrap;line-height:1.5;font-size:14px}
+.question-card{border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;background:white}
+.qtop{display:flex;gap:10px;align-items:center}
+.qnum{background:var(--accent);font-weight:900;padding:9px 13px;border-radius:10px}
+.qtext{flex:1;padding:11px;border:1px solid var(--line);border-radius:10px;font-weight:700}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.choice{border:1px solid var(--line);border-radius:12px;padding:10px}
+.choice.correct{outline:3px solid #8de0bd}
+.choice-head{display:flex;gap:8px;align-items:center}
+.choice input[type=text]{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px}
+.image-row{display:grid;grid-template-columns:1fr auto auto;gap:7px;margin-top:7px}
+.image-row input{width:100%;padding:9px;border:1px solid var(--line);border-radius:9px}
+.mini{padding:9px 11px;border-radius:9px;background:#eef3f8;font-weight:700}
+.thumb{width:100%;height:110px;object-fit:cover;border-radius:9px;margin-top:7px;background:#eef3f8;display:block}
+.answer-select{padding:9px;border:1px solid var(--line);border-radius:9px}
+.empty{padding:25px;text-align:center;color:var(--muted)}
+#game{background:linear-gradient(180deg,#eefaf8,#f7f9fc);padding:10px;overflow:hidden}
+.game-shell{height:calc(100vh - 20px);max-width:1100px;margin:auto;display:flex;flex-direction:column;gap:8px}
+.game-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+.badge{background:white;border:1px solid var(--line);padding:9px 13px;border-radius:12px;font-weight:800}
+.quiz-card{background:white;border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+.listen-area{text-align:center;flex:0 0 auto}
+.listen-btn{width:70px;height:70px;border-radius:50%;font-size:30px;background:var(--accent);box-shadow:0 6px 16px #00000018}
+.listen-btn.active{transform:scale(.96)}
+.status{min-height:24px;margin:5px 0;color:var(--muted);font-weight:700}
+.game-question{font-size:clamp(22px,3.2vw,38px);font-weight:900;text-align:center;line-height:1.15;margin:4px auto 8px;max-width:950px}
+.options{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;flex:1;min-height:0}
+.option{position:relative;border:3px solid var(--line);background:white;border-radius:18px;padding:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:0;overflow:hidden}
+.option:hover{transform:translateY(-1px)}
+.option .letter{position:absolute;left:8px;top:8px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#172033;color:white;font-weight:900;z-index:2}
+.option img{width:100%;height:clamp(90px,18vh,180px);object-fit:contain;border-radius:12px;display:block;background:#f4f6f8}
+.option.no-image img{display:none}
+.option-text{font-size:clamp(18px,2.3vw,28px);font-weight:900;text-align:center;margin:5px;word-break:break-word}
+.option.correct{border-color:var(--ok);background:#ecfff7}
+.option.wrong{border-color:var(--danger);background:#fff0f2}
+.feedback{min-height:34px;text-align:center;font-size:clamp(18px,2.5vw,26px);font-weight:900;padding:4px}
+.voice-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;flex:0 0 auto}
+.small{font-size:12px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0b1020aa;display:none;place-items:center;padding:20px;z-index:50}
+.modal.show{display:grid}
+.modal-box{background:white;border-radius:22px;padding:26px;text-align:center;width:min(420px,100%)}
+.final{font-size:52px;font-weight:900;color:var(--ok)}
+@media(max-width:700px){
+ .container{padding:11px}h1{font-size:24px}
+ .choice-grid{grid-template-columns:1fr}
+ .game-shell{height:calc(100vh - 20px)}
+ .quiz-card{padding:8px}
+ .listen-btn{width:58px;height:58px;font-size:26px}
+ .game-question{font-size:clamp(20px,6vw,30px)}
+ .option{border-radius:13px;padding:5px}
+ .option img{height:clamp(65px,17vh,125px)}
+ .option .letter{width:28px;height:28px;font-size:14px}
+ .option-text{font-size:clamp(15px,4vw,22px)}
+ .feedback{min-height:27px}
+ .btn{padding:10px 12px}
+}
+
+.hands-free-note{text-align:center;font-size:13px;opacity:.78;margin:4px auto 8px}
+@media(max-width:650px){.hands-free-note{font-size:11px;margin:3px auto 6px}}
+</style>
+
+<style id="answer-feedback-style">
+.option.answer-correct{
+  background:#22c55e!important;border-color:#16a34a!important;color:#fff!important;
+  animation:correctPop .28s ease-out;
+  box-shadow:0 0 0 4px rgba(34,197,94,.18),0 8px 24px rgba(34,197,94,.22);
+}
+.option.answer-wrong{
+  background:#ef4444!important;border-color:#dc2626!important;color:#fff!important;
+  animation:wrongShake .34s ease-out;
+  box-shadow:0 0 0 4px rgba(239,68,68,.16),0 8px 24px rgba(239,68,68,.20);
+}
+.option.answer-correct::after{content:" ✓";font-weight:900}
+.option.answer-wrong::after{content:" ✕";font-weight:900}
+@keyframes correctPop{0%{transform:scale(.97)}55%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+</style>
+
+</head>
+<body>
+
+<section id="dashboard" class="screen active">
+<div class="container">
+<h1>🎧 Listen & Choose — Teacher Dashboard</h1>
+
+<div class="panel">
+  <div class="toolbar">
+    <button class="btn success" onclick="startGame()">▶ PLAY GAME</button>
+    <button class="btn primary" onclick="loadFromText()">⚡ BUILD GAME</button>
+    <button class="btn gray" onclick="saveTxt()">📥 SAVE TXT</button>
+    <label class="btn gray">📤 LOAD TXT<input id="fileInput" type="file" accept=".txt,text/plain" hidden onchange="loadTxt(event)"></label>
+    <button class="btn danger" onclick="clearAll()">🗑 Clear</button>
+  </div>
+  <p class="note"><b>How it works:</b> You prepare the question and A/B/C/D yourself. Paste many questions below. The game builds everything at once. Images are completely optional.</p>
+</div>
+
+<div class="panel">
+<h2>1. Paste your questions</h2>
+<div class="example">1. Pizza
+A. Pizza
+B. Hat
+C. Burger
+D. Apple
+Answer: A
+
+2. Where do you eat lunch?
+A. Chicken
+B. Toilet
+C. Ground
+D. Cafeteria
+Answer: D</div>
+<textarea id="bulk" class="bulk" placeholder="1. Pizza
+A. Pizza
+B. Hat
+C. Burger
+D. Apple
+Answer: A
+
+2. Where do you eat lunch?
+A. Chicken
+B. Toilet
+C. Ground
+D. Cafeteria
+Answer: D"></textarea>
+<button class="btn secondary" onclick="loadFromText()">＋ BUILD ALL QUESTIONS</button>
+</div>
+
+<div class="panel">
+<h2>2. Questions</h2>
+<div class="note">You can change any answer, correct letter, or optional image here. “Search Google Images” opens a search for that answer; paste the chosen image URL into the image box.</div>
+<div id="questionList"></div>
+</div>
+</div>
+</section>
+
+<section id="game" class="screen">
+<div class="game-shell">
+  <div class="game-top">
+    <button class="btn danger" onclick="goDashboard()">🚪 Quit</button>
+    <div class="badge">Question <span id="qno">1</span>/<span id="qtotal">1</span></div>
+    <div class="badge">⭐ <span id="score">0</span></div>
+  </div>
+  <div class="quiz-card">
+    <div class="listen-area">
+      <button id="listenBtn" class="listen-btn" onclick="speakQuestion()">🎧</button>
+      <div id="status" class="status">Press 🎧 to hear the question.</div>
+<div id="hands-free-note" class="hands-free-note">
+🎤 Hands-free: say <b>“Listen”</b> to hear the question. Say <b>“Answer”</b> to activate answer mode.
+</div>
+
+      <div class="voice-row">
+        <button class="btn secondary" onclick="speakQuestion(()=>setTimeout(()=>startRecognition('answer'),250))">🎤 Say “Listen”</button>
+        <button class="btn primary" onclick="listenForAnswer()">🎤 Answer A / B / C / D</button>
+      </div>
+    </div>
+    <div id="gameQuestion" class="game-question">—</div>
+    <div id="options" class="options"></div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</div>
+</section>
+
+<div id="modal" class="modal">
+ <div class="modal-box">
+  <h2>🎉 Great Job!</h2>
+  <div id="finalScore" class="final">0/0</div>
+  <p>Well done! 🌟</p>
+  <button class="btn success" onclick="restartGame()">🔄 Play Again</button>
+  <button class="btn primary" onclick="goDashboard()">🏠 Dashboard</button>
+ </div>
+</div>
+
+<script>
+const LETTERS=['A','B','C','D'];
+let questions=[];
+let current=0,score=0,locked=false,recognition=null,listening=false,recognitionMode='answer';
+let voices=[];
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function norm(s){return String(s??'').toLowerCase().replace(/[.!?,;:'"“”‘’]/g,'').replace(/\s+/g,' ').trim()}
+
+function parseQuestions(raw){
+  const lines=raw.replace(/\r/g,'').split('\n');
+  const out=[]; let cur=null;
+  function finish(){
+    if(!cur)return;
+    if(cur.question && cur.options.filter(Boolean).length===4){
+      if(!cur.correct){
+        const qn=norm(cur.question);
+        const exact=cur.options.findIndex(x=>norm(x)===qn);
+        cur.correct=exact>=0?LETTERS[exact]:'A';
+      }
+      out.push(cur);
+    }
+    cur=null;
+  }
+  for(let rawLine of lines){
+    const line=rawLine.trim();
+    if(!line){continue}
+    const qmatch=line.match(/^(?:question\s*)?(\d+)\s*[\.\):\-]\s*(.+)$/i);
+    if(qmatch){
+      finish();
+      cur={question:qmatch[2].trim(),options:['','','',''],images:['','','',''],correct:''};
+      continue;
+    }
+    const om=line.match(/^([ABCD])\s*[\.\):\-]\s*(.+)$/i);
+    if(om){
+      if(!cur)cur={question:'',options:['','','',''],images:['','','',''],correct:''};
+      cur.options[LETTERS.indexOf(om[1].toUpperCase())]=om[2].trim();
+      continue;
+    }
+    const am=line.match(/^(?:answer|correct(?:\s+answer)?)\s*[:=\-]\s*([ABCD])/i);
+    if(am){
+      if(cur)cur.correct=am[1].toUpperCase();
+      continue;
+    }
+    // Also accept "1 Pizza" when there is no punctuation.
+    const loose=line.match(/^(\d+)\s+(.+)$/);
+    if(loose){
+      finish();
+      cur={question:loose[2].trim(),options:['','','',''],images:['','','',''],correct:''};
+      continue;
+    }
+    // If no numbered question exists yet, treat the first free line as a question.
+    if(!cur){
+      cur={question:line,options:['','','',''],images:['','','',''],correct:''};
+    }
+  }
+  finish();
+  return out;
+}
+
+function loadFromText(){
+  const parsed=parseQuestions($('bulk').value);
+  if(!parsed.length){
+    alert('I could not find a complete question. Please use Question + A/B/C/D + Answer.');
+    return;
+  }
+  questions=parsed;
+  renderDashboard();
+  $('questionList').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderDashboard(){
+  const box=$('questionList');
+  if(!questions.length){box.innerHTML='<div class="empty">No questions yet.</div>';return}
+  box.innerHTML=questions.map((q,i)=>`
+    <div class="question-card">
+      <div class="qtop">
+        <div class="qnum">${i+1}</div>
+        <input class="qtext" value="${esc(q.question)}" oninput="questions[${i}].question=this.value">
+        <button class="mini" onclick="removeQuestion(${i})">✕</button>
+      </div>
+      <div class="choice-grid">
+        ${LETTERS.map((L,j)=>`
+          <div class="choice ${q.correct===L?'correct':''}" id="choice-${i}-${j}">
+            <div class="choice-head">
+              <b>${L}</b>
+              <input type="text" value="${esc(q.options[j])}" oninput="questions[${i}].options[${j}]=this.value">
+              <select class="answer-select" onchange="setCorrect(${i},this.value)" title="Correct answer">
+                ${LETTERS.map(x=>`<option value="${x}" ${q.correct===x?'selected':''}>${x}${q.correct===x?' ✓':''}</option>`).join('')}
+              </select>
+            </div>
+            <div class="image-row">
+              <input type="text" value="${esc(q.images[j]||'')}" placeholder="Optional image URL" oninput="questions[${i}].images[${j}]=this.value;updateThumb(${i},${j})">
+              <button class="mini" onclick="searchImage(${i},${j})">🔎 Google</button>
+              <button class="mini" onclick="clearImage(${i},${j})">🗑</button>
+            </div>
+            <img id="thumb-${i}-${j}" class="thumb" ${q.images[j]?'src="'+esc(q.images[j])+'"':'style="display:none"'} onerror="this.style.display='none'">
+          </div>`).join('')}
+      </div>
+      <div class="small" style="margin-top:8px">Correct answer: <b>${q.correct}</b> — Images are optional. No image? The answer text still works.</div>
+    </div>`).join('');
+}
+
+function setCorrect(i,v){questions[i].correct=v;renderDashboard()}
+function removeQuestion(i){questions.splice(i,1);renderDashboard()}
+function clearAll(){if(confirm('Clear all questions?')){questions=[];$('bulk').value='';renderDashboard()}}
+function updateThumb(i,j){
+ const el=$('thumb-'+i+'-'+j),u=questions[i].images[j];
+ if(u){el.src=u;el.style.display='block'}else el.style.display='none';
+}
+function clearImage(i,j){questions[i].images[j]='';renderDashboard()}
+function searchImage(i,j){
+ const q=encodeURIComponent(questions[i].options[j]||'');
+ if(!q)return;
+ window.open('https://www.google.com/search?tbm=isch&q='+q,'_blank','noopener');
+}
+
+function saveTxt(){
+ if(!questions.length){loadFromText();if(!questions.length)return}
+ const blocks=questions.map((q,i)=>{
+   return `${i+1}. ${q.question}\nA. ${q.options[0]}\nB. ${q.options[1]}\nC. ${q.options[2]}\nD. ${q.options[3]}\nAnswer: ${q.correct}\nImage A: ${q.images[0]||''}\nImage B: ${q.images[1]||''}\nImage C: ${q.images[2]||''}\nImage D: ${q.images[3]||''}`;
+ }).join('\n\n');
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(new Blob([blocks],{type:'text/plain;charset=utf-8'}));
+ a.download='listen_choose_quiz.txt';a.click();URL.revokeObjectURL(a.href);
+}
+
+function loadTxt(e){
+ const f=e.target.files[0];if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{
+   const raw=String(r.result);
+   $('bulk').value=raw;
+   const parsed=parseQuestions(raw);
+   // Restore optional images from the saved TXT.
+   const blocks=raw.replace(/\r/g,'').split(/\n\s*\n/);
+   parsed.forEach((q,i)=>{
+     const b=blocks[i]||'';
+     ['A','B','C','D'].forEach((L,j)=>{
+       const m=b.match(new RegExp('^Image '+L+'\\s*:\\s*(.*)$','mi'));
+       if(m)q.images[j]=m[1].trim();
+     });
+   });
+   questions=parsed;renderDashboard();
+ };
+ r.readAsText(f);
+ e.target.value='';
+}
+
+function showScreen(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+ $(id).classList.add('active');
+}
+function goDashboard(){speechSynthesis.cancel();if(recognition)try{recognition.stop()}catch(e){};$('modal').classList.remove('show');showScreen('dashboard')}
+function startGame(){
+ if(!questions.length)loadFromText();
+ if(!questions.length)return;
+ current=0;score=0;locked=false;$('score').textContent='0';$('qtotal').textContent=questions.length;
+ showScreen('game');renderGame();
+ // PLAY GAME is the user gesture that starts microphone access.
+ startHandsFreeVoice();
+}
+function restartGame(){
+  $('modal').classList.remove('show');
+  current=0;score=0;
+  $('score').textContent='0';
+  renderGame();
+  startHandsFreeVoice();
+}
+
+function renderGame(){
+ const q=questions[current];if(!q)return;
+ $('qno').textContent=current+1;$('qtotal').textContent=questions.length;
+ $('gameQuestion').textContent=q.question;
+ $('feedback').textContent='';
+ $('status').textContent='🎤 Say “Listen” to hear the question, or “Answer” to answer.';
+ $('options').innerHTML=LETTERS.map((L,j)=>{
+   const has=!!q.images[j];
+   return `<button class="option ${has?'':'no-image'}" data-index="${j}" onclick="answer(${j},this)">
+     <span class="letter">${L}</span>
+     ${has?`<img src="${esc(q.images[j])}" onerror="this.style.display='none'">`:''}
+     <span class="option-text">${esc(q.options[j])}</span>
+   </button>`;
+ }).join('');
+}
+
+let voiceState = "command";
+let questionSpeaking = false;
+let voiceEnabled = false;
+let restartingRecognition = false;
+
+function updateVoiceStatus(msg){
+  const el=$("status");
+  if(el)el.textContent=msg;
+}
+
+function chooseBritishVoice(){
+  if(!("speechSynthesis" in window)) return null;
+  const voices=speechSynthesis.getVoices()||[];
+  const gb=voices.filter(v=>/^en-GB/i.test(v.lang));
+  const preferred=["Daniel","Kate","Serena","Oliver","Arthur","Libby","Sonia","Brian"];
+  return gb.find(v=>preferred.some(n=>v.name.toLowerCase().includes(n.toLowerCase())))
+      ||gb.find(v=>/natural|enhanced|premium/i.test(v.name))
+      ||gb[0]
+      ||voices.find(v=>/^en-/i.test(v.lang))
+      ||voices[0]
+      ||null;
+}
+
+function speakText(text, callback){
+  if(!("speechSynthesis" in window)){
+    callback && callback();
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const voices = speechSynthesis.getVoices() || [];
+
+  /*
+   * Prefer a natural-sounding English (UK) voice.
+   * Different phones/tablets expose different voice names, so we use
+   * several common names and then fall back safely to any en-GB voice.
+   */
+  const british = voices.filter(v => /^en-GB/i.test(v.lang));
+
+  const preferred = [
+    "Sonia",
+    "Libby",
+    "Ryan",
+    "Oliver",
+    "Daniel",
+    "Kate",
+    "Serena",
+    "Arthur",
+    "Google UK English Female",
+    "Google UK English Male"
+  ];
+
+  const natural = british.filter(v =>
+    /natural|enhanced|premium|neural/i.test(v.name)
+  );
+
+  const selected =
+    natural.find(v =>
+      preferred.some(name =>
+        v.name.toLowerCase().includes(name.toLowerCase())
+      )
+    ) ||
+    british.find(v =>
+      preferred.some(name =>
+        v.name.toLowerCase().includes(name.toLowerCase())
+      )
+    ) ||
+    natural[0] ||
+    british[0] ||
+    voices.find(v => /^en-/i.test(v.lang)) ||
+    voices[0];
+
+  const u = new SpeechSynthesisUtterance(String(text));
+
+  if(selected){
+    u.voice = selected;
+    u.lang = selected.lang || "en-GB";
+  }else{
+    u.lang = "en-GB";
+  }
+
+  /*
+   * Slightly slower and softer than the default robotic TTS.
+   * This sounds more like a teacher reading to children.
+   */
+  u.rate = 0.88;
+  u.pitch = 1.03;
+  u.volume = 1.0;
+
+  let finished = false;
+  const finish = () => {
+    if(finished) return;
+    finished = true;
+    if(callback) callback();
+  };
+
+  u.onend = finish;
+  u.onerror = finish;
+
+  setTimeout(() => speechSynthesis.speak(u), 80);
+}
+
+function normalVoice(s){
+  return String(s||"")
+    .toLowerCase()
+    .replace(/[.,!?]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function extractAnswerLetter(text){
+  const s=normalVoice(text);
+
+  const map={
+    "a":"A","ay":"A",
+    "b":"B","bee":"B","be":"B",
+    "c":"C","see":"C","sea":"C",
+    "d":"D","dee":"D"
+  };
+
+  // The expected classroom phrase.
+  let m=s.match(/^(?:the\s+)?answer\s+is\s+(a|ay|b|bee|be|c|see|sea|d|dee)$/i);
+  if(m)return map[m[1]];
+
+  // Also accept "Answer A".
+  m=s.match(/^answer\s+(a|ay|b|bee|be|c|see|sea|d|dee)$/i);
+  if(m)return map[m[1]];
+
+  return null;
+}
+
+function stopRecognition(){
+  if(!recognition)return;
+  try{recognition.abort()}catch(e){}
+  listening=false;
+}
+
+function setupRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+  if(!SR){
+    updateVoiceStatus("🎤 Voice recognition is not supported by this browser.");
+    return null;
+  }
+
+  const r=new SR();
+
+  // One short session is more reliable on iPhone/iPad than continuous=true.
+  r.lang="en-US";
+  r.continuous=false;
+  r.interimResults=false;
+  r.maxAlternatives=5;
+
+  r.onstart=()=>{
+    listening=true;
+
+    if(voiceState==="answer"){
+      updateVoiceStatus('🎤 Answer mode — say “The answer is A, B, C or D”.');
+    }else{
+      updateVoiceStatus('🎤 Listening — say “Listen” or “Answer”.');
+    }
+  };
+
+  r.onresult=e=>{
+    listening=false;
+
+    let transcript="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){
+        transcript += " " + (e.results[i][0]?.transcript||"");
+      }
+    }
+
+    const spoken=normalVoice(transcript);
+
+    if(!spoken)return;
+
+    /* COMMAND MODE
+       A/B/C/D are ignored here.
+       Only Listen and Answer are commands. */
+    if(voiceState==="command"){
+
+      if(/\blisten\b/.test(spoken)){
+        stopRecognition();
+        setTimeout(()=>speakCurrentQuestion(),100);
+        return;
+      }
+
+      if(/\banswer\b/.test(spoken)){
+        stopRecognition();
+        setTimeout(()=>activateAnswerMode(),100);
+        return;
+      }
+
+      updateVoiceStatus('🎤 Say “Listen” or “Answer”.');
+      setTimeout(()=>startRecognition("command"),300);
+      return;
+    }
+
+    /* ANSWER MODE
+       Only after the child has said "Answer". */
+    if(voiceState==="answer"){
+      const letter=extractAnswerLetter(spoken);
+
+      if(letter){
+        stopRecognition();
+
+        const index=LETTERS.indexOf(letter);
+        const el=[...document.querySelectorAll(".option")]
+          .find(x=>Number(x.dataset.index)===index);
+
+        if(el){
+          answer(index,el);
+          return;
+        }
+      }
+
+      updateVoiceStatus('🎤 Please say “The answer is A”, “B”, “C” or “D”.');
+      setTimeout(()=>startRecognition("answer"),300);
+    }
+  };
+
+  r.onerror=e=>{
+    listening=false;
+
+    if(e.error==="not-allowed"||e.error==="service-not-allowed"){
+      voiceEnabled=false;
+      updateVoiceStatus("🎤 Microphone permission is blocked. Allow microphone access.");
+      return;
+    }
+
+    if(e.error==="no-speech"){
+      updateVoiceStatus(
+        voiceState==="answer"
+          ? '🎤 I did not hear the answer. Say “The answer is A, B, C or D”.'
+          : '🎤 I did not hear you. Say “Listen” or “Answer”.'
+      );
+    }
+
+    if(voiceEnabled && !questionSpeaking){
+      setTimeout(()=>startRecognition(voiceState),450);
+    }
+  };
+
+  r.onend=()=>{
+    listening=false;
+
+    // iOS/Safari frequently ends recognition after one phrase.
+    // Restart automatically so the child can speak the next command.
+    if(voiceEnabled && !questionSpeaking && !restartingRecognition){
+      restartingRecognition=true;
+      setTimeout(()=>{
+        restartingRecognition=false;
+        startRecognition(voiceState);
+      },250);
+    }
+  };
+
+  return r;
+}
+
+function startRecognition(mode){
+  if(mode)voiceState=mode;
+
+  if(!recognition)recognition=setupRecognition();
+  if(!recognition)return false;
+  if(listening||questionSpeaking)return true;
+
+  try{
+    recognition.start();
+    return true;
+  }catch(e){
+    setTimeout(()=>{
+      try{recognition.start()}catch(_){}
+    },250);
+    return true;
+  }
+}
+
+/*
+ * This is called directly by PLAY GAME.
+ * That user gesture is important because mobile browsers restrict
+ * microphone access unless recognition is started from a user action.
+ */
+function startHandsFreeVoice(){
+  voiceEnabled=true;
+  voiceState="command";
+
+  if(!recognition)recognition=setupRecognition();
+
+  if(!recognition)return;
+
+  updateVoiceStatus('🎤 Ready — say “Listen” to hear the question.');
+  startRecognition("command");
+}
+
+function speakCurrentQuestion(){
+  if(questionSpeaking)return;
+  if(!questions[current])return;
+
+  questionSpeaking=true;
+  stopRecognition();
+
+  if($("listenBtn"))$("listenBtn").classList.add("active");
+
+  updateVoiceStatus("🔊 Speaking the question...");
+
+  const q=questions[current].question||"";
+
+  speakText(q,()=>{
+    questionSpeaking=false;
+
+    if($("listenBtn"))$("listenBtn").classList.remove("active");
+
+    voiceState="command";
+    updateVoiceStatus('🎤 Say “Listen” to repeat, or “Answer” to answer.');
+
+    if(voiceEnabled){
+      setTimeout(()=>startRecognition("command"),250);
+    }
+  });
+}
+
+/* Visible Listen button remains available as a backup. */
+function speakQuestion(done){
+  speakCurrentQuestion();
+  if(done)setTimeout(done,100);
+}
+
+function activateAnswerMode(){
+  if(questionSpeaking)return;
+
+  voiceState="answer";
+  stopRecognition();
+
+  updateVoiceStatus('🎤 Answer mode ON — say “The answer is A, B, C or D”.');
+
+  setTimeout(()=>startRecognition("answer"),200);
+}
+
+/* Compatibility for the existing visible voice-answer button. */
+function listenForAnswer(){
+  activateAnswerMode();
+}
+
+function answerOriginal(index,el){
+  if(locked)return;
+
+  const q=questions[current];
+  if(!q||index<0||index>3)return;
+
+  locked=true;
+  stopRecognition();
+
+  const chosen=LETTERS[index];
+  const correct=String(q.correct||"A").toUpperCase();
+  const isCorrect=chosen===correct;
+
+  document.querySelectorAll(".option").forEach((b,i)=>{
+    b.disabled=true;
+
+    if(i===index){
+      b.classList.add(isCorrect?"selected-correct":"selected-wrong");
+    }
+
+    if(LETTERS[i]===correct){
+      b.classList.add("show-correct");
+    }
+  });
+
+  if(isCorrect){
+    score++;
+    $("score").textContent=String(score);
+    $("feedback").textContent="✓ Correct!";
+    updateVoiceStatus("Correct!");
+
+    speakText("Correct!",()=>{
+      setTimeout(nextQuestion,700);
+    });
+  }else{
+    $("feedback").textContent="The answer is "+correct+".";
+    updateVoiceStatus("The answer is "+correct+".");
+
+    speakText("The answer is "+correct+".",()=>{
+      setTimeout(nextQuestion,850);
+    });
+  }
+}
+
+function answer(index, el){
+  if(!questions || !questions[current]) return;
+
+  const q=questions[current];
+  const correctIndex=["A","B","C","D"].indexOf(q.correct);
+  const options=[...document.querySelectorAll(".option")];
+
+  options.forEach(x=>x.classList.remove("answer-correct","answer-wrong"));
+
+  if(index===correctIndex){
+    if(el) el.classList.add("answer-correct");
+  }else{
+    if(el) el.classList.add("answer-wrong");
+    const correctEl=options.find(x=>Number(x.dataset.index)===correctIndex);
+    if(correctEl) correctEl.classList.add("answer-correct");
+  }
+
+  setTimeout(()=>answerOriginal(index,el),260);
+}
+
+
+function nextQuestion(){
+  current++;
+
+  if(current>=questions.length){
+    $("finalScore").textContent=score+"/"+questions.length;
+    $("modal").classList.add("show");
+    locked=false;
+    voiceEnabled=false;
+    stopRecognition();
+    return;
+  }
+
+  locked=false;
+  renderGame();
+
+  // Do not read automatically. The child says "Listen".
+  voiceState="command";
+  updateVoiceStatus('🎤 Say “Listen” to hear the question.');
+  if(voiceEnabled)setTimeout(()=>startRecognition("command"),350);
+}
+</script>
+
+<script>
+function getAvailableBritishVoices(){
+  if(!("speechSynthesis" in window)) return [];
+  return (speechSynthesis.getVoices() || []).filter(v => /^en-GB/i.test(v.lang));
+}
+
+function populateVoiceSelect(){
+  const select=document.getElementById("voiceSelect");
+  if(!select) return;
+
+  const current=select.value;
+  select.innerHTML='<option value="">Auto — Natural British</option>';
+
+  getAvailableBritishVoices().forEach((v,i)=>{
+    const option=document.createElement("option");
+    option.value=String(i);
+    option.textContent=v.name + " (" + v.lang + ")";
+    select.appendChild(option);
+  });
+
+  if(current && [...select.options].some(o=>o.value===current)){
+    select.value=current;
+  }
+}
+
+function testBritishVoice(){
+  const select=document.getElementById("voiceSelect");
+  const voices=getAvailableBritishVoices();
+  let selected=null;
+
+  if(select && select.value!=="" && voices[Number(select.value)]){
+    selected=voices[Number(select.value)];
+  }else{
+    const preferred=[
+      "Sonia","Libby","Ryan","Oliver","Daniel","Kate",
+      "Serena","Arthur","Google UK English Female","Google UK English Male"
+    ];
+
+    selected =
+      voices.find(v =>
+        /natural|enhanced|premium|neural/i.test(v.name) &&
+        preferred.some(n=>v.name.toLowerCase().includes(n.toLowerCase()))
+      ) ||
+      voices.find(v =>
+        preferred.some(n=>v.name.toLowerCase().includes(n.toLowerCase()))
+      ) ||
+      voices.find(v=>/natural|enhanced|premium|neural/i.test(v.name)) ||
+      voices[0];
+  }
+
+  if(!selected){
+    alert("No British English voice is available on this device. Try installing/enabling an English (UK) voice in the device's speech settings.");
+    return;
+  }
+
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(
+    "Hello everyone. Listen carefully. Are you ready to play?"
+  );
+  u.voice=selected;
+  u.lang=selected.lang || "en-GB";
+  u.rate=.88;
+  u.pitch=1.03;
+  u.volume=1;
+  speechSynthesis.speak(u);
+}
+
+if("speechSynthesis" in window){
+  populateVoiceSelect();
+  speechSynthesis.onvoiceschanged=populateVoiceSelect;
+}
+</script>
+
+</body>
+</html>
