@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1976ff">
+<title>Word Builder — AR Vocabulary Game</title>
+
+<!-- ဒီ CDN library တွေကို AR လက်ခြေရာခံစနစ်အတွက်သာ အသုံးပြုထားပါတယ်။ -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+<style>
+/* ဒီအပိုင်းမှာ ဂိမ်းတစ်ခုလုံးရဲ့ အရောင်၊ အကွာအဝေးနဲ့ အခြေခံပုံစံတွေကို သတ်မှတ်ထားပါတယ်။ */
+:root{
+    --blue:#1976ff;
+    --blue2:#4cb8ff;
+    --dark:#12395d;
+    --muted:#71839a;
+    --bg:#f4f8ff;
+    --green:#18a957;
+    --red:#e94b3c;
+    --yellow:#ffbd2e;
+    --shadow:0 14px 40px rgba(32,86,145,.13);
+    --radius:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--dark)}
+body{overflow-x:hidden}
+button,input,textarea,select{font:inherit}
+button{border:0;cursor:pointer}
+.hidden{display:none!important}
+
+/* ဒီအပိုင်းက Start Screen ကို ကလေးတွေအတွက် သန့်ရှင်းပြီး ချစ်စရာပုံစံဖြစ်အောင် ပြုလုပ်ထားပါတယ်။ */
+.start-screen{
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 15% 10%,rgba(25,118,255,.15),transparent 28%),
+        radial-gradient(circle at 90% 85%,rgba(76,184,255,.17),transparent 30%),
+        linear-gradient(145deg,#fff,#eef7ff);
+}
+.start-card{
+    width:min(640px,100%);
+    padding:46px 28px;
+    text-align:center;
+    border-radius:34px;
+    background:rgba(255,255,255,.94);
+    box-shadow:0 28px 75px rgba(30,85,140,.16);
+    position:relative;
+    z-index:2;
+}
+.logo{
+    width:104px;height:104px;margin:0 auto 20px;
+    display:grid;place-items:center;
+    border-radius:30px;
+    color:#fff;font-weight:1000;font-size:30px;
+    background:linear-gradient(135deg,var(--blue),var(--blue2));
+    box-shadow:0 16px 32px rgba(25,118,255,.25);
+    transform:rotate(-4deg);
+}
+.start-card h1{
+    margin:0;color:#1462c7;
+    font-size:clamp(43px,9vw,76px);
+    line-height:.95;letter-spacing:-3px;
+}
+.start-card p{margin:18px 0 32px;color:var(--muted);font-size:22px;font-weight:700}
+.start-buttons{display:grid;gap:13px;max-width:400px;margin:auto}
+
+/* ဒီအပိုင်းက ခလုတ်တွေအတွက် အသုံးပြုတဲ့ အခြေခံပုံစံဖြစ်ပါတယ်။ */
+.primary,.secondary,.danger,.small{
+    min-height:52px;padding:12px 19px;border-radius:16px;font-weight:900;transition:.18s ease;
+}
+.primary{color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 9px 22px rgba(25,118,255,.22)}
+.secondary{color:#155fbf;background:#eaf3ff}
+.danger{color:#a33128;background:#ffeae7}
+.small{min-height:42px;padding:9px 14px;color:#155fbf;background:#edf5ff;font-size:13px}
+.primary:hover,.secondary:hover,.danger:hover,.small:hover{transform:translateY(-2px)}
+.primary:active,.secondary:active,.danger:active,.small:active{transform:scale(.97)}
+
+/* ဒီအပိုင်းက Game Screen ရဲ့ header နဲ့ scoreboard ကို ပြုလုပ်ထားပါတယ်။ */
+.game-screen{min-height:100vh;padding:12px;background:var(--bg)}
+.game-header{
+    width:min(1200px,100%);margin:auto;padding:12px;
+    display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+    background:#fff;border-radius:22px;box-shadow:var(--shadow);
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:1000;color:#1661c4;white-space:nowrap}
+.brand-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));font-size:13px}
+.stats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.stat{min-width:82px;padding:7px 12px;border-radius:13px;text-align:center;background:#f5f9ff}
+.stat small{display:block;color:#8292a6;font-size:9px;font-weight:1000;letter-spacing:.6px}
+.stat b{display:block;color:#145fbf;font-size:20px}
+.progress-area{grid-column:1/-1}
+.progress-info{display:flex;justify-content:space-between;font-size:12px;font-weight:900;color:#667b92;margin-bottom:7px}
+.progress-track{height:10px;background:#e8eff8;border-radius:20px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue2));transition:.4s ease}
+
+/* ဒီအပိုင်းက စာလုံးနဲ့ missing slots တွေကို အဓိကပြသတဲ့ game card ဖြစ်ပါတယ်။ */
+.game-main{width:min(1050px,100%);margin:15px auto 30px}
+.word-card{padding:25px 17px 28px;border-radius:30px;background:#fff;box-shadow:var(--shadow);text-align:center;min-height:500px}
+.badge{display:inline-flex;padding:7px 13px;border-radius:999px;background:#eaf3ff;color:#1560c4;font-size:11px;font-weight:1000}
+.word-hint{margin:17px 0 9px;color:#74869b;font-size:15px;font-weight:800}
+.slots{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;min-height:65px;margin:13px auto 24px}
+.slot{
+    width:56px;height:60px;display:grid;place-items:center;
+    border:3px dashed #8eb8ec;border-radius:15px;
+    background:#f8fbff;color:#155fbf;font-size:29px;font-weight:1000;
+    transition:.16s ease;
+}
+.slot.empty{border-color:#1976ff;background:#edf5ff}
+.slot.filled{border-style:solid;border-color:#63a8ff;background:#fff;animation:slotIn .25s ease}
+.slot.target{border-color:var(--green);background:#edfff4;transform:scale(1.08)}
+@keyframes slotIn{from{transform:scale(.65);opacity:.3}to{transform:scale(1);opacity:1}}
+
+.image-box{
+    width:min(230px,72vw);height:min(175px,48vw);
+    margin:16px auto 10px;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;border-radius:22px;background:#f1f7ff;
+}
+.image-box img{width:100%;height:100%;object-fit:contain}
+.image-box .emoji{font-size:66px;opacity:.7}
+.letter-instruction{margin-bottom:13px;color:#718399;font-size:14px;font-weight:800}
+.letters{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;min-height:78px}
+.letter-card{
+    width:72px;height:72px;display:grid;place-items:center;
+    border:2px solid #d7e7fa;border-radius:19px;background:#fff;
+    box-shadow:0 9px 18px rgba(28,88,145,.13);
+    color:#145fbf;font-size:31px;font-weight:1000;
+    user-select:none;touch-action:none;cursor:grab;
+    transition:.15s ease;
+}
+.letter-card:hover{transform:translateY(-4px);border-color:#6baaff}
+.letter-card.dragging{transform:scale(1.1) rotate(3deg);border-color:#1976ff;box-shadow:0 20px 35px rgba(25,118,255,.3);z-index:1000}
+.letter-card.used{opacity:.22;pointer-events:none}
+.feedback{
+    min-height:54px;margin:17px auto 0;padding:10px 15px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:17px;font-size:19px;font-weight:1000;
+}
+.feedback.info{color:#1765cf;background:#edf5ff}
+.feedback.correct{color:#087c3d;background:#e8fff1;animation:pop .35s ease}
+.feedback.wrong{color:#b22e25;background:#fff0ef;animation:shake .35s ease}
+@keyframes pop{0%{transform:scale(.8)}70%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.game-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:17px}
+.mode{min-height:48px;padding:11px 17px;border-radius:15px;color:#145fbe;background:#edf5ff;font-weight:1000}
+.mode.active{color:#fff;background:#1976ff}
+
+/* ဒီ cursor က AR လက်ချောင်းရဲ့ virtual position ကို game screen ပေါ်မှာ မြင်စေဖို့ အသုံးပြုပါတယ်။ */
+#arCursor{
+    position:fixed;z-index:3500;width:22px;height:22px;border-radius:50%;
+    display:none;pointer-events:none;
+    border:3px solid #fff;background:#4bc7ff;
+    box-shadow:0 0 0 5px rgba(76,184,255,.25),0 0 20px rgba(76,184,255,.8);
+    transform:translate(-50%,-50%);
+}
+#arCursor.pinch{background:#ffbd2e;box-shadow:0 0 0 6px rgba(255,189,46,.25),0 0 24px rgba(255,189,46,.9)}
+#arDragGhost{
+    position:fixed;z-index:3600;width:64px;height:64px;display:none;place-items:center;
+    border-radius:18px;color:#145fbf;background:#fff;border:3px solid #1976ff;
+    box-shadow:0 20px 40px rgba(25,118,255,.32);font-size:31px;font-weight:1000;
+    pointer-events:none;transform:translate(-50%,-50%);
+}
+
+/* ဒီအပိုင်းက AR camera panel ဖြစ်ပြီး screen အပြည့်မဖုံးအောင် floating panel အဖြစ်ထားပါတယ်။ */
+.ar-panel{
+    position:fixed;z-index:3000;right:14px;top:14px;bottom:auto;
+    width:min(260px,calc(100vw - 28px));overflow:hidden;
+    border:2px solid rgba(255,255,255,.95);border-radius:21px;
+    background:#081a2a;box-shadow:0 22px 55px rgba(0,0,0,.28);
+}
+.ar-head{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;color:#fff;background:#102d46}
+.ar-title{font-size:12px;font-weight:1000}
+.ar-video{position:relative;aspect-ratio:4/3;background:#02080e;overflow:hidden}
+#cameraVideo{display:block;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+#handCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1)}
+.ar-status{padding:8px 10px;color:#dbeeff;background:#0a2033;font-size:11px;font-weight:900}
+.ar-controls{padding:8px;background:#0a2033}
+.ar-controls button{width:100%;min-height:39px;border-radius:11px;color:#123d68;background:#fff;font-weight:1000}
+.camera-error{padding:10px;border-radius:12px;color:#ffd7d3;background:#5a211d}
+
+/* ဒီအပိုင်းက Result Screen အတွက် ဖြစ်ပါတယ်။ */
+.result-screen{min-height:100vh;display:grid;place-items:center;padding:22px}
+.result-card{width:min(700px,100%);padding:35px 22px;text-align:center;border-radius:30px;background:#fff;box-shadow:var(--shadow)}
+.result-icon{font-size:70px}
+.result-card h2{margin:8px 0;color:#155fbf;font-size:clamp(32px,7vw,52px)}
+.final-score{padding:20px;margin:15px auto 24px;border-radius:21px;background:#edf5ff}
+.final-score span{font-size:12px;font-weight:1000;color:#71839a}
+.final-score strong{display:block;font-size:56px;color:#1765cf}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.result-stat{padding:14px 7px;border-radius:15px;background:#f6f9fd}
+.result-stat b{display:block;font-size:25px;color:#1765cf}
+.result-stat span{font-size:10px;font-weight:1000;color:#7a899b}
+
+/* ဒီအပိုင်းက Teacher Dashboard ရဲ့ layout နဲ့ form တွေကို သတ်မှတ်ထားပါတယ်။ */
+.dashboard{min-height:100vh;background:#f5f9ff}
+.dashboard-header{position:sticky;top:0;z-index:100;padding:14px;background:#fff;border-bottom:1px solid #e6eef8}
+.dashboard-head-inner{width:min(1250px,100%);margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dashboard-title{display:flex;align-items:center;gap:11px}
+.dashboard-title-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2))}
+.dashboard-title h1{margin:0;font-size:clamp(21px,4vw,30px)}
+.dashboard-content{width:min(1250px,100%);margin:auto;padding:18px 14px 40px}
+.dashboard-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.panel{padding:20px;border-radius:24px;background:#fff;box-shadow:var(--shadow)}
+.panel h2{margin:0 0 16px;color:#155fbf;font-size:21px}
+.panel h3{margin:18px 0 8px;font-size:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:grid;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:1000;color:#65798f}
+.field input,.field textarea,.field select{width:100%;outline:0;border:2px solid #e0ebf7;border-radius:13px;padding:12px 13px;background:#fbfdff;color:var(--dark)}
+.field textarea{min-height:135px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#65a9ff;box-shadow:0 0 0 4px rgba(25,118,255,.07)}
+.action-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+.setting-list{display:grid;gap:9px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;border-radius:13px;background:#f6f9fd}
+.setting-row label{font-size:12px;font-weight:900}
+.setting-row input[type=number]{width:95px}
+.toggle{position:relative;width:48px;height:28px;flex:none}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;border-radius:20px;background:#cbd8e7;transition:.2s}
+.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.15);transition:.2s}
+.toggle input:checked+.slider{background:#1976ff}
+.toggle input:checked+.slider:before{transform:translateX(20px)}
+.vocab-table-wrap{overflow:auto;margin-top:15px;border:1px solid #e3edf8;border-radius:16px}
+.vocab-table{width:100%;min-width:650px;border-collapse:collapse}
+.vocab-table th,.vocab-table td{padding:12px;border-bottom:1px solid #edf2f8;text-align:left;font-size:13px}
+.vocab-table th{background:#f5f9ff;color:#61758c;font-size:10px}
+.thumb{width:48px;height:40px;object-fit:cover;border-radius:9px;background:#edf5ff}
+.note{padding:11px 13px;margin-bottom:12px;border-radius:13px;color:#1765cf;background:#edf5ff;font-size:12px;font-weight:800}
+.danger-zone{margin-top:15px;padding-top:15px;border-top:1px solid #e7edf5}
+
+/* ဒီ modal တွေကို Teacher PIN နဲ့ vocabulary edit အတွက် အသုံးပြုပါတယ်။ */
+.modal-bg{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(9,35,61,.5);backdrop-filter:blur(5px)}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;padding:22px;border-radius:24px;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.modal h2{margin:0 0 15px;color:#155fbf}
+.modal-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}
+
+/* Screen သေးလာရင် layout ကို mobile/tablet အတွက် ပြန်စီပေးပါတယ်။ */
+@media(max-width:900px){
+    .dashboard-grid{grid-template-columns:1fr}
+    .game-header{grid-template-columns:1fr;text-align:center}
+    .brand{justify-content:center}
+    .progress-area{grid-column:auto}
+}
+@media(max-width:600px){
+    .game-screen{padding:8px}
+    .word-card{padding:20px 10px 25px}
+    .slot{width:46px;height:52px;font-size:25px}
+    .letter-card{width:62px;height:62px;font-size:27px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);width:100%}
+    .stat{min-width:0;padding:7px 3px}
+    .stat b{font-size:17px}
+    .result-grid{grid-template-columns:repeat(2,1fr)}
+    .form-grid{grid-template-columns:1fr}
+    .field.full{grid-column:auto}
+    .ar-panel{right:8px;top:8px;bottom:auto;width:min(235px,calc(100vw - 16px))}
+}
+@media(prefers-reduced-motion:reduce){
+    *,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ဒီ screen က ကျောင်းသားတွေ ပထမဆုံးမြင်ရတဲ့ Start Screen ဖြစ်ပါတယ်။ -->
+<section id="startScreen" class="start-screen">
+    <div class="start-card">
+        <div class="logo">ABC</div>
+        <h1>WORD BUILDER</h1>
+        <p>Complete the word!</p>
+        <div class="start-buttons">
+            <button id="startGameBtn" class="primary">START GAME</button>
+            <button id="teacherBtn" class="secondary">TEACHER DASHBOARD</button>
+        </div>
+    </div>
+</section>
+
+<!-- ဒီ screen က ကျောင်းသားတွေက missing letters ဖြည့်တဲ့ အဓိက game screen ဖြစ်ပါတယ်။ -->
+<section id="gameScreen" class="game-screen hidden">
+    <header class="game-header">
+        <div class="brand">
+            <div class="brand-icon">ABC</div>
+            <span>WORD BUILDER</span>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><small>SCORE</small><b id="scoreValue">0</b></div>
+            <div class="stat"><small>CORRECT</small><b id="correctValue">0</b></div>
+            <div class="stat"><small>WRONG</small><b id="wrongValue">0</b></div>
+            <div class="stat"><small>STREAK</small><b id="streakValue">0</b></div>
+        </div>
+
+        <button id="exitGameBtn" class="small">EXIT</button>
+
+        <div class="progress-area">
+            <div class="progress-info">
+                <span id="questionLabel">Question 1 / 10</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+    </header>
+
+    <main class="game-main">
+        <div class="word-card">
+            <div class="badge">VOCABULARY</div>
+
+            <div id="gameImageBox" class="image-box hidden"></div>
+
+            <!-- ဒီနေရာမှာ အဖြေကို မပြဘဲ missing-word slots ပဲ ပြထားပါတယ်။ -->
+            <div class="word-hint">Complete the missing letters.</div>
+            <div id="slots" class="slots"></div>
+
+            <div class="letter-instruction">Drag the correct letters into the empty spaces.</div>
+            <div id="letters" class="letters"></div>
+
+            <div id="feedback" class="feedback info">Choose the missing letters.</div>
+
+            <div class="game-actions">
+                <button id="touchModeBtn" class="mode active">TOUCH MODE</button>
+                <button id="arModeBtn" class="mode">AR HAND MODE</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ဒီ floating panel က camera ကို screen အပြည့်မဖုံးစေဘဲ လက်ကိုသာပြဖို့ အသုံးပြုပါတယ်။ -->
+    <div id="arPanel" class="ar-panel hidden">
+        <div class="ar-head">
+            <span class="ar-title">AR HAND TRACKING</span>
+            <button id="closeArBtn" class="small">CLOSE</button>
+        </div>
+        <div class="ar-video">
+            <video id="cameraVideo" autoplay muted playsinline></video>
+            <canvas id="handCanvas"></canvas>
+        </div>
+        <div id="arStatus" class="ar-status">Show one hand to the camera.</div>
+        <div class="ar-controls">
+            <button id="stopCameraBtn">STOP CAMERA</button>
+        </div>
+    </div>
+
+    <!-- ဒီ cursor က camera ထဲက index finger ကို game screen ပေါ်မှာ virtual cursor အဖြစ်ပြပါတယ်။ -->
+    <div id="arCursor"></div>
+    <div id="arDragGhost"></div>
+    <div id="confettiLayer"></div>
+</section>
+
+<!-- ဒီ screen က game ပြီးသွားတဲ့အခါ final result ကို ပြပါတယ်။ -->
+<section id="resultScreen" class="result-screen hidden">
+    <div class="result-card">
+        <div class="result-icon">🏆</div>
+        <h2>GAME COMPLETE!</h2>
+
+        <div class="final-score">
+            <span>FINAL SCORE</span>
+            <strong id="finalScore">0</strong>
+        </div>
+
+        <div class="result-grid">
+            <div class="result-stat"><b id="finalCorrect">0</b><span>CORRECT ANSWERS</span></div>
+            <div class="result-stat"><b id="finalWrong">0</b><span>WRONG ANSWERS</span></div>
+            <div class="result-stat"><b id="finalAccuracy">0%</b><span>ACCURACY</span></div>
+            <div class="result-stat"><b id="finalBestStreak">0</b><span>BEST STREAK</span></div>
+        </div>
+
+        <div class="start-buttons" style="margin-top:24px">
+            <button id="playAgainBtn" class="primary">PLAY AGAIN</button>
+            <button id="resultDashboardBtn" class="secondary">BACK TO DASHBOARD</button>
+        </div>
+    </div>
+</section>
+
+<!-- ဒီအပိုင်းက Teacher Dashboard ဖြစ်ပြီး vocabulary နဲ့ game settings အားလုံးကို ပြင်နိုင်ပါတယ်။ -->
+<section id="dashboardScreen" class="dashboard hidden">
+    <header class="dashboard-header">
+        <div class="dashboard-head-inner">
+            <div class="dashboard-title">
+                <div class="dashboard-title-icon">⚙️</div>
+                <h1>TEACHER DASHBOARD</h1>
+            </div>
+            <button id="dashboardHomeBtn" class="secondary">HOME</button>
+        </div>
+    </header>
+
+    <main class="dashboard-content">
+        <div id="dashboardStatus" class="note">Your vocabulary and settings are saved automatically.</div>
+
+        <div class="dashboard-grid">
+
+            <section class="panel">
+                <h2>VOCABULARY MANAGER</h2>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="wordInput">WORD</label>
+                        <input id="wordInput" type="text" placeholder="Apple" maxlength="40">
+                    </div>
+                    <div class="field">
+                        <label for="imageInput">IMAGE URL</label>
+                        <input id="imageInput" type="url" placeholder="https://example.com/apple.jpg">
+                    </div>
+                    <div class="field">
+                        <label for="hiddenInput">HIDDEN LETTERS</label>
+                        <input id="hiddenInput" type="number" min="1" value="2">
+                    </div>
+                    <div class="field">
+                        <label for="distractorInput">DISTRACTOR LETTERS</label>
+                        <input id="distractorInput" type="text" placeholder="B, R, O">
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button id="addWordBtn" class="primary">+ ADD WORD</button>
+                    <button id="previewImageBtn" class="secondary">PREVIEW IMAGE</button>
+                    <button id="searchImageBtn" class="secondary">SEARCH IMAGE</button>
+                </div>
+
+                <h3>BULK VOCABULARY</h3>
+                <div class="field">
+                    <textarea id="bulkInput" placeholder="apple
+banana
+orange
+elephant
+tiger
+school
+teacher
+pencil"></textarea>
+                </div>
+                <div class="action-row">
+                    <button id="addBulkBtn" class="primary">ADD ALL WORDS</button>
+                </div>
+
+                <div class="vocab-table-wrap">
+                    <table class="vocab-table">
+                        <thead>
+                            <tr><th>WORD</th><th>IMAGE</th><th>HIDDEN</th><th>DISTRACTORS</th><th>ACTIONS</th></tr>
+                        </thead>
+                        <tbody id="vocabTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="action-row">
+                    <button id="clearAllBtn" class="danger">CLEAR ALL</button>
+                </div>
+            </section>
+
+            <aside>
+                <section class="panel">
+                    <h2>GAME SETTINGS</h2>
+
+                    <div class="setting-list">
+                        <div class="setting-row"><label>NUMBER OF QUESTIONS</label><input id="questionCountSetting" type="number" min="1" max="100"></div>
+                        <div class="setting-row"><label>RANDOM ORDER</label><label class="toggle"><input id="randomOrderSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>RANDOM HIDDEN LETTERS</label><label class="toggle"><input id="randomHiddenSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>SOUND</label><label class="toggle"><input id="soundSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>SHOW IMAGE</label><label class="toggle"><input id="showImageSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>AR MODE AVAILABLE</label><label class="toggle"><input id="arAvailableSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>TIMER</label><label class="toggle"><input id="timerSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>TIMER DURATION</label><input id="timerDurationSetting" type="number" min="5" max="300"></div>
+                        <div class="setting-row"><label>STREAK BONUS</label><label class="toggle"><input id="streakBonusSetting" type="checkbox"><span class="slider"></span></label></div>
+                        <div class="setting-row"><label>NUMBER OF DISTRACTORS</label><input id="distractorCountSetting" type="number" min="1" max="15"></div>
+                        <div class="setting-row">
+                            <label>DIFFICULTY</label>
+                            <select id="difficultySetting">
+                                <option value="easy">EASY</option>
+                                <option value="medium">MEDIUM</option>
+                                <option value="hard">HARD</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" style="margin-top:16px">
+                    <h2>AR SETTINGS</h2>
+                    <div class="note">The camera stays in a small floating panel. Your index finger becomes a virtual cursor on the game screen.</div>
+                    <div class="setting-list">
+                        <div class="setting-row"><label>PINCH SENSITIVITY</label><input id="pinchSetting" type="number" min=".05" max=".30" step=".01"></div>
+                        <div class="setting-row"><label>HAND SMOOTHING</label><input id="smoothingSetting" type="number" min=".1" max=".9" step=".05"></div>
+                    </div>
+                </section>
+
+                <section class="panel" style="margin-top:16px">
+                    <h2>DATA MANAGEMENT</h2>
+                    <div class="action-row">
+                        <button id="saveDataBtn" class="primary">SAVE DATA</button>
+                        <button id="exportBtn" class="secondary">EXPORT VOCABULARY</button>
+                        <button id="importBtn" class="secondary">IMPORT VOCABULARY</button>
+                        <input id="importFile" class="hidden" type="file" accept=".json,application/json">
+                    </div>
+                    <div class="danger-zone">
+                        <button id="resetDataBtn" class="danger">RESET DATA</button>
+                    </div>
+                </section>
+
+                <section class="panel" style="margin-top:16px">
+                    <h2>TEACHER ACCESS</h2>
+                    <button id="changePinBtn" class="secondary">CHANGE PIN</button>
+                </section>
+            </aside>
+        </div>
+    </main>
+</section>
+
+<!-- ဒီ modal က Teacher Dashboard ဝင်ဖို့ PIN ထည့်တဲ့နေရာ ဖြစ်ပါတယ်။ -->
+<div id="pinModal" class="modal-bg hidden">
+    <div class="modal">
+        <h2>TEACHER ACCESS</h2>
+        <div class="field">
+            <label for="pinInput">ENTER TEACHER PIN</label>
+            <input id="pinInput" type="password" inputmode="numeric" maxlength="12" placeholder="Enter PIN">
+        </div>
+        <div id="pinError" class="camera-error hidden" style="margin-top:10px;color:#8e3028;background:#fff0ef">Incorrect PIN. Please try again.</div>
+        <div class="modal-actions">
+            <button id="cancelPinBtn" class="secondary">CANCEL</button>
+            <button id="confirmPinBtn" class="primary">CONTINUE</button>
+        </div>
+    </div>
+</div>
+
+<!-- ဒီ modal က vocabulary item တစ်ခုကို ပြင်ဆင်ဖို့ အသုံးပြုပါတယ်။ -->
+<div id="editModal" class="modal-bg hidden">
+    <div class="modal">
+        <h2>EDIT VOCABULARY</h2>
+        <div class="form-grid">
+            <div class="field"><label for="editWordInput">WORD</label><input id="editWordInput" type="text"></div>
+            <div class="field"><label for="editImageInput">IMAGE URL</label><input id="editImageInput" type="url"></div>
+            <div class="field"><label for="editHiddenInput">HIDDEN LETTERS</label><input id="editHiddenInput" type="number" min="1"></div>
+            <div class="field"><label for="editDistractorInput">DISTRACTOR LETTERS</label><input id="editDistractorInput" type="text"></div>
+        </div>
+        <div class="action-row"><button id="editPreviewBtn" class="secondary">PREVIEW IMAGE</button></div>
+        <div class="modal-actions">
+            <button id="cancelEditBtn" class="secondary">CANCEL</button>
+            <button id="saveEditBtn" class="primary">SAVE CHANGES</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ဒီအပိုင်းမှာ default vocabulary နဲ့ default game settings တွေကို သတ်မှတ်ထားပါတယ်။ */
+const DEFAULT_VOCABULARY = [
+    {word:"APPLE",image:"",hidden:2,distractors:"B,R,O"},
+    {word:"BANANA",image:"",hidden:2,distractors:"E,R,T"},
+    {word:"ORANGE",image:"",hidden:2,distractors:"P,T,B"},
+    {word:"ELEPHANT",image:"",hidden:3,distractors:"B,R,S"},
+    {word:"TIGER",image:"",hidden:2,distractors:"A,O,P"},
+    {word:"MONKEY",image:"",hidden:2,distractors:"A,R,T"},
+    {word:"PENCIL",image:"",hidden:2,distractors:"A,O,B"},
+    {word:"SCHOOL",image:"",hidden:2,distractors:"A,P,R"},
+    {word:"TEACHER",image:"",hidden:3,distractors:"B,O,P"},
+    {word:"WINDOW",image:"",hidden:2,distractors:"A,E,R"}
+];
+
+const DEFAULT_SETTINGS = {
+    questionCount:10,
+    randomOrder:true,
+    randomHidden:true,
+    sound:true,
+    showImage:true,
+    arAvailable:true,
+    timer:false,
+    timerDuration:30,
+    streakBonus:true,
+    distractorCount:4,
+    difficulty:"medium",
+    pinchSensitivity:.13,
+    smoothing:.55
+};
+
+const STORAGE_KEY = "word_builder_ar_game_v2";
+const PIN_KEY = "word_builder_teacher_pin_v2";
+
+/* ဒီ object က game ရဲ့ လက်ရှိအခြေအနေအားလုံးကို ထိန်းထားပါတယ်။ */
+const state = {
+    vocabulary:[],
+    settings:{},
+    questions:[],
+    questionIndex:0,
+    score:0,
+    correct:0,
+    wrong:0,
+    streak:0,
+    bestStreak:0,
+    currentWord:null,
+    hiddenPositions:[],
+    answers:{},
+    checked:false,
+    timerId:null,
+    timeLeft:0,
+    editingIndex:null,
+    pinAction:"login"
+};
+
+/* ဒီ object က AR hand tracking အတွက် လိုအပ်တဲ့ state တွေကို ထိန်းထားပါတယ်။ */
+const ar = {
+    active:false,
+    camera:null,
+    hands:null,
+    stream:null,
+    canvas:null,
+    ctx:null,
+    index:null,
+    thumb:null,
+    smooth:null,
+    pinch:false,
+    pinchFrames:0,
+    releaseFrames:0,
+    grabbedCard:null,
+    processing:false,
+    lastProcess:0,
+    lastHandSeen:0
+};
+
+/* ဒီ function က DOM element ကို ID နဲ့ အလွယ်တကူ ရယူနိုင်အောင် လုပ်ထားပါတယ်။ */
+const $ = id => document.getElementById(id);
+
+const screens = {
+    start:$("startScreen"),
+    game:$("gameScreen"),
+    result:$("resultScreen"),
+    dashboard:$("dashboardScreen")
+};
+
+/* ဒီ function က word ကို uppercase English letters ပဲကျန်အောင် သန့်စင်ပါတယ်။ */
+function cleanWord(value){
+    return String(value || "").toUpperCase().replace(/[^A-Z]/g,"");
+}
+
+/* ဒီ function က distractor input ထဲက comma၊ space စတာတွေကို ဖယ်ပြီး letter တစ်လုံးချင်းပဲ ပြန်ပေးပါတယ်။ */
+function parseLetters(value){
+    return [...new Set(
+        String(value || "")
+            .toUpperCase()
+            .split("")
+            .filter(ch => /[A-Z]/.test(ch))
+    )];
+}
+
+/* ဒီ function က image URL ကို HTTP/HTTPS ဖြစ်မှသာ လက်ခံပါတယ်။ */
+function normalizeImageURL(value){
+    const url = String(value || "").trim();
+    if(!url) return "";
+    try{
+        const parsed = new URL(url);
+        return parsed.protocol==="http:" || parsed.protocol==="https:" ? parsed.href : "";
+    }catch(e){
+        return "";
+    }
+}
+
+/* ဒီ function က number တန်ဖိုးတွေကို သတ်မှတ်ထားတဲ့ range အတွင်းမှာပဲ ထားပါတယ်။ */
+function clamp(value,min,max){
+    return Math.min(max,Math.max(min,value));
+}
+
+/* ဒီ function က array ကို random အစီအစဉ်ပြောင်းပါတယ်။ */
+function shuffle(array){
+    const a=[...array];
+    for(let i=a.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+}
+
+/* ဒီ function က HTML text injection မဖြစ်အောင် text ကို escape လုပ်ပါတယ်။ */
+function escapeHTML(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+/* ဒီ function က vocabulary data ကို စစ်ပြီး game မပျက်အောင် သန့်စင်ပါတယ်။ */
+function sanitizeVocabulary(list){
+    const output=[];
+    const seen=new Set();
+
+    if(!Array.isArray(list)) return output;
+
+    list.forEach(item=>{
+        if(!item || typeof item.word!=="string") return;
+
+        const word=cleanWord(item.word);
+        if(word.length<2 || seen.has(word)) return;
+
+        seen.add(word);
+
+        output.push({
+            word,
+            image:normalizeImageURL(item.image),
+            hidden:clamp(Number(item.hidden)||1,1,Math.max(1,word.length-1)),
+            distractors:parseLetters(item.distractors).join(",")
+        });
+    });
+
+    return output;
+}
+
+/* ဒီ function က localStorage ထဲက vocabulary နဲ့ settings ကို ဖတ်ပါတယ်။ */
+function loadData(){
+    try{
+        const raw=localStorage.getItem(STORAGE_KEY);
+
+        if(raw){
+            const saved=JSON.parse(raw);
+            state.vocabulary=sanitizeVocabulary(saved.vocabulary);
+            state.settings={...DEFAULT_SETTINGS,...(saved.settings||{})};
+        }else{
+            state.vocabulary=DEFAULT_VOCABULARY.map(v=>({...v}));
+            state.settings={...DEFAULT_SETTINGS};
+            saveData(false);
+        }
+    }catch(e){
+        state.vocabulary=DEFAULT_VOCABULARY.map(v=>({...v}));
+        state.settings={...DEFAULT_SETTINGS};
+    }
+
+    syncSettingsUI();
+    renderVocabularyTable();
+}
+
+/* ဒီ function က လက်ရှိ data ကို localStorage ထဲ သိမ်းပါတယ်။ */
+function saveData(showMessage=true){
+    try{
+        localStorage.setItem(STORAGE_KEY,JSON.stringify({
+            vocabulary:state.vocabulary,
+            settings:state.settings
+        }));
+
+        if(showMessage) dashboardStatus("Data saved successfully.");
+    }catch(e){
+        if(showMessage) dashboardStatus("Could not save data in this browser.");
+    }
+}
+
+/* ဒီ function က dashboard message ကို ပြောင်းပေးပါတယ်။ */
+let statusTimeout=null;
+function dashboardStatus(message){
+    $("dashboardStatus").textContent=message;
+    clearTimeout(statusTimeout);
+    statusTimeout=setTimeout(()=>{
+        $("dashboardStatus").textContent="Your vocabulary and settings are saved automatically.";
+    },3200);
+}
+
+/* ဒီ function က dashboard settings UI ကို state နဲ့ ကိုက်ညီအောင် ဖြည့်ပေးပါတယ်။ */
+function syncSettingsUI(){
+    $("questionCountSetting").value=state.settings.questionCount;
+    $("randomOrderSetting").checked=state.settings.randomOrder;
+    $("randomHiddenSetting").checked=state.settings.randomHidden;
+    $("soundSetting").checked=state.settings.sound;
+    $("showImageSetting").checked=state.settings.showImage;
+    $("arAvailableSetting").checked=state.settings.arAvailable;
+    $("timerSetting").checked=state.settings.timer;
+    $("timerDurationSetting").value=state.settings.timerDuration;
+    $("streakBonusSetting").checked=state.settings.streakBonus;
+    $("distractorCountSetting").value=state.settings.distractorCount;
+    $("difficultySetting").value=state.settings.difficulty;
+    $("pinchSetting").value=state.settings.pinchSensitivity;
+    $("smoothingSetting").value=state.settings.smoothing;
+}
+
+/* ဒီ function က dashboard setting တွေကို state ထဲ ပြန်ဖတ်ပါတယ်။ */
+function readSettingsUI(){
+    state.settings.questionCount=clamp(Number($("questionCountSetting").value)||10,1,100);
+    state.settings.randomOrder=$("randomOrderSetting").checked;
+    state.settings.randomHidden=$("randomHiddenSetting").checked;
+    state.settings.sound=$("soundSetting").checked;
+    state.settings.showImage=$("showImageSetting").checked;
+    state.settings.arAvailable=$("arAvailableSetting").checked;
+    state.settings.timer=$("timerSetting").checked;
+    state.settings.timerDuration=clamp(Number($("timerDurationSetting").value)||30,5,300);
+    state.settings.streakBonus=$("streakBonusSetting").checked;
+    state.settings.distractorCount=clamp(Number($("distractorCountSetting").value)||4,1,15);
+    state.settings.difficulty=$("difficultySetting").value;
+    state.settings.pinchSensitivity=clamp(Number($("pinchSetting").value)||.13,.05,.30);
+    state.settings.smoothing=clamp(Number($("smoothingSetting").value)||.55,.1,.9);
+    saveData();
+}
+
+/* ဒီ function က vocabulary table ကို ပြန်တည်ဆောက်ပါတယ်။ */
+function renderVocabularyTable(){
+    const body=$("vocabTableBody");
+    body.innerHTML="";
+
+    if(!state.vocabulary.length){
+        body.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:25px;color:#718399;font-weight:800">No vocabulary available. Add some words to start.</td></tr>`;
+        return;
+    }
+
+    state.vocabulary.forEach((item,index)=>{
+        const row=document.createElement("tr");
+
+        const imageHTML=item.image
+            ? `<img class="thumb" src="${escapeHTML(item.image)}" alt="" onerror="this.style.display='none'">`
+            : `<span style="color:#8a9aab;font-weight:800">No image</span>`;
+
+        row.innerHTML=`
+            <td><strong>${escapeHTML(item.word)}</strong></td>
+            <td>${imageHTML}</td>
+            <td>${item.hidden}</td>
+            <td>${escapeHTML(item.distractors || "Automatic")}</td>
+            <td>
+                <div class="action-row" style="margin:0">
+                    <button class="small" data-edit="${index}">EDIT</button>
+                    <button class="small" data-delete="${index}">DELETE</button>
+                </div>
+            </td>
+        `;
+
+        body.appendChild(row);
+    });
+}
+
+/* ဒီ function က vocabulary အသစ်တစ်ခုကို dashboard ကနေ ထည့်ပါတယ်။ */
+function addWord(){
+    const word=cleanWord($("wordInput").value);
+
+    if(word.length<2){
+        dashboardStatus("Please enter a valid English word.");
+        return;
+    }
+
+    if(state.vocabulary.some(v=>v.word===word)){
+        dashboardStatus("That vocabulary word already exists.");
+        return;
+    }
+
+    const hidden=clamp(
+        Number($("hiddenInput").value)||1,
+        1,
+        word.length-1
+    );
+
+    state.vocabulary.push({
+        word,
+        image:normalizeImageURL($("imageInput").value),
+        hidden,
+        distractors:parseLetters($("distractorInput").value).join(",")
+    });
+
+    $("wordInput").value="";
+    $("imageInput").value="";
+    $("hiddenInput").value="2";
+    $("distractorInput").value="";
+
+    saveData();
+    renderVocabularyTable();
+    dashboardStatus(`${word} was added successfully.`);
+}
+
+/* ဒီ function က bulk vocabulary ကို line တစ်ကြောင်းစီ ဖတ်ပြီး ထည့်ပါတယ်။ */
+function addBulkWords(){
+    const raw=$("bulkInput").value.trim();
+
+    if(!raw){
+        dashboardStatus("Please enter some vocabulary.");
+        return;
+    }
+
+    let added=0;
+    let skipped=0;
+
+    raw.split(/\r?\n/).forEach(line=>{
+        const parts=line.split(",");
+        const word=cleanWord(parts.shift());
+
+        if(word.length<2 || state.vocabulary.some(v=>v.word===word)){
+            skipped++;
+            return;
+        }
+
+        const image=normalizeImageURL(parts.join(",").trim());
+
+        state.vocabulary.push({
+            word,
+            image,
+            hidden:getDifficultyHidden(word),
+            distractors:""
+        });
+
+        added++;
+    });
+
+    $("bulkInput").value="";
+    saveData();
+    renderVocabularyTable();
+    dashboardStatus(`${added} word(s) added. ${skipped} skipped.`);
+}
+
+/* ဒီ function က difficulty အလိုက် default hidden letters အရေအတွက်ကို တွက်ပေးပါတယ်။ */
+function getDifficultyHidden(word){
+    if(state.settings.difficulty==="easy") return 1;
+
+    if(state.settings.difficulty==="hard"){
+        return Math.min(Math.max(3,Math.floor(word.length*.5)),word.length-1);
+    }
+
+    return Math.min(2,word.length-1);
+}
+
+/* ဒီ function က image preview ကို popup အသစ်ထဲမှာ ပြပါတယ်။ */
+function previewImage(url){
+    const clean=normalizeImageURL(url);
+
+    if(!clean){
+        dashboardStatus("Please enter a valid image URL first.");
+        return;
+    }
+
+    const popup=window.open("","_blank");
+
+    if(!popup){
+        dashboardStatus("Please allow pop-ups to preview the image.");
+        return;
+    }
+
+    popup.document.title="Image Preview";
+
+    const style=popup.document.createElement("style");
+    style.textContent="body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f5f9ff}img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.15)}";
+
+    popup.document.head.appendChild(style);
+
+    const image=popup.document.createElement("img");
+    image.src=clean;
+    image.alt="Preview";
+
+    popup.document.body.appendChild(image);
+}
+
+/* ဒီ function က teacher အတွက် image search page ကို ဖွင့်ပေးပါတယ်။ */
+function searchImage(){
+    const word=cleanWord($("wordInput").value);
+
+    if(!word){
+        dashboardStatus("Enter a word before searching for an image.");
+        return;
+    }
+
+    const query=encodeURIComponent(`${word} educational image`);
+    window.open(`https://www.bing.com/images/search?q=${query}`,"_blank","noopener");
+}
+
+/* ဒီ function က vocabulary edit modal ကို ဖွင့်ပါတယ်။ */
+function openEdit(index){
+    const item=state.vocabulary[index];
+    if(!item) return;
+
+    state.editingIndex=index;
+
+    $("editWordInput").value=item.word;
+    $("editImageInput").value=item.image;
+    $("editHiddenInput").value=item.hidden;
+    $("editDistractorInput").value=item.distractors;
+
+    $("editModal").classList.remove("hidden");
+}
+
+/* ဒီ function က edited vocabulary ကို သိမ်းပါတယ်။ */
+function saveEdit(){
+    const index=state.editingIndex;
+    const item=state.vocabulary[index];
+
+    if(!item) return;
+
+    const word=cleanWord($("editWordInput").value);
+
+    if(word.length<2){
+        alert("Please enter a valid English word.");
+        return;
+    }
+
+    if(state.vocabulary.some((v,i)=>i!==index && v.word===word)){
+        alert("That vocabulary word already exists.");
+        return;
+    }
+
+    item.word=word;
+    item.image=normalizeImageURL($("editImageInput").value);
+    item.hidden=clamp(Number($("editHiddenInput").value)||1,1,word.length-1);
+    item.distractors=parseLetters($("editDistractorInput").value).join(",");
+
+    $("editModal").classList.add("hidden");
+
+    saveData();
+    renderVocabularyTable();
+    dashboardStatus("Vocabulary updated.");
+}
+
+/* ဒီ function က vocabulary item တစ်ခုကို ဖျက်ပါတယ်။ */
+function deleteWord(index){
+    const item=state.vocabulary[index];
+    if(!item) return;
+
+    if(!confirm(`Delete "${item.word}"?`)) return;
+
+    state.vocabulary.splice(index,1);
+    saveData();
+    renderVocabularyTable();
+    dashboardStatus("Vocabulary deleted.");
+}
+
+/* ဒီ function က vocabulary အားလုံးကို ဖျက်ပါတယ်။ */
+function clearAllVocabulary(){
+    if(!state.vocabulary.length) return;
+
+    if(!confirm("Delete all vocabulary? This cannot be undone.")) return;
+
+    state.vocabulary=[];
+    saveData();
+    renderVocabularyTable();
+    dashboardStatus("All vocabulary has been cleared.");
+}
+
+/* ဒီ function က teacher PIN ကို localStorage ကနေ ဖတ်ပါတယ်။ */
+function getTeacherPin(){
+    return localStorage.getItem(PIN_KEY) || "1234";
+}
+
+/* ဒီ function က teacher access modal ကို ဖွင့်ပါတယ်။ */
+function openTeacherAccess(action="login"){
+    state.pinAction=action;
+    $("pinInput").value="";
+    $("pinError").classList.add("hidden");
+    $("pinModal").classList.remove("hidden");
+    setTimeout(()=>$("pinInput").focus(),50);
+}
+
+/* ဒီ function က teacher PIN ကို စစ်ပါတယ်။ */
+function confirmPin(){
+    if($("pinInput").value!==getTeacherPin()){
+        $("pinError").classList.remove("hidden");
+        return;
+    }
+
+    $("pinModal").classList.add("hidden");
+
+    if(state.pinAction==="login") showDashboard();
+    else changeTeacherPin();
+}
+
+/* ဒီ function က teacher PIN အသစ် သတ်မှတ်ပေးပါတယ်။ */
+function changeTeacherPin(){
+    const value=prompt("Enter a new teacher PIN:");
+
+    if(value===null) return;
+
+    if(!/^\d{4,12}$/.test(value.trim())){
+        alert("PIN must contain 4 to 12 numbers.");
+        return;
+    }
+
+    localStorage.setItem(PIN_KEY,value.trim());
+    dashboardStatus("Teacher PIN changed successfully.");
+}
+
+/* ဒီ function က dashboard screen ကို ပြပါတယ်။ */
+function showDashboard(){
+    clearTimer();
+    stopAR();
+    showScreen("dashboard");
+    renderVocabularyTable();
+}
+
+/* ဒီ function က screen တစ်ခုကိုပဲ ပြပြီး ကျန်တာတွေကို ဖျောက်ပါတယ်။ */
+function showScreen(name){
+    Object.values(screens).forEach(screen=>screen.classList.add("hidden"));
+    screens[name].classList.remove("hidden");
+}
+
+/* ဒီ function က game စတင်ဖို့ question list ကို ပြင်ဆင်ပါတယ်။ */
+function startGame(){
+    readSettingsUI();
+
+    if(!state.vocabulary.length){
+        alert("No vocabulary is available. Please add words in the Teacher Dashboard.");
+        return;
+    }
+
+    let list=sanitizeVocabulary(state.vocabulary);
+
+    if(state.settings.randomOrder) list=shuffle(list);
+
+    state.questions=list.slice(0,Math.min(state.settings.questionCount,list.length));
+
+    if(!state.questions.length){
+        alert("No valid vocabulary is available.");
+        return;
+    }
+
+    state.questionIndex=0;
+    state.score=0;
+    state.correct=0;
+    state.wrong=0;
+    state.streak=0;
+    state.bestStreak=0;
+
+    showScreen("game");
+    updateScoreboard();
+    loadQuestion();
+}
+
+/* ဒီ function က current question ကို စတင်ပြပါတယ်။ */
+function loadQuestion(){
+    clearTimer();
+    /* Question ပြောင်းတဲ့အခါ AR camera ကို မပိတ်တော့ဘဲ interaction state ကိုပဲ reset လုပ်ပါတယ်။ */
+    if(ar.active){
+        resetARInteraction();
+        $("arPanel").classList.remove("hidden");
+        $("arCursor").style.display="block";
+    }else{
+        stopAR();
+    }
+
+    if(state.questionIndex>=state.questions.length){
+        finishGame();
+        return;
+    }
+
+    state.currentWord=state.questions[state.questionIndex];
+    state.checked=false;
+    state.answers={};
+
+    const word=state.currentWord.word;
+
+    state.hiddenPositions=chooseHiddenPositions(
+        word,
+        state.currentWord.hidden,
+        state.settings.randomHidden
+    );
+
+    renderGameImage(state.currentWord);
+    renderSlots();
+    renderLetterCards();
+    updateScoreboard();
+
+    $("feedback").textContent=state.settings.timer
+        ? `TIME ${formatTime(state.settings.timerDuration)}`
+        : "Choose the missing letters.";
+
+    $("feedback").className="feedback info";
+
+    if(state.settings.timer) startTimer();
+}
+
+/* ဒီ function က hidden positions တွေကို random သို့မဟုတ် fixed အတိုင်း ရွေးပါတယ်။ */
+function chooseHiddenPositions(word,count,randomize){
+    const safe=clamp(Number(count)||1,1,word.length-1);
+    let positions=[...Array(word.length).keys()];
+
+    if(randomize) positions=shuffle(positions);
+
+    return positions.slice(0,safe).sort((a,b)=>a-b);
+}
+
+/* ဒီ function က image ရှိရင် game ထဲမှာ ပြပါတယ်။ */
+function renderGameImage(item){
+    const box=$("gameImageBox");
+    box.innerHTML="";
+
+    if(!state.settings.showImage || !item.image){
+        box.classList.add("hidden");
+        return;
+    }
+
+    const img=document.createElement("img");
+    img.src=item.image;
+    img.alt="";
+
+    img.onerror=()=>{
+        box.innerHTML="";
+        box.classList.add("hidden");
+    };
+
+    box.appendChild(img);
+    box.classList.remove("hidden");
+}
+
+/* ဒီ function က answer အပြည့်အစုံကို မပြဘဲ fixed letters နဲ့ blank slots တွေကိုပဲ ဆောက်ပါတယ်။ */
+function renderSlots(){
+    const container=$("slots");
+    container.innerHTML="";
+
+    const word=state.currentWord.word;
+
+    for(let i=0;i<word.length;i++){
+        const slot=document.createElement("div");
+        slot.className="slot";
+        slot.dataset.position=i;
+
+        if(state.hiddenPositions.includes(i)){
+            slot.classList.add("empty");
+        }else{
+            slot.textContent=word[i];
+        }
+
+        container.appendChild(slot);
+    }
+}
+
+/* ဒီ function က correct letters နဲ့ distractor letters တွေကို card အဖြစ် ဖန်တီးပါတယ်။ */
+function renderLetterCards(){
+    const container=$("letters");
+    container.innerHTML="";
+
+    const word=state.currentWord.word;
+
+    /* ဒီနေရာမှာ comma မပါတော့အောင် distractor ကို letter array အဖြစ်သာ အသုံးပြုပါတယ်။ */
+    const correctLetters=state.hiddenPositions.map(position=>word[position]);
+
+    let manual=parseLetters(state.currentWord.distractors)
+        .filter(letter=>!correctLetters.includes(letter));
+
+    const automaticAlphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        .split("")
+        .filter(letter=>
+            !word.includes(letter) &&
+            !correctLetters.includes(letter) &&
+            !manual.includes(letter)
+        );
+
+    while(manual.length<state.settings.distractorCount && automaticAlphabet.length){
+        const index=Math.floor(Math.random()*automaticAlphabet.length);
+        manual.push(automaticAlphabet.splice(index,1)[0]);
+    }
+
+    const cards=shuffle([
+        ...correctLetters,
+        ...manual.slice(0,state.settings.distractorCount)
+    ]);
+
+    cards.forEach((letter,index)=>{
+        const card=document.createElement("div");
+
+        card.className="letter-card";
+        card.textContent=letter;
+        card.dataset.letter=letter;
+        card.dataset.cardId=`${Date.now()}-${index}-${Math.random()}`;
+
+        attachPointerDrag(card);
+        container.appendChild(card);
+    });
+}
+
+/* ဒီ function က touch နဲ့ mouse နှစ်မျိုးလုံးအတွက် pointer drag ကို ချိတ်ပေးပါတယ်။ */
+function attachPointerDrag(card){
+    card.addEventListener("pointerdown",event=>{
+        if(state.checked || card.classList.contains("used")) return;
+
+        event.preventDefault();
+
+        try{card.setPointerCapture(event.pointerId)}catch(e){}
+
+        beginDrag(card,event.clientX,event.clientY);
+
+        const move=e=>moveDrag(e.clientX,e.clientY);
+        const up=e=>{
+            endDrag(e.clientX,e.clientY);
+            card.removeEventListener("pointermove",move);
+            card.removeEventListener("pointerup",up);
+            card.removeEventListener("pointercancel",up);
+        };
+
+        card.addEventListener("pointermove",move);
+        card.addEventListener("pointerup",up);
+        card.addEventListener("pointercancel",up);
+    });
+}
+
+/* ဒီ function က pointer drag စတင်တဲ့အချိန် card ကို မှတ်ထားပါတယ်။ */
+function beginDrag(card,x,y){
+    ar.grabbedCard=card;
+    card.classList.add("dragging");
+    showGhost(card.textContent,x,y);
+}
+
+/* ဒီ function က drag လုပ်နေတဲ့ card ကို pointer နောက်လိုက်အောင် ရွှေ့ပါတယ်။ */
+function moveDrag(x,y){
+    if(!ar.grabbedCard) return;
+
+    showGhost(ar.grabbedCard.textContent,x,y);
+    highlightSlotAt(x,y);
+}
+
+/* ဒီ function က pointer လွှတ်တဲ့နေရာမှာ slot ရှိမရှိ စစ်ပြီး letter ထည့်ပါတယ်။ */
+function endDrag(x,y){
+    const card=ar.grabbedCard;
+    if(!card) return;
+
+    const slot=findSlotAt(x,y);
+
+    card.classList.remove("dragging");
+    hideGhost();
+
+    if(slot && slot.classList.contains("empty")){
+        fillSlot(slot,card.dataset.letter,card);
+    }
+
+    clearSlotHighlights();
+    ar.grabbedCard=null;
+}
+
+/* ဒီ function က AR cursor သို့မဟုတ် mouse pointer အောက်က slot ကို ရှာပါတယ်။ */
+function findSlotAt(x,y){
+    const direct=document.elementsFromPoint(x,y)
+        .find(el=>el.classList && el.classList.contains("slot"));
+    if(direct) return direct;
+
+    /* AR cursor က slot အနားမှာ နည်းနည်းလွဲရင် nearest empty slot ကိုရွေးပေးပါတယ်။ */
+    let best=null;
+    let bestDistance=Infinity;
+    document.querySelectorAll(".slot.empty").forEach(slot=>{
+        const rect=slot.getBoundingClientRect();
+        const cx=rect.left+rect.width/2;
+        const cy=rect.top+rect.height/2;
+        const d=Math.hypot(x-cx,y-cy);
+        const limit=Math.max(34,Math.min(58,rect.width*.8));
+        if(d<=limit && d<bestDistance){
+            best=slot;
+            bestDistance=d;
+        }
+    });
+    return best;
+}
+
+/* ဒီ function က slot ပေါ်ရောက်တဲ့အခါ green highlight ပြပါတယ်။ */
+function highlightSlotAt(x,y){
+    clearSlotHighlights();
+
+    const slot=findSlotAt(x,y);
+
+    if(slot && slot.classList.contains("empty")){
+        slot.classList.add("target");
+    }
+}
+
+/* ဒီ function က slot highlight အားလုံးကို ဖျောက်ပါတယ်။ */
+function clearSlotHighlights(){
+    document.querySelectorAll(".slot.target")
+        .forEach(slot=>slot.classList.remove("target"));
+}
+
+/* ဒီ function က card ထဲက letter ကို slot ထဲ ထည့်ပါတယ်။ */
+function fillSlot(slot,letter,card){
+    const position=Number(slot.dataset.position);
+
+    if(!state.hiddenPositions.includes(position)) return;
+    if(state.answers[position]) return;
+
+    state.answers[position]=letter;
+
+    slot.textContent=letter;
+    slot.classList.remove("empty");
+    slot.classList.add("filled");
+
+    card.classList.add("used");
+
+    playSound("drop");
+    checkAnswerIfComplete();
+}
+
+/* ဒီ function က blank slot အားလုံးဖြည့်ပြီးပြီလား စစ်ပါတယ်။ */
+function checkAnswerIfComplete(){
+    const complete=state.hiddenPositions.every(
+        position=>state.answers[position]
+    );
+
+    if(!complete || state.checked) return;
+
+    state.checked=true;
+
+    const word=state.currentWord.word;
+
+    const correct=state.hiddenPositions.every(
+        position=>state.answers[position]===word[position]
+    );
+
+    correct ? handleCorrect() : handleWrong();
+}
+
+/* ဒီ function က correct answer ရတဲ့အခါ score နဲ့ streak ကို တိုးပေးပါတယ်။ */
+function handleCorrect(){
+    clearTimer();
+
+    state.correct++;
+    state.streak++;
+    state.bestStreak=Math.max(state.bestStreak,state.streak);
+
+    let points=10;
+
+    if(state.settings.streakBonus && state.streak>1){
+        points+=Math.min(20,(state.streak-1)*2);
+    }
+
+    state.score+=points;
+
+    $("feedback").textContent=`CORRECT! 🎉 +${points}`;
+    $("feedback").className="feedback correct";
+
+    updateScoreboard();
+    playSound("correct");
+    celebrate();
+
+    setTimeout(()=>{
+        state.questionIndex++;
+        loadQuestion();
+    },1200);
+}
+
+/* ဒီ function က wrong answer ရတဲ့အခါ question ကို ပြန်ဖြေခွင့်ပေးပါတယ်။ */
+function handleWrong(){
+    clearTimer();
+
+    state.wrong++;
+    state.streak=0;
+
+    $("feedback").textContent="TRY AGAIN!";
+    $("feedback").className="feedback wrong";
+
+    playSound("wrong");
+    updateScoreboard();
+
+    setTimeout(()=>{
+        state.checked=false;
+        state.answers={};
+        renderSlots();
+        renderLetterCards();
+
+        $("feedback").textContent="Try again. You can do it!";
+        $("feedback").className="feedback info";
+
+        if(state.settings.timer) startTimer();
+    },850);
+}
+
+/* ဒီ function က timer ကို စတင်ပါတယ်။ */
+function startTimer(){
+    clearTimer();
+
+    state.timeLeft=state.settings.timerDuration;
+    updateTimerText();
+
+    state.timerId=setInterval(()=>{
+        state.timeLeft--;
+        updateTimerText();
+
+        if(state.timeLeft<=0){
+            clearTimer();
+            timeUp();
+        }
+    },1000);
+}
+
+/* ဒီ function က timer ကို ရပ်ပါတယ်။ */
+function clearTimer(){
+    if(state.timerId){
+        clearInterval(state.timerId);
+        state.timerId=null;
+    }
+}
+
+/* ဒီ function က timer အချိန်ကို feedback နေရာမှာ ပြပါတယ်။ */
+function updateTimerText(){
+    if(!state.checked){
+        $("feedback").textContent=`TIME ${formatTime(state.timeLeft)}`;
+        $("feedback").className="feedback info";
+    }
+}
+
+/* ဒီ function က seconds ကို MM:SS ပုံစံ ပြောင်းပါတယ်။ */
+function formatTime(seconds){
+    return `${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;
+}
+
+/* ဒီ function က timer ကုန်သွားတဲ့အခါ question ကို skip လုပ်ပါတယ်။ */
+function timeUp(){
+    if(state.checked) return;
+
+    state.checked=true;
+    state.wrong++;
+    state.streak=0;
+
+    $("feedback").textContent="TIME'S UP!";
+    $("feedback").className="feedback wrong";
+
+    playSound("wrong");
+    updateScoreboard();
+
+    setTimeout(()=>{
+        state.questionIndex++;
+        loadQuestion();
+    },1000);
+}
+
+/* ဒီ function က scoreboard နဲ့ progress bar ကို update လုပ်ပါတယ်။ */
+function updateScoreboard(){
+    $("scoreValue").textContent=state.score;
+    $("correctValue").textContent=state.correct;
+    $("wrongValue").textContent=state.wrong;
+    $("streakValue").textContent=state.streak;
+
+    const total=state.questions.length||1;
+    const current=Math.min(state.questionIndex+1,total);
+    const percent=Math.round((state.questionIndex/total)*100);
+
+    $("questionLabel").textContent=`Question ${current} / ${total}`;
+    $("progressPercent").textContent=`${percent}%`;
+    $("progressBar").style.width=`${percent}%`;
+}
+
+/* ဒီ function က game ပြီးသွားတဲ့အခါ result screen ကို ပြပါတယ်။ */
+function finishGame(){
+    clearTimer();
+    stopAR();
+
+    const total=state.correct+state.wrong;
+    const accuracy=total ? Math.round((state.correct/total)*100) : 0;
+
+    $("finalScore").textContent=state.score;
+    $("finalCorrect").textContent=state.correct;
+    $("finalWrong").textContent=state.wrong;
+    $("finalAccuracy").textContent=`${accuracy}%`;
+    $("finalBestStreak").textContent=state.bestStreak;
+
+    showScreen("result");
+    playSound("complete");
+    celebrate();
+}
+
+/* ဒီ function က correct answer အတွက် confetti animation ပြပါတယ်။ */
+function celebrate(){
+    const layer=$("confettiLayer");
+    layer.innerHTML="";
+    layer.style.position="fixed";
+    layer.style.inset="0";
+    layer.style.zIndex="5000";
+    layer.style.pointerEvents="none";
+    layer.style.overflow="hidden";
+
+    const colors=["#1976ff","#4cb8ff","#18a957","#ffbd2e","#ff6b6b","#9b59b6"];
+
+    for(let i=0;i<(innerWidth<600?35:55);i++){
+        const p=document.createElement("div");
+        p.style.position="absolute";
+        p.style.left=`${Math.random()*100}%`;
+        p.style.top="-20px";
+        p.style.width="9px";
+        p.style.height="15px";
+        p.style.background=colors[Math.floor(Math.random()*colors.length)];
+        p.style.animation=`confettiFall ${1.1+Math.random()*.9}s ${Math.random()*.3}s linear forwards`;
+        layer.appendChild(p);
+    }
+
+    setTimeout(()=>layer.innerHTML="",2400);
+}
+
+/* ဒီ style rule က confetti တွေ အောက်ကိုကျသွားအောင် အသုံးပြုပါတယ်။ */
+const confettiStyle=document.createElement("style");
+confettiStyle.textContent="@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}";
+document.head.appendChild(confettiStyle);
+
+/* ဒီအပိုင်းမှာ browser ရဲ့ Web Audio API နဲ့ external audio file မလိုဘဲ sound effect ဖန်တီးပါတယ်။ */
+let audioContext=null;
+
+function getAudioContext(){
+    if(!audioContext){
+        try{
+            audioContext=new(window.AudioContext||window.webkitAudioContext)();
+        }catch(e){
+            return null;
+        }
+    }
+    return audioContext;
+}
+
+/* ဒီ function က game event အလိုက် short sound တွေ ထုတ်ပါတယ်။ */
+function playSound(type){
+    if(!state.settings.sound) return;
+
+    const ctx=getAudioContext();
+    if(!ctx) return;
+
+    if(ctx.state==="suspended") ctx.resume().catch(()=>{});
+
+    if(type==="complete"){
+        tone(ctx,523,0,.12,"sine");
+        tone(ctx,659,.13,.12,"sine");
+        tone(ctx,784,.26,.18,"sine");
+        return;
+    }
+
+    const map={
+        click:[440,.06,"sine"],
+        drop:[520,.08,"sine"],
+        correct:[660,.12,"sine"],
+        wrong:[180,.16,"triangle"]
+    };
+
+    const item=map[type]||map.click;
+    tone(ctx,item[0],0,item[1],item[2]);
+}
+
+/* ဒီ function က oscillator တစ်ခုနဲ့ sound tone တစ်ခု ဖန်တီးပါတယ်။ */
+function tone(ctx,freq,delay,duration,wave){
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+
+    osc.type=wave;
+    osc.frequency.value=freq;
+
+    gain.gain.setValueAtTime(.0001,ctx.currentTime+delay);
+    gain.gain.exponentialRampToValueAtTime(.12,ctx.currentTime+delay+.015);
+    gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+delay+duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime+delay);
+    osc.stop(ctx.currentTime+delay+duration+.02);
+}
+
+/* ဒီ function က AR mode ကို စတင်ပြီး camera permission တောင်းပါတယ်။ */
+async function startAR(){
+    if(!state.settings.arAvailable) return;
+
+    /* AR ဖွင့်ပြီးသားဆိုရင် camera ကို ထပ်မစဘဲ ရှိပြီးသား tracking ကိုပဲ ဆက်သုံးပါတယ်။ */
+    if(ar.active){
+        $("arPanel").classList.remove("hidden");
+        $("arCursor").style.display="block";
+        return;
+    }
+
+    playSound("click");
+
+    $("arPanel").classList.remove("hidden");
+    $("arCursor").style.display="block";
+    $("arStatus").textContent="Starting camera...";
+
+    try{
+        await initializeAR();
+    }catch(error){
+        handleARFailure(error);
+    }
+}
+
+/* ဒီ function က MediaPipe Hands နဲ့ camera ကို initialize လုပ်ပါတယ်။ */
+async function initializeAR(){
+    if(!window.Hands || !window.Camera){
+        throw new Error("AR_LIBRARY_UNAVAILABLE");
+    }
+
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        throw new Error("CAMERA_UNAVAILABLE");
+    }
+
+    if(!ar.hands){
+        ar.hands=new Hands({
+            locateFile:file=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        ar.hands.setOptions({
+            maxNumHands:1,
+            /* Model complexity ကို 0 ထားပြီး tablet/phone တွေမှာ ပိုပေါ့အောင်လုပ်ထားပါတယ်။ */
+            modelComplexity:0,
+            minDetectionConfidence:.55,
+            minTrackingConfidence:.55
+        });
+
+        ar.hands.onResults(handleHandResults);
+    }
+
+    ar.canvas=$("handCanvas");
+    ar.ctx=ar.canvas.getContext("2d");
+
+    const video=$("cameraVideo");
+
+    ar.camera=new Camera(video,{
+        onFrame:async()=>{
+            /* frame တိုင်း model ကို မပို့ဘဲ တစ်စက္ကန့် 24 frame ဝန်းကျင်သာ process လုပ်ပြီး lag ကိုလျှော့ပါတယ်။ */
+            if(!ar.active || !ar.hands || ar.processing) return;
+            const now=performance.now();
+            if(now-ar.lastProcess<42) return;
+            ar.lastProcess=now;
+            ar.processing=true;
+            try{
+                await ar.hands.send({image:video});
+            }catch(e){}
+            finally{
+                ar.processing=false;
+            }
+        },
+        width:480,
+        height:360
+    });
+
+    ar.active=true;
+    await ar.camera.start();
+
+    $("arStatus").textContent="INDEX ●  THUMB ●  Pinch to grab a letter.";
+}
+
+/* ဒီ function က camera permission သို့မဟုတ် AR library ပြဿနာကို user-friendly message ပြပါတယ်။ */
+function handleARFailure(error){
+    ar.active=false;
+
+    if(ar.camera){
+        try{ar.camera.stop()}catch(e){}
+        ar.camera=null;
+    }
+
+    $("arStatus").innerHTML=`<div class="camera-error">AR mode is unavailable. Touch Mode is still ready.</div>`;
+}
+
+/* ဒီ function က MediaPipe ကရလာတဲ့ hand landmarks တွေကို လက်ခံပါတယ်။ */
+function handleHandResults(results){
+    if(!ar.active) return;
+
+    drawHand(results);
+
+    if(!results.multiHandLandmarks || !results.multiHandLandmarks.length){
+        /* လက်မတွေ့ရင် ချက်ချင်း grab ကိုမဖြုတ်ဘဲ ခဏစောင့်ပြီး accidental release ကိုကာကွယ်ပါတယ်။ */
+        if(performance.now()-ar.lastHandSeen>180){
+            resetARInteraction();
+            $("arStatus").textContent="Show one hand to the camera.";
+            $("arCursor").style.display="none";
+        }
+        return;
+    }
+
+    ar.lastHandSeen=performance.now();
+
+    const landmarks=results.multiHandLandmarks[0];
+    const index=landmarks[8];
+    const thumb=landmarks[4];
+
+    /* Camera မှာ mirror ဖြစ်နေတာနဲ့ screen coordinate ကို ကိုက်ညီအောင် ပြောင်းပါတယ်။ */
+    const point={
+        x:clamp((1-index.x)*window.innerWidth,0,window.innerWidth),
+        y:clamp(index.y*window.innerHeight,0,window.innerHeight)
+    };
+
+    ar.index=point;
+    ar.thumb=thumb;
+
+    /* smoothing ကို အနည်းငယ်သာသုံးပြီး cursor ကို မြန်မြန်တုံ့ပြန်စေပါတယ်။ */
+    const smoothing=Math.min(.78,Math.max(.15,state.settings.smoothing));
+    if(!ar.smooth){
+        ar.smooth={...point};
+    }else{
+        ar.smooth.x=ar.smooth.x*smoothing+point.x*(1-smoothing);
+        ar.smooth.y=ar.smooth.y*smoothing+point.y*(1-smoothing);
+    }
+
+    const cursor=$("arCursor");
+    cursor.style.display="block";
+    cursor.style.left=`${ar.smooth.x}px`;
+    cursor.style.top=`${ar.smooth.y}px`;
+
+    /* လက်ချောင်းနှစ်ချောင်းအကွာအဝေးကို palm size နဲ့ normalize လုပ်လို့ လက်အရွယ်အစားမတူလည်း pinch တည်ငြိမ်ပါတယ်။ */
+    const palm=Math.max(.055,Math.hypot(landmarks[5].x-landmarks[17].x,landmarks[5].y-landmarks[17].y));
+    const distance=Math.hypot(index.x-thumb.x,index.y-thumb.y)/palm;
+    const pinchThreshold=Math.min(.95,Math.max(.38,state.settings.pinchSensitivity*5.2));
+
+    if(distance<pinchThreshold){
+        ar.pinchFrames++;
+        ar.releaseFrames=0;
+    }else{
+        ar.releaseFrames++;
+        ar.pinchFrames=0;
+    }
+
+    if(!ar.pinch && ar.pinchFrames>=2){
+        ar.pinch=true;
+        cursor.classList.add("pinch");
+        handlePinchStart();
+    }
+
+    if(ar.pinch && ar.releaseFrames>=2){
+        ar.pinch=false;
+        cursor.classList.remove("pinch");
+        handlePinchEnd();
+    }
+
+    if(ar.pinch && ar.grabbedCard){
+        moveARGrab();
+        $("arStatus").textContent="GRABBED";
+    }else if(ar.pinch){
+        $("arStatus").textContent="PINCH TO GRAB";
+    }else{
+        $("arStatus").textContent="INDEX ●  THUMB ●  Pinch to grab a letter.";
+    }
+}
+
+/* ဒီ function က hand skeleton နဲ့ index/thumb dots ကို camera canvas ပေါ်မှာ ဆွဲပါတယ်။ */
+function drawHand(results){
+    const canvas=ar.canvas;
+    const ctx=ar.ctx;
+
+    if(!canvas || !ctx) return;
+
+    const rect=canvas.getBoundingClientRect();
+    const w=Math.max(1,Math.round(rect.width));
+    const h=Math.max(1,Math.round(rect.height));
+
+    if(canvas.width!==w || canvas.height!==h){
+        canvas.width=w;
+        canvas.height=h;
+    }
+
+    ctx.clearRect(0,0,w,h);
+
+    if(!results.multiHandLandmarks || !results.multiHandLandmarks.length) return;
+
+    results.multiHandLandmarks.forEach(points=>{
+        if(window.drawConnectors){
+            drawConnectors(ctx,points,HAND_CONNECTIONS,{
+                color:"#4bc7ff",
+                lineWidth:3
+            });
+        }
+
+        if(window.drawLandmarks){
+            drawLandmarks(ctx,points,{
+                color:"#fff",
+                fillColor:"#1976ff",
+                lineWidth:1,
+                radius:3
+            });
+        }
+
+        [4,8].forEach(i=>{
+            const p=points[i];
+
+            ctx.beginPath();
+            ctx.arc(p.x*w,p.y*h,8,0,Math.PI*2);
+            ctx.fillStyle=i===8 ? "#4bc7ff" : "#ffbd2e";
+            ctx.fill();
+            ctx.strokeStyle="#fff";
+            ctx.lineWidth=3;
+            ctx.stroke();
+        });
+    });
+}
+
+/* ဒီ function က cursor နားက letter card ကို အနည်းငယ်အကွာအဝေးခွင့်ပြုပြီး ရှာပေးပါတယ်။ */
+function findLetterCardNear(x,y,radius=38){
+    const cards=[...document.querySelectorAll(".letter-card:not(.used)")];
+    let best=null;
+    let bestDistance=Infinity;
+
+    cards.forEach(card=>{
+        const rect=card.getBoundingClientRect();
+        const cx=Math.max(rect.left,Math.min(x,rect.right));
+        const cy=Math.max(rect.top,Math.min(y,rect.bottom));
+        const d=Math.hypot(x-cx,y-cy);
+        if(d<=radius && d<bestDistance){
+            best=card;
+            bestDistance=d;
+        }
+    });
+
+    return best;
+}
+
+/* ဒီ function က pinch စတင်တဲ့အခါ virtual cursor အောက်က letter card ကို ရွေးပါတယ်။ */
+function handlePinchStart(){
+    if(state.checked || !ar.smooth) return;
+
+    /* Cursor က card ကို နည်းနည်းလွဲသွားရင်တောင် 34px အတွင်းက card ကို ရွေးပေးပါတယ်။ */
+    const card=findLetterCardNear(ar.smooth.x,ar.smooth.y,38);
+
+    if(card){
+        ar.grabbedCard=card;
+        card.classList.add("dragging");
+        showGhost(card.dataset.letter||card.textContent,ar.smooth.x,ar.smooth.y);
+        playSound("click");
+    }
+}
+
+/* ဒီ function က pinch ဖြုတ်လိုက်တဲ့အခါ grabbed card ကို slot ထဲ drop လုပ်ပါတယ်။ */
+function handlePinchEnd(){
+    if(!ar.grabbedCard) return;
+
+    const card=ar.grabbedCard;
+    const point=ar.smooth;
+
+    if(point){
+        const slot=findSlotAt(point.x,point.y);
+
+        if(slot && slot.classList.contains("empty")){
+            fillSlot(slot,card.dataset.letter,card);
+        }
+    }
+
+    card.classList.remove("dragging");
+    hideGhost();
+    clearSlotHighlights();
+    ar.grabbedCard=null;
+}
+
+/* ဒီ function က AR grabbed card ကို index finger virtual cursor နောက်လိုက်အောင် ရွှေ့ပါတယ်။ */
+function moveARGrab(){
+    if(!ar.grabbedCard || !ar.smooth) return;
+
+    showGhost(ar.grabbedCard.textContent,ar.smooth.x,ar.smooth.y);
+    highlightSlotAt(ar.smooth.x,ar.smooth.y);
+}
+
+/* ဒီ function က AR interaction ကို reset လုပ်ပါတယ်။ */
+function resetARInteraction(){
+    ar.pinch=false;
+    ar.pinchFrames=0;
+    ar.releaseFrames=0;
+
+    if(ar.grabbedCard){
+        ar.grabbedCard.classList.remove("dragging");
+    }
+
+    ar.grabbedCard=null;
+    ar.lastHandSeen=performance.now();
+    hideGhost();
+    clearSlotHighlights();
+    $("arCursor").classList.remove("pinch");
+}
+
+/* ဒီ function က grabbed letter ရဲ့ floating visual ကို ပြပါတယ်။ */
+function showGhost(letter,x,y){
+    const ghost=$("arDragGhost");
+    ghost.textContent=letter;
+    ghost.style.left=`${x}px`;
+    ghost.style.top=`${y}px`;
+    ghost.style.display="grid";
+}
+
+/* ဒီ function က floating letter ကို ဖျောက်ပါတယ်။ */
+function hideGhost(){
+    $("arDragGhost").style.display="none";
+}
+
+/* ဒီ function က camera နဲ့ AR tracking ကို အပြည့်အဝ ပိတ်ပါတယ်။ */
+function stopAR(){
+    ar.active=false;
+    ar.processing=false;
+    ar.lastProcess=0;
+    ar.smooth=null;
+    resetARInteraction();
+
+    if(ar.camera){
+        try{ar.camera.stop()}catch(e){}
+        ar.camera=null;
+    }
+
+    const video=$("cameraVideo");
+
+    if(video.srcObject){
+        try{
+            video.srcObject.getTracks().forEach(track=>track.stop());
+        }catch(e){}
+        video.srcObject=null;
+    }
+
+    if(ar.ctx && ar.canvas){
+        ar.ctx.clearRect(0,0,ar.canvas.width,ar.canvas.height);
+    }
+
+    $("arPanel").classList.add("hidden");
+    $("arCursor").style.display="none";
+}
+
+/* ဒီ function က vocabulary JSON file ကို download အဖြစ် export လုပ်ပါတယ်။ */
+function exportVocabulary(){
+    const payload={
+        version:2,
+        exportedAt:new Date().toISOString(),
+        vocabulary:state.vocabulary,
+        settings:state.settings
+    };
+
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+
+    a.href=url;
+    a.download="word-builder-vocabulary.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+    dashboardStatus("Vocabulary exported successfully.");
+}
+
+/* ဒီ function က import file picker ကို ဖွင့်ပါတယ်။ */
+function importVocabulary(){
+    $("importFile").click();
+}
+
+/* ဒီ function က JSON import ကို စစ်ပြီး duplicate တွေကို ကျော်ပါတယ်။ */
+function handleImport(event){
+    const file=event.target.files[0];
+    if(!file) return;
+
+    const reader=new FileReader();
+
+    reader.onload=()=>{
+        try{
+            const parsed=JSON.parse(reader.result);
+            const imported=Array.isArray(parsed) ? parsed : parsed.vocabulary;
+
+            if(!Array.isArray(imported)) throw new Error("INVALID");
+
+            const clean=sanitizeVocabulary(imported);
+
+            if(!clean.length) throw new Error("EMPTY");
+
+            const existing=new Set(state.vocabulary.map(v=>v.word));
+            let added=0;
+
+            clean.forEach(item=>{
+                if(!existing.has(item.word)){
+                    state.vocabulary.push(item);
+                    existing.add(item.word);
+                    added++;
+                }
+            });
+
+            if(parsed.settings && typeof parsed.settings==="object"){
+                state.settings={...state.settings,...parsed.settings};
+            }
+
+            saveData();
+            syncSettingsUI();
+            renderVocabularyTable();
+            dashboardStatus(`${added} vocabulary item(s) imported successfully.`);
+        }catch(e){
+            alert("The imported file is not a valid Word Builder vocabulary file.");
+        }
+
+        event.target.value="";
+    };
+
+    reader.onerror=()=>{
+        alert("Could not read the selected file.");
+        event.target.value="";
+    };
+
+    reader.readAsText(file);
+}
+
+/* ဒီ function က vocabulary နဲ့ settings အားလုံးကို default ပြန်ထားပါတယ်။ */
+function resetData(){
+    if(!confirm("Reset all vocabulary and game settings to the original defaults?")) return;
+
+    state.vocabulary=DEFAULT_VOCABULARY.map(v=>({...v}));
+    state.settings={...DEFAULT_SETTINGS};
+
+    localStorage.removeItem(PIN_KEY);
+
+    saveData();
+    syncSettingsUI();
+    renderVocabularyTable();
+
+    dashboardStatus("Data reset. The default teacher PIN is 1234.");
+}
+
+/* ဒီ function က UI event တွေအားလုံးကို ချိတ်ဆက်ပေးပါတယ်။ */
+function bindEvents(){
+    $("startGameBtn").addEventListener("click",()=>{playSound("click");startGame()});
+    $("teacherBtn").addEventListener("click",()=>{playSound("click");openTeacherAccess("login")});
+
+    $("exitGameBtn").addEventListener("click",()=>{
+        if(confirm("Exit the current game?")){
+            clearTimer();
+            stopAR();
+            showScreen("start");
+        }
+    });
+
+    $("playAgainBtn").addEventListener("click",startGame);
+    $("resultDashboardBtn").addEventListener("click",()=>openTeacherAccess("login"));
+    $("dashboardHomeBtn").addEventListener("click",()=>{stopAR();showScreen("start")});
+
+    $("addWordBtn").addEventListener("click",addWord);
+    $("addBulkBtn").addEventListener("click",addBulkWords);
+    $("previewImageBtn").addEventListener("click",()=>previewImage($("imageInput").value));
+    $("searchImageBtn").addEventListener("click",searchImage);
+    $("clearAllBtn").addEventListener("click",clearAllVocabulary);
+
+    $("saveDataBtn").addEventListener("click",()=>{
+        readSettingsUI();
+        saveData();
+        dashboardStatus("All data saved successfully.");
+    });
+
+    $("exportBtn").addEventListener("click",exportVocabulary);
+    $("importBtn").addEventListener("click",importVocabulary);
+    $("importFile").addEventListener("change",handleImport);
+    $("resetDataBtn").addEventListener("click",resetData);
+    $("changePinBtn").addEventListener("click",()=>openTeacherAccess("change"));
+
+    $("confirmPinBtn").addEventListener("click",confirmPin);
+    $("cancelPinBtn").addEventListener("click",()=>$("pinModal").classList.add("hidden"));
+
+    $("pinInput").addEventListener("keydown",e=>{
+        if(e.key==="Enter") confirmPin();
+    });
+
+    $("cancelEditBtn").addEventListener("click",()=>$("editModal").classList.add("hidden"));
+    $("saveEditBtn").addEventListener("click",saveEdit);
+    $("editPreviewBtn").addEventListener("click",()=>previewImage($("editImageInput").value));
+
+    $("vocabTableBody").addEventListener("click",e=>{
+        const edit=e.target.closest("[data-edit]");
+        const del=e.target.closest("[data-delete]");
+
+        if(edit) openEdit(Number(edit.dataset.edit));
+        if(del) deleteWord(Number(del.dataset.delete));
+    });
+
+    $("touchModeBtn").addEventListener("click",()=>{
+        playSound("click");
+        stopAR();
+        $("touchModeBtn").classList.add("active");
+        $("arModeBtn").classList.remove("active");
+    });
+
+    $("arModeBtn").addEventListener("click",()=>{
+        $("touchModeBtn").classList.remove("active");
+        $("arModeBtn").classList.add("active");
+        startAR();
+    });
+
+    $("closeArBtn").addEventListener("click",()=>{
+        stopAR();
+        $("touchModeBtn").classList.add("active");
+        $("arModeBtn").classList.remove("active");
+    });
+
+    $("stopCameraBtn").addEventListener("click",()=>{
+        stopAR();
+        $("touchModeBtn").classList.add("active");
+        $("arModeBtn").classList.remove("active");
+    });
+
+    [
+        "questionCountSetting","randomOrderSetting","randomHiddenSetting",
+        "soundSetting","showImageSetting","arAvailableSetting",
+        "timerSetting","timerDurationSetting","streakBonusSetting",
+        "distractorCountSetting","difficultySetting","pinchSetting","smoothingSetting"
+    ].forEach(id=>{
+        $(id).addEventListener("change",readSettingsUI);
+    });
+
+    $("pinModal").addEventListener("click",e=>{
+        if(e.target===$("pinModal")) $("pinModal").classList.add("hidden");
+    });
+
+    $("editModal").addEventListener("click",e=>{
+        if(e.target===$("editModal")) $("editModal").classList.add("hidden");
+    });
+
+    document.addEventListener("keydown",e=>{
+        if(e.key==="Escape"){
+            stopAR();
+        }
+    });
+
+    window.addEventListener("beforeunload",()=>{
+        stopAR();
+        clearTimer();
+    });
+}
+
+/* ဒီ function က application ကို စတင်တဲ့အခါ data နဲ့ event တွေကို ပြင်ဆင်ပါတယ်။ */
+function init(){
+    loadData();
+    bindEvents();
+    showScreen("start");
+}
+
+/* ဒီ function ကို application စတင်ဖို့ ခေါ်ပါတယ်။ */
+init();
+</script>
+</body>
+</html>
