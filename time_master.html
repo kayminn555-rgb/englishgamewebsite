@@ -1,0 +1,9162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#5b5ce2">
+<title>TIME MASTER – Telling the Time</title>
+
+<style>
+/* =========================================================
+   အခြေခံ Reset နှင့် App Theme
+   ========================================================= */
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --primary:#5b5ce2;
+  --primary-dark:#4546bd;
+  --secondary:#7c4dff;
+  --accent:#ffca28;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --info:#06b6d4;
+
+  --background:#f3f6ff;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#68738a;
+  --border:#e3e8f3;
+
+  --shadow:0 18px 50px rgba(36,48,100,.12);
+  --radius:24px;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  background:var(--background);
+  color:var(--text);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  overflow-x:hidden;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:4px solid rgba(91,92,226,.22);
+  outline-offset:2px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.screen{
+  display:none;
+  min-height:100vh;
+}
+
+.screen.active{
+  display:block;
+}
+
+.container{
+  width:min(1400px,94%);
+  margin:auto;
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.btn{
+  min-height:50px;
+  padding:0 20px;
+  border-radius:15px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-weight:850;
+  transition:.2s ease;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+}
+
+.btn-primary{
+  color:white;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  box-shadow:0 10px 25px rgba(91,92,226,.25);
+}
+
+.btn-secondary{
+  color:var(--primary);
+  background:white;
+  border:2px solid rgba(91,92,226,.15);
+}
+
+.btn-success{
+  color:white;
+  background:var(--success);
+}
+
+.btn-danger{
+  color:white;
+  background:var(--danger);
+}
+
+.btn-ghost{
+  color:var(--text);
+  background:#eef1f8;
+}
+
+.btn-small{
+  min-height:40px;
+  padding:0 13px;
+  border-radius:12px;
+  font-size:.88rem;
+}
+
+.full-width{
+  width:100%;
+}
+
+/* =========================================================
+   Top Navigation
+   ========================================================= */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  min-height:72px;
+  padding:10px max(3%,18px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(243,246,255,.9);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:950;
+  color:var(--primary);
+}
+
+.brand-icon{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  box-shadow:0 8px 20px rgba(91,92,226,.25);
+}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.icon-btn{
+  width:44px;
+  height:44px;
+  border-radius:13px;
+  background:white;
+  border:1px solid var(--border);
+  display:grid;
+  place-items:center;
+  transition:.2s;
+}
+
+.icon-btn:hover{
+  transform:translateY(-2px);
+}
+
+/* =========================================================
+   HOME SCREEN
+   ========================================================= */
+
+.home-screen{
+  background:
+    radial-gradient(circle at 5% 10%,rgba(124,77,255,.15),transparent 27%),
+    radial-gradient(circle at 95% 20%,rgba(6,182,212,.12),transparent 27%),
+    linear-gradient(135deg,#fafbff,#edf2ff);
+}
+
+.home-content{
+  padding:55px 0 70px;
+}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  align-items:center;
+  gap:45px;
+}
+
+.hero-text{
+  text-align:left;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 13px;
+  border-radius:999px;
+  background:#eef0ff;
+  color:var(--primary);
+  font-size:.82rem;
+  font-weight:850;
+}
+
+.hero h1{
+  margin-top:18px;
+  font-size:clamp(3.4rem,8vw,7rem);
+  line-height:.9;
+  letter-spacing:-5px;
+  font-weight:1000;
+}
+
+.hero h1 span{
+  color:var(--primary);
+}
+
+.hero h2{
+  margin-top:20px;
+  font-size:clamp(1.15rem,2.4vw,1.6rem);
+}
+
+.hero p{
+  margin-top:13px;
+  max-width:620px;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:1.05rem;
+}
+
+.home-buttons{
+  margin-top:28px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  max-width:550px;
+}
+
+.home-buttons .btn{
+  min-height:58px;
+}
+
+.hero-clock{
+  display:grid;
+  place-items:center;
+  position:relative;
+}
+
+.hero-clock:before{
+  content:"";
+  position:absolute;
+  width:410px;
+  height:410px;
+  max-width:90%;
+  max-height:90%;
+  border-radius:50%;
+  background:rgba(91,92,226,.09);
+  filter:blur(5px);
+}
+
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-top:55px;
+}
+
+.feature-card{
+  padding:22px 17px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:20px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+
+.feature-icon{
+  font-size:2rem;
+  margin-bottom:8px;
+}
+
+.feature-card strong{
+  display:block;
+}
+
+.feature-card span{
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.5;
+}
+
+/* =========================================================
+   ANALOG CLOCK
+   ========================================================= */
+
+.clock{
+  --size:min(70vw,500px);
+
+  width:var(--size);
+  height:var(--size);
+
+  min-width:280px;
+  min-height:280px;
+  max-width:650px;
+  max-height:650px;
+
+  position:relative;
+  border-radius:50%;
+
+  background:
+    radial-gradient(circle at 50% 50%,#ffffff 0 72%,transparent 72.5%),
+    radial-gradient(circle at 45% 35%,#ffffff,#edf1fc);
+
+  border:11px solid white;
+
+  box-shadow:
+    0 0 0 2px #dfe4ef,
+    0 25px 60px rgba(35,45,90,.18),
+    inset 0 0 35px rgba(30,40,80,.07);
+
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.clock.large{
+  --size:min(68vw,650px);
+}
+
+.clock.small{
+  --size:min(40vw,320px);
+  min-width:230px;
+  min-height:230px;
+  border-width:8px;
+}
+
+.clock-number{
+  position:absolute;
+  left:50%;
+  top:50%;
+
+  width:44px;
+  height:44px;
+
+  transform:
+    translate(-50%,-50%)
+    rotate(var(--angle))
+    translateY(calc(var(--size) * -.405))
+    rotate(calc(var(--angle) * -1));
+
+  display:grid;
+  place-items:center;
+
+  color:#27304a;
+  font-size:clamp(1rem,2.5vw,1.5rem);
+  font-weight:950;
+
+  z-index:5;
+}
+
+.clock-tick{
+  position:absolute;
+  left:50%;
+  top:50%;
+
+  width:3px;
+  height:10px;
+
+  border-radius:10px;
+  background:#aeb6c9;
+
+  transform:
+    translate(-50%,-50%)
+    rotate(var(--angle))
+    translateY(calc(var(--size) * -.425));
+
+  transform-origin:center;
+}
+
+.clock-tick.major{
+  width:5px;
+  height:15px;
+  background:#606a82;
+}
+
+.clock-hand{
+  position:absolute;
+  left:50%;
+  top:50%;
+
+  transform-origin:50% 100%;
+
+  border-radius:999px 999px 8px 8px;
+
+  cursor:grab;
+
+  touch-action:none;
+
+  z-index:20;
+
+  transition:
+    filter .12s ease,
+    width .12s ease;
+}
+
+.clock-hand.hour{
+  width:14px;
+  height:28%;
+  margin-left:-7px;
+  margin-top:-28%;
+
+  background:#26304a;
+  color:#26304a;
+}
+
+.clock-hand.minute{
+  width:8px;
+  height:39%;
+  margin-left:-4px;
+  margin-top:-39%;
+
+  background:var(--primary);
+  color:var(--primary);
+}
+
+.clock-hand:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-18px;
+  width:34px;
+  height:34px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:transparent;
+}
+
+.clock-hand:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-7px;
+  width:18px;
+  height:18px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:currentColor;
+  box-shadow:0 3px 9px rgba(0,0,0,.2);
+}
+
+.clock-hand.dragging{
+  cursor:grabbing;
+  filter:drop-shadow(0 0 10px rgba(91,92,226,.6));
+}
+
+.clock-centre{
+  position:absolute;
+  z-index:30;
+  left:50%;
+  top:50%;
+
+  width:25px;
+  height:25px;
+
+  transform:translate(-50%,-50%);
+
+  border-radius:50%;
+  background:white;
+  border:7px solid var(--primary);
+  box-shadow:0 4px 10px rgba(0,0,0,.18);
+}
+
+/* =========================================================
+   GAME SCREEN
+   ========================================================= */
+
+.game-screen{
+  background:linear-gradient(180deg,#f3f6ff,#ffffff);
+}
+
+.game-header{
+  padding:25px 0 12px;
+}
+
+.game-header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.game-title h1{
+  font-size:clamp(1.5rem,4vw,2.3rem);
+  font-weight:950;
+}
+
+.game-title p{
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.stats{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.stat{
+  min-width:92px;
+  padding:10px 12px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.05);
+}
+
+.stat span{
+  display:block;
+  font-size:.7rem;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.stat strong{
+  display:block;
+  margin-top:2px;
+  font-size:1.15rem;
+}
+
+.game-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 350px;
+  gap:22px;
+  padding:14px 0 45px;
+}
+
+.game-main{
+  min-height:680px;
+  padding:26px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.game-side{
+  height:max-content;
+  padding:21px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  position:sticky;
+  top:90px;
+}
+
+.mode-tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:7px;
+  margin-bottom:20px;
+}
+
+.mode-tab{
+  white-space:nowrap;
+  padding:11px 14px;
+  border-radius:13px;
+  background:#f0f2f8;
+  color:var(--muted);
+  font-weight:850;
+}
+
+.mode-tab.active{
+  background:var(--primary);
+  color:white;
+}
+
+.game-mode{
+  width:100%;
+}
+
+.target-box{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.target-label{
+  color:var(--muted);
+  font-weight:850;
+}
+
+.target-time{
+  margin-top:3px;
+  font-size:clamp(2rem,5vw,3rem);
+  line-height:1;
+  font-weight:1000;
+  color:var(--primary);
+}
+
+.clock-stage{
+  display:grid;
+  place-items:center;
+  padding:5px 0 15px;
+}
+
+.digital-panel{
+  text-align:center;
+  margin-top:4px;
+}
+
+.digital-time{
+  font-size:clamp(2rem,5vw,3.2rem);
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:2px;
+}
+
+.written-time{
+  margin-top:6px;
+  color:var(--primary);
+  font-weight:850;
+  font-size:1.12rem;
+}
+
+.ampm{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:.85rem;
+  font-weight:750;
+}
+
+.hand-guide{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.hand-guide span{
+  padding:7px 11px;
+  border-radius:999px;
+  background:#f4f5fa;
+  color:var(--muted);
+  font-size:.76rem;
+  font-weight:800;
+}
+
+.control-row{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+
+.feedback{
+  display:none;
+  max-width:700px;
+  margin:15px auto 0;
+  padding:14px 18px;
+  border-radius:16px;
+  text-align:center;
+  font-weight:800;
+  line-height:1.5;
+}
+
+.feedback.show{
+  display:block;
+}
+
+.feedback.correct{
+  color:#16733a;
+  background:#eaf9ef;
+  border:1px solid #b8e8c7;
+}
+
+.feedback.incorrect{
+  color:#b42323;
+  background:#fff0f0;
+  border:1px solid #ffcaca;
+}
+
+.feedback.info{
+  color:#075985;
+  background:#eef9ff;
+  border:1px solid #b9e9fa;
+}
+
+.hint-box{
+  display:none;
+  margin:14px auto 0;
+  max-width:700px;
+  padding:15px;
+  border-radius:16px;
+  color:#765700;
+  background:#fff9df;
+  border:1px solid #f0dda1;
+  line-height:1.5;
+}
+
+.hint-box.show{
+  display:block;
+}
+
+/* =========================================================
+   ANSWERS
+   ========================================================= */
+
+.question-heading{
+  margin:10px 0 15px;
+  text-align:center;
+  font-size:1.45rem;
+  font-weight:950;
+}
+
+.answer-grid{
+  max-width:720px;
+  margin:14px auto;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:13px;
+}
+
+.answer-btn{
+  min-height:72px;
+  padding:14px;
+  border-radius:18px;
+  background:white;
+  color:var(--text);
+  border:2px solid var(--border);
+  font-size:1rem;
+  font-weight:900;
+  box-shadow:0 5px 16px rgba(0,0,0,.04);
+  transition:.18s;
+}
+
+.answer-btn:hover{
+  transform:translateY(-2px);
+  border-color:var(--primary);
+}
+
+.answer-btn.correct{
+  background:#eaf9ef;
+  color:#16733a;
+  border-color:var(--success);
+}
+
+.answer-btn.wrong{
+  background:#fff0f0;
+  color:#b42323;
+  border-color:var(--danger);
+}
+
+/* =========================================================
+   SIDE PANEL
+   ========================================================= */
+
+.side-section + .side-section{
+  border-top:1px solid var(--border);
+  margin-top:20px;
+  padding-top:20px;
+}
+
+.side-section h3{
+  font-size:.95rem;
+  margin-bottom:12px;
+}
+
+.side-list{
+  display:grid;
+  gap:8px;
+}
+
+.side-option{
+  width:100%;
+  padding:12px;
+  text-align:left;
+  border-radius:13px;
+  background:#f4f5fa;
+  color:var(--muted);
+  border:2px solid transparent;
+  font-size:.82rem;
+  font-weight:850;
+}
+
+.side-option.active{
+  background:#eef0ff;
+  border-color:var(--primary);
+  color:var(--primary);
+}
+
+/* =========================================================
+   CHALLENGE
+   ========================================================= */
+
+.challenge-info{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-weight:900;
+}
+
+.challenge-bar{
+  height:12px;
+  margin:10px 0 18px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#e6eaf3;
+}
+
+.challenge-fill{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+  transition:width .25s linear;
+}
+
+.streak-text{
+  color:#c56a00;
+}
+
+/* =========================================================
+   PRACTICE
+   ========================================================= */
+
+.practice-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:25px;
+}
+
+.practice-info{
+  padding:22px;
+  border-radius:20px;
+  background:#f6f7fc;
+}
+
+.practice-big{
+  margin-top:13px;
+  font-size:2.7rem;
+  font-weight:1000;
+  color:var(--primary);
+}
+
+.practice-controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:18px;
+}
+
+.practice-instruction{
+  max-width:720px;
+  margin:-4px auto 18px;
+  padding:11px 16px;
+  border-radius:14px;
+  background:#eef0ff;
+  color:var(--primary);
+  text-align:center;
+  font-weight:850;
+  font-size:1rem;
+}
+
+#practiceWritten.hidden{
+  display:none!important;
+}
+
+#setTarget{
+  max-width:820px;
+  margin-left:auto;
+  margin-right:auto;
+  font-size:clamp(1.8rem,4.2vw,2.9rem);
+  line-height:1.15;
+  text-transform:none;
+}
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.results-screen{
+  background:linear-gradient(180deg,#f3f6ff,#ffffff);
+}
+
+.results-wrapper{
+  padding:50px 0;
+}
+
+.results-card{
+  width:min(850px,100%);
+  margin:auto;
+  padding:35px;
+  text-align:center;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+}
+
+.trophy{
+  font-size:4rem;
+}
+
+.results-card h1{
+  margin-top:7px;
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:1000;
+}
+
+.result-name{
+  margin-top:12px;
+}
+
+.result-message{
+  margin:9px 0 25px;
+  color:var(--muted);
+  font-size:1.08rem;
+}
+
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.result-stat{
+  padding:16px;
+  border-radius:16px;
+  background:#f6f7fc;
+}
+
+.result-stat span{
+  display:block;
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:800;
+}
+
+.result-stat strong{
+  display:block;
+  margin-top:3px;
+  font-size:1.45rem;
+}
+
+.result-actions{
+  margin-top:25px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* =========================================================
+   TEACHER MODE
+   ========================================================= */
+
+.teacher-screen{
+  background:#f3f6ff;
+}
+
+.teacher-content{
+  padding:35px 0 60px;
+}
+
+.page-heading{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.page-heading h1{
+  margin-top:9px;
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:1000;
+}
+
+.page-heading p{
+  margin-top:7px;
+  color:var(--muted);
+}
+
+.teacher-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.teacher-card{
+  padding:24px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.teacher-card.full{
+  grid-column:1/-1;
+}
+
+.teacher-card h2{
+  margin-bottom:18px;
+  font-size:1.15rem;
+}
+
+.setting-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.form-group{
+  display:grid;
+  gap:7px;
+}
+
+.form-group label{
+  font-size:.84rem;
+  font-weight:850;
+}
+
+.form-group input,
+.form-group select{
+  min-height:47px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:white;
+  color:var(--text);
+}
+
+.toggle-row{
+  min-height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  border-bottom:1px solid var(--border);
+}
+
+.toggle-row:last-child{
+  border-bottom:0;
+}
+
+.switch{
+  position:relative;
+  width:52px;
+  height:30px;
+  flex:0 0 auto;
+}
+
+.switch input{
+  width:0;
+  height:0;
+  opacity:0;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+  background:#d9deea;
+  border-radius:999px;
+  transition:.2s;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  left:4px;
+  top:4px;
+  border-radius:50%;
+  background:white;
+  box-shadow:0 2px 5px rgba(0,0,0,.18);
+  transition:.2s;
+}
+
+.switch input:checked + .slider{
+  background:var(--primary);
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(22px);
+}
+
+.custom-add{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:9px;
+}
+
+.custom-add input{
+  min-height:47px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:0 12px;
+}
+
+.custom-list{
+  margin-top:15px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:15px;
+}
+
+.custom-empty{
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.custom-row{
+  min-height:52px;
+  display:grid;
+  grid-template-columns:38px 1fr auto;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+.custom-row:last-child{
+  border-bottom:0;
+}
+
+.custom-number{
+  color:var(--muted);
+  font-weight:900;
+}
+
+.custom-actions{
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.custom-actions button{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  background:#f0f2f8;
+}
+
+.teacher-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:18px;
+}
+
+.results-table-wrapper{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:15px;
+}
+
+.results-table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+  background:white;
+}
+
+.results-table th,
+.results-table td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+  font-size:.84rem;
+}
+
+.results-table th{
+  background:#f4f6fb;
+  color:var(--muted);
+}
+
+.results-table tr:last-child td{
+  border-bottom:0;
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(12,18,40,.58);
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.modal{
+  width:min(680px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:27px;
+  border-radius:25px;
+  background:white;
+  box-shadow:0 35px 100px rgba(0,0,0,.3);
+}
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.modal-header h2{
+  font-size:1.4rem;
+}
+
+.modal-close{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:#f0f2f7;
+}
+
+.help-list{
+  display:grid;
+  gap:12px;
+}
+
+.help-item{
+  display:flex;
+  gap:13px;
+  padding:15px;
+  border-radius:16px;
+  background:#f6f7fc;
+  line-height:1.5;
+}
+
+.help-icon{
+  font-size:1.5rem;
+}
+
+.name-modal .modal{
+  width:min(440px,100%);
+  text-align:center;
+}
+
+.name-input{
+  width:100%;
+  height:54px;
+  margin:18px 0;
+  padding:0 14px;
+  border:2px solid var(--border);
+  border-radius:14px;
+}
+
+.name-input:focus{
+  border-color:var(--primary);
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+.shake{
+  animation:shake .4s ease;
+}
+
+@keyframes shake{
+  20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+  100%{transform:translateX(0)}
+}
+
+.pop{
+  animation:pop .35s ease;
+}
+
+@keyframes pop{
+  0%{transform:scale(.94)}
+  60%{transform:scale(1.03)}
+  100%{transform:scale(1)}
+}
+
+.confetti-layer{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.confetti{
+  position:absolute;
+  top:-30px;
+  animation:confettiFall 1.8s ease-out forwards;
+}
+
+@keyframes confettiFall{
+  to{
+    transform:
+      translate3d(var(--x),105vh,0)
+      rotate(720deg);
+    opacity:0;
+  }
+}
+
+/* =========================================================
+   CLASSROOM MODE
+   ========================================================= */
+
+body.classroom .topbar{
+  display:none;
+}
+
+body.classroom .game-layout{
+  grid-template-columns:1fr;
+}
+
+body.classroom .game-side{
+  display:none;
+}
+
+body.classroom .game-main{
+  min-height:100vh;
+}
+
+body.classroom .clock{
+  --size:min(65vw,650px);
+}
+
+body.classroom .answer-btn{
+  min-height:85px;
+  font-size:1.15rem;
+}
+
+body.classroom .digital-time{
+  font-size:clamp(2.5rem,6vw,4rem);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:1050px){
+
+  .hero{
+    grid-template-columns:1fr;
+    text-align:center;
+  }
+
+  .hero-text{
+    text-align:center;
+  }
+
+  .hero p{
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .home-buttons{
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .feature-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .game-layout{
+    grid-template-columns:1fr;
+  }
+
+  .game-side{
+    position:static;
+  }
+
+  .teacher-grid{
+    grid-template-columns:1fr;
+  }
+
+  .teacher-card.full{
+    grid-column:auto;
+  }
+}
+
+@media(max-width:700px){
+
+  .container{
+    width:96%;
+  }
+
+  .topbar{
+    padding-left:2%;
+    padding-right:2%;
+  }
+
+  .home-content{
+    padding-top:30px;
+  }
+
+  .hero h1{
+    letter-spacing:-3px;
+  }
+
+  .home-buttons{
+    grid-template-columns:1fr;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .clock{
+    --size:min(89vw,450px);
+    min-width:250px;
+    min-height:250px;
+  }
+
+  .game-header-row{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .stats{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .stat{
+    flex:1;
+    min-width:70px;
+  }
+
+  .game-main{
+    padding:18px 12px;
+  }
+
+  .answer-grid{
+    grid-template-columns:1fr;
+  }
+
+  .practice-grid{
+    grid-template-columns:1fr;
+  }
+
+  .result-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .setting-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:430px){
+
+  .feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  .clock{
+    --size:89vw;
+    min-width:240px;
+    min-height:240px;
+    border-width:8px;
+  }
+
+  .clock-number{
+    width:35px;
+    height:35px;
+    font-size:.92rem;
+  }
+
+  .clock-hand.hour{
+    width:11px;
+    margin-left:-5.5px;
+  }
+
+  .clock-hand.minute{
+    width:7px;
+    margin-left:-3.5px;
+  }
+
+  .clock-centre{
+    width:20px;
+    height:20px;
+    border-width:6px;
+  }
+
+  .control-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .control-row .btn{
+    width:100%;
+    padding-left:8px;
+    padding-right:8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     HOME SCREEN
+     ========================================================= -->
+
+<section id="homeScreen" class="screen active home-screen">
+
+  <div class="container home-content">
+
+    <div class="hero">
+
+      <div class="hero-text">
+
+        <span class="badge">
+          ⏰ ENGLISH TIME ADVENTURE
+        </span>
+
+        <h1>
+          TIME <span>MASTER</span>
+        </h1>
+
+        <h2>
+          Learn • Set • Read • Master the Time
+        </h2>
+
+        <p>
+          Learn to read and set the clock through fun interactive activities.
+          Drag the hands with your finger or mouse and become a Time Master!
+        </p>
+
+        <div class="home-buttons">
+
+          <button id="playGameButton" class="btn btn-primary">
+            ▶ PLAY GAME
+          </button>
+
+          <button id="teacherModeButton" class="btn btn-secondary">
+            👨‍🏫 TEACHER MODE
+          </button>
+
+          <button id="howToPlayButton" class="btn btn-secondary">
+            📖 HOW TO PLAY
+          </button>
+
+          <button id="settingsButton" class="btn btn-secondary">
+            ⚙ SETTINGS
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="hero-clock">
+        <div id="homeClock" class="clock"></div>
+      </div>
+
+    </div>
+
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">🖐️</div>
+        <strong>Drag & Set</strong>
+        <span>Move the clock hands with your finger or mouse.</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <strong>Learn by Playing</strong>
+        <span>Practise real clock-reading skills.</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">👨‍🏫</div>
+        <strong>Teacher Mode</strong>
+        <span>Create custom classroom activities.</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <strong>Track Progress</strong>
+        <span>Save scores and student results.</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     GAME SCREEN
+     ========================================================= -->
+
+<section id="gameScreen" class="screen game-screen">
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="brand-icon">⏰</div>
+      <span>TIME MASTER</span>
+    </div>
+
+    <div class="top-actions">
+
+      <button id="soundButton" class="icon-btn" aria-label="Toggle sound">
+        🔊
+      </button>
+
+      <button id="classroomButton" class="icon-btn" aria-label="Classroom mode">
+        🖥️
+      </button>
+
+      <button id="fullscreenButton" class="icon-btn" aria-label="Fullscreen">
+        ⛶
+      </button>
+
+      <button id="gameHomeButton" class="icon-btn" aria-label="Home">
+        🏠
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="container">
+
+    <div class="game-header">
+
+      <div class="game-header-row">
+
+        <div class="game-title">
+          <h1 id="gameTitle">SET THE TIME</h1>
+          <p id="gameSubtitle">
+            Move the clock hands to match the target.
+          </p>
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <span>⭐ SCORE</span>
+            <strong id="scoreDisplay">0</strong>
+          </div>
+
+          <div class="stat">
+            <span>🔥 STREAK</span>
+            <strong id="streakDisplay">0</strong>
+          </div>
+
+          <div class="stat">
+            <span>🏆 BEST</span>
+            <strong id="bestDisplay">0</strong>
+          </div>
+
+          <div id="livesStat" class="stat">
+            <span>❤️ LIVES</span>
+            <strong id="livesDisplay">❤️❤️❤️</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="game-layout">
+
+      <main id="gameMain" class="game-main">
+
+        <div class="mode-tabs">
+
+          <button class="mode-tab active" data-mode="set">
+            1. Set the Time
+          </button>
+
+          <button class="mode-tab" data-mode="read">
+            2. Read the Clock
+          </button>
+
+          <button class="mode-tab" data-mode="multiple">
+            3. Multiple Choice
+          </button>
+
+          <button class="mode-tab" data-mode="challenge">
+            4. Time Challenge
+          </button>
+
+          <button class="mode-tab" data-mode="practice">
+            5. Practice Mode
+          </button>
+
+        </div>
+
+
+        <!-- =================================================
+             SET THE TIME
+             ================================================= -->
+
+        <div id="setMode" class="game-mode">
+
+          <div class="target-box">
+
+            <div class="target-label">
+              Set the clock to:
+            </div>
+
+            <div id="setTarget" class="target-time">
+              07:30
+            </div>
+
+          </div>
+
+          <div class="clock-stage">
+
+            <div
+              id="setClock"
+              class="clock"
+              role="application"
+              aria-label="Interactive clock. Drag the hour or minute hand."
+            ></div>
+
+          </div>
+
+          <div class="digital-panel">
+
+            <div id="setDigital" class="digital-time">
+              07:00
+            </div>
+
+            <div id="setWritten" class="written-time">
+              It's seven o'clock.
+            </div>
+
+            <div id="setAmPm" class="ampm">
+              AM
+            </div>
+
+          </div>
+
+          <div class="hand-guide">
+
+            <span>🟣 Minute hand</span>
+            <span>⚫ Hour hand</span>
+            <span>↔ Drag either hand</span>
+
+          </div>
+
+          <div class="control-row">
+
+            <button id="checkSetButton" class="btn btn-success">
+              ✅ CHECK ANSWER
+            </button>
+
+            <button id="hintButton" class="btn btn-secondary">
+              💡 HINT
+            </button>
+
+            <button id="resetSetButton" class="btn btn-ghost">
+              🔄 RESET CLOCK
+            </button>
+
+          </div>
+
+          <div id="hintBox" class="hint-box"></div>
+
+          <div id="setFeedback" class="feedback"></div>
+
+        </div>
+
+
+        <!-- =================================================
+             READ CLOCK
+             ================================================= -->
+
+        <div id="readMode" class="game-mode hidden">
+
+          <div class="question-heading">
+            What time is it?
+          </div>
+
+          <div class="clock-stage">
+
+            <div id="readClock" class="clock"></div>
+
+          </div>
+
+          <div id="readAnswers" class="answer-grid"></div>
+
+          <div id="readFeedback" class="feedback"></div>
+
+          <div class="control-row">
+
+            <button id="nextReadButton" class="btn btn-primary hidden">
+              ▶ NEXT QUESTION
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             MULTIPLE CHOICE
+             ================================================= -->
+
+        <div id="multipleMode" class="game-mode hidden">
+
+          <div class="question-heading">
+            What time is shown on the clock?
+          </div>
+
+          <div class="clock-stage">
+
+            <div id="multipleClock" class="clock"></div>
+
+          </div>
+
+          <div id="multipleAnswers" class="answer-grid"></div>
+
+          <div id="multipleFeedback" class="feedback"></div>
+
+          <div class="control-row">
+
+            <button id="nextMultipleButton" class="btn btn-primary hidden">
+              ▶ NEXT QUESTION
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TIME CHALLENGE
+             ================================================= -->
+
+        <div id="challengeMode" class="game-mode hidden">
+
+          <div class="challenge-info">
+            <span>⏱ TIME CHALLENGE</span>
+            <span id="challengeTimer">60s</span>
+          </div>
+
+          <div class="challenge-bar">
+            <div id="challengeProgress" class="challenge-fill"></div>
+          </div>
+
+          <div class="challenge-info">
+
+            <span>
+              Question <span id="challengeQuestion">1</span>
+            </span>
+
+            <span class="streak-text">
+              🔥 <span id="challengeStreak">0</span>
+            </span>
+
+          </div>
+
+          <div class="target-box" style="margin-top:18px">
+
+            <div class="target-label">
+              Set the clock to:
+            </div>
+
+            <div id="challengeTarget" class="target-time">
+              07:30
+            </div>
+
+          </div>
+
+          <div class="clock-stage">
+
+            <div id="challengeClock" class="clock large"></div>
+
+          </div>
+
+          <div class="digital-panel">
+
+            <div id="challengeDigital" class="digital-time">
+              07:00
+            </div>
+
+            <div id="challengeWritten" class="written-time">
+              It's seven o'clock.
+            </div>
+
+          </div>
+
+          <div class="control-row">
+
+            <button id="checkChallengeButton" class="btn btn-success">
+              ✅ CHECK ANSWER
+            </button>
+
+            <button id="resetChallengeButton" class="btn btn-ghost">
+              🔄 RESET
+            </button>
+
+          </div>
+
+          <div id="challengeFeedback" class="feedback"></div>
+
+        </div>
+
+
+        <!-- =================================================
+             PRACTICE MODE
+             ================================================= -->
+
+        <div id="practiceMode" class="game-mode hidden">
+
+          <div class="question-heading">
+            Practice Mode
+          </div>
+
+          <div class="practice-instruction">
+            Read the time aloud in English.
+          </div>
+
+          <div class="practice-grid">
+
+            <div class="clock-stage">
+
+              <div id="practiceClock" class="clock"></div>
+
+            </div>
+
+            <div class="practice-info">
+
+              <span class="badge">
+                FREE PRACTICE
+              </span>
+
+              <div id="practiceDigital" class="practice-big">
+                07:00
+              </div>
+
+              <div id="practiceWritten" class="written-time">
+                It's seven o'clock.
+              </div>
+
+              <div id="practiceAmPm" class="ampm">
+                AM
+              </div>
+
+              <div class="practice-controls">
+
+                <button id="practicePrevious" class="btn btn-ghost">
+                  ◀ Previous
+                </button>
+
+                <button id="practiceNext" class="btn btn-ghost">
+                  Next ▶
+                </button>
+
+                <button id="practiceRandom" class="btn btn-primary">
+                  🎲 Random Time
+                </button>
+
+                <button id="practiceReset" class="btn btn-secondary">
+                  🔄 Reset
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+
+      <!-- =================================================
+           SIDE PANEL
+           ================================================= -->
+
+      <aside class="game-side">
+
+        <div class="side-section">
+
+          <h3>🎯 Difficulty</h3>
+
+          <div class="side-list">
+
+            <button class="side-option active" data-level="1">
+              LEVEL 1 — O'CLOCK
+            </button>
+
+            <button class="side-option" data-level="2">
+              LEVEL 2 — HALF PAST
+            </button>
+
+            <button class="side-option" data-level="3">
+              LEVEL 3 — QUARTER
+            </button>
+
+            <button class="side-option" data-level="4">
+              LEVEL 4 — PAST / TO
+            </button>
+
+            <button class="side-option" data-level="5">
+              LEVEL 5 — MIXED
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="side-section">
+
+          <h3>📊 Progress</h3>
+
+          <p
+            id="progressText"
+            style="color:var(--muted);line-height:1.7;font-size:.9rem"
+          >
+            Complete questions to build your streak.
+          </p>
+
+        </div>
+
+
+        <div class="side-section">
+
+          <h3>💡 Quick Tip</h3>
+
+          <p
+            id="quickTip"
+            style="color:var(--muted);line-height:1.7;font-size:.9rem"
+          >
+            The minute hand tells us the minutes. The hour hand tells us the hour.
+          </p>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     TEACHER SCREEN
+     ========================================================= -->
+
+<section id="teacherScreen" class="screen teacher-screen">
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="brand-icon">👨‍🏫</div>
+      <span>TIME MASTER — TEACHER MODE</span>
+    </div>
+
+    <div class="top-actions">
+
+      <button id="teacherHomeButton" class="icon-btn" aria-label="Home">
+        🏠
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="container teacher-content">
+
+    <div class="page-heading">
+
+      <span class="badge">
+        👨‍🏫 TEACHER DASHBOARD
+      </span>
+
+      <h1>
+        Game Setup
+      </h1>
+
+      <p>
+        Configure the activity, preview it, and start your class.
+      </p>
+
+    </div>
+
+
+    <div class="teacher-grid">
+
+
+      <!-- GAME SETTINGS -->
+
+      <div class="teacher-card">
+
+        <h2>⚙ GAME SETTINGS</h2>
+
+        <div class="setting-grid">
+
+          <div class="form-group">
+
+            <label for="teacherGameType">
+              Game Type
+            </label>
+
+            <select id="teacherGameType">
+
+              <option value="set">
+                Set the Time
+              </option>
+
+              <option value="read">
+                Read the Clock
+              </option>
+
+              <option value="multiple">
+                Multiple Choice
+              </option>
+
+              <option value="challenge">
+                Time Challenge
+              </option>
+
+              <option value="practice">
+                Practice
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="teacherDifficulty">
+              Difficulty
+            </label>
+
+            <select id="teacherDifficulty">
+
+              <option value="1">
+                Level 1 — O'clock
+              </option>
+
+              <option value="2">
+                Level 2 — Half Past
+              </option>
+
+              <option value="3">
+                Level 3 — Quarter
+              </option>
+
+              <option value="4">
+                Level 4 — Past / To
+              </option>
+
+              <option value="5">
+                Level 5 — Mixed
+              </option>
+
+              <option value="custom">
+                Custom
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="teacherQuestions">
+              Questions
+            </label>
+
+            <select id="teacherQuestions">
+
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="teacherInterval">
+              Time Interval
+            </label>
+
+            <select id="teacherInterval">
+
+              <option value="1">
+                1 minute
+              </option>
+
+              <option value="5" selected>
+                5 minutes
+              </option>
+
+              <option value="10">
+                10 minutes
+              </option>
+
+              <option value="15">
+                15 minutes
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="teacherTimer">
+              Timer
+            </label>
+
+            <select id="teacherTimer">
+
+              <option value="0">
+                OFF
+              </option>
+
+              <option value="30">
+                30 seconds
+              </option>
+
+              <option value="60">
+                60 seconds
+              </option>
+
+              <option value="90">
+                90 seconds
+              </option>
+
+              <option value="120">
+                120 seconds
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:15px">
+
+          <div class="toggle-row">
+
+            <span>❤️ Lives System</span>
+
+            <label class="switch">
+              <input id="teacherLives" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>🔊 Sound</span>
+
+            <label class="switch">
+              <input id="teacherSound" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>💡 Hints</span>
+
+            <label class="switch">
+              <input id="teacherHints" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>🕐 Show Digital Time</span>
+
+            <label class="switch">
+              <input id="teacherDigital" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>📝 Show Written Time</span>
+
+            <label class="switch">
+              <input id="teacherWritten" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>🌞 Allow AM / PM</span>
+
+            <label class="switch">
+              <input id="teacherAmPm" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>🎲 Randomize Questions</span>
+
+            <label class="switch">
+              <input id="teacherRandom" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+
+          <div class="toggle-row">
+
+            <span>👤 Require Student Name</span>
+
+            <label class="switch">
+              <input id="teacherName" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CUSTOM TIMES -->
+
+      <div class="teacher-card">
+
+        <h2>⏰ CUSTOM TARGET TIMES</h2>
+
+        <div class="custom-add">
+
+          <input
+            id="customTimeInput"
+            type="time"
+            value="07:30"
+            aria-label="Custom target time"
+          >
+
+          <button
+            id="addCustomTimeButton"
+            class="btn btn-primary btn-small"
+          >
+            ➕ ADD TIME
+          </button>
+
+        </div>
+
+        <div id="customList" class="custom-list"></div>
+
+        <div class="teacher-actions">
+
+          <button
+            id="randomizeCustomButton"
+            class="btn btn-secondary btn-small"
+          >
+            🎲 RANDOMISE LIST
+          </button>
+
+          <button
+            id="clearCustomButton"
+            class="btn btn-ghost btn-small"
+          >
+            🗑 CLEAR LIST
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- PREVIEW -->
+
+      <div class="teacher-card full">
+
+        <h2>👁 PREVIEW & CLASSROOM</h2>
+
+        <div class="teacher-actions">
+
+          <button
+            id="previewButton"
+            class="btn btn-secondary"
+          >
+            👁 PREVIEW GAME
+          </button>
+
+          <button
+            id="startClassButton"
+            class="btn btn-primary"
+          >
+            ▶ START CLASS GAME
+          </button>
+
+          <button
+            id="teacherClassroomButton"
+            class="btn btn-ghost"
+          >
+            🖥 CLASSROOM MODE
+          </button>
+
+          <button
+            id="teacherFullscreenButton"
+            class="btn btn-ghost"
+          >
+            ⛶ FULL SCREEN
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- RESULTS -->
+
+      <div class="teacher-card full">
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <h2 style="margin:0">
+            📊 RECENT RESULTS
+          </h2>
+
+          <div class="teacher-actions" style="margin:0">
+
+            <button
+              id="exportResultsButton"
+              class="btn btn-secondary btn-small"
+            >
+              📥 EXPORT RESULTS
+            </button>
+
+            <button
+              id="clearResultsButton"
+              class="btn btn-danger btn-small"
+            >
+              🗑 CLEAR RESULTS
+            </button>
+
+          </div>
+
+        </div>
+
+        <div
+          id="teacherResults"
+          style="margin-top:18px"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     RESULTS SCREEN
+     ========================================================= -->
+
+<section id="resultsScreen" class="screen results-screen">
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="brand-icon">🏆</div>
+      <span>TIME MASTER</span>
+    </div>
+
+    <div class="top-actions">
+
+      <button
+        id="resultsHomeButton"
+        class="icon-btn"
+        aria-label="Home"
+      >
+        🏠
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="container results-wrapper">
+
+    <div class="results-card">
+
+      <div class="trophy">
+        🏆
+      </div>
+
+      <h1>
+        GAME COMPLETE!
+      </h1>
+
+      <div
+        id="resultStudent"
+        class="badge result-name"
+      >
+        Student
+      </div>
+
+      <p
+        id="resultMessage"
+        class="result-message"
+      >
+        Great work!
+      </p>
+
+
+      <div class="result-grid">
+
+        <div class="result-stat">
+          <span>SCORE</span>
+          <strong id="resultScore">0</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>CORRECT</span>
+          <strong id="resultCorrect">0</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>WRONG</span>
+          <strong id="resultWrong">0</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>ACCURACY</span>
+          <strong id="resultAccuracy">0%</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>BEST STREAK</span>
+          <strong id="resultBestStreak">0</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>TIME TAKEN</span>
+          <strong id="resultTime">0s</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>QUESTIONS</span>
+          <strong id="resultQuestions">0</strong>
+        </div>
+
+        <div class="result-stat">
+          <span>LEVEL</span>
+          <strong id="resultLevel">1</strong>
+        </div>
+
+      </div>
+
+
+      <div class="result-actions">
+
+        <button
+          id="playAgainButton"
+          class="btn btn-primary"
+        >
+          🔄 PLAY AGAIN
+        </button>
+
+        <button
+          id="viewResultsButton"
+          class="btn btn-secondary"
+        >
+          📊 VIEW RESULTS
+        </button>
+
+        <button
+          id="resultHomeButton"
+          class="btn btn-ghost"
+        >
+          🏠 HOME
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     HOW TO PLAY MODAL
+     ========================================================= -->
+
+<div id="helpModal" class="modal-overlay">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h2>
+        📖 HOW TO PLAY
+      </h2>
+
+      <button
+        class="modal-close"
+        data-close-modal="helpModal"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="help-list">
+
+      <div class="help-item">
+        <div class="help-icon">🖐️</div>
+        <div>
+          <strong>Drag the Hands</strong>
+          <p>
+            Drag the hour hand or minute hand around the clock with your finger or mouse.
+          </p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🟣</div>
+        <div>
+          <strong>Minute Hand</strong>
+          <p>
+            The long hand tells the minutes. In normal practice, each number represents 5 minutes.
+          </p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">⚫</div>
+        <div>
+          <strong>Hour Hand</strong>
+          <p>
+            The short hand tells the hour and moves smoothly as the minutes change.
+          </p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🎯</div>
+        <div>
+          <strong>Set the Time</strong>
+          <p>
+            Move both hands until the clock matches the target time, then check your answer.
+          </p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">💡</div>
+        <div>
+          <strong>Use a Hint</strong>
+          <p>
+            Hints help you understand the time without immediately giving away the answer.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     SETTINGS MODAL
+     ========================================================= -->
+
+<div id="settingsModal" class="modal-overlay">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h2>
+        ⚙ SETTINGS
+      </h2>
+
+      <button
+        class="modal-close"
+        data-close-modal="settingsModal"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="toggle-row">
+
+      <span>
+        🔊 Sound Effects
+      </span>
+
+      <label class="switch">
+
+        <input
+          id="settingsSound"
+          type="checkbox"
+          checked
+        >
+
+        <span class="slider"></span>
+
+      </label>
+
+    </div>
+
+
+    <div class="toggle-row">
+
+      <span>
+        🖥 Classroom Mode
+      </span>
+
+      <label class="switch">
+
+        <input
+          id="settingsClassroom"
+          type="checkbox"
+        >
+
+        <span class="slider"></span>
+
+      </label>
+
+    </div>
+
+
+    <div class="form-group" style="margin-top:18px">
+
+      <label>
+        Language Display
+      </label>
+
+      <select>
+        <option>
+          English
+        </option>
+      </select>
+
+    </div>
+
+
+    <div class="teacher-actions">
+
+      <button
+        class="btn btn-primary"
+        data-close-modal="settingsModal"
+      >
+        ✓ DONE
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     STUDENT NAME MODAL
+     ========================================================= -->
+
+<div id="nameModal" class="modal-overlay name-modal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h2>
+        👋 READY TO PLAY?
+      </h2>
+
+      <button
+        class="modal-close"
+        data-close-modal="nameModal"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <p>
+      What's your name?
+    </p>
+
+    <input
+      id="studentNameInput"
+      class="name-input"
+      type="text"
+      maxlength="40"
+      placeholder="Your Name"
+      autocomplete="off"
+    >
+
+    <button
+      id="startStudentButton"
+      class="btn btn-primary full-width"
+    >
+      ▶ START GAME
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     CONFETTI
+     ========================================================= -->
+
+<div
+  id="confettiLayer"
+  class="confetti-layer"
+></div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   1. App State
+   ========================================================= */
+
+// ဂိမ်းတစ်ခုလုံးရဲ့ လက်ရှိအခြေအနေတွေကို ဒီ object ထဲမှာ သိမ်းထားခြင်း
+const state = {
+
+  screen:"home",
+
+  mode:"set",
+
+  level:1,
+
+  interval:5,
+
+  studentName:"Student",
+
+  score:0,
+
+  streak:0,
+
+  bestStreak:0,
+
+  correct:0,
+
+  wrong:0,
+
+  questionsAnswered:0,
+
+  questionLimit:10,
+
+  lives:3,
+
+  livesEnabled:true,
+
+  soundEnabled:true,
+
+  hintsEnabled:true,
+
+  digitalEnabled:true,
+
+  writtenEnabled:true,
+
+  ampmEnabled:true,
+
+  randomize:true,
+
+  requireName:true,
+
+  timerSetting:0,
+
+  challengeTimeLeft:60,
+
+  challengeTimerId:null,
+
+  gameStartedAt:0,
+
+  challengeStartedAt:0,
+
+  target:{
+    h:7,
+    m:30
+  },
+
+  setTime:{
+    h:7,
+    m:0
+  },
+
+  readTime:{
+    h:3,
+    m:0
+  },
+
+  multipleTime:{
+    h:5,
+    m:30
+  },
+
+  challengeTime:{
+    h:7,
+    m:0
+  },
+
+  practiceTime:{
+    h:7,
+    m:0
+  },
+
+  questionQueue:[],
+
+  queueIndex:0,
+
+  currentAnswered:false,
+
+  hintUsed:false,
+
+  customTimes:[],
+
+  lastResult:null
+
+};
+
+
+/* =========================================================
+   2. Game Data
+   ========================================================= */
+
+// ဂိမ်းအဆင့်တစ်ခုချင်းစီအတွက် ခွင့်ပြုထားတဲ့ မိနစ်တွေကို သတ်မှတ်ခြင်း
+const LEVEL_MINUTES = {
+
+  1:[0],
+
+  2:[30],
+
+  3:[15,45],
+
+  4:[5,10,20,25,35,40,50,55],
+
+  5:[0,5,10,15,20,25,30,35,40,45,50,55]
+
+};
+
+
+// အဆင့်တစ်ခုချင်းစီအတွက် သင်ကြားရေးအကြံပြုချက်များ
+const LEVEL_TIPS = {
+
+  1:
+    "The minute hand points to 12 when it is exactly o'clock.",
+
+  2:
+    "When the minute hand points to 6, we say half past.",
+
+  3:
+    "3 means quarter past. 9 means quarter to.",
+
+  4:
+    "From 1 to 30 minutes, we usually say past. From 31 to 59, we say to.",
+
+  5:
+    "Look carefully at both hands. The hour hand moves as the minutes pass."
+
+};
+
+
+/* =========================================================
+   3. Basic Utility Functions
+   ========================================================= */
+
+// ဂဏန်းကို နှစ်လုံးပါပုံစံအဖြစ် ပြောင်းခြင်း
+function pad(number){
+  return String(number).padStart(2,"0");
+}
+
+
+// နာရီကို 0 မှ 11 အတွင်း normalize လုပ်ခြင်း
+function normalizeHour(hour){
+
+  hour = Number(hour);
+
+  hour = hour % 12;
+
+  if(hour < 0){
+    hour += 12;
+  }
+
+  return hour;
+}
+
+
+// 0 ကို 12 အဖြစ်ပြောင်းပြီး display လုပ်ခြင်း
+function displayHour(hour){
+
+  hour = normalizeHour(hour);
+
+  return hour === 0 ? 12 : hour;
+}
+
+
+// အချိန်နှစ်ခု တူမတူ စစ်ခြင်း
+function sameTime(a,b){
+
+  return (
+    normalizeHour(a.h) === normalizeHour(b.h) &&
+    Number(a.m) === Number(b.m)
+  );
+
+}
+
+
+// Digital time ပြခြင်း
+function formatTime(time){
+
+  return `${pad(displayHour(time.h))}:${pad(time.m)}`;
+
+}
+
+
+// Clock hour hand အတွက် mathematically correct angle
+function getHourAngle(hour,minute){
+
+  return (
+    normalizeHour(hour) * 30 +
+    minute * 0.5
+  );
+
+}
+
+
+// Minute hand angle
+function getMinuteAngle(minute){
+
+  return minute * 6;
+
+}
+
+
+// Selected interval အတိုင်း minute ကို snap လုပ်ခြင်း
+function snapMinute(minute,interval){
+
+  const value =
+    Math.round(minute / interval) * interval;
+
+  return ((value % 60) + 60) % 60;
+
+}
+
+
+/* =========================================================
+   4. English Time Conversion
+   ========================================================= */
+
+// နံပါတ်ကို English စကားလုံးအဖြစ် ပြောင်းခြင်း
+function numberWord(number){
+
+  const words = {
+
+    1:"one",
+    2:"two",
+    3:"three",
+    4:"four",
+    5:"five",
+    6:"six",
+    7:"seven",
+    8:"eight",
+    9:"nine",
+    10:"ten",
+    11:"eleven",
+    12:"twelve",
+
+    5:"five",
+    10:"ten",
+    15:"fifteen",
+    20:"twenty",
+    25:"twenty-five"
+
+  };
+
+  return words[number] || String(number);
+
+}
+
+
+// Digital time ကို natural English phrase အဖြစ်ပြောင်းခြင်း
+function timeToWords(hour,minute){
+
+  hour = normalizeHour(hour);
+
+  const currentHour = displayHour(hour);
+
+  const nextHour =
+    displayHour((hour + 1) % 12);
+
+
+  if(minute === 0){
+
+    return `It's ${numberWord(currentHour)} o'clock.`;
+
+  }
+
+
+  if(minute === 15){
+
+    return `It's quarter past ${numberWord(currentHour)}.`;
+
+  }
+
+
+  if(minute === 30){
+
+    return `It's half past ${numberWord(currentHour)}.`;
+
+  }
+
+
+  if(minute === 45){
+
+    return `It's quarter to ${numberWord(nextHour)}.`;
+
+  }
+
+
+  if(minute < 30){
+
+    return `It's ${numberWord(minute)} past ${numberWord(currentHour)}.`;
+
+  }
+
+
+  return `It's ${numberWord(60-minute)} to ${numberWord(nextHour)}.`;
+
+}
+
+
+// AM / PM ကို display လုပ်ရန်
+function getAmPm(hour){
+
+  return normalizeHour(hour) < 12 ? "AM" : "PM";
+
+}
+
+
+/* =========================================================
+   5. Random Time Generator
+   ========================================================= */
+
+// လက်ရှိ level အတိုင်း random valid time ထုတ်ခြင်း
+function generateRandomTime(level){
+
+  const minutes =
+    LEVEL_MINUTES[level] || LEVEL_MINUTES[5];
+
+  const minute =
+    minutes[
+      Math.floor(
+        Math.random() * minutes.length
+      )
+    ];
+
+  const hour =
+    Math.floor(Math.random() * 12);
+
+  return {
+    h:hour,
+    m:minute
+  };
+
+}
+
+
+/* =========================================================
+   6. Array Helpers
+   ========================================================= */
+
+// Array ကို randomize လုပ်ခြင်း
+function shuffle(array){
+
+  const result = [...array];
+
+  for(
+    let i=result.length-1;
+    i>0;
+    i--
+  ){
+
+    const j =
+      Math.floor(
+        Math.random() * (i+1)
+      );
+
+    [
+      result[i],
+      result[j]
+    ] =
+    [
+      result[j],
+      result[i]
+    ];
+
+  }
+
+  return result;
+
+}
+
+
+/* =========================================================
+   7. Clock Rendering
+   ========================================================= */
+
+// Analog clock ရဲ့ နံပါတ်နဲ့ tick marks တွေကို တည်ဆောက်ခြင်း
+function buildClock(clock){
+
+  if(!clock){
+    return;
+  }
+
+  clock.innerHTML = "";
+
+
+  // Minute tick 60 ခု တည်ဆောက်ခြင်း
+  for(let i=0;i<60;i++){
+
+    const tick =
+      document.createElement("div");
+
+    tick.className =
+      "clock-tick";
+
+    if(i % 5 === 0){
+      tick.classList.add("major");
+    }
+
+    tick.style.setProperty(
+      "--angle",
+      `${i * 6}deg`
+    );
+
+    clock.appendChild(tick);
+
+  }
+
+
+  // Hour numbers 1–12 တည်ဆောက်ခြင်း
+  for(let number=1;number<=12;number++){
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "clock-number";
+
+    item.textContent =
+      number;
+
+    item.style.setProperty(
+      "--angle",
+      `${number * 30}deg`
+    );
+
+    clock.appendChild(item);
+
+  }
+
+
+  // Hour hand
+  const hourHand =
+    document.createElement("div");
+
+  hourHand.className =
+    "clock-hand hour";
+
+  hourHand.dataset.hand =
+    "hour";
+
+  hourHand.setAttribute(
+    "role",
+    "slider"
+  );
+
+  hourHand.setAttribute(
+    "aria-label",
+    "Hour hand"
+  );
+
+  hourHand.tabIndex = 0;
+
+
+  // Minute hand
+  const minuteHand =
+    document.createElement("div");
+
+  minuteHand.className =
+    "clock-hand minute";
+
+  minuteHand.dataset.hand =
+    "minute";
+
+  minuteHand.setAttribute(
+    "role",
+    "slider"
+  );
+
+  minuteHand.setAttribute(
+    "aria-label",
+    "Minute hand"
+  );
+
+  minuteHand.tabIndex = 0;
+
+
+  // Clock centre
+  const centre =
+    document.createElement("div");
+
+  centre.className =
+    "clock-centre";
+
+
+  clock.appendChild(hourHand);
+  clock.appendChild(minuteHand);
+  clock.appendChild(centre);
+
+
+  attachClockInteraction(clock);
+
+}
+
+
+// Clock လက်တံတွေကို အချိန်အတိုင်း render လုပ်ခြင်း
+function renderClock(clock,time){
+
+  if(!clock){
+    return;
+  }
+
+  const hourHand =
+    clock.querySelector(".clock-hand.hour");
+
+  const minuteHand =
+    clock.querySelector(".clock-hand.minute");
+
+  if(!hourHand || !minuteHand){
+    return;
+  }
+
+
+  const hourAngle =
+    getHourAngle(
+      time.h,
+      time.m
+    );
+
+  const minuteAngle =
+    getMinuteAngle(
+      time.m
+    );
+
+
+  hourHand.style.transform =
+    `rotate(${hourAngle}deg)`;
+
+  minuteHand.style.transform =
+    `rotate(${minuteAngle}deg)`;
+
+
+  hourHand.setAttribute(
+    "aria-valuetext",
+    `${formatTime(time)} hour hand`
+  );
+
+  minuteHand.setAttribute(
+    "aria-valuetext",
+    `${formatTime(time)} minute hand`
+  );
+
+}
+
+
+// Pointer ရဲ့ clock centre မှ angle တွက်ခြင်း
+function getPointerAngle(event,clock){
+
+  const rect =
+    clock.getBoundingClientRect();
+
+  const centerX =
+    rect.left + rect.width / 2;
+
+  const centerY =
+    rect.top + rect.height / 2;
+
+
+  const dx =
+    event.clientX - centerX;
+
+  const dy =
+    event.clientY - centerY;
+
+
+  // 12 o'clock ကို 0° အဖြစ် သတ်မှတ်ခြင်း
+  let angle =
+    Math.atan2(dx,-dy) *
+    180 /
+    Math.PI;
+
+
+  if(angle < 0){
+    angle += 360;
+  }
+
+
+  return angle;
+
+}
+
+
+// Circular angle difference
+function angleDifference(a,b){
+
+  let difference =
+    Math.abs(a-b) % 360;
+
+  if(difference > 180){
+    difference =
+      360 - difference;
+  }
+
+  return difference;
+
+}
+
+
+// Pointer နေရာက ဘယ် hand နဲ့ ပိုနီးလဲ တွက်ခြင်း
+function findNearestHand(event,clock){
+
+  const rect =
+    clock.getBoundingClientRect();
+
+  const centerX =
+    rect.left + rect.width/2;
+
+  const centerY =
+    rect.top + rect.height/2;
+
+
+  const dx =
+    event.clientX - centerX;
+
+  const dy =
+    event.clientY - centerY;
+
+  const distance =
+    Math.sqrt(
+      dx*dx + dy*dy
+    );
+
+
+  const radius =
+    rect.width/2;
+
+  const normalizedDistance =
+    distance / radius;
+
+
+  const angle =
+    getPointerAngle(
+      event,
+      clock
+    );
+
+
+  const current =
+    clock.__time || {
+      h:0,
+      m:0
+    };
+
+
+  const hourAngle =
+    getHourAngle(
+      current.h,
+      current.m
+    );
+
+
+  const minuteAngle =
+    getMinuteAngle(
+      current.m
+    );
+
+
+  const hourDifference =
+    angleDifference(
+      angle,
+      hourAngle
+    );
+
+
+  const minuteDifference =
+    angleDifference(
+      angle,
+      minuteAngle
+    );
+
+
+  // Centre အနီးတွင် ရှိလျှင် ပိုနီးသော hand ကို ရွေးခြင်း
+  if(normalizedDistance < .18){
+
+    return (
+      hourDifference <= minuteDifference
+        ? "hour"
+        : "minute"
+    );
+
+  }
+
+
+  // Minute hand က ပိုရှည်သောကြောင့် အပြင်ဘက်ပိုင်းကို priority ပေးခြင်း
+  if(
+    normalizedDistance > .52 &&
+    minuteDifference < 20
+  ){
+
+    return "minute";
+
+  }
+
+
+  if(
+    hourDifference < 18 &&
+    normalizedDistance < .72
+  ){
+
+    return "hour";
+
+  }
+
+
+  if(minuteDifference < 18){
+
+    return "minute";
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =========================================================
+   8. Clock Dragging Engine
+   ========================================================= */
+
+// Mouse နှင့် Touch နှစ်မျိုးလုံးအတွက် pointer dragging system
+function attachClockInteraction(clock){
+
+  let activeHand = null;
+
+
+  // Pointer down ဖြစ်လျှင် hand ကို ရွေးခြင်း
+  clock.addEventListener(
+    "pointerdown",
+    event => {
+
+      const hand =
+        findNearestHand(
+          event,
+          clock
+        );
+
+      if(!hand){
+        return;
+      }
+
+
+      activeHand = hand;
+
+
+      const element =
+        clock.querySelector(
+          `.clock-hand.${hand}`
+        );
+
+
+      if(element){
+        element.classList.add(
+          "dragging"
+        );
+      }
+
+
+      try{
+        clock.setPointerCapture(
+          event.pointerId
+        );
+      }catch(error){}
+
+
+      event.preventDefault();
+
+    }
+  );
+
+
+  // Pointer move ဖြစ်နေစဉ် hand ကို update လုပ်ခြင်း
+  clock.addEventListener(
+    "pointermove",
+    event => {
+
+      if(!activeHand){
+        return;
+      }
+
+
+      const angle =
+        getPointerAngle(
+          event,
+          clock
+        );
+
+
+      const current =
+        clock.__time || {
+          h:0,
+          m:0
+        };
+
+
+      const updated = {
+        h:current.h,
+        m:current.m
+      };
+
+
+      if(activeHand === "minute"){
+
+        // Pointer angle ကို minute အဖြစ် ပြောင်းခြင်း
+        const rawMinute =
+          angle / 6;
+
+
+        // Teacher သတ်မှတ်ထားတဲ့ interval အတိုင်း snap
+        const newMinute =
+          snapMinute(
+            rawMinute,
+            state.interval
+          );
+
+
+        // 55 → 00 ဖြတ်သွားခြင်းကို မှန်ကန်စွာ ချိန်ခြင်း
+        if(
+          current.m >= 45 &&
+          newMinute <= 10
+        ){
+
+          updated.h =
+            normalizeHour(
+              current.h + 1
+            );
+
+        }
+        else if(
+          current.m <= 10 &&
+          newMinute >= 45
+        ){
+
+          updated.h =
+            normalizeHour(
+              current.h - 1
+            );
+
+        }
+
+
+        updated.m =
+          newMinute;
+
+      }
+      else{
+
+        /*
+          Hour hand ကို ဆွဲရာတွင်
+          မိနစ်ကို မပြောင်းဘဲ
+          current minute ပါဝင်သော exact hour angle
+          နဲ့ အနီးဆုံး hour ကို တွက်ခြင်း
+        */
+
+        let hourFloat =
+          angle / 30;
+
+
+        // 12 o'clock boundary ကို စနစ်တကျ handle
+        let newHour =
+          Math.round(hourFloat);
+
+
+        if(newHour === 12){
+          newHour = 0;
+        }
+
+
+        updated.h =
+          normalizeHour(
+            newHour
+          );
+
+      }
+
+
+      clock.__time = {
+        ...updated
+      };
+
+
+      renderClock(
+        clock,
+        updated
+      );
+
+
+      // Clock တစ်ခုချင်းစီရဲ့ bound function ကို ခေါ်ခြင်း
+      if(clock.dataset.bind === "set"){
+
+        updateSetDisplay(
+          updated
+        );
+
+      }
+
+
+      if(clock.dataset.bind === "challenge"){
+
+        updateChallengeDisplay(
+          updated
+        );
+
+      }
+
+
+      if(clock.dataset.bind === "practice"){
+
+        updatePracticeDisplay(
+          updated
+        );
+
+      }
+
+
+      event.preventDefault();
+
+    }
+  );
+
+
+  // Drag ရပ်ခြင်း
+  function stopDragging(event){
+
+    if(!activeHand){
+      return;
+    }
+
+
+    const element =
+      clock.querySelector(
+        `.clock-hand.${activeHand}`
+      );
+
+
+    if(element){
+
+      element.classList.remove(
+        "dragging"
+      );
+
+    }
+
+
+    try{
+      clock.releasePointerCapture(
+        event.pointerId
+      );
+    }catch(error){}
+
+
+    activeHand = null;
+
+  }
+
+
+  clock.addEventListener(
+    "pointerup",
+    stopDragging
+  );
+
+  clock.addEventListener(
+    "pointercancel",
+    stopDragging
+  );
+
+
+  // Keyboard support
+  clock.addEventListener(
+    "keydown",
+    event => {
+
+      const target =
+        event.target;
+
+
+      if(
+        !target.classList.contains(
+          "clock-hand"
+        )
+      ){
+        return;
+      }
+
+
+      const current =
+        clock.__time || {
+          h:0,
+          m:0
+        };
+
+
+      const updated = {
+        ...current
+      };
+
+
+      const step =
+        event.shiftKey
+          ? 1
+          : state.interval;
+
+
+      if(
+        target.dataset.hand ===
+        "minute"
+      ){
+
+        if(
+          event.key === "ArrowRight" ||
+          event.key === "ArrowUp"
+        ){
+
+          updated.m += step;
+
+          if(updated.m >= 60){
+
+            updated.m -= 60;
+
+            updated.h =
+              normalizeHour(
+                updated.h + 1
+              );
+
+          }
+
+        }
+        else if(
+          event.key === "ArrowLeft" ||
+          event.key === "ArrowDown"
+        ){
+
+          updated.m -= step;
+
+          if(updated.m < 0){
+
+            updated.m += 60;
+
+            updated.h =
+              normalizeHour(
+                updated.h - 1
+              );
+
+          }
+
+        }
+        else{
+
+          return;
+
+        }
+
+      }
+      else{
+
+        if(
+          event.key === "ArrowRight" ||
+          event.key === "ArrowUp"
+        ){
+
+          updated.h =
+            normalizeHour(
+              updated.h + 1
+            );
+
+        }
+        else if(
+          event.key === "ArrowLeft" ||
+          event.key === "ArrowDown"
+        ){
+
+          updated.h =
+            normalizeHour(
+              updated.h - 1
+            );
+
+        }
+        else{
+
+          return;
+
+        }
+
+      }
+
+
+      clock.__time =
+        updated;
+
+
+      renderClock(
+        clock,
+        updated
+      );
+
+
+      if(clock.dataset.bind === "set"){
+        updateSetDisplay(updated);
+      }
+
+      if(clock.dataset.bind === "challenge"){
+        updateChallengeDisplay(updated);
+      }
+
+      if(clock.dataset.bind === "practice"){
+        updatePracticeDisplay(updated);
+      }
+
+
+      event.preventDefault();
+
+    }
+  );
+
+}
+
+
+// Clock ကို data နှင့် bind လုပ်ခြင်း
+function setClockTime(clock,time,bind){
+
+  if(!clock){
+    return;
+  }
+
+  const cleanTime = {
+    h:normalizeHour(time.h),
+    m:Number(time.m)
+  };
+
+
+  clock.dataset.bind =
+    bind || "";
+
+
+  clock.__time =
+    cleanTime;
+
+
+  renderClock(
+    clock,
+    cleanTime
+  );
+
+}
+
+
+/* =========================================================
+   9. Question Queue
+   ========================================================= */
+
+// လက်ရှိ setting အတိုင်း question list တည်ဆောက်ခြင်း
+function buildQuestionQueue(){
+
+  const total =
+    Number(state.questionLimit) || 10;
+
+
+  let list = [];
+
+
+  // Teacher custom list ရှိပါက အသုံးပြုခြင်း
+  if(state.customTimes.length > 0){
+
+    list =
+      state.customTimes.map(
+        time => ({
+          h:normalizeHour(time.h),
+          m:Number(time.m)
+        })
+      );
+
+  }
+
+
+  // Custom list မရှိလျှင် random questions
+  while(list.length < total){
+
+    list.push(
+      generateRandomTime(
+        state.level
+      )
+    );
+
+  }
+
+
+  // Question count ထက် ပိုနေပါက ဖြတ်ခြင်း
+  list =
+    list.slice(
+      0,
+      total
+    );
+
+
+  if(state.randomize){
+
+    list =
+      shuffle(list);
+
+  }
+
+
+  return list;
+
+}
+
+
+/* =========================================================
+   10. Answer Choices
+   ========================================================= */
+
+// Correct answer အပါအဝင် choice ၄ ခု ထုတ်ခြင်း
+function generateChoices(correct){
+
+  const result = new Map();
+
+
+  function key(time){
+
+    return `${normalizeHour(time.h)}:${time.m}`;
+
+  }
+
+
+  result.set(
+    key(correct),
+    {...correct}
+  );
+
+
+  // နီးစပ်တဲ့အချိန်တွေကို candidate အဖြစ် စုခြင်း
+  const candidates = [];
+
+
+  const minutes =
+    LEVEL_MINUTES[state.level] ||
+    LEVEL_MINUTES[5];
+
+
+  for(let hourOffset=-3;hourOffset<=3;hourOffset++){
+
+    for(const minute of minutes){
+
+      candidates.push({
+        h:normalizeHour(
+          correct.h + hourOffset
+        ),
+        m:minute
+      });
+
+    }
+
+  }
+
+
+  // Random candidates ထည့်ခြင်း
+  while(
+    result.size < 4 &&
+    candidates.length > 0
+  ){
+
+    const index =
+      Math.floor(
+        Math.random() *
+        candidates.length
+      );
+
+
+    const candidate =
+      candidates.splice(
+        index,
+        1
+      )[0];
+
+
+    result.set(
+      key(candidate),
+      candidate
+    );
+
+  }
+
+
+  // မလုံလောက်သေးလျှင် 5-minute times ဖြည့်ခြင်း
+  while(result.size < 4){
+
+    const candidate = {
+      h:Math.floor(
+        Math.random() * 12
+      ),
+      m:
+        Math.floor(
+          Math.random() * 12
+        ) * 5
+    };
+
+
+    result.set(
+      key(candidate),
+      candidate
+    );
+
+  }
+
+
+  return shuffle(
+    [...result.values()]
+  );
+
+}
+
+
+/* =========================================================
+   11. Game Start
+   ========================================================= */
+
+// Game statistics reset
+function resetGameStats(){
+
+  state.score = 0;
+
+  state.streak = 0;
+
+  state.bestStreak = 0;
+
+  state.correct = 0;
+
+  state.wrong = 0;
+
+  state.questionsAnswered = 0;
+
+  state.lives = 3;
+
+  state.currentAnswered = false;
+
+  state.hintUsed = false;
+
+  state.queueIndex = 0;
+
+  state.gameStartedAt =
+    Date.now();
+
+  updateStatsUI();
+
+}
+
+
+// Student game စတင်ခြင်း
+function startGame(){
+
+  resetGameStats();
+
+
+  state.questionQueue =
+    buildQuestionQueue();
+
+
+  showScreen(
+    "gameScreen"
+  );
+
+
+  updateDifficultyUI();
+
+
+  switchMode(
+    state.mode
+  );
+
+}
+
+
+/* =========================================================
+   12. Mode Switching
+   ========================================================= */
+
+// Game mode ပြောင်းခြင်း
+function switchMode(mode){
+
+  stopChallengeTimer();
+
+
+  state.mode =
+    mode;
+
+
+  state.currentAnswered =
+    false;
+
+
+  state.hintUsed =
+    false;
+
+
+  document
+    .querySelectorAll(".mode-tab")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.mode === mode
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(".game-mode")
+    .forEach(section => {
+
+      section.classList.add(
+        "hidden"
+      );
+
+    });
+
+
+  const modeElementMap = {
+
+    set:"setMode",
+
+    read:"readMode",
+
+    multiple:"multipleMode",
+
+    challenge:"challengeMode",
+
+    practice:"practiceMode"
+
+  };
+
+
+  const target =
+    document.getElementById(
+      modeElementMap[mode]
+    );
+
+
+  if(target){
+    target.classList.remove(
+      "hidden"
+    );
+  }
+
+
+  const titles = {
+
+    set:[
+      "SET THE TIME",
+      "Move the clock hands to match the target."
+    ],
+
+    read:[
+      "READ THE CLOCK",
+      "Look carefully and choose the correct time."
+    ],
+
+    multiple:[
+      "MULTIPLE CHOICE",
+      "Read the clock and choose the correct sentence."
+    ],
+
+    challenge:[
+      "TIME CHALLENGE",
+      "Set as many clocks correctly as you can."
+    ],
+
+    practice:[
+      "PRACTICE MODE",
+      "Explore the clock and practise freely."
+    ]
+
+  };
+
+
+  document.getElementById(
+    "gameTitle"
+  ).textContent =
+    titles[mode][0];
+
+
+  document.getElementById(
+    "gameSubtitle"
+  ).textContent =
+    titles[mode][1];
+
+
+  if(mode === "set"){
+
+    prepareSetQuestion();
+
+  }
+
+
+  if(mode === "read"){
+
+    prepareReadQuestion();
+
+  }
+
+
+  if(mode === "multiple"){
+
+    prepareMultipleQuestion();
+
+  }
+
+
+  if(mode === "challenge"){
+
+    prepareChallengeQuestion();
+
+    startChallengeTimer();
+
+  }
+
+
+  if(mode === "practice"){
+
+    preparePractice();
+
+  }
+
+
+  updateStatsUI();
+
+}
+
+
+/* =========================================================
+   13. SET THE TIME MODE
+   ========================================================= */
+
+// Set Time question ပြင်ဆင်ခြင်း
+function prepareSetQuestion(){
+
+  const target =
+    state.questionQueue[
+      state.queueIndex
+    ] ||
+    generateRandomTime(
+      state.level
+    );
+
+
+  state.target = {
+    ...target
+  };
+
+
+  // Target အချိန်နဲ့ မတူတဲ့ စတင်ချိန်ကို သတ်မှတ်ခြင်း
+  let startHour = 0;
+  let startMinute = 0;
+
+  if(
+    normalizeHour(target.h) === startHour &&
+    Number(target.m) === startMinute
+  ){
+    startHour = 6;
+  }
+
+  state.setTime = {
+    h:startHour,
+    m:startMinute
+  };
+
+
+  state.currentAnswered =
+    false;
+
+
+  state.hintUsed =
+    false;
+
+
+  // Set the Time မေးခွန်းကို English စာသားဖြင့် ပြခြင်း
+  document.getElementById(
+    "setTarget"
+  ).textContent =
+    timeToWords(
+      state.target.h,
+      state.target.m
+    ).replace(/^It's\s+/,"");
+
+
+  setClockTime(
+    document.getElementById(
+      "setClock"
+    ),
+    state.setTime,
+    "set"
+  );
+
+
+  updateSetDisplay(
+    state.setTime
+  );
+
+
+  clearFeedback(
+    "setFeedback"
+  );
+
+
+  const hintBox =
+    document.getElementById(
+      "hintBox"
+    );
+
+
+  hintBox.classList.remove(
+    "show"
+  );
+
+
+  hintBox.textContent =
+    "";
+
+}
+
+
+// Set clock display update
+function updateSetDisplay(time){
+
+  state.setTime = {
+    ...time
+  };
+
+
+  document.getElementById(
+    "setDigital"
+  ).textContent =
+    formatTime(time);
+
+
+  document.getElementById(
+    "setWritten"
+  ).textContent =
+    timeToWords(
+      time.h,
+      time.m
+    );
+
+
+  document.getElementById(
+    "setAmPm"
+  ).textContent =
+    getAmPm(time.h);
+
+
+  document.getElementById(
+    "setDigital"
+  ).parentElement
+    .classList.toggle(
+      "hidden",
+      !state.digitalEnabled
+    );
+
+
+  document.getElementById(
+    "setWritten"
+  ).classList.toggle(
+    "hidden",
+    !state.writtenEnabled
+  );
+
+
+  document.getElementById(
+    "setAmPm"
+  ).classList.toggle(
+    "hidden",
+    !state.ampmEnabled
+  );
+
+}
+
+
+// Set Time answer စစ်ခြင်း
+function checkSetAnswer(){
+
+  if(state.currentAnswered){
+    return;
+  }
+
+
+  if(
+    sameTime(
+      state.setTime,
+      state.target
+    )
+  ){
+
+    state.currentAnswered =
+      true;
+
+
+    registerCorrect();
+
+
+    showFeedback(
+      "setFeedback",
+      "🎉 Correct!",
+      "Excellent! You set the clock correctly.",
+      "correct"
+    );
+
+
+    celebrate();
+
+
+    setTimeout(
+      nextSetQuestion,
+      900
+    );
+
+  }
+  else{
+
+    registerWrong();
+
+
+    showFeedback(
+      "setFeedback",
+      "❌ Not quite!",
+      "Try again.",
+      "incorrect"
+    );
+
+
+    shakeElement(
+      document.getElementById(
+        "gameMain"
+      )
+    );
+
+
+    if(
+      state.livesEnabled &&
+      state.lives <= 0
+    ){
+
+      setTimeout(
+        endGame,
+        500
+      );
+
+    }
+
+  }
+
+}
+
+
+// Next Set question
+function nextSetQuestion(){
+
+  if(
+    state.questionsAnswered >=
+      state.questionLimit
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  if(
+    state.livesEnabled &&
+    state.lives <= 0
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  state.queueIndex++;
+
+  prepareSetQuestion();
+
+}
+
+
+/* =========================================================
+   14. HINT
+   ========================================================= */
+
+// Educational hint ပြခြင်း
+function showHint(){
+
+  if(
+    !state.hintsEnabled ||
+    state.currentAnswered
+  ){
+
+    return;
+
+  }
+
+
+  state.hintUsed =
+    true;
+
+
+  const target =
+    state.target;
+
+
+  let hint;
+
+
+  if(target.m === 0){
+
+    hint =
+      "The minute hand should point to 12. This is an o'clock time.";
+
+  }
+  else if(target.m === 15){
+
+    hint =
+      "15 minutes means quarter past the hour.";
+
+  }
+  else if(target.m === 30){
+
+    hint =
+      "30 minutes means half past the hour.";
+
+  }
+  else if(target.m === 45){
+
+    hint =
+      "45 minutes means quarter to the next hour.";
+
+  }
+  else if(target.m < 30){
+
+    hint =
+      `${target.m} minutes means ${target.m} past the hour.`;
+
+  }
+  else{
+
+    hint =
+      `${60-target.m} minutes means ${60-target.m} to the next hour.`;
+
+  }
+
+
+  const box =
+    document.getElementById(
+      "hintBox"
+    );
+
+
+  box.textContent =
+    `💡 ${hint}`;
+
+
+  box.classList.add(
+    "show"
+  );
+
+
+  state.score =
+    Math.max(
+      0,
+      state.score - 2
+    );
+
+
+  updateStatsUI();
+
+}
+
+
+/* =========================================================
+   15. READ THE CLOCK
+   ========================================================= */
+
+// Read Clock question ပြင်ဆင်ခြင်း
+function prepareReadQuestion(){
+
+  const current =
+    state.questionQueue[
+      state.queueIndex
+    ] ||
+    generateRandomTime(
+      state.level
+    );
+
+
+  state.readTime =
+    {...current};
+
+
+  state.currentAnswered =
+    false;
+
+
+  setClockTime(
+    document.getElementById(
+      "readClock"
+    ),
+    state.readTime,
+    "read"
+  );
+
+
+  renderReadAnswers();
+
+
+  clearFeedback(
+    "readFeedback"
+  );
+
+
+  document.getElementById(
+    "nextReadButton"
+  ).classList.add(
+    "hidden"
+  );
+
+}
+
+
+// Read Clock answers
+function renderReadAnswers(){
+
+  const container =
+    document.getElementById(
+      "readAnswers"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  const choices =
+    generateChoices(
+      state.readTime
+    );
+
+
+  choices.forEach(
+    (choice,index) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.className =
+        "answer-btn";
+
+
+      // Read the Clock အဖြေရွေးချယ်စရာများကို English စာသားဖြင့် ပြခြင်း
+      button.textContent =
+        `${String.fromCharCode(65+index)}. ${timeToWords(choice.h,choice.m)}`;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          answerRead(
+            choice,
+            button
+          )
+      );
+
+
+      container.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+// Read answer စစ်ခြင်း
+function answerRead(choice,button){
+
+  if(state.currentAnswered){
+    return;
+  }
+
+
+  state.currentAnswered =
+    true;
+
+
+  if(
+    sameTime(
+      choice,
+      state.readTime
+    )
+  ){
+
+    button.classList.add(
+      "correct"
+    );
+
+
+    registerCorrect();
+
+
+    showFeedback(
+      "readFeedback",
+      "🎉 Correct!",
+      "Great reading! The minute hand tells us the minutes.",
+      "correct"
+    );
+
+
+    celebrate();
+
+  }
+  else{
+
+    button.classList.add(
+      "wrong"
+    );
+
+
+    registerWrong();
+
+
+    showFeedback(
+      "readFeedback",
+      "❌ Not quite!",
+      `The correct answer is ${timeToWords(state.readTime.h,state.readTime.m)}`,
+      "incorrect"
+    );
+
+
+    document
+      .querySelectorAll(
+        "#readAnswers .answer-btn"
+      )
+      .forEach(
+        answerButton => {
+
+          if(
+            answerButton.textContent.includes(
+              timeToWords(
+                state.readTime.h,
+                state.readTime.m
+              )
+            )
+          ){
+
+            answerButton.classList.add(
+              "correct"
+            );
+
+          }
+
+        }
+      );
+
+  }
+
+
+  const next =
+    document.getElementById(
+      "nextReadButton"
+    );
+
+
+  next.classList.remove(
+    "hidden"
+  );
+
+
+  if(
+    state.questionsAnswered >=
+      state.questionLimit ||
+    (
+      state.livesEnabled &&
+      state.lives <= 0
+    )
+  ){
+
+    next.textContent =
+      "🏆 VIEW RESULTS";
+
+  }
+
+}
+
+
+// Next Read question
+function nextReadQuestion(){
+
+  if(
+    state.questionsAnswered >=
+      state.questionLimit
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  if(
+    state.livesEnabled &&
+    state.lives <= 0
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  state.queueIndex++;
+
+  prepareReadQuestion();
+
+}
+
+
+/* =========================================================
+   16. MULTIPLE CHOICE
+   ========================================================= */
+
+// Multiple Choice question ပြင်ဆင်ခြင်း
+function prepareMultipleQuestion(){
+
+  const current =
+    state.questionQueue[
+      state.queueIndex
+    ] ||
+    generateRandomTime(
+      state.level
+    );
+
+
+  state.multipleTime =
+    {...current};
+
+
+  state.currentAnswered =
+    false;
+
+
+  setClockTime(
+    document.getElementById(
+      "multipleClock"
+    ),
+    state.multipleTime,
+    "multiple"
+  );
+
+
+  renderMultipleAnswers();
+
+
+  clearFeedback(
+    "multipleFeedback"
+  );
+
+
+  document.getElementById(
+    "nextMultipleButton"
+  ).classList.add(
+    "hidden"
+  );
+
+}
+
+
+// Multiple Choice answers
+function renderMultipleAnswers(){
+
+  const container =
+    document.getElementById(
+      "multipleAnswers"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  const choices =
+    generateChoices(
+      state.multipleTime
+    );
+
+
+  choices.forEach(
+    (choice,index) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.className =
+        "answer-btn";
+
+
+      button.textContent =
+        `${String.fromCharCode(65+index)}. ${timeToWords(choice.h,choice.m)}`;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          answerMultiple(
+            choice,
+            button
+          )
+      );
+
+
+      container.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+// Multiple Choice answer စစ်ခြင်း
+function answerMultiple(choice,button){
+
+  if(state.currentAnswered){
+    return;
+  }
+
+
+  state.currentAnswered =
+    true;
+
+
+  if(
+    sameTime(
+      choice,
+      state.multipleTime
+    )
+  ){
+
+    button.classList.add(
+      "correct"
+    );
+
+
+    registerCorrect();
+
+
+    showFeedback(
+      "multipleFeedback",
+      "🎉 Correct!",
+      "You read the clock correctly.",
+      "correct"
+    );
+
+
+    celebrate();
+
+  }
+  else{
+
+    button.classList.add(
+      "wrong"
+    );
+
+
+    registerWrong();
+
+
+    showFeedback(
+      "multipleFeedback",
+      "❌ Not quite!",
+      `The correct answer is: ${timeToWords(state.multipleTime.h,state.multipleTime.m)}`,
+      "incorrect"
+    );
+
+
+    document
+      .querySelectorAll(
+        "#multipleAnswers .answer-btn"
+      )
+      .forEach(
+        answerButton => {
+
+          if(
+            answerButton.textContent.includes(
+              timeToWords(
+                state.multipleTime.h,
+                state.multipleTime.m
+              )
+            )
+          ){
+
+            answerButton.classList.add(
+              "correct"
+            );
+
+          }
+
+        }
+      );
+
+  }
+
+
+  const next =
+    document.getElementById(
+      "nextMultipleButton"
+    );
+
+
+  next.classList.remove(
+    "hidden"
+  );
+
+
+  if(
+    state.questionsAnswered >=
+      state.questionLimit ||
+    (
+      state.livesEnabled &&
+      state.lives <= 0
+    )
+  ){
+
+    next.textContent =
+      "🏆 VIEW RESULTS";
+
+  }
+
+}
+
+
+// Next Multiple Choice
+function nextMultipleQuestion(){
+
+  if(
+    state.questionsAnswered >=
+      state.questionLimit
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  if(
+    state.livesEnabled &&
+    state.lives <= 0
+  ){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  state.queueIndex++;
+
+  prepareMultipleQuestion();
+
+}
+
+
+/* =========================================================
+   17. TIME CHALLENGE
+   ========================================================= */
+
+// Challenge question ပြင်ဆင်ခြင်း
+function prepareChallengeQuestion(){
+
+  const target =
+    state.questionQueue[
+      state.queueIndex
+    ] ||
+    generateRandomTime(
+      state.level
+    );
+
+
+  state.target =
+    {...target};
+
+
+  state.challengeTime = {
+    h:target.h,
+    m:0
+  };
+
+
+  state.currentAnswered =
+    false;
+
+
+  document.getElementById(
+    "challengeTarget"
+  ).textContent =
+    formatTime(
+      target
+    );
+
+
+  setClockTime(
+    document.getElementById(
+      "challengeClock"
+    ),
+    state.challengeTime,
+    "challenge"
+  );
+
+
+  updateChallengeDisplay(
+    state.challengeTime
+  );
+
+
+  clearFeedback(
+    "challengeFeedback"
+  );
+
+
+  document.getElementById(
+    "challengeQuestion"
+  ).textContent =
+    state.queueIndex + 1;
+
+}
+
+
+// Challenge display update
+function updateChallengeDisplay(time){
+
+  state.challengeTime =
+    {...time};
+
+
+  document.getElementById(
+    "challengeDigital"
+  ).textContent =
+    formatTime(time);
+
+
+  document.getElementById(
+    "challengeWritten"
+  ).textContent =
+    timeToWords(
+      time.h,
+      time.m
+    );
+
+
+  document.getElementById(
+    "challengeDigital"
+  ).parentElement
+    .classList.toggle(
+      "hidden",
+      !state.digitalEnabled
+    );
+
+
+  document.getElementById(
+    "challengeWritten"
+  ).classList.toggle(
+    "hidden",
+    !state.writtenEnabled
+  );
+
+}
+
+
+// Challenge timer start
+function startChallengeTimer(){
+
+  stopChallengeTimer();
+
+
+  state.challengeTimeLeft =
+    state.timerSetting ||
+    60;
+
+
+  updateChallengeTimerUI();
+
+
+  state.challengeStartedAt =
+    Date.now();
+
+
+  state.challengeTimerId =
+    setInterval(
+      () => {
+
+        state.challengeTimeLeft--;
+
+        updateChallengeTimerUI();
+
+
+        if(
+          state.challengeTimeLeft <= 0
+        ){
+
+          stopChallengeTimer();
+
+
+          showFeedback(
+            "challengeFeedback",
+            "⏰ Time's up!",
+            "Your challenge is complete.",
+            "incorrect"
+          );
+
+
+          setTimeout(
+            endGame,
+            900
+          );
+
+        }
+
+      },
+      1000
+    );
+
+}
+
+
+// Challenge timer stop
+function stopChallengeTimer(){
+
+  if(
+    state.challengeTimerId
+  ){
+
+    clearInterval(
+      state.challengeTimerId
+    );
+
+    state.challengeTimerId =
+      null;
+
+  }
+
+}
+
+
+// Challenge timer UI
+function updateChallengeTimerUI(){
+
+  const total =
+    state.timerSetting ||
+    60;
+
+
+  const percentage =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        state.challengeTimeLeft /
+        total *
+        100
+      )
+    );
+
+
+  document.getElementById(
+    "challengeTimer"
+  ).textContent =
+    `${state.challengeTimeLeft}s`;
+
+
+  document.getElementById(
+    "challengeProgress"
+  ).style.width =
+    `${percentage}%`;
+
+}
+
+
+// Challenge answer check
+function checkChallengeAnswer(){
+
+  if(
+    state.currentAnswered ||
+    state.challengeTimeLeft <= 0
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    sameTime(
+      state.challengeTime,
+      state.target
+    )
+  ){
+
+    state.currentAnswered =
+      true;
+
+
+    registerCorrect(
+      true
+    );
+
+
+    showFeedback(
+      "challengeFeedback",
+      "🎉 Correct!",
+      "+10 points. Keep going!",
+      "correct"
+    );
+
+
+    celebrate();
+
+
+    setTimeout(
+      () => {
+
+        if(
+          state.challengeTimeLeft <= 0
+        ){
+
+          return;
+
+        }
+
+
+        if(
+          state.questionsAnswered >=
+          state.questionLimit
+        ){
+
+          endGame();
+
+          return;
+
+        }
+
+
+        state.queueIndex++;
+
+        prepareChallengeQuestion();
+
+      },
+      450
+    );
+
+  }
+  else{
+
+    registerWrong(
+      true
+    );
+
+
+    showFeedback(
+      "challengeFeedback",
+      "❌ Not quite!",
+      "Keep trying.",
+      "incorrect"
+    );
+
+
+    if(
+      state.livesEnabled &&
+      state.lives <= 0
+    ){
+
+      setTimeout(
+        endGame,
+        500
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   18. PRACTICE MODE
+   ========================================================= */
+
+// Practice mode စတင်ခြင်း
+function preparePractice(){
+
+  state.practiceTime = {
+    h:7,
+    m:0
+  };
+
+
+  setClockTime(
+    document.getElementById(
+      "practiceClock"
+    ),
+    state.practiceTime,
+    "practice"
+  );
+
+
+  updatePracticeDisplay(
+    state.practiceTime
+  );
+
+}
+
+
+// Practice display
+function updatePracticeDisplay(time){
+
+  state.practiceTime =
+    {...time};
+
+
+  document.getElementById(
+    "practiceDigital"
+  ).textContent =
+    formatTime(time);
+
+
+  document.getElementById(
+    "practiceWritten"
+  ).textContent =
+    timeToWords(
+      time.h,
+      time.m
+    );
+
+
+  document.getElementById(
+    "practiceAmPm"
+  ).textContent =
+    getAmPm(time.h);
+
+
+  document.getElementById(
+    "practiceDigital"
+  ).parentElement
+    .classList.toggle(
+      "hidden",
+      !state.digitalEnabled
+    );
+
+
+  // Practice Mode တွင် English အဖြေစာသားကို မပြဘဲ ဂဏန်းအချိန်ကိုသာ ပြခြင်း
+  document.getElementById(
+    "practiceWritten"
+  ).classList.add(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "practiceAmPm"
+  ).classList.toggle(
+    "hidden",
+    !state.ampmEnabled
+  );
+
+}
+
+
+// Practice time ကို ရှေ့/နောက်ရွှေ့ခြင်း
+function changePracticeTime(delta){
+
+  let total =
+    state.practiceTime.h * 60 +
+    state.practiceTime.m +
+    delta;
+
+
+  total =
+    (
+      total % 720 +
+      720
+    ) % 720;
+
+
+  const updated = {
+
+    h:Math.floor(total/60),
+
+    m:total%60
+
+  };
+
+
+  setClockTime(
+    document.getElementById(
+      "practiceClock"
+    ),
+    updated,
+    "practice"
+  );
+
+
+  updatePracticeDisplay(
+    updated
+  );
+
+}
+
+
+// Practice random
+function randomPracticeTime(){
+
+  const time =
+    generateRandomTime(
+      state.level
+    );
+
+
+  setClockTime(
+    document.getElementById(
+      "practiceClock"
+    ),
+    time,
+    "practice"
+  );
+
+
+  updatePracticeDisplay(
+    time
+  );
+
+}
+
+
+/* =========================================================
+   19. SCORE SYSTEM
+   ========================================================= */
+
+// Correct answer မှတ်တမ်းတင်ခြင်း
+function registerCorrect(challenge=false){
+
+  state.correct++;
+
+  state.questionsAnswered++;
+
+  state.streak++;
+
+  state.bestStreak =
+    Math.max(
+      state.bestStreak,
+      state.streak
+    );
+
+
+  let points = 10;
+
+
+  // Streak bonus
+  if(state.streak >= 3){
+
+    points += 2;
+
+  }
+
+
+  // Challenge speed bonus
+  if(
+    challenge &&
+    state.challengeTimeLeft > 0
+  ){
+
+    points += Math.min(
+      5,
+      Math.floor(
+        state.challengeTimeLeft / 15
+      )
+    );
+
+  }
+
+
+  // Hint အသုံးပြုထားလျှင် 2 points လျော့ခြင်း
+  if(state.hintUsed){
+
+    points =
+      Math.max(
+        1,
+        points - 2
+      );
+
+  }
+
+
+  state.score +=
+    points;
+
+
+  saveBestScore();
+
+
+  updateStatsUI();
+
+  updateProgressUI();
+
+}
+
+
+// Wrong answer မှတ်တမ်းတင်ခြင်း
+function registerWrong(){
+
+  state.wrong++;
+
+  state.questionsAnswered++;
+
+  state.streak = 0;
+
+
+  if(state.livesEnabled){
+
+    state.lives =
+      Math.max(
+        0,
+        state.lives - 1
+      );
+
+  }
+
+
+  updateStatsUI();
+
+  updateProgressUI();
+
+}
+
+
+// Stats UI update
+function updateStatsUI(){
+
+  document.getElementById(
+    "scoreDisplay"
+  ).textContent =
+    state.score;
+
+
+  document.getElementById(
+    "streakDisplay"
+  ).textContent =
+    state.streak;
+
+
+  document.getElementById(
+    "bestDisplay"
+  ).textContent =
+    getBestScore();
+
+
+  document.getElementById(
+    "livesStat"
+  ).classList.toggle(
+    "hidden",
+    !state.livesEnabled
+  );
+
+
+  document.getElementById(
+    "livesDisplay"
+  ).textContent =
+    "❤️".repeat(state.lives) +
+    "🖤".repeat(
+      3-state.lives
+    );
+
+}
+
+
+// Progress UI
+function updateProgressUI(){
+
+  const total =
+    state.questionLimit;
+
+
+  const completed =
+    Math.min(
+      state.questionsAnswered,
+      total
+    );
+
+
+  const attempts =
+    state.correct +
+    state.wrong;
+
+
+  const accuracy =
+    attempts === 0
+      ? 0
+      : Math.round(
+          state.correct /
+          attempts *
+          100
+        );
+
+
+  document.getElementById(
+    "progressText"
+  ).innerHTML =
+    `<strong>${completed}/${total}</strong> questions completed.<br>Accuracy: <strong>${accuracy}%</strong>`;
+
+
+  document.getElementById(
+    "challengeQuestion"
+  ).textContent =
+    state.queueIndex + 1;
+
+
+  document.getElementById(
+    "challengeStreak"
+  ).textContent =
+    state.streak;
+
+}
+
+
+// Best score save
+function saveBestScore(){
+
+  const currentBest =
+    getBestScore();
+
+
+  if(
+    state.score >
+    currentBest
+  ){
+
+    localStorage.setItem(
+      "timeMasterBestScore",
+      String(
+        state.score
+      )
+    );
+
+  }
+
+}
+
+
+// Best score read
+function getBestScore(){
+
+  return Number(
+    localStorage.getItem(
+      "timeMasterBestScore"
+    ) || 0
+  );
+
+}
+
+
+/* =========================================================
+   20. TEACHER MODE
+   ========================================================= */
+
+// Teacher settings ဖတ်ခြင်း
+function readTeacherSettings(){
+
+  state.mode =
+    document.getElementById(
+      "teacherGameType"
+    ).value;
+
+
+  const difficulty =
+    document.getElementById(
+      "teacherDifficulty"
+    ).value;
+
+
+  state.level =
+    difficulty === "custom"
+      ? 5
+      : Number(
+          difficulty
+        );
+
+
+  state.questionLimit =
+    Number(
+      document.getElementById(
+        "teacherQuestions"
+      ).value
+    );
+
+
+  state.interval =
+    Number(
+      document.getElementById(
+        "teacherInterval"
+      ).value
+    );
+
+
+  state.timerSetting =
+    Number(
+      document.getElementById(
+        "teacherTimer"
+      ).value
+    );
+
+
+  state.livesEnabled =
+    document.getElementById(
+      "teacherLives"
+    ).checked;
+
+
+  state.soundEnabled =
+    document.getElementById(
+      "teacherSound"
+    ).checked;
+
+
+  state.hintsEnabled =
+    document.getElementById(
+      "teacherHints"
+    ).checked;
+
+
+  state.digitalEnabled =
+    document.getElementById(
+      "teacherDigital"
+    ).checked;
+
+
+  state.writtenEnabled =
+    document.getElementById(
+      "teacherWritten"
+    ).checked;
+
+
+  state.ampmEnabled =
+    document.getElementById(
+      "teacherAmPm"
+    ).checked;
+
+
+  state.randomize =
+    document.getElementById(
+      "teacherRandom"
+    ).checked;
+
+
+  state.requireName =
+    document.getElementById(
+      "teacherName"
+    ).checked;
+
+
+  saveTeacherSettings();
+
+}
+
+
+// Teacher settings save
+function saveTeacherSettings(){
+
+  const settings = {
+
+    mode:state.mode,
+
+    level:state.level,
+
+    questionLimit:
+      state.questionLimit,
+
+    interval:
+      state.interval,
+
+    timerSetting:
+      state.timerSetting,
+
+    livesEnabled:
+      state.livesEnabled,
+
+    soundEnabled:
+      state.soundEnabled,
+
+    hintsEnabled:
+      state.hintsEnabled,
+
+    digitalEnabled:
+      state.digitalEnabled,
+
+    writtenEnabled:
+      state.writtenEnabled,
+
+    ampmEnabled:
+      state.ampmEnabled,
+
+    randomize:
+      state.randomize,
+
+    requireName:
+      state.requireName
+
+  };
+
+
+  localStorage.setItem(
+    "timeMasterTeacherSettings",
+    JSON.stringify(
+      settings
+    )
+  );
+
+}
+
+
+// Teacher settings load
+function loadTeacherSettings(){
+
+  try{
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          "timeMasterTeacherSettings"
+        ) || "null"
+      );
+
+
+    if(!saved){
+      return;
+    }
+
+
+    Object.keys(saved).forEach(
+      key => {
+
+        if(
+          Object.prototype.hasOwnProperty.call(
+            state,
+            key
+          )
+        ){
+
+          state[key] =
+            saved[key];
+
+        }
+
+      }
+    );
+
+  }
+  catch(error){}
+
+}
+
+
+// Teacher UI sync
+function syncTeacherUI(){
+
+  document.getElementById(
+    "teacherGameType"
+  ).value =
+    state.mode;
+
+
+  document.getElementById(
+    "teacherDifficulty"
+  ).value =
+    String(
+      state.level
+    );
+
+
+  document.getElementById(
+    "teacherQuestions"
+  ).value =
+    String(
+      state.questionLimit
+    );
+
+
+  document.getElementById(
+    "teacherInterval"
+  ).value =
+    String(
+      state.interval
+    );
+
+
+  document.getElementById(
+    "teacherTimer"
+  ).value =
+    String(
+      state.timerSetting
+    );
+
+
+  document.getElementById(
+    "teacherLives"
+  ).checked =
+    state.livesEnabled;
+
+
+  document.getElementById(
+    "teacherSound"
+  ).checked =
+    state.soundEnabled;
+
+
+  document.getElementById(
+    "teacherHints"
+  ).checked =
+    state.hintsEnabled;
+
+
+  document.getElementById(
+    "teacherDigital"
+  ).checked =
+    state.digitalEnabled;
+
+
+  document.getElementById(
+    "teacherWritten"
+  ).checked =
+    state.writtenEnabled;
+
+
+  document.getElementById(
+    "teacherAmPm"
+  ).checked =
+    state.ampmEnabled;
+
+
+  document.getElementById(
+    "teacherRandom"
+  ).checked =
+    state.randomize;
+
+
+  document.getElementById(
+    "teacherName"
+  ).checked =
+    state.requireName;
+
+}
+
+
+/* =========================================================
+   21. CUSTOM TIME LIST
+   ========================================================= */
+
+// Custom times load
+function loadCustomTimes(){
+
+  try{
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          "timeMasterCustomTimes"
+        ) || "[]"
+      );
+
+
+    if(Array.isArray(saved)){
+
+      state.customTimes =
+        saved;
+
+    }
+
+  }
+  catch(error){
+
+    state.customTimes = [];
+
+  }
+
+
+  renderCustomTimes();
+
+}
+
+
+// Custom times save
+function saveCustomTimes(){
+
+  localStorage.setItem(
+    "timeMasterCustomTimes",
+    JSON.stringify(
+      state.customTimes
+    )
+  );
+
+}
+
+
+// Custom time list render
+function renderCustomTimes(){
+
+  const container =
+    document.getElementById(
+      "customList"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  if(
+    state.customTimes.length === 0
+  ){
+
+    container.innerHTML =
+      `<div class="custom-empty">No custom times yet. Add a time above.</div>`;
+
+    return;
+
+  }
+
+
+  state.customTimes.forEach(
+    (time,index) => {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "custom-row";
+
+
+      const number =
+        document.createElement(
+          "div"
+        );
+
+
+      number.className =
+        "custom-number";
+
+
+      number.textContent =
+        index + 1;
+
+
+      const value =
+        document.createElement(
+          "strong"
+        );
+
+
+      value.textContent =
+        formatTime(
+          time
+        );
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "custom-actions";
+
+
+      const up =
+        document.createElement(
+          "button"
+        );
+
+
+      up.textContent =
+        "⬆";
+
+
+      up.title =
+        "Move up";
+
+
+      up.disabled =
+        index === 0;
+
+
+      up.addEventListener(
+        "click",
+        () =>
+          moveCustomTime(
+            index,
+            -1
+          )
+      );
+
+
+      const down =
+        document.createElement(
+          "button"
+        );
+
+
+      down.textContent =
+        "⬇";
+
+
+      down.title =
+        "Move down";
+
+
+      down.disabled =
+        index ===
+        state.customTimes.length-1;
+
+
+      down.addEventListener(
+        "click",
+        () =>
+          moveCustomTime(
+            index,
+            1
+          )
+      );
+
+
+      const edit =
+        document.createElement(
+          "button"
+        );
+
+
+      edit.textContent =
+        "✏";
+
+
+      edit.title =
+        "Edit";
+
+
+      edit.addEventListener(
+        "click",
+        () =>
+          editCustomTime(
+            index
+          )
+      );
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+
+      deleteButton.textContent =
+        "🗑";
+
+
+      deleteButton.title =
+        "Delete";
+
+
+      deleteButton.addEventListener(
+        "click",
+        () =>
+          deleteCustomTime(
+            index
+          )
+      );
+
+
+      actions.append(
+        up,
+        down,
+        edit,
+        deleteButton
+      );
+
+
+      row.append(
+        number,
+        value,
+        actions
+      );
+
+
+      container.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+// Custom time add
+function addCustomTime(){
+
+  const input =
+    document.getElementById(
+      "customTimeInput"
+    );
+
+
+  if(!input.value){
+    return;
+  }
+
+
+  const parts =
+    input.value
+      .split(":")
+      .map(Number);
+
+
+  const hour =
+    parts[0] % 12;
+
+
+  const minute =
+    parts[1];
+
+
+  // Teacher interval အတိုင်း မကိုက်ပါက ခွင့်ပြုထားသည့် nearest interval သို့ snap
+  const snapped =
+    snapMinute(
+      minute,
+      state.interval
+    );
+
+
+  state.customTimes.push({
+
+    h:hour,
+
+    m:snapped
+
+  });
+
+
+  saveCustomTimes();
+
+  renderCustomTimes();
+
+}
+
+
+// Custom time edit
+function editCustomTime(index){
+
+  const current =
+    state.customTimes[
+      index
+    ];
+
+
+  const oldValue =
+    `${pad(displayHour(current.h))}:${pad(current.m)}`;
+
+
+  const replacement =
+    prompt(
+      "Enter the new time (HH:MM):",
+      oldValue
+    );
+
+
+  if(
+    replacement === null
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !/^\d{1,2}:\d{2}$/.test(
+      replacement
+    )
+  ){
+
+    alert(
+      "Please enter a valid time such as 07:30."
+    );
+
+    return;
+
+  }
+
+
+  const parts =
+    replacement
+      .split(":")
+      .map(Number);
+
+
+  const hour =
+    parts[0];
+
+
+  const minute =
+    parts[1];
+
+
+  if(
+    hour < 0 ||
+    hour > 23 ||
+    minute < 0 ||
+    minute > 59
+  ){
+
+    alert(
+      "Please enter a valid time."
+    );
+
+    return;
+
+  }
+
+
+  state.customTimes[
+    index
+  ] = {
+
+    h:hour % 12,
+
+    m:snapMinute(
+      minute,
+      state.interval
+    )
+
+  };
+
+
+  saveCustomTimes();
+
+  renderCustomTimes();
+
+}
+
+
+// Custom time delete
+function deleteCustomTime(index){
+
+  if(
+    !confirm(
+      "Delete this custom time?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  state.customTimes.splice(
+    index,
+    1
+  );
+
+
+  saveCustomTimes();
+
+  renderCustomTimes();
+
+}
+
+
+// Custom time move
+function moveCustomTime(
+  index,
+  direction
+){
+
+  const newIndex =
+    index + direction;
+
+
+  if(
+    newIndex < 0 ||
+    newIndex >=
+      state.customTimes.length
+  ){
+
+    return;
+
+  }
+
+
+  [
+    state.customTimes[index],
+    state.customTimes[newIndex]
+  ] =
+  [
+    state.customTimes[newIndex],
+    state.customTimes[index]
+  ];
+
+
+  saveCustomTimes();
+
+  renderCustomTimes();
+
+}
+
+
+// Custom list randomize
+function randomizeCustomTimes(){
+
+  state.customTimes =
+    shuffle(
+      state.customTimes
+    );
+
+
+  saveCustomTimes();
+
+  renderCustomTimes();
+
+}
+
+
+// Custom list clear
+function clearCustomTimes(){
+
+  if(
+    state.customTimes.length === 0
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    confirm(
+      "Clear all custom target times?"
+    )
+  ){
+
+    state.customTimes =
+      [];
+
+    saveCustomTimes();
+
+    renderCustomTimes();
+
+  }
+
+}
+
+
+/* =========================================================
+   22. RESULTS
+   ========================================================= */
+
+// Result data သိမ်းခြင်း
+function saveResult(){
+
+  const attempts =
+    state.correct +
+    state.wrong;
+
+
+  const accuracy =
+    attempts === 0
+      ? 0
+      : Math.round(
+          state.correct /
+          attempts *
+          100
+        );
+
+
+  const timeTaken =
+    Math.round(
+      (
+        Date.now() -
+        state.gameStartedAt
+      ) / 1000
+    );
+
+
+  const result = {
+
+    name:
+      state.studentName,
+
+    score:
+      state.score,
+
+    correct:
+      state.correct,
+
+    wrong:
+      state.wrong,
+
+    accuracy,
+
+    time:
+      timeTaken,
+
+    bestStreak:
+      state.bestStreak,
+
+    date:
+      new Date().toLocaleString()
+
+  };
+
+
+  let results = [];
+
+
+  try{
+
+    results =
+      JSON.parse(
+        localStorage.getItem(
+          "timeMasterResults"
+        ) || "[]"
+      );
+
+  }
+  catch(error){
+
+    results = [];
+
+  }
+
+
+  if(!Array.isArray(results)){
+    results = [];
+  }
+
+
+  results.unshift(
+    result
+  );
+
+
+  results =
+    results.slice(
+      0,
+      100
+    );
+
+
+  localStorage.setItem(
+    "timeMasterResults",
+    JSON.stringify(
+      results
+    )
+  );
+
+
+  state.lastResult =
+    result;
+
+
+  return result;
+
+}
+
+
+// Result screen
+function endGame(){
+
+  stopChallengeTimer();
+
+
+  const result =
+    saveResult();
+
+
+  let message;
+
+
+  if(result.accuracy >= 90){
+
+    message =
+      "Outstanding! You're a Time Master! 🏆";
+
+  }
+  else if(result.accuracy >= 70){
+
+    message =
+      "Great job! Keep practising! ⭐";
+
+  }
+  else if(result.accuracy >= 50){
+
+    message =
+      "Good effort! You're getting better! 💪";
+
+  }
+  else{
+
+    message =
+      "Keep practising. You can do it! 🌟";
+
+  }
+
+
+  document.getElementById(
+    "resultStudent"
+  ).textContent =
+    result.name;
+
+
+  document.getElementById(
+    "resultMessage"
+  ).textContent =
+    message;
+
+
+  document.getElementById(
+    "resultScore"
+  ).textContent =
+    result.score;
+
+
+  document.getElementById(
+    "resultCorrect"
+  ).textContent =
+    result.correct;
+
+
+  document.getElementById(
+    "resultWrong"
+  ).textContent =
+    result.wrong;
+
+
+  document.getElementById(
+    "resultAccuracy"
+  ).textContent =
+    `${result.accuracy}%`;
+
+
+  document.getElementById(
+    "resultBestStreak"
+  ).textContent =
+    result.bestStreak;
+
+
+  document.getElementById(
+    "resultTime"
+  ).textContent =
+    `${result.time}s`;
+
+
+  document.getElementById(
+    "resultQuestions"
+  ).textContent =
+    result.correct +
+    result.wrong;
+
+
+  document.getElementById(
+    "resultLevel"
+  ).textContent =
+    state.level;
+
+
+  showScreen(
+    "resultsScreen"
+  );
+
+}
+
+
+// Teacher results table
+function renderTeacherResults(){
+
+  const container =
+    document.getElementById(
+      "teacherResults"
+    );
+
+
+  let results = [];
+
+
+  try{
+
+    results =
+      JSON.parse(
+        localStorage.getItem(
+          "timeMasterResults"
+        ) || "[]"
+      );
+
+  }
+  catch(error){
+
+    results = [];
+
+  }
+
+
+  if(
+    !Array.isArray(results) ||
+    results.length === 0
+  ){
+
+    container.innerHTML =
+      `<div style="padding:30px;text-align:center;color:var(--muted)">No results yet.</div>`;
+
+    return;
+
+  }
+
+
+  const wrapper =
+    document.createElement(
+      "div"
+    );
+
+
+  wrapper.className =
+    "results-table-wrapper";
+
+
+  const table =
+    document.createElement(
+      "table"
+    );
+
+
+  table.className =
+    "results-table";
+
+
+  table.innerHTML = `
+
+    <thead>
+
+      <tr>
+
+        <th>Student Name</th>
+
+        <th>Score</th>
+
+        <th>Correct</th>
+
+        <th>Wrong</th>
+
+        <th>Accuracy</th>
+
+        <th>Time</th>
+
+        <th>Date</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody></tbody>
+
+  `;
+
+
+  const tbody =
+    table.querySelector(
+      "tbody"
+    );
+
+
+  results.forEach(
+    result => {
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>${escapeHtml(result.name)}</td>
+
+        <td>${result.score}</td>
+
+        <td>${result.correct}</td>
+
+        <td>${result.wrong}</td>
+
+        <td>${result.accuracy}%</td>
+
+        <td>${result.time}s</td>
+
+        <td>${escapeHtml(result.date)}</td>
+
+      `;
+
+
+      tbody.appendChild(
+        row
+      );
+
+    }
+  );
+
+
+  wrapper.appendChild(
+    table
+  );
+
+
+  container.innerHTML =
+    "";
+
+
+  container.appendChild(
+    wrapper
+  );
+
+}
+
+
+// CSV export
+function exportResults(){
+
+  let results = [];
+
+
+  try{
+
+    results =
+      JSON.parse(
+        localStorage.getItem(
+          "timeMasterResults"
+        ) || "[]"
+      );
+
+  }
+  catch(error){
+
+    results = [];
+
+  }
+
+
+  if(
+    !Array.isArray(results) ||
+    results.length === 0
+  ){
+
+    alert(
+      "There are no results to export."
+    );
+
+    return;
+
+  }
+
+
+  const headers = [
+
+    "Student Name",
+
+    "Score",
+
+    "Correct",
+
+    "Wrong",
+
+    "Accuracy",
+
+    "Time",
+
+    "Date"
+
+  ];
+
+
+  const lines = [
+
+    headers.join(",")
+
+  ];
+
+
+  results.forEach(
+    result => {
+
+      lines.push(
+
+        [
+
+          csvEscape(
+            result.name
+          ),
+
+          result.score,
+
+          result.correct,
+
+          result.wrong,
+
+          `${result.accuracy}%`,
+
+          `${result.time}s`,
+
+          csvEscape(
+            result.date
+          )
+
+        ].join(",")
+
+      );
+
+    }
+  );
+
+
+  const blob =
+    new Blob(
+      [
+        "\ufeff" +
+        lines.join("\n")
+      ],
+      {
+        type:
+          "text/csv;charset=utf-8"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href =
+    url;
+
+
+  link.download =
+    "time-master-results.csv";
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  URL.revokeObjectURL(
+    url
+  );
+
+}
+
+
+// CSV field escape
+function csvEscape(value){
+
+  return `"${String(
+    value ?? ""
+  ).replace(
+    /"/g,
+    '""'
+  )}"`;
+
+}
+
+
+// HTML escape
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    character => {
+
+      const map = {
+
+        "&":"&amp;",
+
+        "<":"&lt;",
+
+        ">":"&gt;",
+
+        '"':"&quot;",
+
+        "'":"&#039;"
+
+      };
+
+
+      return map[
+        character
+      ];
+
+    }
+  );
+
+}
+
+
+// Results clear
+function clearResults(){
+
+  if(
+    confirm(
+      "Clear all saved student results? This cannot be undone."
+    )
+  ){
+
+    localStorage.removeItem(
+      "timeMasterResults"
+    );
+
+
+    renderTeacherResults();
+
+  }
+
+}
+
+
+/* =========================================================
+   23. LOCAL STORAGE
+   ========================================================= */
+
+// General settings save
+function saveGeneralSettings(){
+
+  localStorage.setItem(
+    "timeMasterSound",
+    state.soundEnabled
+      ? "1"
+      : "0"
+  );
+
+
+  localStorage.setItem(
+    "timeMasterClassroom",
+    document.body.classList.contains(
+      "classroom"
+    )
+      ? "1"
+      : "0"
+  );
+
+}
+
+
+// General settings load
+function loadGeneralSettings(){
+
+  const savedSound =
+    localStorage.getItem(
+      "timeMasterSound"
+    );
+
+
+  if(
+    savedSound !== null
+  ){
+
+    state.soundEnabled =
+      savedSound === "1";
+
+  }
+
+
+  const classroom =
+    localStorage.getItem(
+      "timeMasterClassroom"
+    ) === "1";
+
+
+  document.body.classList.toggle(
+    "classroom",
+    classroom
+  );
+
+
+  document.getElementById(
+    "settingsSound"
+  ).checked =
+    state.soundEnabled;
+
+
+  document.getElementById(
+    "settingsClassroom"
+  ).checked =
+    classroom;
+
+
+  updateSoundButton();
+
+}
+
+
+// Settings apply
+function applySettings(){
+
+  state.soundEnabled =
+    document.getElementById(
+      "settingsSound"
+    ).checked;
+
+
+  const classroom =
+    document.getElementById(
+      "settingsClassroom"
+    ).checked;
+
+
+  document.body.classList.toggle(
+    "classroom",
+    classroom
+  );
+
+
+  saveGeneralSettings();
+
+  updateSoundButton();
+
+}
+
+
+// Sound button update
+function updateSoundButton(){
+
+  document.getElementById(
+    "soundButton"
+  ).textContent =
+    state.soundEnabled
+      ? "🔊"
+      : "🔇";
+
+}
+
+
+/* =========================================================
+   24. SOUND SYSTEM
+   ========================================================= */
+
+let audioContext = null;
+
+
+// Web Audio Context ဖန်တီးခြင်း
+function getAudioContext(){
+
+  if(!audioContext){
+
+    try{
+
+      audioContext =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+    catch(error){
+
+      return null;
+
+    }
+
+  }
+
+
+  if(
+    audioContext.state ===
+    "suspended"
+  ){
+
+    audioContext.resume();
+
+  }
+
+
+  return audioContext;
+
+}
+
+
+// Tone တစ်ခုထုတ်ခြင်း
+function playTone(
+  frequency,
+  duration,
+  type="sine",
+  volume=.05,
+  delay=0
+){
+
+  if(
+    !state.soundEnabled
+  ){
+
+    return;
+
+  }
+
+
+  const context =
+    getAudioContext();
+
+
+  if(!context){
+    return;
+  }
+
+
+  const oscillator =
+    context.createOscillator();
+
+
+  const gain =
+    context.createGain();
+
+
+  oscillator.type =
+    type;
+
+
+  oscillator.frequency.value =
+    frequency;
+
+
+  gain.gain.setValueAtTime(
+    0,
+    context.currentTime +
+      delay
+  );
+
+
+  gain.gain.linearRampToValueAtTime(
+    volume,
+    context.currentTime +
+      delay +
+      .01
+  );
+
+
+  gain.gain.exponentialRampToValueAtTime(
+    .001,
+    context.currentTime +
+      delay +
+      duration
+  );
+
+
+  oscillator.connect(
+    gain
+  );
+
+
+  gain.connect(
+    context.destination
+  );
+
+
+  oscillator.start(
+    context.currentTime +
+      delay
+  );
+
+
+  oscillator.stop(
+    context.currentTime +
+      delay +
+      duration +
+      .03
+  );
+
+}
+
+
+// Button click sound
+function clickSound(){
+
+  playTone(
+    520,
+    .035,
+    "square",
+    .025
+  );
+
+}
+
+
+// Correct sound
+function correctSound(){
+
+  playTone(
+    523,
+    .12,
+    "sine",
+    .06,
+    0
+  );
+
+  playTone(
+    659,
+    .12,
+    "sine",
+    .06,
+    .09
+  );
+
+  playTone(
+    784,
+    .2,
+    "sine",
+    .07,
+    .18
+  );
+
+}
+
+
+// Wrong sound
+function wrongSound(){
+
+  playTone(
+    220,
+    .15,
+    "triangle",
+    .04,
+    0
+  );
+
+  playTone(
+    175,
+    .18,
+    "triangle",
+    .035,
+    .12
+  );
+
+}
+
+
+/* =========================================================
+   25. ANIMATION
+   ========================================================= */
+
+// Correct answer celebration
+function celebrate(){
+
+  correctSound();
+
+
+  const layer =
+    document.getElementById(
+      "confettiLayer"
+    );
+
+
+  layer.innerHTML =
+    "";
+
+
+  const symbols = [
+    "⭐",
+    "✨",
+    "🎉",
+    "●",
+    "◆"
+  ];
+
+
+  for(
+    let i=0;
+    i<40;
+    i++
+  ){
+
+    const item =
+      document.createElement(
+        "div"
+      );
+
+
+    item.className =
+      "confetti";
+
+
+    item.textContent =
+      symbols[
+        Math.floor(
+          Math.random() *
+          symbols.length
+        )
+      ];
+
+
+    item.style.left =
+      `${Math.random()*100}%`;
+
+
+    item.style.fontSize =
+      `${10 + Math.random()*15}px`;
+
+
+    item.style.setProperty(
+      "--x",
+      `${(Math.random()-.5)*180}px`
+    );
+
+
+    item.style.animationDelay =
+      `${Math.random()*.3}s`;
+
+
+    layer.appendChild(
+      item
+    );
+
+  }
+
+
+  setTimeout(
+    () => {
+      layer.innerHTML =
+        "";
+    },
+    2300
+  );
+
+}
+
+
+// Shake animation
+function shakeElement(element){
+
+  if(!element){
+    return;
+  }
+
+
+  element.classList.remove(
+    "shake"
+  );
+
+
+  void element.offsetWidth;
+
+
+  element.classList.add(
+    "shake"
+  );
+
+
+  setTimeout(
+    () => {
+
+      element.classList.remove(
+        "shake"
+      );
+
+    },
+    500
+  );
+
+}
+
+
+// Feedback display
+function showFeedback(
+  id,
+  title,
+  message,
+  type
+){
+
+  const box =
+    document.getElementById(
+      id
+    );
+
+
+  box.className =
+    `feedback show ${type}`;
+
+
+  box.innerHTML =
+    `<strong>${title}</strong><br>${message}`;
+
+
+  if(
+    type === "correct"
+  ){
+
+    correctSound();
+
+  }
+  else if(
+    type === "incorrect"
+  ){
+
+    wrongSound();
+
+  }
+
+}
+
+
+// Feedback clear
+function clearFeedback(id){
+
+  const box =
+    document.getElementById(
+      id
+    );
+
+
+  box.className =
+    "feedback";
+
+
+  box.innerHTML =
+    "";
+
+}
+
+
+/* =========================================================
+   26. SCREEN & MODAL
+   ========================================================= */
+
+// Screen ပြောင်းခြင်း
+function showScreen(id){
+
+  document
+    .querySelectorAll(
+      ".screen"
+    )
+    .forEach(
+      screen => {
+
+        screen.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
+
+  const screen =
+    document.getElementById(
+      id
+    );
+
+
+  if(screen){
+
+    screen.classList.add(
+      "active"
+    );
+
+  }
+
+
+  state.screen =
+    id;
+
+
+  window.scrollTo(
+    {
+      top:0,
+      behavior:"smooth"
+    }
+  );
+
+}
+
+
+// Modal ဖွင့်ခြင်း
+function openModal(id){
+
+  const modal =
+    document.getElementById(
+      id
+    );
+
+
+  if(modal){
+
+    modal.classList.add(
+      "show"
+    );
+
+  }
+
+}
+
+
+// Modal ပိတ်ခြင်း
+function closeModal(id){
+
+  const modal =
+    document.getElementById(
+      id
+    );
+
+
+  if(modal){
+
+    modal.classList.remove(
+      "show"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   27. STUDENT START FLOW
+   ========================================================= */
+
+// Student name modal ကို ဖွင့်ခြင်း
+function beginStudentGame(){
+
+  if(
+    state.requireName
+  ){
+
+    openModal(
+      "nameModal"
+    );
+
+
+    setTimeout(
+      () => {
+
+        document.getElementById(
+          "studentNameInput"
+        ).focus();
+
+      },
+      100
+    );
+
+  }
+  else{
+
+    state.studentName =
+      "Student";
+
+
+    startGame();
+
+  }
+
+}
+
+
+// Name ဖြည့်ပြီး start
+function startStudentFromName(){
+
+  const input =
+    document.getElementById(
+      "studentNameInput"
+    );
+
+
+  const name =
+    input.value.trim();
+
+
+  state.studentName =
+    name ||
+    "Student";
+
+
+  closeModal(
+    "nameModal"
+  );
+
+
+  startGame();
+
+}
+
+
+/* =========================================================
+   28. DIFFICULTY
+   ========================================================= */
+
+// Difficulty UI update
+function updateDifficultyUI(){
+
+  document
+    .querySelectorAll(
+      ".side-option"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          Number(
+            button.dataset.level
+          ) === state.level
+        );
+
+      }
+    );
+
+
+  document.getElementById(
+    "quickTip"
+  ).textContent =
+    LEVEL_TIPS[
+      state.level
+    ] ||
+    LEVEL_TIPS[5];
+
+}
+
+
+/* =========================================================
+   29. FULLSCREEN & CLASSROOM
+   ========================================================= */
+
+// Fullscreen toggle
+async function toggleFullscreen(){
+
+  try{
+
+    if(
+      !document.fullscreenElement
+    ){
+
+      await document
+        .documentElement
+        .requestFullscreen();
+
+    }
+    else{
+
+      await document
+        .exitFullscreen();
+
+    }
+
+  }
+  catch(error){}
+
+}
+
+
+// Classroom mode toggle
+function toggleClassroom(){
+
+  document.body.classList.toggle(
+    "classroom"
+  );
+
+
+  document.getElementById(
+    "settingsClassroom"
+  ).checked =
+    document.body.classList.contains(
+      "classroom"
+    );
+
+
+  saveGeneralSettings();
+
+}
+
+
+/* =========================================================
+   30. EVENT LISTENERS
+   ========================================================= */
+
+// Home Play
+document.getElementById(
+  "playGameButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+    beginStudentGame();
+
+  }
+);
+
+
+// Teacher Mode
+document.getElementById(
+  "teacherModeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+    syncTeacherUI();
+
+    renderTeacherResults();
+
+    showScreen(
+      "teacherScreen"
+    );
+
+  }
+);
+
+
+// How to play
+document.getElementById(
+  "howToPlayButton"
+).addEventListener(
+  "click",
+  () => {
+
+    openModal(
+      "helpModal"
+    );
+
+  }
+);
+
+
+// Settings
+document.getElementById(
+  "settingsButton"
+).addEventListener(
+  "click",
+  () => {
+
+    openModal(
+      "settingsModal"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Mode Tabs
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    ".mode-tab"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          clickSound();
+
+          switchMode(
+            button.dataset.mode
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   Difficulty Buttons
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    ".side-option"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          state.level =
+            Number(
+              button.dataset.level
+            );
+
+
+          state.questionQueue =
+            buildQuestionQueue();
+
+
+          state.queueIndex =
+            0;
+
+
+          updateDifficultyUI();
+
+
+          switchMode(
+            state.mode
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   Set Time Controls
+   ========================================================= */
+
+document.getElementById(
+  "checkSetButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+    checkSetAnswer();
+
+  }
+);
+
+
+document.getElementById(
+  "hintButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+    showHint();
+
+  }
+);
+
+
+document.getElementById(
+  "resetSetButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+
+    const resetTime = {
+      h:0,
+      m:0
+    };
+
+
+    state.setTime =
+      resetTime;
+
+
+    setClockTime(
+      document.getElementById(
+        "setClock"
+      ),
+      resetTime,
+      "set"
+    );
+
+
+    updateSetDisplay(
+      resetTime
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Read Controls
+   ========================================================= */
+
+document.getElementById(
+  "nextReadButton"
+).addEventListener(
+  "click",
+  nextReadQuestion
+);
+
+
+/* =========================================================
+   Multiple Choice Controls
+   ========================================================= */
+
+document.getElementById(
+  "nextMultipleButton"
+).addEventListener(
+  "click",
+  nextMultipleQuestion
+);
+
+
+/* =========================================================
+   Challenge Controls
+   ========================================================= */
+
+document.getElementById(
+  "checkChallengeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    clickSound();
+
+    checkChallengeAnswer();
+
+  }
+);
+
+
+document.getElementById(
+  "resetChallengeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    const resetTime = {
+      h:state.target.h,
+      m:0
+    };
+
+
+    state.challengeTime =
+      resetTime;
+
+
+    setClockTime(
+      document.getElementById(
+        "challengeClock"
+      ),
+      resetTime,
+      "challenge"
+    );
+
+
+    updateChallengeDisplay(
+      resetTime
+    );
+
+
+    clearFeedback(
+      "challengeFeedback"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Practice Controls
+   ========================================================= */
+
+document.getElementById(
+  "practicePrevious"
+).addEventListener(
+  "click",
+  () => {
+
+    changePracticeTime(
+      -state.interval
+    );
+
+  }
+);
+
+
+document.getElementById(
+  "practiceNext"
+).addEventListener(
+  "click",
+  () => {
+
+    changePracticeTime(
+      state.interval
+    );
+
+  }
+);
+
+
+document.getElementById(
+  "practiceRandom"
+).addEventListener(
+  "click",
+  randomPracticeTime
+);
+
+
+document.getElementById(
+  "practiceReset"
+).addEventListener(
+  "click",
+  () => {
+
+    const resetTime = {
+      h:0,
+      m:0
+    };
+
+
+    setClockTime(
+      document.getElementById(
+        "practiceClock"
+      ),
+      resetTime,
+      "practice"
+    );
+
+
+    updatePracticeDisplay(
+      resetTime
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Top Buttons
+   ========================================================= */
+
+document.getElementById(
+  "soundButton"
+).addEventListener(
+  "click",
+  () => {
+
+    state.soundEnabled =
+      !state.soundEnabled;
+
+
+    document.getElementById(
+      "settingsSound"
+    ).checked =
+      state.soundEnabled;
+
+
+    saveGeneralSettings();
+
+    updateSoundButton();
+
+  }
+);
+
+
+document.getElementById(
+  "classroomButton"
+).addEventListener(
+  "click",
+  toggleClassroom
+);
+
+
+document.getElementById(
+  "fullscreenButton"
+).addEventListener(
+  "click",
+  toggleFullscreen
+);
+
+
+document.getElementById(
+  "gameHomeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    stopChallengeTimer();
+
+    showScreen(
+      "homeScreen"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Teacher Navigation
+   ========================================================= */
+
+document.getElementById(
+  "teacherHomeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    showScreen(
+      "homeScreen"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Teacher Settings
+   ========================================================= */
+
+[
+  "teacherGameType",
+  "teacherDifficulty",
+  "teacherQuestions",
+  "teacherInterval",
+  "teacherTimer",
+  "teacherLives",
+  "teacherSound",
+  "teacherHints",
+  "teacherDigital",
+  "teacherWritten",
+  "teacherAmPm",
+  "teacherRandom",
+  "teacherName"
+]
+.forEach(
+  id => {
+
+    document.getElementById(
+      id
+    ).addEventListener(
+      "change",
+      readTeacherSettings
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Custom Times
+   ========================================================= */
+
+document.getElementById(
+  "addCustomTimeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    addCustomTime();
+
+  }
+);
+
+
+document.getElementById(
+  "randomizeCustomButton"
+).addEventListener(
+  "click",
+  randomizeCustomTimes
+);
+
+
+document.getElementById(
+  "clearCustomButton"
+).addEventListener(
+  "click",
+  clearCustomTimes
+);
+
+
+/* =========================================================
+   Teacher Preview
+   ========================================================= */
+
+document.getElementById(
+  "previewButton"
+).addEventListener(
+  "click",
+  () => {
+
+    readTeacherSettings();
+
+    state.studentName =
+      "Preview";
+
+    startGame();
+
+  }
+);
+
+
+/* =========================================================
+   Start Class
+   ========================================================= */
+
+document.getElementById(
+  "startClassButton"
+).addEventListener(
+  "click",
+  () => {
+
+    readTeacherSettings();
+
+    beginStudentGame();
+
+  }
+);
+
+
+/* =========================================================
+   Teacher Classroom
+   ========================================================= */
+
+document.getElementById(
+  "teacherClassroomButton"
+).addEventListener(
+  "click",
+  () => {
+
+    document.body.classList.add(
+      "classroom"
+    );
+
+
+    saveGeneralSettings();
+
+  }
+);
+
+
+/* =========================================================
+   Teacher Fullscreen
+   ========================================================= */
+
+document.getElementById(
+  "teacherFullscreenButton"
+).addEventListener(
+  "click",
+  toggleFullscreen
+);
+
+
+/* =========================================================
+   Results Export
+   ========================================================= */
+
+document.getElementById(
+  "exportResultsButton"
+).addEventListener(
+  "click",
+  exportResults
+);
+
+
+document.getElementById(
+  "clearResultsButton"
+).addEventListener(
+  "click",
+  clearResults
+);
+
+
+/* =========================================================
+   Name Modal
+   ========================================================= */
+
+document.getElementById(
+  "startStudentButton"
+).addEventListener(
+  "click",
+  startStudentFromName
+);
+
+
+document.getElementById(
+  "studentNameInput"
+).addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Enter"
+    ){
+
+      startStudentFromName();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   Settings
+   ========================================================= */
+
+document.getElementById(
+  "settingsSound"
+).addEventListener(
+  "change",
+  applySettings
+);
+
+
+document.getElementById(
+  "settingsClassroom"
+).addEventListener(
+  "change",
+  applySettings
+);
+
+
+/* =========================================================
+   Results Buttons
+   ========================================================= */
+
+document.getElementById(
+  "resultsHomeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    showScreen(
+      "homeScreen"
+    );
+
+  }
+);
+
+
+document.getElementById(
+  "resultHomeButton"
+).addEventListener(
+  "click",
+  () => {
+
+    showScreen(
+      "homeScreen"
+    );
+
+  }
+);
+
+
+document.getElementById(
+  "playAgainButton"
+).addEventListener(
+  "click",
+  () => {
+
+    startGame();
+
+  }
+);
+
+
+document.getElementById(
+  "viewResultsButton"
+).addEventListener(
+  "click",
+  () => {
+
+    syncTeacherUI();
+
+    renderTeacherResults();
+
+    showScreen(
+      "teacherScreen"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   Modal Close Buttons
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    "[data-close-modal]"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          closeModal(
+            button.dataset.closeModal
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   Modal Background Click
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    ".modal-overlay"
+  )
+  .forEach(
+    modal => {
+
+      modal.addEventListener(
+        "click",
+        event => {
+
+          if(
+            event.target === modal
+          ){
+
+            modal.classList.remove(
+              "show"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   31. Responsive Behaviour
+   ========================================================= */
+
+// Screen resize ဖြစ်လျှင် clock တွေကို လက်ရှိအချိန်အတိုင်း ပြန် render
+window.addEventListener(
+  "resize",
+  () => {
+
+    renderClock(
+      document.getElementById(
+        "homeClock"
+      ),
+      {
+        h:10,
+        m:10
+      }
+    );
+
+
+    renderClock(
+      document.getElementById(
+        "setClock"
+      ),
+      state.setTime
+    );
+
+
+    renderClock(
+      document.getElementById(
+        "readClock"
+      ),
+      state.readTime
+    );
+
+
+    renderClock(
+      document.getElementById(
+        "multipleClock"
+      ),
+      state.multipleTime
+    );
+
+
+    renderClock(
+      document.getElementById(
+        "challengeClock"
+      ),
+      state.challengeTime
+    );
+
+
+    renderClock(
+      document.getElementById(
+        "practiceClock"
+      ),
+      state.practiceTime
+    );
+
+  }
+);
+
+
+// Fullscreen state update
+document.addEventListener(
+  "fullscreenchange",
+  () => {
+
+    document.getElementById(
+      "fullscreenButton"
+    ).textContent =
+      document.fullscreenElement
+        ? "✕"
+        : "⛶";
+
+  }
+);
+
+
+/* =========================================================
+   32. INITIALIZATION
+   ========================================================= */
+
+// App စတင်ချိန်တွင် clock များနှင့် settings များကို initialize လုပ်ခြင်း
+function initializeApp(){
+
+  // Clock များအားလုံးကို တည်ဆောက်ခြင်း
+  buildClock(
+    document.getElementById(
+      "homeClock"
+    )
+  );
+
+
+  buildClock(
+    document.getElementById(
+      "setClock"
+    )
+  );
+
+
+  buildClock(
+    document.getElementById(
+      "readClock"
+    )
+  );
+
+
+  buildClock(
+    document.getElementById(
+      "multipleClock"
+    )
+  );
+
+
+  buildClock(
+    document.getElementById(
+      "challengeClock"
+    )
+  );
+
+
+  buildClock(
+    document.getElementById(
+      "practiceClock"
+    )
+  );
+
+
+  // Teacher settings ပြန်ဖတ်ခြင်း
+  loadTeacherSettings();
+
+
+  // Custom times ပြန်ဖတ်ခြင်း
+  loadCustomTimes();
+
+
+  // General settings ပြန်ဖတ်ခြင်း
+  loadGeneralSettings();
+
+
+  // Teacher UI ကို sync လုပ်ခြင်း
+  syncTeacherUI();
+
+
+  // Home clock အတွက် အလှဆင်အချိန်
+  setClockTime(
+    document.getElementById(
+      "homeClock"
+    ),
+    {
+      h:10,
+      m:10
+    },
+    "decorative"
+  );
+
+
+  // Game clocks initial values
+  setClockTime(
+    document.getElementById(
+      "setClock"
+    ),
+    state.setTime,
+    "set"
+  );
+
+
+  setClockTime(
+    document.getElementById(
+      "readClock"
+    ),
+    state.readTime,
+    "read"
+  );
+
+
+  setClockTime(
+    document.getElementById(
+      "multipleClock"
+    ),
+    state.multipleTime,
+    "multiple"
+  );
+
+
+  setClockTime(
+    document.getElementById(
+      "challengeClock"
+    ),
+    state.challengeTime,
+    "challenge"
+  );
+
+
+  setClockTime(
+    document.getElementById(
+      "practiceClock"
+    ),
+    state.practiceTime,
+    "practice"
+  );
+
+
+  // UI စတင် update
+  updateStatsUI();
+
+  updateProgressUI();
+
+  updateDifficultyUI();
+
+  updateSoundButton();
+
+  updatePracticeDisplay(
+    state.practiceTime
+  );
+
+
+  renderCustomTimes();
+
+  renderTeacherResults();
+
+}
+
+
+// App စတင်ခြင်း
+initializeApp();
+
+</script>
+
+</body>
+</html>
