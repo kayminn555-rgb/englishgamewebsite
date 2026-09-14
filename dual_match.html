@@ -1,0 +1,6595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#f4f9ff">
+<title>DUAL MATCH — Vocabulary Matching Game</title>
+
+<style>
+:root{
+  --bg:#11152d;
+  --panel:#1d2245;
+  --panel2:#252b55;
+  --text:#fff;
+  --muted:#b9c0df;
+  --red:#ff5364;
+  --red2:#ff7b6d;
+  --blue:#24b9ff;
+  --blue2:#5877ff;
+  --green:#42df9b;
+  --yellow:#ffd34e;
+  --shadow:0 18px 45px rgba(0,0,0,.32);
+  --radius:26px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:active{
+  transform:scale(.96);
+}
+
+.hidden{
+  display:none!important;
+}
+
+#app{
+  width:100%;
+  height:100%;
+  position:relative;
+  overflow:hidden;
+}
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+.screen{
+  width:100%;
+  height:100%;
+  overflow:auto;
+  position:absolute;
+  inset:0;
+}
+
+.panel-screen{
+  background:
+    radial-gradient(circle at 0 0,rgba(85,92,255,.2),transparent 28%),
+    linear-gradient(145deg,#12152e,#1d2141);
+}
+
+.topbar{
+  height:76px;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(17,21,45,.86);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.topbar h2{
+  margin:0;
+  font-size:clamp(21px,3vw,32px);
+}
+
+.topbar button{
+  min-height:44px;
+  padding:9px 16px;
+  border-radius:14px;
+  background:#303758;
+  color:#fff;
+  font-weight:800;
+}
+
+.content{
+  width:min(1050px,94vw);
+  margin:0 auto;
+  padding:28px 0 50px;
+}
+
+.card{
+  background:rgba(31,36,72,.92);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:24px;
+  margin-bottom:18px;
+}
+
+.card h3{
+  margin:0 0 7px;
+  font-size:23px;
+}
+
+.card p{
+  color:var(--muted);
+  margin:6px 0;
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  margin:14px 0;
+}
+
+label{
+  font-weight:800;
+  color:#eef0ff;
+}
+
+input[type=text],
+input[type=number]{
+  width:100%;
+  border:2px solid #3a4168;
+  background:#141831;
+  color:#fff;
+  border-radius:14px;
+  padding:13px 15px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#6e8cff;
+}
+
+.range-value{
+  min-width:58px;
+  text-align:center;
+  font-weight:1000;
+  color:#fff;
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:#6e7cff;
+}
+
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+
+.small-btn{
+  min-height:44px;
+  padding:10px 15px;
+  border-radius:13px;
+  color:#fff;
+  background:#343b60;
+  font-weight:900;
+}
+
+.small-btn:hover{
+  filter:brightness(1.1);
+}
+
+.primary-small{
+  background:linear-gradient(135deg,#596cff,#8159f5);
+}
+
+.green-small{
+  background:linear-gradient(135deg,#28c890,#279edc);
+}
+
+.red-small{
+  background:#d84255;
+}
+
+.download-btn{
+  background:linear-gradient(135deg,#20b995,#3c91e8);
+}
+
+.upload-btn{
+  background:linear-gradient(135deg,#7c67ff,#bd59ed);
+}
+
+.notice{
+  padding:13px 15px;
+  border-radius:14px;
+  background:rgba(255,211,78,.12);
+  border:1px solid rgba(255,211,78,.25);
+  color:#ffe89a;
+  font-weight:700;
+  margin-top:14px;
+}
+
+.status{
+  min-height:22px;
+  margin-top:12px;
+  font-weight:800;
+  color:#8ef0c5;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:10px;
+  background:#3b426b;
+  font-size:11px;
+  font-weight:900;
+  color:#dce1ff;
+}
+
+/* =========================================================
+   MAIN MENU
+========================================================= */
+
+.menu-screen{
+  background:
+    radial-gradient(circle at 10% 15%,rgba(255,83,100,.22),transparent 25%),
+    radial-gradient(circle at 90% 15%,rgba(36,185,255,.22),transparent 25%),
+    radial-gradient(circle at 50% 100%,rgba(104,78,255,.22),transparent 35%),
+    linear-gradient(145deg,#10132c,#1b1d3d 50%,#11152d);
+}
+
+.menu-screen:before,
+.menu-screen:after{
+  content:"";
+  position:absolute;
+  border-radius:50%;
+  filter:blur(2px);
+  opacity:.3;
+  pointer-events:none;
+}
+
+.menu-screen:before{
+  width:240px;
+  height:240px;
+  background:#ff5364;
+  left:-100px;
+  top:50%;
+}
+
+.menu-screen:after{
+  width:280px;
+  height:280px;
+  background:#24b9ff;
+  right:-120px;
+  bottom:5%;
+}
+
+.menu-content{
+  position:relative;
+  z-index:2;
+  min-height:100%;
+  padding:30px 22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+}
+
+.logo{
+  text-align:center;
+  animation:floatLogo 4s ease-in-out infinite;
+}
+
+.logo h1{
+  margin:0;
+  font-size:clamp(48px,8vw,92px);
+  line-height:.9;
+  letter-spacing:4px;
+  font-weight:1000;
+  background:linear-gradient(90deg,#ff6574,#ffd54e,#4bdcff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.25));
+}
+
+.logo p{
+  margin:14px 0 0;
+  color:#e1e5ff;
+  font-size:clamp(16px,2vw,23px);
+  font-weight:700;
+}
+
+.team-preview{
+  width:min(760px,92vw);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:30px;
+  margin:3px 0 8px;
+}
+
+.preview-team{
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  box-shadow:var(--shadow),inset 0 0 0 8px rgba(255,255,255,.12);
+  border:4px solid rgba(255,255,255,.2);
+}
+
+.preview-team.red{
+  background:radial-gradient(circle at 35% 30%,#ff9c8d,#ff5364 55%,#d92e53);
+}
+
+.preview-team.blue{
+  background:radial-gradient(circle at 35% 30%,#7eeaff,#24b9ff 55%,#4360db);
+}
+
+.preview-icon{
+  width:90px;
+  height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:62px;
+  background:rgba(255,255,255,.9);
+  border-radius:50%;
+  margin-bottom:8px;
+}
+
+.preview-team strong{
+  font-size:18px;
+  letter-spacing:1px;
+}
+
+.vs{
+  font-weight:1000;
+  font-size:25px;
+  color:#fff;
+  opacity:.9;
+}
+
+.menu-buttons{
+  width:min(390px,92vw);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.game-btn{
+  min-height:58px;
+  border-radius:18px;
+  color:white;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:.3px;
+  padding:13px 22px;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,.2),
+    0 15px 30px rgba(0,0,0,.18);
+  transition:.18s ease;
+}
+
+.game-btn:hover{
+  transform:translateY(-3px);
+  filter:brightness(1.08);
+}
+
+.play-btn{
+  background:linear-gradient(135deg,#ff5b69,#ff8a64);
+}
+
+.teacher-btn{
+  background:linear-gradient(135deg,#765bff,#a25cff);
+}
+
+.settings-btn{
+  background:linear-gradient(135deg,#1db9c9,#2e7cf7);
+}
+
+.how-btn{
+  background:linear-gradient(135deg,#36c98b,#36a86d);
+}
+
+.version{
+  font-size:12px;
+  color:#858db2;
+  margin-top:3px;
+}
+
+/* =========================================================
+   TEACHER MODE
+========================================================= */
+
+.add-vocab{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.upload-area{
+  border:2px dashed #515b89;
+  border-radius:18px;
+  min-height:170px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  cursor:pointer;
+  background:#171b38;
+}
+
+.upload-area:hover{
+  border-color:#7891ff;
+  background:#1c2142;
+}
+
+.upload-area input{
+  display:none;
+}
+
+.upload-icon{
+  font-size:42px;
+}
+
+.upload-preview{
+  width:120px;
+  height:120px;
+  object-fit:contain;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.3));
+}
+
+.set-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:15px;
+}
+
+.set-card{
+  background:#252b53;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:17px;
+}
+
+.set-card h4{
+  margin:0 0 7px;
+  font-size:20px;
+}
+
+.set-count{
+  color:#aeb5d5;
+  font-size:14px;
+  margin-bottom:12px;
+}
+
+.set-selected{
+  outline:3px solid #687cff;
+  box-shadow:0 0 0 6px rgba(104,124,255,.12);
+}
+
+.selected-set-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.vocab-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:13px;
+  margin-top:18px;
+}
+
+.vocab-item{
+  position:relative;
+  padding:13px;
+  border-radius:18px;
+  background:#171b37;
+  border:1px solid #343b61;
+  text-align:center;
+}
+
+.vocab-item img{
+  width:100px;
+  height:90px;
+  object-fit:contain;
+  display:block;
+  margin:0 auto 7px;
+  filter:drop-shadow(0 6px 5px rgba(0,0,0,.25));
+}
+
+.vocab-word{
+  font-weight:900;
+  margin-bottom:9px;
+}
+
+.delete-vocab{
+  background:#d64054;
+  color:white;
+  padding:7px 11px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:900;
+}
+
+/* =========================================================
+   WRONG ANSWER PENALTY SETTINGS
+========================================================= */
+
+.penalty-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:15px;
+}
+
+.penalty-option{
+  position:relative;
+  flex:1;
+  min-width:180px;
+}
+
+.penalty-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.penalty-label{
+  display:block;
+  padding:17px;
+  text-align:center;
+  border-radius:17px;
+  background:#171b38;
+  border:2px solid #3b4269;
+  color:#d9def8;
+  font-weight:900;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.penalty-label:hover{
+  border-color:#6676d8;
+  transform:translateY(-2px);
+}
+
+.penalty-option input:checked + .penalty-label{
+  border-color:#6e82ff;
+  background:linear-gradient(
+    135deg,
+    rgba(85,105,255,.28),
+    rgba(135,82,255,.2)
+  );
+  box-shadow:0 0 0 4px rgba(104,124,255,.1);
+  color:#fff;
+}
+
+.penalty-label .penalty-icon{
+  display:block;
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+/* =========================================================
+   HOW TO PLAY
+========================================================= */
+
+.rules{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+.rule{
+  background:#252b53;
+  border-radius:20px;
+  padding:20px;
+}
+
+.rule .num{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#ff5a70,#775cff);
+  font-weight:1000;
+  margin-bottom:12px;
+}
+
+.rule h4{
+  margin:0 0 7px;
+  font-size:18px;
+}
+
+.rule p{
+  margin:0;
+  line-height:1.45;
+}
+
+/* =========================================================
+   GAME
+========================================================= */
+
+.game-screen{
+  background:#10142b;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+}
+
+.game-hud{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:100px;
+  z-index:20;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  pointer-events:none;
+}
+
+.team-score{
+  padding:0 28px;
+  font-size:clamp(22px,2.4vw,34px);
+  font-weight:1000;
+  text-shadow:0 4px 10px rgba(0,0,0,.3);
+  line-height:1.05;
+}
+
+.team-score .score-number{
+  display:block;
+  font-size:clamp(32px,4vw,52px);
+  margin-top:4px;
+}
+
+.red-score{
+  justify-self:start;
+}
+
+.blue-score{
+  justify-self:end;
+  text-align:right;
+}
+
+.center-hud{
+  text-align:center;
+  min-width:190px;
+}
+
+.score-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-width:135px;
+  padding:10px 22px;
+  border-radius:19px;
+  background:rgba(255,255,255,.96);
+  color:#202541;
+  font-weight:1000;
+  font-size:clamp(25px,3vw,38px);
+  line-height:1;
+  box-shadow:
+    0 9px 25px rgba(0,0,0,.22),
+    inset 0 0 0 2px rgba(255,255,255,.8);
+}
+
+.round-label{
+  font-size:clamp(16px,1.7vw,23px);
+  font-weight:1000;
+  color:#fff;
+  margin-top:7px;
+  letter-spacing:.5px;
+  text-shadow:0 3px 8px rgba(0,0,0,.3);
+}
+
+.timer{
+  font-size:clamp(25px,2.7vw,38px);
+  line-height:1;
+  color:#ffd96c;
+  font-weight:1000;
+  margin-top:4px;
+  text-shadow:0 4px 10px rgba(0,0,0,.35);
+}
+
+.timer.warning{
+  color:#fff;
+  animation:timerPulse .55s ease infinite alternate;
+}
+
+.arena-area{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.team-side{
+  height:100%;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.red-side{
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.08),transparent 50%),
+    linear-gradient(135deg,#9d263f,#ff5c67);
+}
+
+.blue-side{
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.1),transparent 50%),
+    linear-gradient(135deg,#1870c9,#22c9ec);
+}
+
+.arena{
+  width:min(76vh,42vw);
+  height:min(76vh,42vw);
+  min-width:250px;
+  min-height:250px;
+  max-width:680px;
+  max-height:680px;
+  background:radial-gradient(circle at 50% 42%,#ffffff,#f1f3f8);
+  border-radius:50%;
+  position:relative;
+  box-shadow:
+    0 25px 55px rgba(0,0,0,.28),
+    inset 0 0 0 8px rgba(255,255,255,.7),
+    inset 0 0 45px rgba(25,36,75,.09);
+  overflow:hidden;
+}
+
+.arena:after{
+  content:"";
+  position:absolute;
+  inset:4%;
+  border:2px dashed rgba(58,68,110,.12);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.picture{
+  position:absolute;
+  width:20%;
+  height:20%;
+  min-width:54px;
+  min-height:54px;
+  max-width:115px;
+  max-height:115px;
+  object-fit:contain;
+  z-index:5;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-drag:none;
+  filter:drop-shadow(0 7px 5px rgba(20,30,55,.22));
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+  touch-action:none;
+  -webkit-touch-callout:none;
+}
+
+.picture:hover{
+  transform:scale(1.1) rotate(-2deg);
+  filter:drop-shadow(0 10px 8px rgba(20,30,55,.28));
+}
+
+.picture.shake{
+  animation:shake .36s ease;
+}
+
+.picture.correct{
+  animation:correctPop .45s ease forwards;
+}
+
+.arena-team-label{
+  position:absolute;
+  bottom:5%;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
+  font-size:clamp(12px,1.5vw,17px);
+  font-weight:1000;
+  color:#4a5271;
+  letter-spacing:1px;
+  opacity:.65;
+}
+
+.exit-game{
+  position:absolute;
+  z-index:30;
+  bottom:14px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:11px 23px;
+  border-radius:15px;
+  color:white;
+  background:rgba(21,25,50,.86);
+  border:1px solid rgba(255,255,255,.2);
+  font-weight:1000;
+  font-size:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.exit-game:active{
+  transform:translateX(-50%) scale(.96);
+}
+
+.point-pop{
+  position:absolute;
+  z-index:40;
+  pointer-events:none;
+  font-size:clamp(34px,5vw,65px);
+  font-weight:1000;
+  text-shadow:0 6px 15px rgba(0,0,0,.3);
+  animation:pointPop .75s ease forwards;
+}
+
+.red-point{
+  color:#fff;
+}
+
+.blue-point{
+  color:#fff;
+}
+
+.penalty-pop{
+  position:absolute;
+  z-index:40;
+  pointer-events:none;
+  font-size:clamp(27px,4vw,52px);
+  font-weight:1000;
+  color:#ff5265;
+  text-shadow:
+    0 4px 10px rgba(0,0,0,.25),
+    0 0 10px rgba(255,255,255,.4);
+  animation:penaltyPop .7s ease forwards;
+}
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(9,12,29,.76);
+  backdrop-filter:blur(10px);
+}
+
+.result-panel{
+  width:min(520px,94vw);
+  background:linear-gradient(145deg,#282e59,#1c2144);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:32px;
+  padding:35px 25px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.4);
+  animation:resultIn .45s ease;
+}
+
+.result-icon{
+  font-size:65px;
+  margin-bottom:8px;
+}
+
+.result-panel h2{
+  margin:0;
+  font-size:clamp(29px,6vw,46px);
+}
+
+.final-score{
+  font-size:clamp(45px,8vw,65px);
+  font-weight:1000;
+  margin:18px 0;
+  background:linear-gradient(90deg,#ff6975,#fff,#4fd9ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.result-buttons{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.result-buttons button{
+  padding:13px 19px;
+  border-radius:15px;
+  color:#fff;
+  font-weight:900;
+  background:#3a4168;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translate(-50%,20px);
+  z-index:999;
+  background:#fff;
+  color:#202541;
+  padding:13px 19px;
+  border-radius:15px;
+  font-weight:900;
+  box-shadow:0 15px 35px rgba(0,0,0,.3);
+  opacity:0;
+  pointer-events:none;
+  transition:.25s ease;
+  max-width:90vw;
+  text-align:center;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes floatLogo{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-6px);
+  }
+}
+
+@keyframes shake{
+  0%,100%{
+    transform:translateX(0) rotate(0);
+  }
+  20%{
+    transform:translateX(-9px) rotate(-5deg);
+  }
+  40%{
+    transform:translateX(9px) rotate(5deg);
+  }
+  60%{
+    transform:translateX(-7px) rotate(-4deg);
+  }
+  80%{
+    transform:translateX(6px) rotate(3deg);
+  }
+}
+
+@keyframes correctPop{
+  0%{
+    transform:scale(1);
+  }
+  45%{
+    transform:scale(1.35) rotate(-5deg);
+  }
+  100%{
+    transform:scale(0);
+    opacity:0;
+  }
+}
+
+@keyframes pointPop{
+  0%{
+    transform:translate(-50%,0) scale(.5);
+    opacity:0;
+  }
+  20%{
+    transform:translate(-50%,-10px) scale(1.15);
+    opacity:1;
+  }
+  100%{
+    transform:translate(-50%,-90px) scale(1);
+    opacity:0;
+  }
+}
+
+@keyframes penaltyPop{
+  0%{
+    transform:translate(-50%,0) scale(.5);
+    opacity:0;
+  }
+  20%{
+    transform:translate(-50%,-5px) scale(1.15);
+    opacity:1;
+  }
+  100%{
+    transform:translate(-50%,-75px) scale(1);
+    opacity:0;
+  }
+}
+
+@keyframes timerPulse{
+  from{
+    transform:scale(1);
+  }
+  to{
+    transform:scale(1.14);
+  }
+}
+
+@keyframes resultIn{
+  from{
+    opacity:0;
+    transform:scale(.85) translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+
+/* =========================================================
+   BRIGHT CLASSROOM THEME
+========================================================= */
+html,body{background:#f4f9ff;color:#17213f}
+.panel-screen{
+  background:
+    radial-gradient(circle at 5% 5%,rgba(255,111,125,.16),transparent 25%),
+    radial-gradient(circle at 95% 10%,rgba(36,185,255,.16),transparent 25%),
+    linear-gradient(145deg,#f8fbff,#eef6ff 55%,#f8fbff);
+}
+.topbar{
+  background:rgba(255,255,255,.90);
+  border-bottom:1px solid rgba(42,64,110,.10);
+  box-shadow:0 6px 24px rgba(47,78,130,.08);
+}
+.topbar h2{color:#182443}
+.topbar button{background:#e9f0ff;color:#24355f;box-shadow:0 4px 12px rgba(49,78,130,.10)}
+.card{background:rgba(255,255,255,.94);border:1px solid rgba(56,87,137,.10);box-shadow:0 16px 40px rgba(50,82,130,.11)}
+.card h3{color:#1c294b}.card p{color:#667391}label{color:#26365d}
+input[type=text],input[type=number]{border-color:#cbd8ee;background:#f8fbff;color:#1c294b}
+input:focus{border-color:#5e8cff;background:#fff}
+.range-value{color:#253a68}.small-btn{background:#e7eefb;color:#26365d}
+.upload-area{border-color:#b9c9e5;background:#f7fbff}
+.upload-area:hover{border-color:#7195e8;background:#eef6ff}
+.set-card{background:#f7faff;border-color:#dbe5f4;box-shadow:0 8px 22px rgba(48,79,125,.07)}
+.set-count{color:#71809e}.vocab-item{background:#f8fbff;border-color:#dbe5f4}
+.notice{background:#fff8dc;border-color:#f2d875;color:#705b00}
+.status{color:#16815c}.badge{background:#e8efff;color:#4a5f91}
+.penalty-label{background:#f7faff;border-color:#cfdbed;color:#465574}
+.penalty-option input:checked + .penalty-label{color:#24355f}
+.rule{background:#fff;box-shadow:0 10px 25px rgba(50,82,130,.08)}
+.rule p{color:#667391}
+.menu-screen{
+  background:
+    radial-gradient(circle at 8% 15%,rgba(255,83,100,.20),transparent 24%),
+    radial-gradient(circle at 92% 15%,rgba(36,185,255,.20),transparent 24%),
+    radial-gradient(circle at 50% 100%,rgba(104,78,255,.13),transparent 34%),
+    linear-gradient(145deg,#f8fcff,#edf7ff 52%,#f9fbff);
+}
+.logo p{color:#4d5f83}.version{color:#7787a6}
+.game-screen{background:#eef6ff}
+.red-side{
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.30),transparent 50%),
+    linear-gradient(135deg,#ff9a9f,#ff6573);
+}
+.blue-side{
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.34),transparent 50%),
+    linear-gradient(135deg,#67dfff,#38bfff);
+}
+.exit-game{background:rgba(255,255,255,.94);color:#26365d;border-color:rgba(45,70,115,.12);box-shadow:0 8px 22px rgba(45,70,115,.16)}
+.overlay{background:rgba(238,246,255,.72)}
+.result-panel{background:linear-gradient(145deg,#fff,#f0f7ff);border-color:#dce7f6;box-shadow:0 30px 80px rgba(48,79,125,.20)}
+.result-panel > div[style*="color:#b8c0df"]{color:#61708e!important}
+.result-buttons button{background:#e5edf9;color:#26365d}
+
+/* GAME START COUNTDOWN */
+.countdown-overlay{
+  position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;
+  background:rgba(239,247,255,.62);backdrop-filter:blur(7px);pointer-events:auto;
+}
+.countdown-content{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.countdown-number{
+  width:min(230px,35vw);height:min(230px,35vw);min-width:150px;min-height:150px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:linear-gradient(145deg,#fff,#eaf4ff);color:#273b6b;
+  font-size:clamp(82px,14vw,150px);line-height:1;font-weight:1000;
+  box-shadow:0 25px 60px rgba(48,83,140,.20),inset 0 0 0 8px rgba(255,255,255,.85);
+  animation:countdownPop .72s cubic-bezier(.2,.85,.25,1.25);
+}
+.countdown-number.go{
+  width:min(280px,42vw);height:min(280px,42vw);color:#fff;
+  background:linear-gradient(135deg,#ff5b69,#7b67ff,#28c9a0);
+  font-size:clamp(58px,9vw,100px);letter-spacing:2px;
+}
+.countdown-sub{margin-top:18px;color:#334a78;font-size:clamp(14px,2vw,22px);font-weight:1000;letter-spacing:1px;text-transform:uppercase}
+@keyframes countdownPop{0%{transform:scale(.45);opacity:0}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes countdownGo{0%{transform:scale(.55);opacity:0}55%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:700px){
+
+  .menu-content{
+    padding:18px 15px;
+    gap:13px;
+  }
+
+  .preview-team{
+    width:125px;
+    height:125px;
+  }
+
+  .preview-icon{
+    width:60px;
+    height:60px;
+    font-size:40px;
+  }
+
+  .team-preview{
+    gap:8px;
+  }
+
+  .vs{
+    font-size:18px;
+  }
+
+  .menu-buttons{
+    gap:9px;
+  }
+
+  .game-btn{
+    min-height:50px;
+    font-size:16px;
+  }
+
+  .topbar{
+    height:65px;
+    padding:10px 12px;
+  }
+
+  .content{
+    padding-top:18px;
+  }
+
+  .card{
+    padding:17px;
+  }
+
+  .add-vocab{
+    grid-template-columns:1fr;
+  }
+
+  .rules{
+    grid-template-columns:1fr;
+  }
+
+  .arena{
+    width:44vw;
+    height:44vw;
+    min-width:165px;
+    min-height:165px;
+  }
+
+  .picture{
+    min-width:38px;
+    min-height:38px;
+  }
+
+  .game-hud{
+    height:82px;
+  }
+
+  .team-score{
+    font-size:15px;
+    padding:0 9px;
+  }
+
+  .team-score .score-number{
+    font-size:29px;
+  }
+
+  .center-hud{
+    min-width:110px;
+  }
+
+  .score-badge{
+    min-width:78px;
+    padding:7px 10px;
+    font-size:22px;
+    gap:5px;
+  }
+
+  .round-label{
+    font-size:13px;
+  }
+
+  .timer{
+    font-size:24px;
+  }
+
+  .exit-game{
+    bottom:7px;
+    padding:7px 13px;
+    font-size:12px;
+  }
+
+  .penalty-option{
+    min-width:100%;
+  }
+}
+
+@media(max-height:560px){
+
+  .arena{
+    width:65vh;
+    height:65vh;
+  }
+
+  .menu-content{
+    padding-top:10px;
+    padding-bottom:10px;
+  }
+
+  .logo h1{
+    font-size:48px;
+  }
+
+  .preview-team{
+    width:110px;
+    height:110px;
+  }
+
+  .preview-icon{
+    width:50px;
+    height:50px;
+    font-size:32px;
+  }
+
+  .game-hud{
+    height:72px;
+  }
+
+  .team-score .score-number{
+    font-size:30px;
+  }
+
+  .score-badge{
+    font-size:22px;
+    padding:6px 12px;
+  }
+
+  .round-label{
+    font-size:13px;
+  }
+
+  .timer{
+    font-size:24px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- ========================================================
+     MAIN MENU
+========================================================= -->
+
+<section id="menuScreen" class="screen menu-screen">
+
+  <div class="menu-content">
+
+    <div class="logo">
+      <h1>DUAL MATCH</h1>
+      <p>Find the matching picture first!</p>
+    </div>
+
+    <div class="team-preview">
+
+      <div class="preview-team red">
+        <div class="preview-icon">📚</div>
+        <strong>RED TEAM</strong>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div class="preview-team blue">
+        <div class="preview-icon">🎒</div>
+        <strong>BLUE TEAM</strong>
+      </div>
+
+    </div>
+
+    <div class="menu-buttons">
+
+      <button class="game-btn play-btn" id="playBtn">
+        ▶ PLAY GAME
+      </button>
+
+      <button class="game-btn teacher-btn" id="teacherBtn">
+        🎨 TEACHER MODE
+      </button>
+
+      <button class="game-btn settings-btn" id="settingsBtn">
+        ⚙ SETTINGS
+      </button>
+
+      <button class="game-btn how-btn" id="howBtn">
+        ❓ HOW TO PLAY
+      </button>
+
+    </div>
+
+    <div class="version">
+      DUAL MATCH • Vocabulary Edition
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================================
+     TEACHER MODE
+========================================================= -->
+
+<section id="teacherScreen" class="screen panel-screen hidden">
+
+  <div class="topbar">
+    <h2>🎨 Teacher Mode</h2>
+    <button id="teacherBackBtn">← Main Menu</button>
+  </div>
+
+  <div class="content">
+
+    <div class="card">
+
+      <h3>Vocabulary Sets</h3>
+
+      <p>
+        Create and manage separate vocabulary sets for your classes.
+      </p>
+
+      <div class="form-row">
+
+        <label for="newSetName">
+          New Set Name
+        </label>
+
+        <input
+          id="newSetName"
+          type="text"
+          placeholder="Example: Animals"
+        >
+
+      </div>
+
+      <div class="action-row">
+
+        <button
+          class="small-btn primary-small"
+          id="createSetBtn">
+          ＋ CREATE SET
+        </button>
+
+        <button
+          class="small-btn download-btn"
+          id="downloadSetBtn">
+          ⬇ DOWNLOAD VOCABULARY SET
+        </button>
+
+        <button
+          class="small-btn upload-btn"
+          id="uploadSetBtn">
+          ⬆ UPLOAD SAVED SET
+        </button>
+
+        <input
+          id="setFileInput"
+          type="file"
+          accept=".json,application/json"
+          hidden
+        >
+
+      </div>
+
+      <div id="setStatus" class="status"></div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="selected-set-title">
+
+        <div>
+
+          <h3 id="selectedSetTitle">
+            School Objects
+          </h3>
+
+          <p id="selectedSetInfo">
+            Built-in default vocabulary set.
+          </p>
+
+        </div>
+
+        <span id="selectedSetBadge" class="badge">
+          SELECTED
+        </span>
+
+      </div>
+
+      <div class="action-row">
+
+        <button
+          class="small-btn green-small"
+          id="playSelectedBtn">
+          ▶ PLAY THIS SET
+        </button>
+
+        <button
+          class="small-btn red-small"
+          id="deleteSetBtn">
+          🗑 DELETE SET
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>＋ Add Vocabulary</h3>
+
+      <p>
+        The word and its uploaded picture are stored together
+        as one vocabulary item.
+      </p>
+
+      <div class="add-vocab">
+
+        <div>
+
+          <div
+            class="form-row"
+            style="grid-template-columns:1fr">
+
+            <label for="wordInput">
+              Word
+            </label>
+
+            <input
+              id="wordInput"
+              type="text"
+              placeholder="Example: Pencil"
+            >
+
+          </div>
+
+
+          <div
+            class="upload-area"
+            id="uploadArea">
+
+            <div class="upload-icon">
+              🖼️
+            </div>
+
+            <strong>
+              CHOOSE PICTURE
+            </strong>
+
+            <p>
+              PNG • JPG • JPEG • WEBP • GIF
+            </p>
+
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            >
+
+          </div>
+
+
+          <div class="action-row">
+
+            <button
+              class="small-btn primary-small"
+              id="addVocabBtn">
+              ＋ ADD VOCABULARY
+            </button>
+
+          </div>
+
+          <div id="vocabStatus" class="status"></div>
+
+        </div>
+
+
+        <div
+          style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          text-align:center;
+          color:#9fa7c9;
+          ">
+
+          <div>
+
+            <div id="newImagePreviewBox"></div>
+
+            <strong id="newImageName">
+              No picture selected
+            </strong>
+
+            <p>
+              The exact uploaded image will be used in the game.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Vocabulary in this set
+      </h3>
+
+      <p id="vocabCountText">
+        0 items
+      </p>
+
+      <div
+        id="vocabList"
+        class="vocab-list">
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Portable Saved Sets
+      </h3>
+
+      <p>
+        Downloaded JSON files contain the actual images as
+        embedded Data URLs. You can move the file to another
+        computer and upload it again.
+      </p>
+
+      <div class="notice">
+
+        Images are stored in IndexedDB locally rather than
+        localStorage. Normal classroom image files are therefore
+        handled separately from the small settings data.
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================================
+     SETTINGS
+========================================================= -->
+
+<section id="settingsScreen" class="screen panel-screen hidden">
+
+  <div class="topbar">
+
+    <h2>
+      ⚙ Game Settings
+    </h2>
+
+    <button id="settingsBackBtn">
+      ← Main Menu
+    </button>
+
+  </div>
+
+
+  <div class="content">
+
+
+    <div class="card">
+
+      <h3>
+        Rounds
+      </h3>
+
+      <p>
+        Choose how many rounds the match contains.
+      </p>
+
+      <div
+        class="form-row"
+        style="grid-template-columns:1fr auto">
+
+        <input
+          id="roundRange"
+          type="range"
+          min="1"
+          max="30"
+          value="10"
+        >
+
+        <span
+          id="roundValue"
+          class="range-value">
+          10
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Time per Round
+      </h3>
+
+      <p>
+        The timer counts down in real time.
+        When it reaches zero, the round ends without a point.
+      </p>
+
+      <div
+        class="form-row"
+        style="grid-template-columns:1fr auto">
+
+        <input
+          id="timeRange"
+          type="range"
+          min="3"
+          max="60"
+          value="10"
+        >
+
+        <span
+          id="timeValue"
+          class="range-value">
+          10s
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Pictures per Side
+      </h3>
+
+      <p>
+        Every round uses exactly one shared vocabulary item.
+      </p>
+
+      <div
+        class="form-row"
+        style="grid-template-columns:1fr auto">
+
+        <input
+          id="pictureRange"
+          type="range"
+          min="4"
+          max="8"
+          value="6"
+        >
+
+        <span
+          id="pictureValue"
+          class="range-value">
+          6
+        </span>
+
+      </div>
+
+      <div class="notice">
+
+        Required vocabulary =
+        <strong id="requiredVocab">
+          11
+        </strong>
+        different vocabulary items.
+
+        <br>
+
+        Formula:
+        pictures per side × 2 − 1
+
+      </div>
+
+    </div>
+
+
+    <!-- NEW PENALTY SETTING -->
+
+    <div class="card">
+
+      <h3>
+        ❌ Wrong Answer Penalty
+      </h3>
+
+      <p>
+        Choose what happens when a player taps the wrong picture.
+      </p>
+
+      <div class="penalty-options">
+
+        <div class="penalty-option">
+
+          <input
+            type="radio"
+            name="penalty"
+            id="penaltyNone"
+            value="none"
+            checked
+          >
+
+          <label
+            class="penalty-label"
+            for="penaltyNone">
+
+            <span class="penalty-icon">
+              😊
+            </span>
+
+            NO PENALTY
+
+            <div
+              style="
+              font-size:12px;
+              font-weight:600;
+              margin-top:5px;
+              color:#aeb5d5;
+              ">
+
+              Wrong picture shakes.
+              No points lost.
+
+            </div>
+
+          </label>
+
+        </div>
+
+
+        <div class="penalty-option">
+
+          <input
+            type="radio"
+            name="penalty"
+            id="penaltyMinusOne"
+            value="minusOne"
+          >
+
+          <label
+            class="penalty-label"
+            for="penaltyMinusOne">
+
+            <span class="penalty-icon">
+              ⚡
+            </span>
+
+            -1 POINT
+
+            <div
+              style="
+              font-size:12px;
+              font-weight:600;
+              margin-top:5px;
+              color:#aeb5d5;
+              ">
+
+              Wrong picture removes
+              1 point from that team.
+
+            </div>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Current Selection
+      </h3>
+
+      <p id="settingsSetName">
+        School Objects
+      </p>
+
+      <p id="settingsSetCount">
+        11 vocabulary items
+      </p>
+
+      <div class="action-row">
+
+        <button
+          class="small-btn primary-small"
+          id="settingsPlayBtn">
+          ▶ PLAY NOW
+        </button>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<!-- ========================================================
+     HOW TO PLAY
+========================================================= -->
+
+<section id="howScreen" class="screen panel-screen hidden">
+
+  <div class="topbar">
+
+    <h2>
+      ❓ How to Play
+    </h2>
+
+    <button id="howBackBtn">
+      ← Main Menu
+    </button>
+
+  </div>
+
+
+  <div class="content">
+
+    <div class="card">
+
+      <h3>
+        DUAL MATCH
+      </h3>
+
+      <p>
+        Two teams race to find the one picture that appears
+        in both circles.
+      </p>
+
+    </div>
+
+
+    <div class="rules">
+
+
+      <div class="rule">
+
+        <div class="num">
+          1
+        </div>
+
+        <h4>
+          Look at both circles
+        </h4>
+
+        <p>
+          Red Team and Blue Team each receive their own
+          group of pictures.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          2
+        </div>
+
+        <h4>
+          Find the match
+        </h4>
+
+        <p>
+          Exactly one picture is shared by both sides.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          3
+        </div>
+
+        <h4>
+          Tap your side
+        </h4>
+
+        <p>
+          Tap the matching picture on your own team's side.
+          Mouse and touch both work.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          4
+        </div>
+
+        <h4>
+          Wrong? Keep going!
+        </h4>
+
+        <p>
+          A wrong picture shakes. If penalty is OFF,
+          no points are lost. If penalty is ON,
+          your team loses 1 point.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          5
+        </div>
+
+        <h4>
+          First correct player wins
+        </h4>
+
+        <p>
+          The first team to tap the correct picture gets +1.
+          The round then ends immediately.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          6
+        </div>
+
+        <h4>
+          Fastest tap wins
+        </h4>
+
+        <p>
+          If both players tap at almost the same time,
+          the first valid tap wins the round.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          7
+        </div>
+
+        <h4>
+          Timer
+        </h4>
+
+        <p>
+          Find the answer before the countdown reaches zero.
+          If time expires, nobody gets a point.
+        </p>
+
+      </div>
+
+
+      <div class="rule">
+
+        <div class="num">
+          8
+        </div>
+
+        <h4>
+          Highest score wins
+        </h4>
+
+        <p>
+          After all rounds, the team with the most points
+          wins the match.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================================
+     GAME
+========================================================= -->
+
+<section
+  id="gameScreen"
+  class="screen game-screen hidden">
+
+
+  <div id="countdownOverlay" class="countdown-overlay hidden">
+    <div class="countdown-content">
+      <div id="countdownNumber" class="countdown-number">3</div>
+      <div id="countdownSub" class="countdown-sub">GET READY!</div>
+    </div>
+  </div>
+
+  <div class="game-hud">
+
+
+    <div class="team-score red-score">
+
+      🔴 RED
+
+      <span
+        id="redScore"
+        class="score-number">
+        0
+      </span>
+
+    </div>
+
+
+    <div class="center-hud">
+
+      <div class="score-badge">
+
+        <span id="centerRedScore">
+          0
+        </span>
+
+        <span>
+          —
+        </span>
+
+        <span id="centerBlueScore">
+          0
+        </span>
+
+      </div>
+
+
+      <div
+        id="roundLabel"
+        class="round-label">
+
+        ROUND 1 / 10
+
+      </div>
+
+
+      <div
+        id="timerLabel"
+        class="timer">
+
+        10
+
+      </div>
+
+    </div>
+
+
+    <div class="team-score blue-score">
+
+      <span
+        id="blueScore"
+        class="score-number">
+        0
+      </span>
+
+      BLUE 🔵
+
+    </div>
+
+  </div>
+
+
+  <div class="arena-area">
+
+
+    <div
+      id="redSide"
+      class="team-side red-side">
+
+      <div
+        id="redArena"
+        class="arena">
+
+        <div class="arena-team-label">
+          RED TEAM
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="blueSide"
+      class="team-side blue-side">
+
+      <div
+        id="blueArena"
+        class="arena">
+
+        <div class="arena-team-label">
+          BLUE TEAM
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <button
+    id="exitGameBtn"
+    class="exit-game">
+
+    ✕ EXIT
+
+  </button>
+
+
+  <!-- GAME OVER -->
+
+  <div
+    id="resultOverlay"
+    class="overlay hidden">
+
+    <div class="result-panel">
+
+
+      <div
+        id="resultIcon"
+        class="result-icon">
+
+        🏆
+
+      </div>
+
+
+      <h2 id="resultTitle">
+        RED TEAM WINS!
+      </h2>
+
+
+      <div class="final-score">
+
+        <span id="finalRed">
+          0
+        </span>
+
+        —
+
+        <span id="finalBlue">
+          0
+        </span>
+
+      </div>
+
+
+      <div
+        style="
+        color:#b8c0df;
+        margin-bottom:20px;
+        ">
+
+        FINAL SCORE
+
+      </div>
+
+
+      <div class="result-buttons">
+
+        <button id="playAgainBtn">
+          ▶ PLAY AGAIN
+        </button>
+
+        <button id="mainMenuFromResultBtn">
+          🏠 MAIN MENU
+        </button>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</section>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+"use strict";
+
+/* ============================================================
+   DUAL MATCH
+   Complete single-file game
+============================================================ */
+
+
+/* ============================================================
+   DATABASE
+============================================================ */
+
+const DB_NAME = "DualMatchDB";
+const DB_VERSION = 1;
+const STORE_NAME = "sets";
+
+let db = null;
+
+
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+
+let state = {
+
+  sets: [],
+
+  selectedSetId: null,
+
+  selectedSet: null,
+
+  settings: {
+
+    rounds: 10,
+
+    timePerRound: 10,
+
+    picturesPerSide: 6,
+
+    wrongAnswerPenalty: "none"
+
+  },
+
+  game: {
+
+    redScore: 0,
+
+    blueScore: 0,
+
+    currentRound: 1,
+
+    roundActive: false,
+
+    timerRemaining: 10,
+
+    timerId: null,
+
+    roundTimeoutId: null,
+
+    countdownTimeoutId: null,
+
+    countdownActive: false,
+
+    redItems: [],
+
+    blueItems: [],
+
+    targetId: null
+
+  },
+
+  pendingImageData: null,
+
+  pendingImageName: "",
+
+  audio: {
+
+    context: null,
+
+    enabled: true
+
+  }
+
+};
+
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const $ = id => document.getElementById(id);
+
+
+/* ============================================================
+   SCREEN
+============================================================ */
+
+function showScreen(id){
+
+  document
+    .querySelectorAll(".screen")
+    .forEach(screen=>{
+      screen.classList.add("hidden");
+    });
+
+  $(id).classList.remove("hidden");
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+function toast(message,duration=2200){
+
+  const el=$("toast");
+
+  el.textContent=message;
+
+  el.classList.add("show");
+
+  clearTimeout(toast._timer);
+
+  toast._timer=setTimeout(()=>{
+    el.classList.remove("show");
+  },duration);
+}
+
+
+/* ============================================================
+   SAFE TEXT
+============================================================ */
+
+function safeText(value){
+
+  return String(value ?? "").trim();
+
+}
+
+
+/* ============================================================
+   AUDIO ENGINE
+============================================================ */
+
+function ensureAudio(){
+
+  try{
+
+    if(!state.audio.context){
+
+      const AudioContext =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if(!AudioContext){
+        state.audio.enabled=false;
+        return null;
+      }
+
+      state.audio.context = new AudioContext();
+
+    }
+
+    if(state.audio.context.state==="suspended"){
+
+      state.audio.context.resume().catch(()=>{});
+
+    }
+
+    return state.audio.context;
+
+  }catch(error){
+
+    console.warn("Audio unavailable:",error);
+
+    state.audio.enabled=false;
+
+    return null;
+
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   Generic tone
+------------------------------------------------------------ */
+
+function tone(
+  frequency,
+  duration,
+  type="sine",
+  volume=.08,
+  startOffset=0
+){
+
+  const ctx=ensureAudio();
+
+  if(!ctx || !state.audio.enabled) return;
+
+  try{
+
+    const now=ctx.currentTime+startOffset;
+
+    const oscillator=ctx.createOscillator();
+
+    const gain=ctx.createGain();
+
+    oscillator.type=type;
+
+    oscillator.frequency.setValueAtTime(
+      frequency,
+      now
+    );
+
+    gain.gain.setValueAtTime(
+      0.0001,
+      now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      volume,
+      now+.015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      now+duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(ctx.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(now+duration+.03);
+
+  }catch(error){
+
+    console.warn("Tone error:",error);
+
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   Correct sound
+------------------------------------------------------------ */
+
+function playCorrectSound(){
+
+  tone(523.25,.12,"sine",.08,0);
+
+  tone(659.25,.14,"sine",.09,.08);
+
+  tone(783.99,.20,"sine",.10,.17);
+
+}
+
+
+/* ------------------------------------------------------------
+   Wrong sound
+------------------------------------------------------------ */
+
+function playWrongSound(){
+
+  tone(180,.10,"sawtooth",.055,0);
+
+  tone(125,.13,"square",.035,.08);
+
+}
+
+
+/* ------------------------------------------------------------
+   Round start
+------------------------------------------------------------ */
+
+function playRoundStartSound(){
+
+  tone(392,.08,"sine",.055,0);
+
+  tone(523.25,.12,"sine",.065,.08);
+
+}
+
+
+/* ------------------------------------------------------------
+   Game start countdown sounds
+------------------------------------------------------------ */
+
+function playCountdownBeep(){
+  tone(440,.11,"sine",.075,0);
+}
+
+function playCountdownGo(){
+  tone(523.25,.10,"sine",.075,0);
+  tone(659.25,.12,"sine",.085,.09);
+  tone(783.99,.20,"sine",.095,.19);
+}
+
+
+/* ------------------------------------------------------------
+   Game over
+------------------------------------------------------------ */
+
+function playGameOverSound(){
+
+  tone(523.25,.12,"sine",.07,0);
+
+  tone(659.25,.12,"sine",.07,.10);
+
+  tone(783.99,.14,"sine",.08,.20);
+
+  tone(1046.50,.25,"sine",.10,.34);
+
+}
+
+
+/* ============================================================
+   INDEXED DB
+============================================================ */
+
+function openDatabase(){
+
+  return new Promise((resolve,reject)=>{
+
+    if(!window.indexedDB){
+
+      reject(
+        new Error("IndexedDB is not available.")
+      );
+
+      return;
+    }
+
+    const request =
+      indexedDB.open(
+        DB_NAME,
+        DB_VERSION
+      );
+
+    request.onupgradeneeded=event=>{
+
+      const database=event.target.result;
+
+      if(
+        !database.objectStoreNames
+          .contains(STORE_NAME)
+      ){
+
+        database.createObjectStore(
+          STORE_NAME,
+          {keyPath:"id"}
+        );
+
+      }
+
+    };
+
+    request.onsuccess=()=>{
+
+      db=request.result;
+
+      resolve(db);
+
+    };
+
+    request.onerror=()=>{
+
+      reject(request.error);
+
+    };
+
+  });
+
+}
+
+
+function dbGetAll(){
+
+  return new Promise((resolve,reject)=>{
+
+    const transaction=
+      db.transaction(
+        STORE_NAME,
+        "readonly"
+      );
+
+    const store=
+      transaction.objectStore(STORE_NAME);
+
+    const request=
+      store.getAll();
+
+    request.onsuccess=()=>{
+      resolve(request.result || []);
+    };
+
+    request.onerror=()=>{
+      reject(request.error);
+    };
+
+  });
+
+}
+
+
+function dbPut(set){
+
+  return new Promise((resolve,reject)=>{
+
+    const transaction=
+      db.transaction(
+        STORE_NAME,
+        "readwrite"
+      );
+
+    transaction
+      .objectStore(STORE_NAME)
+      .put(set);
+
+    transaction.oncomplete=()=>{
+      resolve();
+    };
+
+    transaction.onerror=()=>{
+      reject(transaction.error);
+    };
+
+  });
+
+}
+
+
+function dbDelete(id){
+
+  return new Promise((resolve,reject)=>{
+
+    const transaction=
+      db.transaction(
+        STORE_NAME,
+        "readwrite"
+      );
+
+    transaction
+      .objectStore(STORE_NAME)
+      .delete(id);
+
+    transaction.oncomplete=()=>{
+      resolve();
+    };
+
+    transaction.onerror=()=>{
+      reject(transaction.error);
+    };
+
+  });
+
+}
+
+
+/* ============================================================
+   DEFAULT SVG IMAGES
+============================================================ */
+
+function svgData(svg){
+
+  return "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(
+      svg
+        .replace(/\n/g," ")
+        .replace(/\s+/g," ")
+        .trim()
+    );
+
+}
+
+
+function classroomSVG(type){
+
+  const common=`
+
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="400"
+       height="400"
+       viewBox="0 0 400 400">
+
+    <defs>
+
+      <filter id="s"
+              x="-30%"
+              y="-30%"
+              width="160%"
+              height="160%">
+
+        <feDropShadow
+          dx="0"
+          dy="10"
+          stdDeviation="7"
+          flood-color="#18213b"
+          flood-opacity=".25"/>
+
+      </filter>
+
+      <linearGradient
+        id="g"
+        x1="0"
+        y1="0"
+        x2="1"
+        y2="1">
+
+        <stop
+          offset="0"
+          stop-color="#ffffff"/>
+
+        <stop
+          offset="1"
+          stop-color="#edf1fa"/>
+
+      </linearGradient>
+
+    </defs>
+
+    <ellipse
+      cx="200"
+      cy="330"
+      rx="120"
+      ry="20"
+      fill="#cbd2e2"
+      opacity=".35"/>
+
+  `;
+
+  let drawing="";
+
+
+  switch(type){
+
+    case "Pencil":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-28 200 200)">
+
+        <polygon
+          points="85,165 315,165 345,200 315,235 85,235"
+          fill="#ffd54d"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <rect
+          x="120"
+          y="165"
+          width="40"
+          height="70"
+          fill="#ff8b5c"/>
+
+        <rect
+          x="265"
+          y="165"
+          width="50"
+          height="70"
+          fill="#f6c4b7"/>
+
+        <polygon
+          points="85,165 35,200 85,235"
+          fill="#f0c5a6"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <polygon
+          points="35,200 56,194 56,206"
+          fill="#333b4e"/>
+
+        <line
+          x1="180"
+          y1="165"
+          x2="180"
+          y2="235"
+          stroke="#e0a929"
+          stroke-width="7"/>
+
+        <line
+          x1="225"
+          y1="165"
+          x2="225"
+          y2="235"
+          stroke="#e0a929"
+          stroke-width="7"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Pen":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-28 200 200)">
+
+        <rect
+          x="65"
+          y="174"
+          width="250"
+          height="52"
+          rx="24"
+          fill="#3974e8"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <rect
+          x="105"
+          y="174"
+          width="105"
+          height="52"
+          rx="8"
+          fill="#56b6ff"/>
+
+        <polygon
+          points="315,174 355,200 315,226"
+          fill="#d7e0ec"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <polygon
+          points="355,200 325,194 325,206"
+          fill="#343b4d"/>
+
+        <path
+          d="M105 174 Q130 135 150 174"
+          fill="none"
+          stroke="#dce8ff"
+          stroke-width="10"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Eraser":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-12 200 200)">
+
+        <rect
+          x="80"
+          y="135"
+          width="240"
+          height="130"
+          rx="28"
+          fill="#ff7fa1"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <path
+          d="M220 135 L300 135
+             Q320 135 320 160
+             L320 240
+             Q320 265 300 265
+             L220 265 Z"
+          fill="#f5f7fb"/>
+
+        <path
+          d="M80 205 L220 205"
+          stroke="#d94e76"
+          stroke-width="8"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Ball":
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <circle
+          cx="200"
+          cy="195"
+          r="110"
+          fill="#fff"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <path
+          d="M200 85
+             L230 135
+             L215 180
+             L165 180
+             L150 135 Z"
+          fill="#ef5262"
+          stroke="#303951"
+          stroke-width="6"/>
+
+        <path
+          d="M165 180 L105 220
+             M215 180 L270 225
+             M230 135 L290 110"
+          stroke="#303951"
+          stroke-width="7"
+          fill="none"/>
+
+        <path
+          d="M105 220
+             Q145 285 200 305
+             Q255 285 290 225"
+          fill="none"
+          stroke="#303951"
+          stroke-width="7"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Book":
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <path
+          d="M70 125
+             Q135 100 200 135
+             L200 290
+             Q135 255 70 280 Z"
+          fill="#ff6b6b"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <path
+          d="M330 125
+             Q265 100 200 135
+             L200 290
+             Q265 255 330 280 Z"
+          fill="#4c8cff"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <path
+          d="M95 155
+             Q145 140 185 158
+             M95 185
+             Q145 170 185 188
+             M215 158
+             Q255 140 305 155
+             M215 188
+             Q255 170 305 185"
+          fill="none"
+          stroke="#fff"
+          stroke-width="8"
+          stroke-linecap="round"/>
+
+        <line
+          x1="200"
+          y1="135"
+          x2="200"
+          y2="290"
+          stroke="#303951"
+          stroke-width="7"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Ruler":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-14 200 200)">
+
+        <rect
+          x="55"
+          y="165"
+          width="290"
+          height="70"
+          rx="12"
+          fill="#ffd85c"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <g
+          stroke="#7b6420"
+          stroke-width="5">
+
+          <path d="M85 165V200"/>
+          <path d="M115 165V185"/>
+          <path d="M145 165V200"/>
+          <path d="M175 165V185"/>
+          <path d="M205 165V200"/>
+          <path d="M235 165V185"/>
+          <path d="M265 165V200"/>
+          <path d="M295 165V185"/>
+          <path d="M325 165V200"/>
+
+        </g>
+
+        <text
+          x="85"
+          y="220"
+          font-size="22"
+          fill="#63531c"
+          font-family="Arial"
+          font-weight="bold">
+
+          1  2  3  4  5  6  7
+
+        </text>
+
+      </g>`;
+
+      break;
+
+
+    case "Bag":
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <path
+          d="M105 145
+             Q105 85 200 85
+             Q295 85 295 145"
+          fill="none"
+          stroke="#303951"
+          stroke-width="18"
+          stroke-linecap="round"/>
+
+        <path
+          d="M80 140
+             Q200 110 320 140
+             L300 295
+             Q200 330 100 295 Z"
+          fill="#7b64e8"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <rect
+          x="105"
+          y="195"
+          width="190"
+          height="85"
+          rx="22"
+          fill="#a08df3"
+          stroke="#303951"
+          stroke-width="7"/>
+
+        <circle
+          cx="200"
+          cy="238"
+          r="13"
+          fill="#ffd34e"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Apple":
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <path
+          d="M200 130
+             C155 85 82 125 90 205
+             C98 292 180 315 200 318
+             C220 315 302 292 310 205
+             C318 125 245 85 200 130Z"
+          fill="#ef5260"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <path
+          d="M200 130
+             Q205 90 230 65"
+          fill="none"
+          stroke="#604331"
+          stroke-width="13"
+          stroke-linecap="round"/>
+
+        <path
+          d="M218 86
+             Q270 50 300 92
+             Q250 115 218 86Z"
+          fill="#4dbb72"
+          stroke="#303951"
+          stroke-width="7"/>
+
+        <path
+          d="M135 165
+             Q125 205 145 230"
+          fill="none"
+          stroke="#ff9da5"
+          stroke-width="13"
+          stroke-linecap="round"
+          opacity=".8"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Crayon":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-18 200 200)">
+
+        <polygon
+          points="85,155 285,155 325,200 285,245 85,245"
+          fill="#ff4f8b"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <polygon
+          points="285,155 345,200 285,245"
+          fill="#f0c9a8"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <polygon
+          points="345,200 320,194 320,206"
+          fill="#343b4d"/>
+
+        <rect
+          x="105"
+          y="155"
+          width="38"
+          height="90"
+          fill="#ffc83d"/>
+
+        <rect
+          x="143"
+          y="155"
+          width="38"
+          height="90"
+          fill="#5cd6a0"/>
+
+        <rect
+          x="181"
+          y="155"
+          width="38"
+          height="90"
+          fill="#54a5ff"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Clock":
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <circle
+          cx="200"
+          cy="200"
+          r="120"
+          fill="#fff"
+          stroke="#303951"
+          stroke-width="9"/>
+
+        <circle
+          cx="200"
+          cy="200"
+          r="9"
+          fill="#303951"/>
+
+        <g
+          stroke="#303951"
+          stroke-width="7"
+          stroke-linecap="round">
+
+          <path d="M200 105V125"/>
+          <path d="M200 275V295"/>
+          <path d="M105 200H125"/>
+          <path d="M275 200H295"/>
+
+        </g>
+
+        <path
+          d="M200 200 L200 135"
+          stroke="#ff5265"
+          stroke-width="11"
+          stroke-linecap="round"/>
+
+        <path
+          d="M200 200 L250 225"
+          stroke="#3974e8"
+          stroke-width="11"
+          stroke-linecap="round"/>
+
+      </g>`;
+
+      break;
+
+
+    case "Notebook":
+
+      drawing=`
+
+      <g filter="url(#s)"
+         transform="rotate(-4 200 200)">
+
+        <rect
+          x="80"
+          y="90"
+          width="240"
+          height="220"
+          rx="14"
+          fill="#fff"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <rect
+          x="80"
+          y="90"
+          width="45"
+          height="220"
+          fill="#ff6575"/>
+
+        <g fill="#303951">
+
+          <circle cx="102" cy="125" r="7"/>
+          <circle cx="102" cy="165" r="7"/>
+          <circle cx="102" cy="205" r="7"/>
+          <circle cx="102" cy="245" r="7"/>
+          <circle cx="102" cy="285" r="7"/>
+
+        </g>
+
+        <g
+          stroke="#a8b4ce"
+          stroke-width="5">
+
+          <path d="M145 145H285"/>
+          <path d="M145 180H285"/>
+          <path d="M145 215H285"/>
+          <path d="M145 250H285"/>
+
+        </g>
+
+      </g>`;
+
+      break;
+
+
+    default:
+
+      drawing=`
+
+      <g filter="url(#s)">
+
+        <circle
+          cx="200"
+          cy="200"
+          r="110"
+          fill="#dfe5f2"
+          stroke="#303951"
+          stroke-width="8"/>
+
+        <text
+          x="200"
+          y="220"
+          text-anchor="middle"
+          font-size="80"
+          font-family="Arial"
+          font-weight="bold"
+          fill="#536080">
+
+          ?
+
+        </text>
+
+      </g>`;
+
+  }
+
+  return svgData(
+    common+
+    drawing+
+    "</svg>"
+  );
+
+}
+
+
+/* ============================================================
+   DEFAULT SET
+============================================================ */
+
+function createDefaultSet(){
+
+  const names=[
+    "Pencil",
+    "Pen",
+    "Eraser",
+    "Ball",
+    "Book",
+    "Ruler",
+    "Bag",
+    "Apple",
+    "Crayon",
+    "Clock",
+    "Notebook"
+  ];
+
+  return {
+
+    id:"default-school-objects",
+
+    name:"School Objects",
+
+    builtIn:true,
+
+    createdAt:Date.now(),
+
+    items:names.map((word,index)=>({
+
+      id:"default-"+index,
+
+      word,
+
+      image:classroomSVG(word),
+
+      imageName:
+        word.toLowerCase()+
+        ".svg"
+
+    }))
+
+  };
+
+}
+
+
+/* ============================================================
+   LOAD SETS
+============================================================ */
+
+async function loadSets(){
+
+  try{
+
+    state.sets=await dbGetAll();
+
+    const defaultSet=
+      state.sets.find(
+        s=>s.id==="default-school-objects"
+      );
+
+    if(!defaultSet){
+
+      const newDefault=
+        createDefaultSet();
+
+      state.sets.push(newDefault);
+
+      await dbPut(newDefault);
+
+    }
+
+    let storedSelected=null;
+
+    try{
+
+      storedSelected=
+        localStorage.getItem(
+          "dualMatchSelectedSet"
+        );
+
+    }catch(error){}
+
+    state.selectedSetId=
+      state.sets.some(
+        s=>s.id===storedSelected
+      )
+      ? storedSelected
+      : "default-school-objects";
+
+    state.selectedSet=
+      state.sets.find(
+        s=>s.id===state.selectedSetId
+      ) ||
+      state.sets[0];
+
+    renderTeacher();
+
+    updateSettingsDisplay();
+
+  }catch(error){
+
+    console.error(error);
+
+    state.sets=[
+      createDefaultSet()
+    ];
+
+    state.selectedSet=
+      state.sets[0];
+
+    state.selectedSetId=
+      state.selectedSet.id;
+
+    toast(
+      "Saved storage could not be read. Default set is ready."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   SAVE SET
+============================================================ */
+
+async function saveSet(set){
+
+  await dbPut(set);
+
+  const index=
+    state.sets.findIndex(
+      s=>s.id===set.id
+    );
+
+  if(index>=0){
+
+    state.sets[index]=set;
+
+  }else{
+
+    state.sets.push(set);
+
+  }
+
+  state.selectedSet=set;
+
+  state.selectedSetId=set.id;
+
+  try{
+
+    localStorage.setItem(
+      "dualMatchSelectedSet",
+      set.id
+    );
+
+  }catch(error){}
+
+  renderTeacher();
+
+  updateSettingsDisplay();
+
+}
+
+
+/* ============================================================
+   SELECT SET
+============================================================ */
+
+function selectSet(id){
+
+  const set=
+    state.sets.find(
+      s=>s.id===id
+    );
+
+  if(!set) return;
+
+  state.selectedSetId=id;
+
+  state.selectedSet=set;
+
+  try{
+
+    localStorage.setItem(
+      "dualMatchSelectedSet",
+      id
+    );
+
+  }catch(error){}
+
+  renderTeacher();
+
+  updateSettingsDisplay();
+
+  toast(
+    `Selected: ${set.name}`
+  );
+
+}
+
+
+/* ============================================================
+   CREATE SET
+============================================================ */
+
+async function createSet(){
+
+  const name=
+    safeText(
+      $("newSetName").value
+    );
+
+  if(!name){
+
+    toast(
+      "Please enter a vocabulary set name."
+    );
+
+    $("newSetName").focus();
+
+    return;
+  }
+
+  if(
+    state.sets.some(
+      s=>s.name.toLowerCase()===
+      name.toLowerCase()
+    )
+  ){
+
+    toast(
+      "A set with that name already exists."
+    );
+
+    return;
+  }
+
+  const set={
+
+    id:
+      "set-"+Date.now()+
+      "-"+
+      Math.random()
+        .toString(36)
+        .slice(2),
+
+    name,
+
+    builtIn:false,
+
+    createdAt:Date.now(),
+
+    items:[]
+
+  };
+
+  try{
+
+    await saveSet(set);
+
+    $("newSetName").value="";
+
+    toast(
+      `Created "${name}".`
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Could not create the set."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   DELETE SET
+============================================================ */
+
+async function deleteSelectedSet(){
+
+  const set=state.selectedSet;
+
+  if(!set) return;
+
+  if(set.builtIn){
+
+    toast(
+      "The built-in School Objects set cannot be deleted."
+    );
+
+    return;
+  }
+
+  if(
+    !confirm(
+      `Delete "${set.name}" and all of its vocabulary?`
+    )
+  ) return;
+
+  try{
+
+    await dbDelete(set.id);
+
+    state.sets=
+      state.sets.filter(
+        s=>s.id!==set.id
+      );
+
+    state.selectedSet=
+      state.sets.find(
+        s=>s.id==="default-school-objects"
+      ) ||
+      state.sets[0];
+
+    state.selectedSetId=
+      state.selectedSet.id;
+
+    try{
+
+      localStorage.setItem(
+        "dualMatchSelectedSet",
+        state.selectedSetId
+      );
+
+    }catch(error){}
+
+    renderTeacher();
+
+    updateSettingsDisplay();
+
+    toast(
+      "Vocabulary set deleted."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Could not delete the set."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   TEACHER RENDER
+============================================================ */
+
+function renderTeacher(){
+
+  const set=state.selectedSet;
+
+  if(!set) return;
+
+  $("selectedSetTitle").textContent=
+    set.name;
+
+  $("selectedSetInfo").textContent=
+    set.builtIn
+    ? "Built-in default vocabulary set."
+    : "Custom vocabulary set.";
+
+  $("selectedSetBadge").textContent=
+    set.builtIn
+    ? "DEFAULT • SELECTED"
+    : "SELECTED";
+
+  $("vocabCountText").textContent=
+    `${set.items.length} item${
+      set.items.length===1?"":"s"
+    }`;
+
+  $("vocabList").innerHTML="";
+
+  if(set.items.length===0){
+
+    $("vocabList").innerHTML=`
+
+      <div
+        style="
+        grid-column:1/-1;
+        text-align:center;
+        padding:30px;
+        color:#9fa7c9">
+
+        No vocabulary yet.
+        Add your first word and picture above.
+
+      </div>
+
+    `;
+
+  }
+
+  set.items.forEach(item=>{
+
+    const div=
+      document.createElement("div");
+
+    div.className="vocab-item";
+
+
+    const img=
+      document.createElement("img");
+
+    img.src=item.image;
+
+    img.alt=item.word;
+
+    img.onerror=()=>{
+
+      img.src=
+        classroomSVG("fallback");
+
+    };
+
+
+    const word=
+      document.createElement("div");
+
+    word.className="vocab-word";
+
+    word.textContent=item.word;
+
+
+    const del=
+      document.createElement("button");
+
+    del.className="delete-vocab";
+
+    del.textContent="DELETE";
+
+    del.addEventListener(
+      "click",
+      ()=>{
+        deleteVocabulary(item.id);
+      }
+    );
+
+
+    div.append(
+      img,
+      word,
+      del
+    );
+
+    $("vocabList")
+      .appendChild(div);
+
+  });
+
+  renderSetGrid();
+
+}
+
+
+/* ============================================================
+   SET GRID
+============================================================ */
+
+function renderSetGrid(){
+
+  const existing=
+    document.querySelector(
+      "#teacherSetGrid"
+    );
+
+  if(existing){
+    existing.remove();
+  }
+
+  const setCard=
+    $("selectedSetTitle")
+      .closest(".card");
+
+  const grid=
+    document.createElement("div");
+
+  grid.id="teacherSetGrid";
+
+  grid.className="set-grid";
+
+  grid.style.marginTop="20px";
+
+
+  state.sets.forEach(set=>{
+
+    const card=
+      document.createElement("div");
+
+    card.className=
+      "set-card"+
+      (
+        set.id===state.selectedSetId
+        ? " set-selected"
+        : ""
+      );
+
+
+    const title=
+      document.createElement("h4");
+
+    title.textContent=set.name;
+
+
+    const count=
+      document.createElement("div");
+
+    count.className="set-count";
+
+    count.textContent=
+      `${set.items.length} vocabulary item${
+        set.items.length===1?"":"s"
+      }`;
+
+
+    const badge=
+      document.createElement("span");
+
+    badge.className="badge";
+
+    badge.textContent=
+      set.builtIn
+      ? "BUILT-IN"
+      : "CUSTOM";
+
+
+    const actions=
+      document.createElement("div");
+
+    actions.className="action-row";
+
+
+    const select=
+      document.createElement("button");
+
+    select.className=
+      "small-btn primary-small";
+
+    select.textContent=
+      set.id===state.selectedSetId
+      ? "✓ SELECTED"
+      : "SELECT";
+
+    select.addEventListener(
+      "click",
+      ()=>{
+        selectSet(set.id);
+      }
+    );
+
+
+    const play=
+      document.createElement("button");
+
+    play.className=
+      "small-btn green-small";
+
+    play.textContent="▶ PLAY";
+
+    play.addEventListener(
+      "click",
+      ()=>{
+        selectSet(set.id);
+        startGame();
+      }
+    );
+
+
+    actions.append(
+      select,
+      play
+    );
+
+    card.append(
+      title,
+      count,
+      badge,
+      actions
+    );
+
+    grid.appendChild(card);
+
+  });
+
+  setCard.appendChild(grid);
+
+}
+
+
+/* ============================================================
+   DELETE VOCAB
+============================================================ */
+
+async function deleteVocabulary(itemId){
+
+  const set=state.selectedSet;
+
+  if(!set) return;
+
+  const item=
+    set.items.find(
+      i=>i.id===itemId
+    );
+
+  if(!item) return;
+
+  if(
+    !confirm(
+      `Delete "${item.word}" from "${set.name}"?`
+    )
+  ) return;
+
+  set.items=
+    set.items.filter(
+      i=>i.id!==itemId
+    );
+
+  try{
+
+    await saveSet(set);
+
+    toast(
+      `Deleted "${item.word}".`
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Could not delete the vocabulary item."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   IMAGE FILE READER
+============================================================ */
+
+function readImageAsDataURL(file){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      if(!file){
+
+        reject(
+          new Error("No file")
+        );
+
+        return;
+      }
+
+      const allowed=[
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/gif"
+      ];
+
+      if(
+        !allowed.includes(file.type)
+      ){
+
+        reject(
+          new Error(
+            "Unsupported image type"
+          )
+        );
+
+        return;
+      }
+
+      const reader=
+        new FileReader();
+
+      reader.onload=()=>{
+
+        if(
+          typeof reader.result!=="string"
+        ){
+
+          reject(
+            new Error(
+              "Image could not be read."
+            )
+          );
+
+        }else{
+
+          resolve(
+            reader.result
+          );
+
+        }
+
+      };
+
+      reader.onerror=()=>{
+
+        reject(
+          reader.error ||
+          new Error("Read failed")
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   HANDLE IMAGE
+============================================================ */
+
+function handleImageSelection(file){
+
+  if(!file) return;
+
+  readImageAsDataURL(file)
+
+    .then(data=>{
+
+      state.pendingImageData=data;
+
+      state.pendingImageName=
+        file.name;
+
+      $("newImageName")
+        .textContent=file.name;
+
+      $("newImagePreviewBox")
+        .innerHTML="";
+
+
+      const img=
+        document.createElement("img");
+
+      img.className=
+        "upload-preview";
+
+      img.src=data;
+
+      img.alt=
+        "Selected vocabulary picture";
+
+
+      $("newImagePreviewBox")
+        .appendChild(img);
+
+    })
+
+    .catch(error=>{
+
+      console.error(error);
+
+      state.pendingImageData=null;
+
+      state.pendingImageName="";
+
+      $("newImageName")
+        .textContent=
+        "No picture selected";
+
+      $("newImagePreviewBox")
+        .innerHTML="";
+
+      toast(
+        "Please choose a valid PNG, JPG, JPEG, WEBP or GIF image."
+      );
+
+    });
+
+}
+
+
+/* ============================================================
+   ADD VOCAB
+============================================================ */
+
+async function addVocabulary(){
+
+  const word=
+    safeText(
+      $("wordInput").value
+    );
+
+  const set=
+    state.selectedSet;
+
+  if(!set){
+
+    toast(
+      "Please select a vocabulary set."
+    );
+
+    return;
+  }
+
+  if(!word){
+
+    toast(
+      "Please enter the vocabulary word."
+    );
+
+    $("wordInput").focus();
+
+    return;
+  }
+
+  if(!state.pendingImageData){
+
+    toast(
+      "Please choose a picture for this word."
+    );
+
+    return;
+  }
+
+  if(
+    set.items.some(
+      i=>i.word.toLowerCase()===
+      word.toLowerCase()
+    )
+  ){
+
+    toast(
+      "That word already exists in this set."
+    );
+
+    return;
+  }
+
+  const item={
+
+    id:
+      "item-"+Date.now()+
+      "-"+
+      Math.random()
+        .toString(36)
+        .slice(2),
+
+    word,
+
+    image:
+      state.pendingImageData,
+
+    imageName:
+      state.pendingImageName
+
+  };
+
+  set.items.push(item);
+
+  try{
+
+    await saveSet(set);
+
+    $("wordInput").value="";
+
+    $("imageInput").value="";
+
+    state.pendingImageData=null;
+
+    state.pendingImageName="";
+
+    $("newImageName")
+      .textContent=
+      "No picture selected";
+
+    $("newImagePreviewBox")
+      .innerHTML="";
+
+    toast(
+      `Added "${word}".`
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    set.items=
+      set.items.filter(
+        i=>i.id!==item.id
+      );
+
+    toast(
+      "Could not save this vocabulary item."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   DOWNLOAD SET
+============================================================ */
+
+function safeFilename(name){
+
+  return name
+    .replace(
+      /[<>:"/\\|?*\x00-\x1F]/g,
+      ""
+    )
+    .replace(/\s+/g,"_")
+    .slice(0,80)
+    ||
+    "Vocabulary_Set";
+
+}
+
+
+function downloadSelectedSet(){
+
+  const set=state.selectedSet;
+
+  if(!set){
+
+    toast(
+      "No vocabulary set selected."
+    );
+
+    return;
+  }
+
+  const portableSet={
+
+    format:
+      "DUAL_MATCH_VOCABULARY_SET",
+
+    version:1,
+
+    exportedAt:
+      new Date().toISOString(),
+
+    setName:
+      set.name,
+
+    vocabulary:
+      set.items.map(item=>({
+
+        word:item.word,
+
+        image:item.image,
+
+        imageName:
+          item.imageName || ""
+
+      }))
+
+  };
+
+  try{
+
+    const json=
+      JSON.stringify(
+        portableSet,
+        null,
+        2
+      );
+
+    const blob=
+      new Blob(
+        [json],
+        {type:"application/json"}
+      );
+
+    const url=
+      URL.createObjectURL(blob);
+
+    const a=
+      document.createElement("a");
+
+    a.href=url;
+
+    a.download=
+      safeFilename(set.name)+
+      "_DualMatch.json";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    setTimeout(
+      ()=>{
+        URL.revokeObjectURL(url);
+      },
+      1000
+    );
+
+    toast(
+      "Vocabulary set downloaded."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Could not create the saved set file."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   UPLOAD SET
+============================================================ */
+
+async function uploadSavedSet(file){
+
+  if(!file) return;
+
+  try{
+
+    const text=
+      await file.text();
+
+    const data=
+      JSON.parse(text);
+
+    if(
+      data.format!==
+      "DUAL_MATCH_VOCABULARY_SET"
+    ){
+
+      throw new Error(
+        "Invalid Dual Match vocabulary file."
+      );
+
+    }
+
+    const name=
+      safeText(data.setName) ||
+      "Imported Set";
+
+    const vocabulary=
+      Array.isArray(data.vocabulary)
+      ? data.vocabulary
+      : [];
+
+
+    if(vocabulary.length===0){
+
+      throw new Error(
+        "The file contains no vocabulary."
+      );
+
+    }
+
+
+    const items=[];
+
+
+    for(
+      const raw of vocabulary
+    ){
+
+      const word=
+        safeText(raw.word);
+
+      const image=
+        safeText(raw.image);
+
+
+      if(!word || !image){
+        continue;
+      }
+
+
+      if(
+        !image.startsWith(
+          "data:image/"
+        )
+      ){
+
+        continue;
+
+      }
+
+
+      items.push({
+
+        id:
+          "import-"+Date.now()+
+          "-"+
+          Math.random()
+            .toString(36)
+            .slice(2),
+
+        word,
+
+        image,
+
+        imageName:
+          safeText(
+            raw.imageName
+          )
+
+      });
+
+    }
+
+
+    if(items.length===0){
+
+      throw new Error(
+        "No valid vocabulary images were found."
+      );
+
+    }
+
+
+    let finalName=name;
+
+
+    if(
+      state.sets.some(
+        s=>
+          s.name.toLowerCase()===
+          finalName.toLowerCase()
+          &&
+          !s.builtIn
+      )
+    ){
+
+      finalName=
+        name+
+        " (Imported)";
+
+    }
+
+
+    const imported={
+
+      id:
+        "set-import-"+Date.now()+
+        "-"+
+        Math.random()
+          .toString(36)
+          .slice(2),
+
+      name:finalName,
+
+      builtIn:false,
+
+      createdAt:Date.now(),
+
+      importedAt:Date.now(),
+
+      items
+
+    };
+
+
+    await saveSet(imported);
+
+    $("setFileInput").value="";
+
+    toast(
+      `Imported "${finalName}" with ${items.length} items.`
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Could not import this vocabulary file."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   SETTINGS UI
+============================================================ */
+
+function updateSettingsUI(){
+
+  $("roundRange").value=
+    state.settings.rounds;
+
+  $("roundValue").textContent=
+    state.settings.rounds;
+
+
+  $("timeRange").value=
+    state.settings.timePerRound;
+
+  $("timeValue").textContent=
+    state.settings.timePerRound+
+    "s";
+
+
+  $("pictureRange").value=
+    state.settings.picturesPerSide;
+
+  $("pictureValue").textContent=
+    state.settings.picturesPerSide;
+
+
+  const required=
+    state.settings.picturesPerSide*
+    2-
+    1;
+
+  $("requiredVocab").textContent=
+    required;
+
+
+  const penalty=
+    state.settings.wrongAnswerPenalty;
+
+
+  if(penalty==="minusOne"){
+
+    $("penaltyMinusOne").checked=true;
+
+  }else{
+
+    $("penaltyNone").checked=true;
+
+  }
+
+
+  updateSettingsDisplay();
+
+}
+
+
+/* ============================================================
+   SETTINGS DISPLAY
+============================================================ */
+
+function updateSettingsDisplay(){
+
+  if(!state.selectedSet) return;
+
+  $("settingsSetName")
+    .textContent=
+    state.selectedSet.name;
+
+  const count=
+    state.selectedSet.items.length;
+
+  $("settingsSetCount")
+    .textContent=
+    `${count} vocabulary item${
+      count===1?"":"s"
+    }`;
+
+}
+
+
+/* ============================================================
+   GAME VALIDATION
+============================================================ */
+
+function validateGameSet(set){
+
+  if(!set){
+
+    toast(
+      "No vocabulary set is selected."
+    );
+
+    return false;
+
+  }
+
+
+  const required=
+    state.settings.picturesPerSide*
+    2-
+    1;
+
+
+  if(
+    set.items.length<
+    required
+  ){
+
+    toast(
+      `For ${state.settings.picturesPerSide} pictures per side, you need ${required} different vocabulary items.`,
+      5000
+    );
+
+    return false;
+
+  }
+
+
+  const valid=
+    set.items.filter(
+      item=>
+        safeText(item.word)
+        &&
+        safeText(item.image)
+          .startsWith(
+            "data:image/"
+          )
+    );
+
+
+  if(
+    valid.length<
+    required
+  ){
+
+    toast(
+      `This set needs ${required} vocabulary items with valid images.`,
+      5000
+    );
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* ============================================================
+   SHUFFLE
+============================================================ */
+
+function shuffle(array){
+
+  const copy=
+    array.slice();
+
+  for(
+    let i=copy.length-1;
+    i>0;
+    i--
+  ){
+
+    const j=
+      Math.floor(
+        Math.random()*(i+1)
+      );
+
+    [
+      copy[i],
+      copy[j]
+    ]=[
+      copy[j],
+      copy[i]
+    ];
+
+  }
+
+  return copy;
+
+}
+
+
+/* ============================================================
+   CHOOSE ROUND ITEMS
+============================================================ */
+
+function chooseRoundItems(set){
+
+  const needed=
+    state.settings.picturesPerSide;
+
+
+  const validItems=
+    set.items.filter(
+      item=>
+        safeText(item.word)
+        &&
+        safeText(item.image)
+          .startsWith(
+            "data:image/"
+          )
+    );
+
+
+  const shuffled=
+    shuffle(validItems);
+
+
+  const target=
+    shuffled[0];
+
+
+  const others=
+    shuffled.slice(1);
+
+
+  const redOthers=
+    others.slice(
+      0,
+      needed-1
+    );
+
+
+  const blueOthers=
+    others.slice(
+      needed-1,
+      (needed-1)*2
+    );
+
+
+  const red=
+    shuffle([
+      target,
+      ...redOthers
+    ]);
+
+
+  const blue=
+    shuffle([
+      target,
+      ...blueOthers
+    ]);
+
+
+  return {
+
+    red,
+
+    blue,
+
+    targetId:
+      target.id
+
+  };
+
+}
+
+
+/* ============================================================
+   START GAME
+============================================================ */
+
+function startGame(){
+
+  const set=
+    state.selectedSet;
+
+  if(!validateGameSet(set)){
+    return;
+  }
+
+  ensureAudio();
+  stopGameTimers();
+
+  state.game.redScore=0;
+  state.game.blueScore=0;
+  state.game.currentRound=1;
+  state.game.roundActive=false;
+  state.game.countdownActive=true;
+  state.game.timerRemaining=state.settings.timePerRound;
+
+  $("resultOverlay").classList.add("hidden");
+
+  updateGameScores();
+  showScreen("gameScreen");
+
+  requestAnimationFrame(()=>{
+    runStartCountdown();
+  });
+
+}
+
+
+/* ============================================================
+   STOP TIMERS
+============================================================ */
+
+function stopGameTimers(){
+
+  if(state.game.timerId){
+
+    clearInterval(
+      state.game.timerId
+    );
+
+    state.game.timerId=null;
+
+  }
+
+
+  if(state.game.roundTimeoutId){
+
+    clearTimeout(
+      state.game.roundTimeoutId
+    );
+
+    state.game.roundTimeoutId=null;
+
+  }
+
+}
+
+
+/* ============================================================
+   GAME SCORES
+============================================================ */
+
+function updateGameScores(){
+
+  $("redScore")
+    .textContent=
+    state.game.redScore;
+
+  $("blueScore")
+    .textContent=
+    state.game.blueScore;
+
+  $("centerRedScore")
+    .textContent=
+    state.game.redScore;
+
+  $("centerBlueScore")
+    .textContent=
+    state.game.blueScore;
+
+
+  $("roundLabel")
+    .textContent=
+    `ROUND ${state.game.currentRound} / ${state.settings.rounds}`;
+
+
+  $("timerLabel")
+    .textContent=
+    Math.max(
+      0,
+      state.game.timerRemaining
+    );
+
+
+  const timer=
+    $("timerLabel");
+
+
+  if(
+    state.game.timerRemaining<=3
+  ){
+
+    timer.classList.add(
+      "warning"
+    );
+
+  }else{
+
+    timer.classList.remove(
+      "warning"
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   CLEAR ARENA
+============================================================ */
+
+function clearArena(arena){
+
+  arena
+    .querySelectorAll(".picture")
+    .forEach(
+      el=>el.remove()
+    );
+
+}
+
+
+/* ============================================================
+   START GAME COUNTDOWN
+============================================================ */
+
+function runStartCountdown(){
+
+  const overlay=$("countdownOverlay");
+  const number=$("countdownNumber");
+  const sub=$("countdownSub");
+
+  if(!overlay || !number || !sub){
+    state.game.countdownActive=false;
+    startRound();
+    return;
+  }
+
+  state.game.countdownActive=true;
+  overlay.classList.remove("hidden");
+
+  let count=3;
+
+  function showCount(){
+
+    if(!state.game.countdownActive){
+      overlay.classList.add("hidden");
+      return;
+    }
+
+    number.className="countdown-number";
+    number.textContent=count;
+    sub.textContent="GET READY!";
+
+    void number.offsetWidth;
+    number.style.animation="countdownPop .72s cubic-bezier(.2,.85,.25,1.25)";
+
+    playCountdownBeep();
+
+    if(count===1){
+
+      state.game.countdownTimeoutId=setTimeout(()=>{
+
+        if(!state.game.countdownActive) return;
+
+        number.className="countdown-number go";
+        number.textContent="GO!";
+        sub.textContent="FIND THE MATCH!";
+
+        void number.offsetWidth;
+        number.style.animation="countdownGo .62s cubic-bezier(.2,.85,.25,1.15)";
+
+        playCountdownGo();
+
+        state.game.countdownTimeoutId=setTimeout(()=>{
+
+          if(!state.game.countdownActive) return;
+
+          state.game.countdownActive=false;
+          overlay.classList.add("hidden");
+          number.style.animation="";
+          state.game.countdownTimeoutId=null;
+
+          startRound();
+
+        },650);
+
+      },700);
+
+      return;
+    }
+
+    count--;
+
+    state.game.countdownTimeoutId=setTimeout(showCount,800);
+  }
+
+  showCount();
+}
+
+
+/* ============================================================
+   START ROUND
+============================================================ */
+
+function startRound(){
+
+  if(state.game.countdownActive){
+    return;
+  }
+
+  stopGameTimers();
+
+
+  if(
+    state.game.currentRound>
+    state.settings.rounds
+  ){
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  const chosen=
+    chooseRoundItems(
+      state.selectedSet
+    );
+
+
+  state.game.redItems=
+    chosen.red;
+
+  state.game.blueItems=
+    chosen.blue;
+
+  state.game.targetId=
+    chosen.targetId;
+
+
+  /*
+    IMPORTANT:
+    The round is unlocked exactly once here.
+  */
+
+  state.game.roundActive=true;
+
+  state.game.timerRemaining=
+    state.settings.timePerRound;
+
+
+  renderArena(
+    $("redArena"),
+    chosen.red,
+    "red"
+  );
+
+
+  renderArena(
+    $("blueArena"),
+    chosen.blue,
+    "blue"
+  );
+
+
+  updateGameScores();
+
+  playRoundStartSound();
+
+
+  /*
+    REAL TIMER
+  */
+
+  state.game.timerId=
+    setInterval(()=>{
+
+      if(
+        !state.game.roundActive
+      ){
+
+        return;
+
+      }
+
+
+      state.game.timerRemaining--;
+
+      updateGameScores();
+
+
+      if(
+        state.game.timerRemaining<=0
+      ){
+
+        endRound(null);
+
+      }
+
+    },1000);
+
+}
+
+
+/* ============================================================
+   RENDER ARENA
+============================================================ */
+
+function renderArena(
+  arena,
+  items,
+  team
+){
+
+  clearArena(arena);
+
+
+  const rect=
+    arena.getBoundingClientRect();
+
+
+  const w=rect.width;
+
+  const h=rect.height;
+
+
+  const points=[];
+
+
+  const size=
+    Math.max(
+      45,
+      Math.min(
+        110,
+        w*.20
+      )
+    );
+
+
+  function validPoint(x,y){
+
+    const cx=w/2;
+
+    const cy=h/2;
+
+    const radius=
+      Math.min(w,h)/2;
+
+
+    const dx=
+      x-cx;
+
+    const dy=
+      y-cy;
+
+
+    if(
+      Math.sqrt(
+        dx*dx+
+        dy*dy
+      )>
+      radius-size*.72
+    ){
+
+      return false;
+
+    }
+
+
+    for(
+      const p of points
+    ){
+
+      const distance=
+        Math.hypot(
+          x-p.x,
+          y-p.y
+        );
+
+
+      if(
+        distance<
+        size*1.18
+      ){
+
+        return false;
+
+      }
+
+    }
+
+
+    return true;
+
+  }
+
+
+  for(
+    let i=0;
+    i<items.length;
+    i++
+  ){
+
+    let x;
+
+    let y;
+
+    let found=false;
+
+
+    for(
+      let attempt=0;
+      attempt<500;
+      attempt++
+    ){
+
+      const radius=
+        Math.min(w,h)/2-
+        size*.9;
+
+
+      const angle=
+        Math.random()*
+        Math.PI*
+        2;
+
+
+      const distance=
+        Math.sqrt(
+          Math.random()
+        )*
+        radius*
+        .82;
+
+
+      x=
+        w/2+
+        Math.cos(angle)*
+        distance;
+
+
+      y=
+        h/2+
+        Math.sin(angle)*
+        distance;
+
+
+      if(
+        validPoint(x,y)
+      ){
+
+        found=true;
+
+        break;
+
+      }
+
+    }
+
+
+    if(!found){
+
+      const angle=
+        (i/items.length)*
+        Math.PI*
+        2;
+
+      const radius=
+        Math.min(w,h)*.29;
+
+      x=
+        w/2+
+        Math.cos(angle)*
+        radius;
+
+      y=
+        h/2+
+        Math.sin(angle)*
+        radius;
+
+    }
+
+
+    points.push({
+      x,
+      y
+    });
+
+
+    const img=
+      document.createElement("img");
+
+
+    img.className="picture";
+
+
+    /*
+      IMPORTANT:
+      The exact stored image belonging to this vocabulary
+      object is used here.
+    */
+
+    img.src=
+      items[i].image;
+
+
+    img.alt="";
+
+    img.draggable=false;
+
+
+    img.dataset.itemId=
+      items[i].id;
+
+
+    img.dataset.team=
+      team;
+
+
+    const left=
+      (
+        (x-size/2)/w
+      )*
+      100;
+
+
+    const top=
+      (
+        (y-size/2)/h
+      )*
+      100;
+
+
+    img.style.left=
+      left+"%";
+
+
+    img.style.top=
+      top+"%";
+
+
+    img.addEventListener(
+      "error",
+      ()=>{
+
+        /*
+          Broken images NEVER crash the game.
+        */
+
+        if(
+          !img.dataset.fallbackApplied
+        ){
+
+          img.dataset.fallbackApplied="1";
+
+          img.src=
+            classroomSVG(
+              "fallback"
+            );
+
+        }
+
+      }
+    );
+
+
+    /*
+      POINTERDOWN
+      This works with mouse + touchscreen + tablet.
+    */
+
+    img.addEventListener(
+      "pointerdown",
+      event=>{
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+
+        if(
+          !state.game.roundActive
+        ){
+
+          return;
+
+        }
+
+
+        /*
+          Pointer capture is intentionally attempted
+          for reliable touchscreen interaction.
+        */
+
+        try{
+
+          if(
+            img.setPointerCapture
+          ){
+
+            img.setPointerCapture(
+              event.pointerId
+            );
+
+          }
+
+        }catch(error){}
+
+
+        handlePictureTap(
+          img,
+          items[i],
+          team
+        );
+
+      },
+      {
+        passive:false
+      }
+    );
+
+
+    arena.appendChild(img);
+
+  }
+
+}
+
+
+/* ============================================================
+   HANDLE PICTURE TAP
+============================================================ */
+
+function handlePictureTap(
+  element,
+  item,
+  team
+){
+
+  /*
+    CRITICAL RACE LOCK:
+    The first correct pointerdown changes roundActive
+    to false BEFORE any sound, animation or timeout.
+
+    Therefore two simultaneous touches cannot both score.
+  */
+
+  if(
+    !state.game.roundActive
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    item.id===
+    state.game.targetId
+  ){
+
+    /*
+      FIRST ACTION:
+      LOCK ROUND IMMEDIATELY.
+    */
+
+    state.game.roundActive=false;
+
+
+    /*
+      Now stop timer immediately.
+    */
+
+    stopGameTimers();
+
+
+    /*
+      Award exactly ONE point.
+    */
+
+    if(team==="red"){
+
+      state.game.redScore++;
+
+    }else if(team==="blue"){
+
+      state.game.blueScore++;
+
+    }
+
+
+    playCorrectSound();
+
+
+    showPoint(
+      team,
+      element
+    );
+
+
+    element.classList.add(
+      "correct"
+    );
+
+
+    updateGameScores();
+
+
+    /*
+      Start next round only after the current
+      winner animation has begun.
+    */
+
+    state.game.roundTimeoutId=
+      setTimeout(()=>{
+
+        state.game.currentRound++;
+
+
+        if(
+          state.game.currentRound>
+          state.settings.rounds
+        ){
+
+          finishGame();
+
+        }else{
+
+          startRound();
+
+        }
+
+      },650);
+
+
+  }else{
+
+    /*
+      WRONG ANSWER
+    */
+
+    playWrongSound();
+
+
+    element.classList.remove(
+      "shake"
+    );
+
+
+    void element.offsetWidth;
+
+
+    element.classList.add(
+      "shake"
+    );
+
+
+    /*
+      Optional -1 penalty.
+    */
+
+    if(
+      state.settings.wrongAnswerPenalty===
+      "minusOne"
+    ){
+
+      if(team==="red"){
+
+        state.game.redScore=
+          Math.max(
+            0,
+            state.game.redScore-1
+          );
+
+        showPenalty(
+          "red",
+          element
+        );
+
+      }else if(team==="blue"){
+
+        state.game.blueScore=
+          Math.max(
+            0,
+            state.game.blueScore-1
+          );
+
+        showPenalty(
+          "blue",
+          element
+        );
+
+      }
+
+
+      updateGameScores();
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   +1 FEEDBACK
+============================================================ */
+
+function showPoint(
+  team,
+  element
+){
+
+  const pop=
+    document.createElement("div");
+
+
+  pop.className=
+    "point-pop "+
+    (
+      team==="red"
+      ? "red-point"
+      : "blue-point"
+    );
+
+
+  pop.textContent="+1";
+
+
+  const side=
+    team==="red"
+    ? $("redSide")
+    : $("blueSide");
+
+
+  const rect=
+    side.getBoundingClientRect();
+
+
+  let x=
+    rect.width/2;
+
+
+  let y=
+    rect.height/2;
+
+
+  if(element){
+
+    const er=
+      element.getBoundingClientRect();
+
+
+    x=
+      er.left-
+      rect.left+
+      er.width/2;
+
+
+    y=
+      er.top-
+      rect.top+
+      er.height/2;
+
+  }
+
+
+  pop.style.left=
+    x+"px";
+
+
+  pop.style.top=
+    y+"px";
+
+
+  side.appendChild(pop);
+
+
+  setTimeout(
+    ()=>{
+      pop.remove();
+    },
+    800
+  );
+
+}
+
+
+/* ============================================================
+   -1 FEEDBACK
+============================================================ */
+
+function showPenalty(
+  team,
+  element
+){
+
+  const pop=
+    document.createElement("div");
+
+
+  pop.className=
+    "penalty-pop";
+
+
+  pop.textContent="-1";
+
+
+  const side=
+    team==="red"
+    ? $("redSide")
+    : $("blueSide");
+
+
+  const rect=
+    side.getBoundingClientRect();
+
+
+  let x=
+    rect.width/2;
+
+
+  let y=
+    120;
+
+
+  if(element){
+
+    const er=
+      element.getBoundingClientRect();
+
+
+    x=
+      er.left-
+      rect.left+
+      er.width/2;
+
+
+    y=
+      er.top-
+      rect.top+
+      er.height/2;
+
+  }
+
+
+  pop.style.left=
+    x+"px";
+
+
+  pop.style.top=
+    y+"px";
+
+
+  side.appendChild(pop);
+
+
+  setTimeout(
+    ()=>{
+      pop.remove();
+    },
+    750
+  );
+
+}
+
+
+/* ============================================================
+   END ROUND
+============================================================ */
+
+function endRound(
+  winner,
+  correctElement=null
+){
+
+  /*
+    If the round was already won by another player,
+    ignore this event.
+  */
+
+  if(
+    !state.game.roundActive &&
+    winner!==null
+  ){
+
+    return;
+
+  }
+
+
+  /*
+    Timeout case.
+  */
+
+  if(winner===null){
+
+    if(
+      !state.game.roundActive
+    ){
+
+      return;
+
+    }
+
+    state.game.roundActive=false;
+
+    stopGameTimers();
+
+    updateGameScores();
+
+
+    state.game.roundTimeoutId=
+      setTimeout(()=>{
+
+        state.game.currentRound++;
+
+
+        if(
+          state.game.currentRound>
+          state.settings.rounds
+        ){
+
+          finishGame();
+
+        }else{
+
+          startRound();
+
+        }
+
+      },500);
+
+
+    return;
+
+  }
+
+}
+
+
+/* ============================================================
+   FINISH GAME
+============================================================ */
+
+function finishGame(){
+
+  stopGameTimers();
+
+  state.game.roundActive=false;
+
+  playGameOverSound();
+
+
+  $("finalRed")
+    .textContent=
+    state.game.redScore;
+
+
+  $("finalBlue")
+    .textContent=
+    state.game.blueScore;
+
+
+  if(
+    state.game.redScore>
+    state.game.blueScore
+  ){
+
+    $("resultIcon")
+      .textContent="🔴🏆";
+
+    $("resultTitle")
+      .textContent=
+      "RED TEAM WINS!";
+
+
+  }else if(
+    state.game.blueScore>
+    state.game.redScore
+  ){
+
+    $("resultIcon")
+      .textContent="🔵🏆";
+
+    $("resultTitle")
+      .textContent=
+      "BLUE TEAM WINS!";
+
+
+  }else{
+
+    $("resultIcon")
+      .textContent="🤝";
+
+    $("resultTitle")
+      .textContent=
+      "DRAW!";
+
+  }
+
+
+  $("resultOverlay")
+    .classList
+    .remove("hidden");
+
+}
+
+
+/* ============================================================
+   EXIT GAME
+============================================================ */
+
+function exitGame(){
+
+  stopGameTimers();
+
+  state.game.roundActive=false;
+  state.game.countdownActive=false;
+
+  const countdownOverlay=$("countdownOverlay");
+  if(countdownOverlay){
+    countdownOverlay.classList.add("hidden");
+  }
+
+  $("resultOverlay")
+    .classList
+    .add("hidden");
+
+  showScreen(
+    "menuScreen"
+  );
+
+}
+
+
+/* ============================================================
+   EVENTS
+============================================================ */
+
+function setupEvents(){
+
+
+  /*
+    MAIN MENU
+  */
+
+  $("playBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        ensureAudio();
+        startGame();
+      }
+    );
+
+
+  $("teacherBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        renderTeacher();
+        showScreen(
+          "teacherScreen"
+        );
+      }
+    );
+
+
+  $("settingsBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+
+        updateSettingsUI();
+
+        showScreen(
+          "settingsScreen"
+        );
+
+      }
+    );
+
+
+  $("howBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        showScreen(
+          "howScreen"
+        );
+      }
+    );
+
+
+  /*
+    BACK
+  */
+
+  $("teacherBackBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        showScreen(
+          "menuScreen"
+        );
+      }
+    );
+
+
+  $("settingsBackBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        showScreen(
+          "menuScreen"
+        );
+      }
+    );
+
+
+  $("howBackBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        showScreen(
+          "menuScreen"
+        );
+      }
+    );
+
+
+  /*
+    TEACHER
+  */
+
+  $("createSetBtn")
+    .addEventListener(
+      "click",
+      createSet
+    );
+
+
+  $("newSetName")
+    .addEventListener(
+      "keydown",
+      event=>{
+
+        if(event.key==="Enter"){
+
+          createSet();
+
+        }
+
+      }
+    );
+
+
+  $("uploadArea")
+    .addEventListener(
+      "click",
+      ()=>{
+        $("imageInput").click();
+      }
+    );
+
+
+  $("imageInput")
+    .addEventListener(
+      "change",
+      event=>{
+
+        handleImageSelection(
+          event.target.files[0]
+        );
+
+      }
+    );
+
+
+  $("addVocabBtn")
+    .addEventListener(
+      "click",
+      addVocabulary
+    );
+
+
+  $("wordInput")
+    .addEventListener(
+      "keydown",
+      event=>{
+
+        if(event.key==="Enter"){
+
+          addVocabulary();
+
+        }
+
+      }
+    );
+
+
+  $("downloadSetBtn")
+    .addEventListener(
+      "click",
+      downloadSelectedSet
+    );
+
+
+  $("uploadSetBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        $("setFileInput").click();
+      }
+    );
+
+
+  $("setFileInput")
+    .addEventListener(
+      "change",
+      event=>{
+
+        uploadSavedSet(
+          event.target.files[0]
+        );
+
+      }
+    );
+
+
+  $("deleteSetBtn")
+    .addEventListener(
+      "click",
+      deleteSelectedSet
+    );
+
+
+  $("playSelectedBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        ensureAudio();
+        startGame();
+      }
+    );
+
+
+  /*
+    SETTINGS
+  */
+
+  $("roundRange")
+    .addEventListener(
+      "input",
+      event=>{
+
+        state.settings.rounds=
+          Number(
+            event.target.value
+          );
+
+        updateSettingsUI();
+
+      }
+    );
+
+
+  $("timeRange")
+    .addEventListener(
+      "input",
+      event=>{
+
+        state.settings.timePerRound=
+          Number(
+            event.target.value
+          );
+
+        updateSettingsUI();
+
+      }
+    );
+
+
+  $("pictureRange")
+    .addEventListener(
+      "input",
+      event=>{
+
+        state.settings.picturesPerSide=
+          Number(
+            event.target.value
+          );
+
+        updateSettingsUI();
+
+      }
+    );
+
+
+  $("penaltyNone")
+    .addEventListener(
+      "change",
+      event=>{
+
+        if(event.target.checked){
+
+          state.settings.wrongAnswerPenalty=
+            "none";
+
+        }
+
+      }
+    );
+
+
+  $("penaltyMinusOne")
+    .addEventListener(
+      "change",
+      event=>{
+
+        if(event.target.checked){
+
+          state.settings.wrongAnswerPenalty=
+            "minusOne";
+
+        }
+
+      }
+    );
+
+
+  $("settingsPlayBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+        ensureAudio();
+        startGame();
+      }
+    );
+
+
+  /*
+    GAME
+  */
+
+  $("exitGameBtn")
+    .addEventListener(
+      "click",
+      exitGame
+    );
+
+
+  $("playAgainBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+
+        $("resultOverlay")
+          .classList
+          .add("hidden");
+
+        ensureAudio();
+
+        startGame();
+
+      }
+    );
+
+
+  $("mainMenuFromResultBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+
+        $("resultOverlay")
+          .classList
+          .add("hidden");
+
+        exitGame();
+
+      }
+    );
+
+
+  /*
+    Prevent browser context menu during game.
+  */
+
+  $("gameScreen")
+    .addEventListener(
+      "contextmenu",
+      event=>{
+        event.preventDefault();
+      }
+    );
+
+
+  /*
+    Prevent scrolling / browser gestures inside game.
+  */
+
+  $("gameScreen")
+    .addEventListener(
+      "touchmove",
+      event=>{
+        event.preventDefault();
+      },
+      {
+        passive:false
+      }
+    );
+
+
+  /*
+    Resize handling.
+  */
+
+  let resizeTimer=null;
+
+
+  window.addEventListener(
+    "resize",
+    ()=>{
+
+      clearTimeout(
+        resizeTimer
+      );
+
+
+      resizeTimer=
+        setTimeout(()=>{
+
+          if(
+            !$("gameScreen")
+              .classList
+              .contains("hidden")
+            &&
+            state.game.roundActive
+          ){
+
+            renderArena(
+              $("redArena"),
+              state.game.redItems,
+              "red"
+            );
+
+
+            renderArena(
+              $("blueArena"),
+              state.game.blueItems,
+              "blue"
+            );
+
+          }
+
+        },150);
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   ERROR SAFETY
+============================================================ */
+
+window.addEventListener(
+  "error",
+  event=>{
+
+    console.error(
+      "Dual Match error:",
+      event.error ||
+      event.message
+    );
+
+
+    if(
+      document.readyState==="complete"
+    ){
+
+      toast(
+        "Something went wrong, but the game is still running.",
+        3500
+      );
+
+    }
+
+  }
+);
+
+
+window.addEventListener(
+  "unhandledrejection",
+  event=>{
+
+    console.error(
+      "Dual Match promise error:",
+      event.reason
+    );
+
+
+    if(
+      document.readyState==="complete"
+    ){
+
+      toast(
+        "A saved-data operation could not be completed.",
+        3500
+      );
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+async function initialize(){
+
+  try{
+
+    setupEvents();
+
+    updateSettingsUI();
+
+    await openDatabase();
+
+    await loadSets();
+
+
+    if(!state.selectedSet){
+
+      state.selectedSet=
+        createDefaultSet();
+
+      state.selectedSetId=
+        state.selectedSet.id;
+
+    }
+
+
+    showScreen(
+      "menuScreen"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Initialization error:",
+      error
+    );
+
+
+    /*
+      Guaranteed fallback:
+      The game still gets a default set and
+      the menu will not become black.
+    */
+
+    state.sets=[
+      createDefaultSet()
+    ];
+
+    state.selectedSet=
+      state.sets[0];
+
+    state.selectedSetId=
+      state.selectedSet.id;
+
+
+    /*
+      setupEvents may not have run if initialization
+      failed very early.
+    */
+
+    try{
+
+      setupEvents();
+
+    }catch(eventError){
+
+      console.error(
+        eventError
+      );
+
+    }
+
+
+    updateSettingsUI();
+
+    showScreen(
+      "menuScreen"
+    );
+
+
+    toast(
+      "Saved storage is unavailable. Default School Objects is ready.",
+      5000
+    );
+
+  }
+
+}
+
+
+initialize();
+
+</script>
+
+</body>
+</html>
