@@ -456,8 +456,11 @@ input[type=range]{
 }
 
 .upload-preview{
-  width:120px;
-  height:120px;
+  display:block;
+  width:120px !important;
+  height:120px !important;
+  max-width:120px !important;
+  max-height:120px !important;
   object-fit:contain;
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.3));
 }
@@ -521,6 +524,10 @@ input[type=range]{
   display:block;
   margin:0 auto 7px;
   filter:drop-shadow(0 6px 5px rgba(0,0,0,.25));
+}
+
+.teacher-vocab-thumb{
+  width:100px !important;height:90px !important;max-width:100px !important;max-height:90px !important;object-fit:contain !important;
 }
 
 .vocab-word{
@@ -1144,11 +1151,38 @@ input:focus{border-color:#5e8cff;background:#fff}
 @keyframes countdownPop{0%{transform:scale(.45);opacity:0}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes countdownGo{0%{transform:scale(.55);opacity:0}55%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
 
+
+/* =========================================================
+   TEACHER DISPLAY MODES + BULK IMAGE IMPORT
+========================================================= */
+.display-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.display-mode-option{position:relative;cursor:pointer}.display-mode-option input{position:absolute;opacity:0;pointer-events:none}
+.display-mode-label{min-height:125px;padding:15px;border:2px solid #d2deef;border-radius:18px;background:#f7faff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px;transition:.18s ease;color:#34476e}
+.display-mode-label:hover{transform:translateY(-2px);border-color:#8ca8df}
+.display-mode-option input:checked + .display-mode-label{border-color:#5e80ef;background:linear-gradient(145deg,#edf3ff,#fff);box-shadow:0 0 0 4px rgba(94,128,239,.12);color:#203b72}
+.display-mode-icon{font-size:28px}.display-mode-label strong{font-size:13px}.display-mode-label small{font-size:11px;color:#71809e}
+.bulk-upload-box{margin-top:14px;padding:15px;border:2px dashed #b9c9e5;border-radius:18px;background:#f7fbff;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.bulk-upload-box p{font-size:12px;margin:4px 0 0}.bulk-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}
+.bulk-item{background:#fff;border:1px solid #d9e4f3;border-radius:15px;padding:10px;display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;align-items:center;min-width:0}
+.bulk-item img{display:block;width:70px!important;height:70px!important;max-width:70px!important;max-height:70px!important;min-width:0!important;min-height:0!important;object-fit:contain;filter:drop-shadow(0 4px 4px rgba(30,50,90,.16))}
+.bulk-item input{box-sizing:border-box;padding:9px 10px;border:1px solid #cbd8ee;border-radius:10px;width:100%;min-width:0;background:#f8fbff;color:#203154}
+.bulk-item small{display:block;color:#8290a9;font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bulk-actions{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end}.bulk-actions button{padding:7px 10px;border-radius:9px;font-size:11px;font-weight:900}
+.bulk-preview .small-btn{box-sizing:border-box}
+.text-choice{position:absolute;z-index:5;cursor:pointer;user-select:none;touch-action:none;max-width:27%;min-width:0;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.96);color:#24355f;font-size:clamp(13px,1.65vw,20px);font-weight:1000;text-align:center;box-shadow:0 7px 16px rgba(38,61,103,.16);border:2px solid rgba(52,79,130,.10);white-space:normal;overflow-wrap:anywhere;transform:translate(-50%,-50%)}
+.text-choice:hover{transform:translate(-50%,-50%) scale(1.05);background:#fff}.text-choice.shake{animation:shakeText .36s ease}.text-choice.correct{animation:correctText .45s ease forwards}
+.choice-both{position:absolute;z-index:5;cursor:pointer;touch-action:none;user-select:none;width:15%;min-width:58px;max-width:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translate(-50%,-50%)}
+.choice-both img{display:block;width:100%;height:64px;max-height:64px;object-fit:contain;filter:drop-shadow(0 7px 5px rgba(20,30,55,.22))}.choice-both .choice-word{margin-top:3px;padding:4px 6px;max-width:100%;border-radius:8px;background:rgba(255,255,255,.92);color:#24355f;font-size:clamp(9px,1.05vw,14px);font-weight:1000;text-align:center;box-shadow:0 4px 9px rgba(38,61,103,.12);overflow-wrap:anywhere}
+.choice-both.shake{animation:shake .36s ease}.choice-both.correct{animation:correctPop .45s ease forwards}
+@keyframes shakeText{0%,100%{transform:translate(-50%,-50%) translateX(0)}20%{transform:translate(-50%,-50%) translateX(-8px)}40%{transform:translate(-50%,-50%) translateX(8px)}60%{transform:translate(-50%,-50%) translateX(-6px)}80%{transform:translate(-50%,-50%) translateX(5px)}}
+@keyframes correctText{0%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-50%) scale(1.15)}100%{transform:translate(-50%,-50%) scale(0);opacity:0}}
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
 @media(max-width:700px){
+  .display-mode-grid{grid-template-columns:1fr}
+  .bulk-upload-box{flex-direction:column;align-items:stretch}
 
   .menu-content{
     padding:18px 15px;
@@ -1484,6 +1518,32 @@ input:focus{border-color:#5e8cff;background:#fff}
 
     <div class="card">
 
+      <h3>🎮 Game Display</h3>
+
+      <p>Choose how vocabulary appears during the game.</p>
+
+      <div class="display-mode-grid">
+        <label class="display-mode-option">
+          <input type="radio" name="displayMode" id="modePicture" value="picture" checked>
+          <span class="display-mode-label"><span class="display-mode-icon">🖼️</span><strong>PICTURES</strong><small>Pictures only</small></span>
+        </label>
+        <label class="display-mode-option">
+          <input type="radio" name="displayMode" id="modeText" value="text">
+          <span class="display-mode-label"><span class="display-mode-icon">🔤</span><strong>WORD</strong><small>Words only</small></span>
+        </label>
+        <label class="display-mode-option">
+          <input type="radio" name="displayMode" id="modeBoth" value="both">
+          <span class="display-mode-label"><span class="display-mode-icon">🖼️ + 🔤</span><strong>WORD + PICTURES</strong><small>Word and picture together</small></span>
+        </label>
+      </div>
+
+      <div id="displayModeHint" class="notice">Pictures: each vocabulary item needs a picture.</div>
+
+    </div>
+
+
+    <div class="card">
+
       <h3>＋ Add Vocabulary</h3>
 
       <p>
@@ -1535,6 +1595,17 @@ input:focus{border-color:#5e8cff;background:#fff}
             >
 
           </div>
+
+          <div class="bulk-upload-box">
+            <div>
+              <strong>⚡ ADD MANY PICTURES AT ONCE</strong>
+              <p>Select multiple classroom images. The filename becomes the word automatically, and you can edit each word before saving.</p>
+            </div>
+            <button type="button" class="small-btn green-small" id="bulkImageBtn">📁 CHOOSE MULTIPLE</button>
+            <input id="bulkImageInput" type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+          </div>
+
+          <div id="bulkPreview" class="bulk-preview"></div>
 
 
           <div class="action-row">
@@ -2326,6 +2397,8 @@ let state = {
 
     picturesPerSide: 6,
 
+    displayMode: "picture",
+
     wrongAnswerPenalty: "none"
 
   },
@@ -2361,6 +2434,8 @@ let state = {
   pendingImageData: null,
 
   pendingImageName: "",
+
+  pendingBulkImages: [],
 
   audio: {
 
@@ -3806,19 +3881,22 @@ function renderTeacher(){
     div.className="vocab-item";
 
 
-    const img=
-      document.createElement("img");
+    const media=document.createElement("div");
+    media.style.minHeight="90px";
+    media.style.display="flex";
+    media.style.alignItems="center";
+    media.style.justifyContent="center";
 
-    img.src=item.image;
-
-    img.alt=item.word;
-
-    img.onerror=()=>{
-
-      img.src=
-        classroomSVG("fallback");
-
-    };
+    if(safeText(item.image).startsWith("data:image/")){
+      const img=document.createElement("img");
+      img.className="teacher-vocab-thumb";
+      img.src=item.image;
+      img.alt=item.word;
+      img.onerror=()=>{ img.src=classroomSVG("fallback"); };
+      media.appendChild(img);
+    }else{
+      media.innerHTML='<div style="font-size:42px">🔤</div>';
+    }
 
 
     const word=
@@ -3845,7 +3923,7 @@ function renderTeacher(){
 
 
     div.append(
-      img,
+      media,
       word,
       del
     );
@@ -4189,6 +4267,77 @@ function handleImageSelection(file){
 
 
 /* ============================================================
+   BULK IMAGE IMPORT
+============================================================ */
+
+async function handleBulkImageSelection(files){
+  const validFiles=Array.from(files||[]).filter(file=>["image/png","image/jpeg","image/webp","image/gif"].includes((file.type||"").toLowerCase()));
+  if(!validFiles.length){ toast("Please choose PNG, JPG, JPEG, WEBP or GIF images."); return; }
+
+  state.pendingBulkImages=[];
+  const seenNames=new Set();
+
+  for(const file of validFiles){
+    const key=(file.name||"").toLowerCase()+"|"+file.size+"|"+file.lastModified;
+    if(seenNames.has(key)) continue;
+    seenNames.add(key);
+    try{
+      const data=await readImageAsDataURL(file);
+      state.pendingBulkImages.push({
+        image:data,
+        imageName:file.name,
+        word:file.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim()||"New Word"
+      });
+    }catch(error){
+      console.warn("Bulk image skipped:",file.name,error);
+    }
+  }
+
+  renderBulkPreview();
+  toast(`${state.pendingBulkImages.length} picture(s) ready to add.`);
+}
+
+function renderBulkPreview(){
+  const box=$("bulkPreview"); if(!box) return; box.innerHTML="";
+  if(!state.pendingBulkImages.length) return;
+  state.pendingBulkImages.forEach((entry,index)=>{
+    const row=document.createElement("div"); row.className="bulk-item";
+    const img=document.createElement("img"); img.src=entry.image; img.alt="";
+    const controls=document.createElement("div");
+    const input=document.createElement("input"); input.type="text"; input.value=entry.word; input.placeholder="Word";
+    input.addEventListener("input",()=>{state.pendingBulkImages[index].word=safeText(input.value);});
+    const small=document.createElement("small"); small.textContent=entry.imageName;
+    controls.append(input,small);
+    const actions=document.createElement("div"); actions.className="bulk-actions";
+    const remove=document.createElement("button"); remove.className="small-btn red-small"; remove.textContent="REMOVE";
+    remove.addEventListener("click",()=>{state.pendingBulkImages.splice(index,1);renderBulkPreview();});
+    actions.appendChild(remove); row.append(img,controls,actions); box.appendChild(row);
+  });
+  const save=document.createElement("button"); save.className="small-btn primary-small"; save.style.gridColumn="1/-1";
+  save.textContent=`＋ ADD ALL ${state.pendingBulkImages.length} PICTURES`;
+  save.addEventListener("click",addBulkVocabulary); box.appendChild(save);
+}
+
+async function addBulkVocabulary(){
+  const set=state.selectedSet; if(!set){toast("Please select a vocabulary set.");return;}
+  const entries=state.pendingBulkImages.filter(e=>safeText(e.word)&&safeText(e.image).startsWith("data:image/"));
+  if(!entries.length){toast("There are no valid pictures ready to add.");return;}
+  const existing=new Set(set.items.map(i=>safeText(i.word).toLowerCase()));
+  let added=0,skipped=0;
+  for(const entry of entries){
+    const word=safeText(entry.word);
+    if(existing.has(word.toLowerCase())){skipped++;continue;}
+    set.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2),word,image:entry.image,imageName:entry.imageName});
+    existing.add(word.toLowerCase()); added++;
+  }
+  try{
+    await saveSet(set); state.pendingBulkImages=[]; $("bulkImageInput").value=""; renderBulkPreview();
+    toast(`Added ${added} picture(s)${skipped?`; ${skipped} duplicate(s) skipped`:""}.`);
+  }catch(error){console.error(error);toast("Could not save the bulk vocabulary import.");}
+}
+
+
+/* ============================================================
    ADD VOCAB
 ============================================================ */
 
@@ -4257,7 +4406,7 @@ async function addVocabulary(){
     word,
 
     image:
-      state.pendingImageData,
+      state.pendingImageData || "",
 
     imageName:
       state.pendingImageName
@@ -4344,7 +4493,9 @@ function downloadSelectedSet(){
     format:
       "DUAL_MATCH_VOCABULARY_SET",
 
-    version:1,
+    version:2,
+
+    displayMode:state.settings.displayMode,
 
     exportedAt:
       new Date().toISOString(),
@@ -4483,19 +4634,12 @@ async function uploadSavedSet(file){
         safeText(raw.image);
 
 
-      if(!word || !image){
+      if(!word){
         continue;
       }
 
-
-      if(
-        !image.startsWith(
-          "data:image/"
-        )
-      ){
-
+      if(image && !image.startsWith("data:image/")){
         continue;
-
       }
 
 
@@ -4523,11 +4667,7 @@ async function uploadSavedSet(file){
 
 
     if(items.length===0){
-
-      throw new Error(
-        "No valid vocabulary images were found."
-      );
-
+      throw new Error("No valid vocabulary items were found.");
     }
 
 
@@ -4575,6 +4715,11 @@ async function uploadSavedSet(file){
 
     await saveSet(imported);
 
+    if(data.displayMode==="text" || data.displayMode==="picture" || data.displayMode==="both"){
+      state.settings.displayMode=data.displayMode;
+      updateSettingsUI();
+    }
+
     $("setFileInput").value="";
 
     toast(
@@ -4599,6 +4744,13 @@ async function uploadSavedSet(file){
 ============================================================ */
 
 function updateSettingsUI(){
+
+  const mode=state.settings.displayMode || "picture";
+  ["modePicture","modeText","modeBoth"].forEach(id=>{ if($(id)) $(id).checked=false; });
+  const modeId={picture:"modePicture",text:"modeText",both:"modeBoth"}[mode] || "modePicture";
+  if($(modeId)) $(modeId).checked=true;
+  const hints={picture:"Pictures: the game shows pictures only.",text:"Word: the game shows words only. Pictures are optional.",both:"Word + Pictures: the game shows each word together with its picture."};
+  if($("displayModeHint")) $("displayModeHint").textContent=hints[mode] || hints.picture;
 
   $("roundRange").value=
     state.settings.rounds;
@@ -4681,67 +4833,33 @@ function updateSettingsDisplay(){
 
 function validateGameSet(set){
 
-  if(!set){
+  if(!set){ toast("No vocabulary set is selected."); return false; }
 
-    toast(
-      "No vocabulary set is selected."
-    );
-
+  const required=state.settings.picturesPerSide*2-1;
+  if(set.items.length<required){
+    toast(`For ${state.settings.picturesPerSide} pictures per side, you need ${required} different vocabulary items.`,5000);
     return false;
-
   }
 
+  const mode=state.settings.displayMode;
+  const valid=set.items.filter(item=>{
+    const hasWord=!!safeText(item.word);
+    const hasImage=safeText(item.image).startsWith("data:image/");
+    if(mode==="text") return hasWord;
+    return hasWord && hasImage;
+  });
 
-  const required=
-    state.settings.picturesPerSide*
-    2-
-    1;
-
-
-  if(
-    set.items.length<
-    required
-  ){
-
-    toast(
-      `For ${state.settings.picturesPerSide} pictures per side, you need ${required} different vocabulary items.`,
-      5000
-    );
-
+  if(valid.length<required){
+    const msg=mode==="text"
+      ? `Text Only needs ${required} vocabulary words with names.`
+      : mode==="both"
+        ? `Picture + Text needs ${required} items with both a word and a valid picture.`
+        : `Picture Only needs ${required} items with both a word and a valid picture.`;
+    toast(msg,5000);
     return false;
-
   }
-
-
-  const valid=
-    set.items.filter(
-      item=>
-        safeText(item.word)
-        &&
-        safeText(item.image)
-          .startsWith(
-            "data:image/"
-          )
-    );
-
-
-  if(
-    valid.length<
-    required
-  ){
-
-    toast(
-      `This set needs ${required} vocabulary items with valid images.`,
-      5000
-    );
-
-    return false;
-
-  }
-
 
   return true;
-
 }
 
 
@@ -4786,73 +4904,23 @@ function shuffle(array){
 
 function chooseRoundItems(set){
 
-  const needed=
-    state.settings.picturesPerSide;
+  const needed=state.settings.picturesPerSide;
+  const mode=state.settings.displayMode;
 
+  const validItems=set.items.filter(item=>{
+    const hasWord=!!safeText(item.word);
+    const hasImage=safeText(item.image).startsWith("data:image/");
+    if(mode==="text") return hasWord;
+    return hasWord && hasImage;
+  });
 
-  const validItems=
-    set.items.filter(
-      item=>
-        safeText(item.word)
-        &&
-        safeText(item.image)
-          .startsWith(
-            "data:image/"
-          )
-    );
+  const shuffled=shuffle(validItems);
+  const target=shuffled[0];
+  const others=shuffled.slice(1);
+  const redOthers=others.slice(0,needed-1);
+  const blueOthers=others.slice(needed-1,(needed-1)*2);
 
-
-  const shuffled=
-    shuffle(validItems);
-
-
-  const target=
-    shuffled[0];
-
-
-  const others=
-    shuffled.slice(1);
-
-
-  const redOthers=
-    others.slice(
-      0,
-      needed-1
-    );
-
-
-  const blueOthers=
-    others.slice(
-      needed-1,
-      (needed-1)*2
-    );
-
-
-  const red=
-    shuffle([
-      target,
-      ...redOthers
-    ]);
-
-
-  const blue=
-    shuffle([
-      target,
-      ...blueOthers
-    ]);
-
-
-  return {
-
-    red,
-
-    blue,
-
-    targetId:
-      target.id
-
-  };
-
+  return {red:shuffle([target,...redOthers]),blue:shuffle([target,...blueOthers]),targetId:target.id};
 }
 
 
@@ -4916,6 +4984,11 @@ function stopGameTimers(){
 
     state.game.roundTimeoutId=null;
 
+  }
+
+  if(state.game.countdownTimeoutId){
+    clearTimeout(state.game.countdownTimeoutId);
+    state.game.countdownTimeoutId=null;
   }
 
 }
@@ -4987,10 +5060,8 @@ function updateGameScores(){
 function clearArena(arena){
 
   arena
-    .querySelectorAll(".picture")
-    .forEach(
-      el=>el.remove()
-    );
+    .querySelectorAll(".picture,.text-choice,.choice-both")
+    .forEach(el=>el.remove());
 
 }
 
@@ -5183,324 +5254,84 @@ function startRound(){
    RENDER ARENA
 ============================================================ */
 
-function renderArena(
-  arena,
-  items,
-  team
-){
+function renderArena(arena,items,team){
 
   clearArena(arena);
 
-
-  const rect=
-    arena.getBoundingClientRect();
-
-
+  const rect=arena.getBoundingClientRect();
   const w=rect.width;
-
   const h=rect.height;
+  const mode=state.settings.displayMode;
+  const n=items.length;
+  const slots=[];
 
-
-  const points=[];
-
-
-  const size=
-    Math.max(
-      45,
-      Math.min(
-        110,
-        w*.20
-      )
-    );
-
-
-  function validPoint(x,y){
-
-    const cx=w/2;
-
-    const cy=h/2;
-
-    const radius=
-      Math.min(w,h)/2;
-
-
-    const dx=
-      x-cx;
-
-    const dy=
-      y-cy;
-
-
-    if(
-      Math.sqrt(
-        dx*dx+
-        dy*dy
-      )>
-      radius-size*.72
-    ){
-
-      return false;
-
-    }
-
-
-    for(
-      const p of points
-    ){
-
-      const distance=
-        Math.hypot(
-          x-p.x,
-          y-p.y
-        );
-
-
-      if(
-        distance<
-        size*1.18
-      ){
-
-        return false;
-
-      }
-
-    }
-
-
-    return true;
-
+  /*
+     Collision-safe fixed positions.
+     Every position keeps a generous margin from the arena edge,
+     and every choice uses a small, controlled footprint.
+  */
+  if(n===4){
+    slots.push({x:.28,y:.30},{x:.72,y:.30},{x:.28,y:.66},{x:.72,y:.66});
+  }else if(n===5){
+    slots.push({x:.50,y:.27},{x:.25,y:.45},{x:.75,y:.45},{x:.34,y:.69},{x:.66,y:.69});
+  }else if(n===6){
+    slots.push({x:.27,y:.28},{x:.73,y:.28},{x:.23,y:.50},{x:.77,y:.50},{x:.31,y:.72},{x:.69,y:.72});
+  }else if(n===7){
+    slots.push({x:.50,y:.24},{x:.25,y:.29},{x:.75,y:.29},{x:.22,y:.53},{x:.78,y:.53},{x:.32,y:.74},{x:.68,y:.74});
+  }else{
+    slots.push({x:.30,y:.24},{x:.70,y:.24},{x:.22,y:.43},{x:.50,y:.38},{x:.78,y:.43},{x:.22,y:.67},{x:.50,y:.72},{x:.78,y:.67});
   }
 
-
-  for(
-    let i=0;
-    i<items.length;
-    i++
-  ){
-
-    let x;
-
-    let y;
-
-    let found=false;
-
-
-    for(
-      let attempt=0;
-      attempt<500;
-      attempt++
-    ){
-
-      const radius=
-        Math.min(w,h)/2-
-        size*.9;
-
-
-      const angle=
-        Math.random()*
-        Math.PI*
-        2;
-
-
-      const distance=
-        Math.sqrt(
-          Math.random()
-        )*
-        radius*
-        .82;
-
-
-      x=
-        w/2+
-        Math.cos(angle)*
-        distance;
-
-
-      y=
-        h/2+
-        Math.sin(angle)*
-        distance;
-
-
-      if(
-        validPoint(x,y)
-      ){
-
-        found=true;
-
-        break;
-
-      }
-
-    }
-
-
-    if(!found){
-
-      const angle=
-        (i/items.length)*
-        Math.PI*
-        2;
-
-      const radius=
-        Math.min(w,h)*.29;
-
-      x=
-        w/2+
-        Math.cos(angle)*
-        radius;
-
-      y=
-        h/2+
-        Math.sin(angle)*
-        radius;
-
-    }
-
-
-    points.push({
-      x,
-      y
-    });
-
-
-    const img=
-      document.createElement("img");
-
-
-    img.className="picture";
-
-
-    /*
-      IMPORTANT:
-      The exact stored image belonging to this vocabulary
-      object is used here.
-    */
-
-    img.src=
-      items[i].image;
-
-
-    img.alt="";
-
-    img.draggable=false;
-
-
-    img.dataset.itemId=
-      items[i].id;
-
-
-    img.dataset.team=
-      team;
-
-
-    const left=
-      (
-        (x-size/2)/w
-      )*
-      100;
-
-
-    const top=
-      (
-        (y-size/2)/h
-      )*
-      100;
-
-
-    img.style.left=
-      left+"%";
-
-
-    img.style.top=
-      top+"%";
-
-
-    img.addEventListener(
-      "error",
-      ()=>{
-
-        /*
-          Broken images NEVER crash the game.
-        */
-
-        if(
-          !img.dataset.fallbackApplied
-        ){
-
-          img.dataset.fallbackApplied="1";
-
-          img.src=
-            classroomSVG(
-              "fallback"
-            );
-
-        }
-
-      }
-    );
-
-
-    /*
-      POINTERDOWN
-      This works with mouse + touchscreen + tablet.
-    */
-
-    img.addEventListener(
-      "pointerdown",
-      event=>{
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-
-        if(
-          !state.game.roundActive
-        ){
-
-          return;
-
-        }
-
-
-        /*
-          Pointer capture is intentionally attempted
-          for reliable touchscreen interaction.
-        */
-
-        try{
-
-          if(
-            img.setPointerCapture
-          ){
-
-            img.setPointerCapture(
-              event.pointerId
-            );
-
-          }
-
-        }catch(error){}
-
-
-        handlePictureTap(
-          img,
-          items[i],
-          team
-        );
-
-      },
-      {
-        passive:false
-      }
-    );
-
-
-    arena.appendChild(img);
-
+  const orderedSlots=shuffle(slots);
+
+  function attachChoice(choice,item){
+    choice.dataset.itemId=item.id;
+    choice.dataset.team=team;
+    choice.addEventListener("pointerdown",event=>{
+      event.preventDefault(); event.stopPropagation();
+      if(!state.game.roundActive) return;
+      try{ if(choice.setPointerCapture) choice.setPointerCapture(event.pointerId); }catch(error){}
+      handlePictureTap(choice,item,team);
+    },{passive:false});
   }
 
+  items.forEach((item,i)=>{
+    const slot=orderedSlots[i];
+    let choice;
+
+    if(mode==="text"){
+      choice=document.createElement("div");
+      choice.className="text-choice";
+      choice.textContent=item.word;
+      choice.style.left=(slot.x*100)+"%";
+      choice.style.top=(slot.y*100)+"%";
+    }else if(mode==="both"){
+      choice=document.createElement("div");
+      choice.className="choice-both";
+      choice.style.left=(slot.x*100)+"%";
+      choice.style.top=(slot.y*100)+"%";
+      const img=document.createElement("img");
+      img.src=safeText(item.image).startsWith("data:image/") ? item.image : classroomSVG("fallback");
+      img.alt=""; img.draggable=false;
+      img.onerror=()=>{ if(!img.dataset.fallbackApplied){ img.dataset.fallbackApplied="1"; img.src=classroomSVG("fallback"); } };
+      const label=document.createElement("div"); label.className="choice-word"; label.textContent=item.word;
+      choice.append(img,label);
+    }else{
+      choice=document.createElement("img");
+      choice.className="picture";
+      choice.src=item.image; choice.alt=""; choice.draggable=false;
+      choice.style.left=(slot.x*100)+"%";
+      choice.style.top=(slot.y*100)+"%";
+      choice.style.transform="translate(-50%,-50%)";
+      choice.style.width="15%"; choice.style.height="15%";
+      choice.style.minWidth="50px"; choice.style.minHeight="50px";
+      choice.style.maxWidth="90px"; choice.style.maxHeight="90px";
+      choice.onerror=()=>{ if(!choice.dataset.fallbackApplied){ choice.dataset.fallbackApplied="1"; choice.src=classroomSVG("fallback"); } };
+    }
+
+    attachChoice(choice,item);
+    arena.appendChild(choice);
+  });
 }
 
 
@@ -6153,6 +5984,23 @@ function setupEvents(){
 
       }
     );
+
+
+  $("bulkImageBtn").addEventListener("click",()=>$("bulkImageInput").click());
+
+  $("bulkImageInput").addEventListener("change",event=>{
+    handleBulkImageSelection(event.target.files);
+  });
+
+  ["modePicture","modeText","modeBoth"].forEach(id=>{
+    $(id).addEventListener("change",event=>{
+      if(event.target.checked){
+        state.settings.displayMode=event.target.value;
+        updateSettingsUI();
+        renderTeacher();
+      }
+    });
+  });
 
 
   $("addVocabBtn")
