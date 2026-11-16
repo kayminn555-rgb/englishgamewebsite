@@ -38,122 +38,267 @@
         }
 
         #pdf-content-wrapper {
-            width: fit-content;
-            margin: 0 auto;
-            transform-origin: top center;
-            transform: scale(0.85); 
+            width: max-content;
+            max-width: 100%;
+            min-width: 100%;
+            gap: 16px;
         }
 
-        /* --- PDF Page Layout Fix --- */
-        /* To prevent blank pages, we strict the dimensions and page breaks */
+        #pdf-content-wrapper > .pdf-page { zoom: var(--preview-zoom, 1); }
+
         .pdf-page {
-            width: 297mm; /* A4 Landscape width */
-            height: 205mm; /* Slightly less than 210mm to avoid spillover triggering a blank page */
+            width: 296mm;
+            height: 208mm;
             padding: 10mm;
             box-sizing: border-box;
             display: flex;
-            justify-content: space-around;
-            align-items: center;
+            gap: 6mm;
+            align-items: stretch;
             background: white;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            page-break-inside: avoid; /* Important */
-            page-break-after: always; /* Important */
         }
 
-        /* The very last page should not force a break after it */
-        .pdf-page:last-child {
-            page-break-after: auto;
-            margin-bottom: 0;
+        :root { color-scheme: light; }
+
+        #generator-section :is(input:not([type="file"]), textarea, select) {
+            color-scheme: light;
+            background: #fff;
+            color: #172334;
+            border: 1px solid #94a3b8;
+        }
+        #generator-section :is(input, textarea)::placeholder { color: #526278; opacity: 1; }
+        #generator-section :is(input, textarea, select):focus {
+            outline: 2px solid #17844f;
+            outline-offset: 2px;
         }
 
-        /* --- Bingo Card Design --- */
         .bingo-card {
-            width: 48%; /* Optimize width to fit 2 perfectly */
-            height: 98%;
-            border: 4px solid #b91c1c; 
-            border-radius: 16px;
-            padding: 12px;
+            --edge: #3f327b;
+            --ink: #2d215d;
+            --sky: #d8cdff;
+            --ground: #eee7ff;
+            --tile: #f2edff;
+            --line: #a285d8;
+            --ribbon: #493283;
+            flex: 1 1 0;
+            min-width: 0;
+            border: 2px solid var(--edge);
+            border-radius: 20px;
+            padding: 9px;
             display: flex;
             flex-direction: column;
-            background: #fef2f2; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            background: var(--ground);
+            color: var(--ink);
             box-sizing: border-box;
         }
 
-        .card-header-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            border-bottom: 3px dashed #b91c1c;
-            padding-bottom: 8px;
+        .bingo-card[data-theme="monster"] {
+            --edge: #543784;
+            --ink: #382361;
+            --sky: #f0deff;
+            --ground: #f7edff;
+            --tile: #f8f1ff;
+            --line: #b894db;
+            --ribbon: #613d9a;
         }
 
-        .bingo-logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #b91c1c;
-            display: flex;
+        .mascot {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, 15px);
+            align-content: center;
             justify-content: center;
+            gap: 4px;
+            width: 66px;
+            height: 70px;
+            margin: 9px auto 0;
+            border-radius: 46% 46% 39% 39%;
+            border: 2px solid #25745a;
+            background: linear-gradient(150deg, #edffb7, #74e0a3 56%, #3caa87);
+            transform: rotate(-10deg);
+        }
+
+        .mascot:nth-last-child(1) {
+            grid-template-columns: 22px;
+            border-color: #975387;
+            background: linear-gradient(150deg, #fff3a5, #ffc3ab 50%, #eb87b4);
+            transform: translateY(3px) rotate(12deg);
+        }
+
+        .mascot::before, .mascot::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            top: -11px;
+            left: 3px;
+            width: 13px;
+            height: 20px;
+            border: 2px solid #975387;
+            border-radius: 70% 70% 38% 38%;
+            background: #ffda98;
+            transform: rotate(-21deg);
+        }
+        .mascot::after { left: auto; right: 3px; transform: rotate(21deg); }
+        .mascot-eye {
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #694a85;
+            background: radial-gradient(circle at 56% 40%, white 0 9%, #2d215d 12% 40%, white 44%);
+        }
+        .mascot-smile {
+            grid-column: 1 / -1;
+            justify-self: center;
+            width: 17px;
+            height: 8px;
+            border-radius: 2px 2px 10px 10px;
+            background: #543784;
+        }
+
+        .bingo-card[data-theme="ocean"] {
+            --edge: #13667a;
+            --ink: #11465c;
+            --sky: #a8eef6;
+            --ground: #e0f8f8;
+            --tile: #e8faff;
+            --line: #72b5c4;
+            --ribbon: #14657e;
+        }
+
+        .bingo-card[data-theme="jungle"] {
+            --edge: #36633b;
+            --ink: #234a30;
+            --sky: #c7ea9c;
+            --ground: #edf6d9;
+            --tile: #f0f7e1;
+            --line: #98b876;
+            --ribbon: #3b683e;
+        }
+
+        .card-header-wrapper {
+            position: relative;
+            isolation: isolate;
+            display: grid;
+            grid-template-columns: 87px minmax(0, 1fr) 87px;
             align-items: center;
-            font-size: 10px;
-            font-weight: bold;
-            color: #b91c1c;
             text-align: center;
-            line-height: 1.1;
+            min-height: 122px;
+            padding: 8px 5px 11px;
+            border-radius: 13px;
+            overflow: hidden;
+            margin-bottom: 9px;
+            background: linear-gradient(170deg, #fff 0%, var(--sky) 46%, var(--line) 100%);
+        }
+
+        .card-motif {
+            position: absolute;
+            font-size: 18px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        .card-motif:first-child { left: 9%; top: 5%; }
+        .card-motif:nth-child(2) { right: 12%; bottom: 4%; }
+
+        .bingo-logo {
+            display: block;
+            width: 84px;
+            height: 86px;
+            line-height: 86px;
+            object-fit: contain;
+            font-size: 66px;
+            transform: rotate(-9deg);
+        }
+        .bingo-logo:last-child { transform: rotate(9deg); }
+        img.bingo-logo {
+            width: 72px;
+            height: 72px;
+            border: 2px solid var(--line);
+            background: white;
+            border-radius: 50%;
+            transform: none;
         }
 
         .bingo-header {
-            font-family: 'Bangers', cursive;
-            font-size: 42px;
-            color: #1d4ed8; 
-            text-shadow: 2px 2px 0px #fff, 4px 4px 0px #f59e0b; 
-            letter-spacing: 2px;
-            flex-grow: 1;
-            text-align: center;
-            line-height: 1;
+            font-family: 'Poppins', 'Noto Sans Myanmar', 'Noto Sans Thai', sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+        }
+
+        .bingo-label {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 2px 20px 4px 24px;
+            border: 2px solid white;
+            border-radius: 22px;
+            background: var(--ribbon);
+            color: white;
+            font-family: 'Bangers', 'Poppins', sans-serif;
+            font-size: 29px;
+            line-height: 1.15;
+            letter-spacing: 4px;
+            font-weight: 700;
         }
 
         .bingo-grid {
             display: grid;
-            gap: 3px;
-            flex-grow: 1;
-            background-color: #b91c1c; 
-            border: 3px solid #b91c1c;
-            border-radius: 8px;
-            overflow: hidden;
+            gap: 4px;
+            flex: 1 1 0;
+            min-height: 0;
         }
 
         .bingo-cell {
-            background-color: white;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            min-width: 0;
+            min-height: 0;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 8px;
             text-align: center;
-            font-size: 18px;
-            padding: 6px;
-            word-wrap: break-word;
-            overflow: hidden;
+            font-family: 'Poppins', 'Noto Sans Myanmar', 'Noto Sans Thai', sans-serif;
+            font-size: var(--cell-font);
+            line-height: 1.18;
+            padding: 4px;
             font-weight: 700;
-            color: #111827;
         }
 
-        .bingo-cell.free-space {
-            background-color: #fef08a; 
-            font-size: 22px;
-            color: #b91c1c;
-            font-family: 'Bangers', cursive;
-            letter-spacing: 1px;
-            flex-direction: column;
+        .bingo-cell > span {
+            max-width: 100%;
+            white-space: pre-line;
+            overflow-wrap: break-word;
         }
-        .bingo-cell.free-space span {
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            color: #374151;
+
+        .bingo-cell[data-shade="true"] { background: var(--tile); }
+        .bingo-cell.free-space {
+            background: #ffed9d;
+            border: 2px dashed #ad782d;
+            color: #5c350c;
+        }
+
+        [hidden], .hidden { display: none !important; }
+
+        #print-pages[hidden] { display: none; }
+        #print-pages { display: none; }
+        .pdf-capture-source { position: absolute; left: -12000px; top: 0; }
+
+        @page { size: A4 landscape; margin: 0; }
+
+        @media print {
+            body { margin: 0; background: white; }
+            body:has(#print-pages:not([hidden])) > :not(#print-pages) { display: none !important; }
+            #print-pages:not([hidden]) { display: block; }
+            #print-pages .pdf-page {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                break-after: page;
+                page-break-after: always;
+                margin: 0 auto;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            #print-pages .pdf-page:last-child { break-after: auto; page-break-after: auto; }
         }
 
         /* --- Caller Ball Animation Styles --- */
@@ -198,7 +343,7 @@
         }
 
         .ball-machine.shuffling .mini-ball {
-            animation: bounce 0.3s infinite alternate ease-in-out;
+            animation: swirl var(--spin-duration) var(--spin-delay) infinite linear;
         }
 
         @keyframes float {
@@ -206,41 +351,51 @@
             50% { transform: translate(calc(20px * var(--tx)), calc(20px * var(--ty))); }
         }
 
-        @keyframes bounce {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(calc(80px * var(--tx)), calc(80px * var(--ty))); }
+        @keyframes swirl {
+            0% { transform: translate(var(--orbit), 0) scale(0.88); }
+            25% { transform: translate(0, var(--orbit)) scale(1.05); }
+            50% { transform: translate(calc(-1 * var(--orbit)), 0) scale(1.12); }
+            75% { transform: translate(0, calc(-1 * var(--orbit))) scale(0.96); }
+            100% { transform: translate(var(--orbit), 0) scale(0.88); }
         }
 
-        /* Full Screen Overlay for Drawn Ball */
         #ball-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(9, 13, 40, 0.84);
             z-index: 50;
             justify-content: center;
             align-items: center;
         }
 
+        #ball-overlay.active { display: flex; }
+        #ball-overlay.travelling { background: transparent; }
+        #ball-overlay.active:not(.travelling) { transition: background 0.35s ease; }
+        #ball-overlay.travelling .reveal-control { visibility: hidden; }
+
         .big-ball-container {
             position: relative;
-            width: 0px;
-            height: 0px;
-            transition: all 0.5s ease-out;
+            width: min(300px, 80vw, 53vh);
+            height: min(300px, 80vw, 53vh);
         }
 
-        .big-ball-container.show {
-            width: 300px;
-            height: 300px;
-            animation: dropFromPipe 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        .big-ball-container.dropping {
+            animation: drop-from-pipe 1.45s both;
         }
 
-        @keyframes dropFromPipe {
-            0% { transform: translateY(-400px) scale(0.2); opacity: 0; }
-            20% { transform: translateY(-200px) scale(0.4); opacity: 1; }
-            60% { transform: translateY(30px) scale(1.1) rotate(15deg); }
-            80% { transform: translateY(-15px) scale(0.95) rotate(-5deg); }
-            100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+        @keyframes drop-from-pipe {
+            0% {
+                transform: translate(var(--pipe-x), var(--pipe-y)) scale(var(--pipe-scale)) rotate(-25deg);
+                opacity: 0.35;
+            }
+            36% {
+                transform: translate(var(--pipe-x), var(--bounce-y)) scale(var(--pipe-scale)) rotate(31deg);
+                opacity: 1;
+                animation-timing-function: cubic-bezier(0.16, 0.78, 0.3, 1);
+            }
+            89% { transform: translateY(8px) scale(1.045) rotate(6deg); }
+            100% { transform: translateY(0) scale(1) rotate(0deg); }
         }
 
         .ball-half {
@@ -249,7 +404,7 @@
             height: 50%;
             background: radial-gradient(circle at 50% 20%, #ef4444, #991b1b);
             border: 4px solid #450a0a;
-            transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: transform 0.85s cubic-bezier(.2,.75,.25,1), opacity 0.8s ease-in 0.12s;
             z-index: 10;
         }
 
@@ -282,8 +437,8 @@
             transition: opacity 0.3s;
         }
 
-        .big-ball-container.open .ball-half.top { transform: translateY(-120px) scale(1.1); opacity: 0;}
-        .big-ball-container.open .ball-half.bottom { transform: translateY(120px) scale(1.1); opacity: 0;}
+        .big-ball-container.open .ball-half.top { transform: translateY(-54%) rotate(-15deg) scale(1.05); opacity: 0;}
+        .big-ball-container.open .ball-half.bottom { transform: translateY(56%) rotate(15deg) scale(1.05); opacity: 0;}
         .big-ball-container.open .ball-center-button { opacity: 0; }
 
         .ball-content {
@@ -302,8 +457,7 @@
             padding: 20px;
             opacity: 0;
             transform: scale(0.5);
-            transition: all 0.8s ease-in-out;
-            transition-delay: 0.5s; 
+            transition: transform 0.65s ease-out 0.2s, opacity 0.65s ease-out 0.2s; 
             z-index: 5;
             box-shadow: 0 0 40px rgba(254, 240, 138, 0.9);
             word-break: break-word;
@@ -316,6 +470,10 @@
             transform: scale(1);
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .mini-ball, .big-ball-container.dropping { animation: none !important; }
+            .ball-content, .ball-half, .ball-center-button { transition: none !important; }
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -340,7 +498,7 @@
         
         <!-- ==================== GENERATOR TAB ==================== -->
         <div id="generator-section" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-fade-in">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <div class="flex flex-wrap gap-3 justify-between items-center mb-6 border-b pb-4">
                 <h2 class="text-3xl font-bold text-green-800">Create Bingo Cards</h2>
                 
                 <!-- Logo Input Field (Optional for user) -->
@@ -355,7 +513,7 @@
                 <div class="lg:col-span-4 space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Words List</label>
-                        <p class="text-xs text-gray-500 mb-2">Separate words by comma, space, or newline.</p>
+                        <p class="text-xs text-gray-500 mb-2">Use commas or new lines to separate entries. Phrases wrap onto extra lines when needed. Use | to choose a line break, e.g. Grand|Father.</p>
                         <textarea id="word-input" rows="8" class="w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:border-green-500 transition shadow-sm text-sm" placeholder="e.g. Apple, Banana, Orange..."></textarea>
                         
                         <div class="flex justify-between items-center mt-2">
@@ -378,20 +536,31 @@
 
                     <!-- Grid & Page Settings -->
                     <div class="space-y-4 bg-green-50 p-4 rounded-xl border border-green-100">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Grid Size</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="radio" name="gridSize" value="3" class="w-4 h-4 text-green-600"> <span class="font-semibold">3x3</span>
-                                </label>
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="radio" name="gridSize" value="4" class="w-4 h-4 text-green-600"> <span class="font-semibold">4x4</span>
-                                </label>
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="radio" name="gridSize" value="5" checked class="w-4 h-4 text-green-600"> <span class="font-semibold">5x5</span>
-                                </label>
-                            </div>
-                        </div>
+                        <label class="block text-sm font-bold text-gray-700">
+                            Card Heading
+                            <input id="card-heading" type="text" value="Teacher Minn" maxlength="80" class="block w-full border border-gray-300 rounded-lg p-2 mt-1" dir="auto">
+                        </label>
+                        <label class="block text-sm font-bold text-gray-700">
+                            Cartoon Theme
+                            <select id="card-theme" class="block w-full border border-gray-300 rounded-lg p-2 mt-1">
+                                <option value="monster">Monster Party</option>
+                                <option value="space">Space Adventure</option>
+                                <option value="ocean">Ocean Friends</option>
+                                <option value="jungle">Jungle Friends</option>
+                            </select>
+                        </label>
+                        <label class="block text-sm font-bold text-gray-700">
+                            Grid Size
+                            <select id="grid-size" class="block w-full border border-gray-300 rounded-lg p-2 mt-1">
+                                <option value="3">3 × 3</option>
+                                <option value="4">4 × 4</option>
+                                <option value="5" selected>5 × 5</option>
+                                <option value="6">6 × 6</option>
+                                <option value="7">7 × 7</option>
+                                <option value="8">8 × 8</option>
+                            </select>
+                            <span id="word-requirement" class="block mt-1 text-xs text-gray-600 font-normal"></span>
+                        </label>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Number of Pages</label>
@@ -407,14 +576,17 @@
 
                 <!-- Right: Preview Area -->
                 <div class="lg:col-span-8">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-wrap gap-2 justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-gray-800">Cards Preview</h3>
-                        <button onclick="downloadPDF()" id="download-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded shadow-lg transition duration-200 flex items-center gap-2">
+                        <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="printCards()" id="print-btn" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded">Print Cards</button>
+                        <button onclick="downloadPDF()" id="download-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded shadow-lg transition duration-200 flex items-center gap-2 disabled:opacity-50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                             Download PDF
                         </button>
+                        </div>
                     </div>
 
                     <!-- Scrollable Area for Preview -->
@@ -436,7 +608,7 @@
         <!-- ==================== CALLER / PLAY TAB ==================== -->
         <div id="caller-section" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-fade-in text-center">
             <h2 class="text-4xl font-bold mb-2 text-blue-800" style="font-family: 'Bangers', cursive; letter-spacing: 2px;">LET'S PLAY BINGO!</h2>
-            <p class="text-gray-500 mb-8 font-medium">Click Shuffle & Draw to get a random word.</p>
+            <p class="text-gray-500 mb-8 font-medium">Draw a word with the button or spacebar. Press Esc to close the reveal.</p>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
@@ -461,6 +633,7 @@
                         Restart Game
                     </button>
                     
+                    <p id="game-status" role="status" class="mt-4 text-sm font-semibold text-blue-900"></p>
                     <div class="mt-6 text-lg font-bold text-blue-900 bg-blue-100 px-6 py-2 rounded-full shadow-sm w-full">
                         Remaining: <span id="remaining-count" class="text-2xl">0</span>
                     </div>
@@ -480,16 +653,18 @@
     </div>
 
     <!-- Full Screen Animation Overlay for Drawn Ball -->
-    <div id="ball-overlay">
+    <div id="ball-overlay" role="dialog" aria-modal="true" aria-label="Drawn word">
         <div class="big-ball-container" id="big-ball">
             <div class="ball-half top"></div>
             <div class="ball-center-button"></div>
             <div class="ball-half bottom"></div>
             <div class="ball-content" id="ball-text">WORD</div>
         </div>
-        <button onclick="closeBall()" class="absolute top-10 right-10 text-white text-5xl hover:text-gray-300 font-bold transition transform hover:scale-110">&times;</button>
-        <p class="absolute bottom-10 text-white text-xl animate-pulse font-semibold tracking-wider">CLICK ANYWHERE TO CONTINUE</p>
+        <button id="close-ball" aria-label="Close drawn word" class="reveal-control absolute top-4 right-6 text-white text-5xl hover:text-gray-300 font-bold transition transform hover:scale-110">&times;</button>
+        <p class="reveal-control absolute bottom-10 text-white text-xl animate-pulse font-semibold tracking-wider">CLICK ANYWHERE TO CONTINUE</p>
     </div>
+
+    <div id="print-pages" hidden></div>
 
     <!-- Audio Elements -->
     <audio id="snd-shuffle" loop>
@@ -508,6 +683,11 @@
         let gameWords = []; 
         let calledWords = [];
 
+        let drawTimer;
+        let revealTimer;
+        let ballOpen = false;
+        let exporting = false;
+
         // --- DOM Elements ---
         const wordInput = document.getElementById('word-input');
         const wordCountDisplay = document.getElementById('word-count');
@@ -516,6 +696,21 @@
         const logoUrlInput = document.getElementById('logo-url');
         const actionBtn = document.getElementById('action-btn');
         
+        const gridSize = document.getElementById('grid-size');
+        const headingInput = document.getElementById('card-heading');
+        const themeInput = document.getElementById('card-theme');
+        const printBtn = document.getElementById('print-btn');
+        const printPages = document.getElementById('print-pages');
+        const overlay = document.getElementById('ball-overlay');
+        const machine = document.getElementById('ball-machine');
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        const themes = {
+            monster: ['', '', '✦', '✦'],
+            space: ['🚀', '🪐', '✦', '✨'],
+            ocean: ['🐬', '🐙', '🫧', '🐚'],
+            jungle: ['🦁', '🐵', '🌿', '🍃']
+        };
+
         // --- Audio Elements ---
         const sndShuffle = document.getElementById('snd-shuffle');
         const sndDrop = document.getElementById('snd-drop');
@@ -529,14 +724,40 @@
         wordInput.addEventListener('input', () => {
             allWords = parseWords(wordInput.value);
             wordCountDisplay.innerText = allWords.length;
-            resetGame(false); 
+            resetGame(); 
         });
 
-        document.getElementById('ball-overlay').addEventListener('click', function(e) {
-            if(e.target === this || e.target.tagName === 'BUTTON' || e.target.tagName === 'P') {
+        overlay.addEventListener('click', () => closeBall());
+        window.addEventListener('beforeprint', preparePrintPages);
+        window.addEventListener('afterprint', () => {
+            printPages.hidden = true;
+            printPages.replaceChildren();
+        });
+        gridSize.addEventListener('change', updateWordRequirement);
+        document.addEventListener('keydown', event => {
+            if (event.repeat || document.getElementById('caller-section').classList.contains('hidden')) return;
+            if (ballOpen && (event.key === 'Escape' || event.code === 'Space')) {
+                event.preventDefault();
                 closeBall();
+            } else if (event.code === 'Space' && event.target === document.body) {
+                event.preventDefault();
+                shuffleAndDraw();
             }
         });
+
+        function updateWordRequirement() {
+            const { requiredWords, hasFreeSpace } = getGridSettings();
+            document.getElementById('word-requirement').textContent =
+                `${requiredWords} unique entries needed${hasFreeSpace ? ' • free centre' : ''}.`;
+        }
+
+        updateWordRequirement();
+
+        const previewArea = document.getElementById('preview-scroll-area');
+        new ResizeObserver(([entry]) => {
+            pdfContentWrapper.style.setProperty('--preview-zoom',
+                Math.max(0.48, Math.min(1, entry.contentRect.width / (296 * 96 / 25.4))));
+        }).observe(previewArea);
 
         // --- File Upload / Download (TXT) ---
         function exportTxt() {
@@ -564,7 +785,7 @@
                 wordInput.value = text;
                 allWords = parseWords(text);
                 wordCountDisplay.innerText = allWords.length;
-                resetGame(false);
+                resetGame();
                 event.target.value = ''; 
             };
             reader.readAsText(file);
@@ -578,6 +799,8 @@
             const tabCall = document.getElementById('tab-caller');
 
             if (tab === 'generator') {
+                cancelDraw();
+                updateGameControls();
                 genSec.classList.remove('hidden');
                 callSec.classList.add('hidden');
                 tabGen.classList.replace('hover:bg-green-800', 'bg-green-900');
@@ -593,18 +816,25 @@
                 tabGen.classList.remove('bg-green-900');
                 
                 if(gameWords.length === 0 && calledWords.length === 0) {
-                    resetGame(false);
+                    resetGame();
                 }
-                initMachineBalls();
-                actionBtn.disabled = false;
+                if (!machine.children.length) initMachineBalls();
+                updateGameControls();
+                if (!actionBtn.disabled) actionBtn.focus({ preventScroll: true });
             }
         }
 
         function parseWords(text) {
             if (!text) return [];
-            return text.split(/[\n,]+/)
-                .map(w => w.trim())
-                .filter(w => w.length > 0);
+            const entries = new Map();
+            for (const entry of text.split(/[\n,]+/)) {
+                const word = entry.trim();
+                const normalized = word.replace(/\s*\|\s*/g, ' ').trim();
+                if (normalized && (!entries.has(normalized) || word.includes('|'))) {
+                    entries.set(normalized, word);
+                }
+            }
+            return [...entries.values()];
         }
 
         function shuffle(array) {
@@ -618,138 +848,200 @@
         }
 
         function getGridSettings() {
-            const size = parseInt(document.querySelector('input[name="gridSize"]:checked').value);
-            let maxWords = size * size;
-            let hasFreeSpace = (size === 5);
-            let requiredWords = hasFreeSpace ? maxWords - 1 : maxWords;
-            return { size, requiredWords, hasFreeSpace };
+            const size = Number(gridSize.value);
+            const hasFreeSpace = size >= 5 && size % 2 === 1;
+            return { size, requiredWords: size * size - Number(hasFreeSpace), hasFreeSpace };
         }
 
-        // ==================== BINGO GENERATOR LOGIC ====================
-
-        function createBingoCard(wordsArray, settings) {
-            let { size, requiredWords, hasFreeSpace } = settings;
-            let shuffledWords = shuffle([...wordsArray]).slice(0, requiredWords);
-            let userLogo = logoUrlInput.value.trim();
-            
-            let logoHtml = '';
-            if (userLogo) {
-                logoHtml = `<img src="${userLogo}" class="bingo-logo" onerror="this.style.display='none'" alt="Logo">`;
-            } else {
-                logoHtml = `<div class="bingo-logo">Teacher<br>Minn</div>`;
+        function createBingoCard(words, { size, requiredWords, hasFreeSpace }) {
+            const selected = shuffle([...words]).slice(0, requiredWords);
+            const centre = Math.floor(size * size / 2);
+            const heading = headingInput.value.trim();
+            const theme = themeInput.value;
+            const [left, right, topMotif, bottomMotif] = themes[theme];
+            const eye = '<span class="mascot-eye"></span>';
+            const smile = '<span class="mascot-smile"></span>';
+            const leftArt = theme === 'monster'
+                ? `<span class="card-art mascot" aria-hidden="true">${eye.repeat(2)}${smile}</span>`
+                : `<span class="card-art bingo-logo" aria-hidden="true">${left}</span>`;
+            const rightArt = theme === 'monster'
+                ? `<span class="card-art mascot" aria-hidden="true">${eye}${smile}</span>`
+                : `<span class="card-art bingo-logo" aria-hidden="true">${right}</span>`;
+            const card = document.createElement('article');
+            card.className = 'bingo-card';
+            card.dataset.theme = theme;
+            card.style.setProperty('--cell-font', `${Math.min(23, Math.floor(112 / size))}px`);
+            card.innerHTML = `
+                <header class="card-header-wrapper">
+                    <span class="card-motif" aria-hidden="true">${topMotif}</span>
+                    <span class="card-motif" aria-hidden="true">${bottomMotif}</span>
+                    ${leftArt}
+                    <div><div class="bingo-header" dir="auto"></div><div class="bingo-label">BINGO</div></div>
+                    ${rightArt}
+                </header>
+                <div class="bingo-grid"></div>`;
+            card.querySelector('.bingo-header').textContent = heading;
+            const logoUrl = logoUrlInput.value.trim();
+            if (logoUrl) {
+                const mascot = card.querySelector('.card-art');
+                const logo = new Image();
+                logo.className = 'bingo-logo';
+                logo.alt = 'Logo';
+                logo.crossOrigin = 'anonymous';
+                logo.onload = () => mascot.replaceWith(logo);
+                logo.src = logoUrl;
             }
 
-            let cardHtml = `
-            <div class="bingo-card">
-                <div class="card-header-wrapper">
-                    ${logoHtml}
-                    <div class="bingo-header">TEACHER MINN</div>
-                    ${logoHtml}
-                </div>
-                <div class="bingo-grid" style="grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr);">`;
-            
+            const grid = card.querySelector('.bingo-grid');
+            grid.style.gridTemplate = `repeat(${size}, minmax(0, 1fr)) / repeat(${size}, minmax(0, 1fr))`;
             let wordIndex = 0;
-            const centerIndex = Math.floor((size * size) / 2);
-
-            for (let i = 0; i < (size * size); i++) {
-                if (hasFreeSpace && i === centerIndex) {
-                    cardHtml += `<div class="bingo-cell free-space">FREE<span>SPACE</span></div>`;
-                } else {
-                    let text = shuffledWords[wordIndex] || '';
-                    cardHtml += `<div class="bingo-cell">${text}</div>`;
-                    wordIndex++;
-                }
+            for (let index = 0; index < size * size; index++) {
+                const free = hasFreeSpace && index === centre;
+                const cell = document.createElement('div');
+                cell.className = free ? 'bingo-cell free-space' : 'bingo-cell';
+                const label = document.createElement('span');
+                label.dir = 'auto';
+                cell.dataset.shade = (Math.floor(index / size) + index % size) % 2 === 1;
+                label.textContent = free ? 'FREE\nSPACE' : selected[wordIndex++].replace(/\s*\|\s*/g, '\n');
+                cell.append(label);
+                grid.append(cell);
             }
-            
-            cardHtml += `</div></div>`;
-            return cardHtml;
+            return card;
         }
 
         function generatePreview() {
-            const pages = parseInt(document.getElementById('page-count').value);
+            const pages = Number(document.getElementById('page-count').value);
             const words = parseWords(wordInput.value);
             const settings = getGridSettings();
-
+            if (!Number.isInteger(pages) || pages < 1 || pages > 100) {
+                alert('Enter a page count from 1 to 100.');
+                return;
+            }
             if (words.length < settings.requiredWords) {
-                alert(`For a ${settings.size}x${settings.size} grid, you need at least ${settings.requiredWords} words. You currently have ${words.length}.`);
+                alert(`A ${settings.size} × ${settings.size} grid needs ${settings.requiredWords} unique entries. You have ${words.length}.`);
                 return;
             }
 
-            pdfContentWrapper.innerHTML = ''; 
-
-            for (let i = 0; i < pages; i++) {
-                // Add an ID to easily identify pages if needed
-                let pageHtml = `<div class="pdf-page" id="page-${i+1}">`;
-                pageHtml += createBingoCard(words, settings); // Card 1
-                pageHtml += createBingoCard(words, settings); // Card 2
-                pageHtml += `</div>`;
-                pdfContentWrapper.innerHTML += pageHtml;
+            const sheets = document.createDocumentFragment();
+            for (let index = 0; index < pages; index++) {
+                const sheet = document.createElement('section');
+                sheet.className = 'pdf-page';
+                sheet.append(createBingoCard(words, settings), createBingoCard(words, settings));
+                sheets.append(sheet);
             }
-
-            pdfContentWrapper.style.transform = 'scale(0.85)';
+            pdfContentWrapper.replaceChildren(sheets);
+            printBtn.classList.remove('hidden');
             downloadBtn.classList.remove('hidden');
-            
-            // Wait a moment for rendering, then scroll
-            setTimeout(() => {
-                document.getElementById('preview-scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
-            }, 100);
+            previewArea.scrollTo({ top: 0, left: 0 });
+            fitCardLabels();
+            document.fonts.ready.then(fitCardLabels);
         }
 
-        function downloadPDF() {
-            if(!pdfContentWrapper.querySelector('.pdf-page')) {
-                alert("Please generate the preview first!");
+        function fitCardLabels() {
+            pdfContentWrapper.querySelectorAll('.bingo-cell > span').forEach(label => {
+                const cell = label.parentElement;
+                const maxHeight = cell.clientHeight - 8;
+                let fontSize = Number.parseFloat(getComputedStyle(label).fontSize);
+                while (label.offsetHeight > maxHeight && fontSize > 8) {
+                    label.style.fontSize = `${--fontSize}px`;
+                }
+            });
+        }
+
+        function preparePrintPages() {
+            const pages = [...pdfContentWrapper.querySelectorAll('.pdf-page')];
+            printPages.replaceChildren(...pages.map(page => page.cloneNode(true)));
+            printPages.hidden = pages.length === 0;
+        }
+
+        async function printCards() {
+            await document.fonts.ready;
+            window.print();
+        }
+
+        async function downloadPDF() {
+            const pages = [...pdfContentWrapper.querySelectorAll('.pdf-page')];
+            if (exporting || !pages.length) return;
+            if (typeof html2pdf !== 'function') {
+                alert('PDF download is unavailable. Choose Save as PDF in the print dialog.');
+                await printCards();
                 return;
             }
 
-            document.getElementById('loading').classList.remove('hidden');
+            exporting = true;
             downloadBtn.disabled = true;
-
-            // Remove scale to get exact A4 dimensions
-            pdfContentWrapper.style.transform = 'none';
-
-            // Use html2pdf with pagebreak settings to avoid blank pages
-            const opt = {
-                margin:       0,
-                filename:     'Teacher_Minns_Bingo_Cards.pdf',
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // This prevents internal breaks
-            };
-
-            html2pdf().set(opt).from(pdfContentWrapper).save().then(() => {
-                document.getElementById('loading').classList.add('hidden');
+            const loading = document.getElementById('loading');
+            loading.classList.remove('hidden');
+            const source = document.createElement('div');
+            source.className = 'pdf-capture-source';
+            document.body.append(source);
+            try {
+                await document.fonts.ready;
+                let pdf;
+                for (const page of pages) {
+                    source.replaceChildren(page.cloneNode(true));
+                    const worker = html2pdf().set({
+                        margin: 0,
+                        html2canvas: { scale: 2, useCORS: true, logging: false, imageTimeout: 3000 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                        pagebreak: { mode: [] }
+                    }).from(source.firstElementChild).toCanvas();
+                    const canvas = await worker.get('canvas');
+                    // Use the bundled PDF writer, then place each sheet explicitly.
+                    if (!pdf) {
+                        pdf = await worker.toPdf().get('pdf');
+                        while (pdf.getNumberOfPages() > 0) pdf.deletePage(pdf.getNumberOfPages());
+                    }
+                    pdf.addPage('a4', 'landscape');
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0.5, 0.5, 296, 208);
+                    canvas.width = canvas.height = 0;
+                }
+                pdf.save('Bingo_Cards.pdf');
+            } catch (error) {
+                console.error('Bingo PDF export failed:', error);
+                alert('PDF download failed. Use Print Cards and choose Save as PDF.');
+            } finally {
+                source.remove();
+                exporting = false;
                 downloadBtn.disabled = false;
-                pdfContentWrapper.style.transform = 'scale(0.85)';
-            }).catch(err => {
-                console.error("PDF Error:", err);
-                alert("An error occurred while generating the PDF.");
-                document.getElementById('loading').classList.add('hidden');
-                downloadBtn.disabled = false;
-                pdfContentWrapper.style.transform = 'scale(0.85)';
-            });
+                loading.classList.add('hidden');
+            }
         }
 
         // ==================== CALLER GAME LOGIC ====================
 
-        function resetGame(updateAlert = true) {
+        function resetGame() {
+            cancelDraw();
             allWords = parseWords(wordInput.value);
-            gameWords = [...allWords];
+            gameWords = shuffle([...allWords]);
             calledWords = [];
-            
-            document.getElementById('called-words-container').innerHTML = '<div class="text-gray-400 italic font-medium w-full text-center mt-10" id="empty-history">Game not started yet. Draw a ball!</div>';
+            updateHistoryUI();
+            updateGameControls();
+        }
+
+        function cancelDraw() {
+            clearTimeout(drawTimer);
+            clearTimeout(revealTimer);
+            drawTimer = revealTimer = undefined;
+            ballOpen = false;
+            overlay.classList.remove('active', 'travelling');
+            machine.classList.remove('shuffling');
+            for (const sound of [sndShuffle, sndDrop, sndTada]) sound.pause();
+        }
+
+        function updateGameControls() {
             updateRemainingCount();
-            
-            actionBtn.disabled = false;
-            actionBtn.innerText = "SHUFFLE & DRAW";
-            document.getElementById('ball-machine').classList.remove('shuffling');
+            const finished = !gameWords.length && calledWords.length > 0;
+            actionBtn.disabled = Boolean(drawTimer || ballOpen || !gameWords.length);
+            actionBtn.textContent = drawTimer ? 'SHUFFLING…' : finished ? 'ROUND COMPLETE' : 'SHUFFLE & DRAW';
+            document.getElementById('game-status').textContent = !allWords.length
+                ? 'Add words in the Generator tab to start.'
+                : finished ? 'All words have been called. Restart to play again.' : '';
+        }
 
-            sndShuffle.pause();
-            sndShuffle.currentTime = 0;
-
-            if(updateAlert && allWords.length > 0) {
-                alert("Game has been restarted!");
-            }
+        function playSound(sound) {
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
         }
 
         function updateRemainingCount() {
@@ -757,7 +1049,6 @@
         }
 
         function initMachineBalls() {
-            const machine = document.getElementById('ball-machine');
             machine.innerHTML = '';
             for(let i=0; i<20; i++) {
                 let ball = document.createElement('div');
@@ -767,6 +1058,9 @@
                 ball.style.setProperty('--tx', (Math.random() - 0.5) * 2);
                 ball.style.setProperty('--ty', (Math.random() - 0.5) * 2);
                 ball.style.animationDelay = (Math.random() * 2) + 's';
+                ball.style.setProperty('--orbit', `${22 + Math.random() * 42}px`);
+                ball.style.setProperty('--spin-duration', `${0.48 + Math.random() * 0.42}s`);
+                ball.style.setProperty('--spin-delay', `${-Math.random()}s`);
                 
                 const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
                 ball.style.background = `radial-gradient(circle at 10px 10px, ${colors[Math.floor(Math.random()*colors.length)]}, #000)`;
@@ -775,101 +1069,83 @@
             }
         }
 
-        // Combined function: Shuffle for 2.5 seconds, then automatically Draw
         function shuffleAndDraw() {
-            if (allWords.length === 0) {
-                alert("Please add words in the Generator tab first!");
-                switchTab('generator');
-                return;
-            }
-
-            if (gameWords.length === 0) {
-                alert("All words have been called! Please restart the game.");
-                return;
-            }
-
-            const machine = document.getElementById('ball-machine');
-
-            // 1. Start Shuffling State
-            actionBtn.disabled = true;
-            actionBtn.innerText = "SHUFFLING...";
+            if (drawTimer || ballOpen || !gameWords.length) return;
             machine.classList.add('shuffling');
-            
-            sndShuffle.currentTime = 0;
-            sndShuffle.play().catch(e => console.log("Audio play blocked:", e));
-
-            // Shuffle data array
-            gameWords = shuffle(gameWords);
-
-            // 2. Wait 2.5 seconds, then stop shuffle and start draw animation
-            setTimeout(() => {
+            playSound(sndShuffle);
+            drawTimer = setTimeout(() => {
+                drawTimer = undefined;
                 machine.classList.remove('shuffling');
                 sndShuffle.pause();
-
-                const drawnWord = gameWords.pop();
-                calledWords.unshift(drawnWord); 
-                updateRemainingCount();
-                
-                sndDrop.currentTime = 0;
-                sndDrop.play().catch(e => console.log(e));
-
-                showBallAnimation(drawnWord);
-                
-                // Reset button text but keep disabled until ball overlay is closed
-                actionBtn.innerText = "SHUFFLE & DRAW";
-
-            }, 2500); // 2.5 seconds of spinning
+                showBallAnimation();
+                updateGameControls();
+            }, reducedMotion.matches ? 0 : 2500);
+            updateGameControls();
         }
 
-        function showBallAnimation(word) {
-            const overlay = document.getElementById('ball-overlay');
+        function showBallAnimation() {
             const bigBall = document.getElementById('big-ball');
             const ballText = document.getElementById('ball-text');
+            const word = gameWords[gameWords.length - 1].replace(/\s*\|\s*/g, ' ');
+            bigBall.className = 'big-ball-container';
+            ballText.textContent = word;
+            ballText.style.fontSize = `clamp(14px, 7vw, ${Math.max(14, Math.min(46, 340 / Math.sqrt(word.length * 3)))}px)`;
+            ballOpen = true;
+            overlay.classList.add('active', 'travelling');
 
-            bigBall.className = 'big-ball-container'; 
-            ballText.innerText = word;
-            
-            overlay.style.display = 'flex';
-            
-            setTimeout(() => {
-                bigBall.classList.add('show');
-                
-                setTimeout(() => {
-                    bigBall.classList.add('open');
-                    
-                    sndTada.currentTime = 0;
-                    sndTada.play().catch(e => console.log(e));
+            if (!reducedMotion.matches) {
+                const pipe = document.querySelector('.pipe').getBoundingClientRect();
+                const ball = bigBall.getBoundingClientRect();
+                const dx = pipe.left + pipe.width / 2 - (ball.left + ball.width / 2);
+                const dy = pipe.bottom + 14 - (ball.top + ball.height / 2);
+                bigBall.style.setProperty('--pipe-x', `${dx}px`);
+                bigBall.style.setProperty('--pipe-y', `${dy}px`);
+                bigBall.style.setProperty('--bounce-y', `${dy + 34}px`);
+                bigBall.style.setProperty('--pipe-scale', String(30 / ball.width));
+                bigBall.classList.add('dropping');
+                playSound(sndDrop);
+            }
 
-                    updateHistoryUI(); 
-                }, 1000);
+            revealTimer = setTimeout(() => {
+                overlay.classList.remove('travelling');
+                bigBall.classList.remove('dropping');
+                bigBall.classList.add('open');
+                document.getElementById('close-ball').focus({ preventScroll: true });
+                playSound(sndTada);
+                revealTimer = setTimeout(finishReveal, reducedMotion.matches ? 0 : 780);
+            }, reducedMotion.matches ? 0 : 1450);
+        }
 
-            }, 50);
+        function finishReveal() {
+            clearTimeout(revealTimer);
+            revealTimer = undefined;
+            calledWords.unshift(gameWords.pop());
+            updateHistoryUI();
+            updateGameControls();
         }
 
         function closeBall() {
-            document.getElementById('ball-overlay').style.display = 'none';
-            // Enable button for next draw if words are left
-            if(gameWords.length > 0) {
-                actionBtn.disabled = false;
-            } else {
-                actionBtn.innerText = "GAME OVER";
-            }
+            if (!ballOpen || revealTimer) return;
+            cancelDraw();
+            updateGameControls();
+            actionBtn.focus({ preventScroll: true });
         }
 
         function updateHistoryUI() {
             const container = document.getElementById('called-words-container');
-            container.innerHTML = '';
+            container.innerHTML = calledWords.length ? '' :
+                '<div class="text-gray-400 italic font-medium w-full text-center mt-10">Game not started yet. Draw a ball!</div>';
             
             calledWords.forEach((word, index) => {
                 const badge = document.createElement('div');
                 if (index === 0) {
-                    badge.className = 'px-6 py-3 bg-red-600 text-white font-bold rounded-lg shadow-md animate-bounce text-xl border-2 border-red-800';
+                    badge.className = 'px-6 py-3 bg-red-600 text-white font-bold rounded-lg shadow-md text-xl border-2 border-red-800';
                     badge.style.fontFamily = "'Bangers', cursive";
                     badge.style.letterSpacing = "1px";
                 } else {
                     badge.className = 'px-4 py-2 bg-white border-2 border-gray-300 text-gray-700 rounded-lg shadow-sm text-md font-semibold';
                 }
-                badge.innerText = word;
+                badge.innerText = word.replace(/\s*\|\s*/g, ' ');
                 container.appendChild(badge);
             });
         }
